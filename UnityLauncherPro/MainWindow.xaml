@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="600" Width="500" WindowStartupLocation="CenterScreen" Background="#FF121212">
+        Title="UnityLauncherPro" Height="600" Width="500" WindowStartupLocation="CenterScreen" Background="#FF121212" MinWidth="500" MinHeight="300">
 
 	<Window.Resources>
 		<Style x:Key="TabItemStyle1" TargetType="{x:Type TabItem}">
@@ -50,6 +50,8 @@
 			<TabItem Header="Projects" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
 				<Grid>
 					<TextBox x:Name="textBox" Height="19" TextWrapping="Wrap" Text="Search" Width="230" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,6,0,0" Background="#FF333337" Foreground="Gainsboro" BorderBrush="#FF434346"/>
+					<Button x:Name="button" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,3,0" Padding="1,-2,1,1"/>
+
 					<DataGrid x:Name="dataGrid" Margin="0,30" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000">
 						<DataGrid.Columns>
 							<DataGridTextColumn Binding="{Binding Project}" ClipboardContentBinding="{x:Null}" Header="Project" IsReadOnly="True" MinWidth="123"/>
