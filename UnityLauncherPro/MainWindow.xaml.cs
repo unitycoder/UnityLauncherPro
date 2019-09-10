@@ -34,6 +34,32 @@ namespace UnityLauncherPro
             dataGrid.Items.Add(new TestData { Project = "kuykkyu", Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
             dataGrid.Items.Add(new TestData { Project = "RT435y", Version = "3333", Path = "X:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
         }
+
+
+        private void OnRectangleMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left) this.DragMove();
+        }
+
+        private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textbox = (TextBox)sender;
+            //FilterProjects(textbox.Text);
+        }
+
+        private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    ((TextBox)sender).Text = "";
+                    //FilterProjects(null);
+                    break;
+                default:
+                    break;
+            }
+        }
+
     }
 
     public struct TestData
@@ -45,5 +71,7 @@ namespace UnityLauncherPro
         public string Arguments { set; get; }
         public string GITBranch { set; get; }
     }
+
+
 
 }

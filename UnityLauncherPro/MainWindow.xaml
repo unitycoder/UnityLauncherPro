@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="600" Width="500" WindowStartupLocation="CenterScreen" Background="#FF121212" MinWidth="500" MinHeight="300">
+        Title="UnityLauncherPro" Height="600" Width="500" WindowStartupLocation="CenterScreen" Background="#FF121212" MinWidth="500" MinHeight="300" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True">
 
 	<Window.Resources>
 		<Style x:Key="TabItemStyle1" TargetType="{x:Type TabItem}">
@@ -46,10 +46,35 @@
 	</Window.Resources>
 
 	<Grid Margin="0">
-		<TabControl x:Name="tabControl"  Background="#FF262626" BorderBrush="{x:Null}" Padding="0">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="23" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+
+		<Grid>
+			<Rectangle Grid.Row="0" Fill="#FF0C0C0C" MouseDown="OnRectangleMouseDown" />
+			<Image Source="Images/icon.png" HorizontalAlignment="Left" Width="16" Height="16" Margin="4,0,0,0" />
+			<Label Content="UnityLauncherPro 1.0" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="#FFB8B8B8" FontSize="12" HorizontalAlignment="Left"  />
+		</Grid>
+
+		<TabControl Grid.Row="1" x:Name="tabControl"  Background="#FF262626" BorderBrush="{x:Null}" Padding="0">
 			<TabItem Header="Projects" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
 				<Grid>
-					<TextBox x:Name="textBox" Height="19" TextWrapping="Wrap" Text="Search" Width="230" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,6,0,0" Background="#FF333337" Foreground="Gainsboro" BorderBrush="#FF434346"/>
+					<TextBox x:Name="SearchTermTextBox" Height="19" TextWrapping="Wrap" Width="230" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,6,0,0" Background="#FF333337" Foreground="Gainsboro" BorderBrush="#FF434346" TextChanged="OnSearchTextChanged" PreviewKeyDown="OnSearchPreviewKeyDown"/>
+
+					<TextBlock IsHitTestVisible="False" Text="Search" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Foreground="#FF707070" Height="29" Padding="12,6.5,0,0">
+						<TextBlock.Style>
+							<Style TargetType="{x:Type TextBlock}">
+								<Setter Property="Visibility" Value="Collapsed"/>
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding Text, ElementName=SearchTermTextBox}" Value="">
+										<Setter Property="Visibility" Value="Visible"/>
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
+
 					<Button x:Name="button" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,3,0" Padding="1,-2,1,1"/>
 
 					<DataGrid x:Name="dataGrid" Margin="0,30" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000">
