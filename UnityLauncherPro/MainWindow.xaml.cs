@@ -60,6 +60,36 @@ namespace UnityLauncherPro
             }
         }
 
+        private void BtnAddProjectFolder_Click(object sender, RoutedEventArgs e)
+        {
+            // https://stackoverflow.com/a/50261723/5452781
+            // Create a "Save As" dialog for selecting a directory (HACK)
+            var dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.InitialDirectory = "c:";//textbox.Text; // Use current value for initial dir
+            dialog.Title = "Select a Directory"; // instead of default "Save As"
+            dialog.Filter = "Project Folder|*.Folder"; // Prevents displaying files
+            dialog.FileName = "Project"; // Filename will then be "select.this.directory"
+            if (dialog.ShowDialog() == true)
+            {
+                string path = dialog.FileName;
+                // Remove fake filename from resulting path
+                path = path.Replace("\\Project.Folder", "");
+                path = path.Replace("Project.Folder", "");
+                // If user has changed the filename, create the new directory
+                if (!System.IO.Directory.Exists(path))
+                {
+                    System.IO.Directory.CreateDirectory(path);
+                }
+                // Our final value is in path
+                //textbox.Text = path;
+                Console.WriteLine(path);
+            }
+        }
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 
     public struct TestData
