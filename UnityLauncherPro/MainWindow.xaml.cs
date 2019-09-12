@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing; // for notifyicon
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,9 @@ namespace UnityLauncherPro
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        private System.Windows.Forms.NotifyIcon notifyIcon;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -29,10 +33,39 @@ namespace UnityLauncherPro
         void Start()
         {
             // test data
-            dataGrid.Items.Add(new TestData { Project = "asdf", Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments ="", GITBranch = "-" });
-            dataGrid.Items.Add(new TestData { Project = "asdf asd", Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-            dataGrid.Items.Add(new TestData { Project = "kuykkyu", Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-            dataGrid.Items.Add(new TestData { Project = "RT435y", Version = "3333", Path = "X:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+            dataGrid.Items.Add(new Project { Title = "asdf", Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+            dataGrid.Items.Add(new Project { Title = "asdf asd", Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+            dataGrid.Items.Add(new Project { Title = "kuykkyu", Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+            dataGrid.Items.Add(new Project { Title = "RT435y", Version = "3333", Path = "X:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+
+            // build notifyicon
+            notifyIcon = new System.Windows.Forms.NotifyIcon();
+            notifyIcon.Icon = new Icon(System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
+            notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
+        }
+
+        void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            this.Show();
+            this.WindowState = WindowState.Normal;
+            notifyIcon.Visible = false;
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState == WindowState.Minimized)
+            {
+                this.ShowInTaskbar = false;
+                notifyIcon.BalloonTipTitle = "Minimize Sucessful";
+                notifyIcon.BalloonTipText = "Minimized the app ";
+                notifyIcon.ShowBalloonTip(400);
+                notifyIcon.Visible = true;
+            }
+            else if (this.WindowState == WindowState.Normal)
+            {
+                notifyIcon.Visible = false;
+                this.ShowInTaskbar = true;
+            }
         }
 
 
@@ -65,7 +98,7 @@ namespace UnityLauncherPro
             // https://stackoverflow.com/a/50261723/5452781
             // Create a "Save As" dialog for selecting a directory (HACK)
             var dialog = new Microsoft.Win32.SaveFileDialog();
-            dialog.InitialDirectory = "c:";//textbox.Text; // Use current value for initial dir
+            dialog.InitialDirectory = "c:"; // Use current value for initial dir
             dialog.Title = "Select a Directory"; // instead of default "Save As"
             dialog.Filter = "Project Folder|*.Folder"; // Prevents displaying files
             dialog.FileName = "Project"; // Filename will then be "select.this.directory"
@@ -81,7 +114,6 @@ namespace UnityLauncherPro
                     System.IO.Directory.CreateDirectory(path);
                 }
                 // Our final value is in path
-                //textbox.Text = path;
                 Console.WriteLine(path);
             }
         }
@@ -90,18 +122,13 @@ namespace UnityLauncherPro
         {
             this.Close();
         }
+
+        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+        {
+            // remove focus from minimize button
+            dataGrid.Focus();
+            notifyIcon.Visible = true;
+            this.Hide();
+        }
     }
-
-    public struct TestData
-    {
-        public string Project { set; get; }
-        public string Version { set; get; }
-        public string Path { set; get; }
-        public DateTime Modified { set; get; }
-        public string Arguments { set; get; }
-        public string GITBranch { set; get; }
-    }
-
-
-
 }
