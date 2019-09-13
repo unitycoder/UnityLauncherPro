@@ -99,7 +99,7 @@ namespace UnityLauncherPro
             // Create a "Save As" dialog for selecting a directory (HACK)
             var dialog = new Microsoft.Win32.SaveFileDialog();
             dialog.InitialDirectory = "c:"; // Use current value for initial dir
-            dialog.Title = "Select a Directory"; // instead of default "Save As"
+            dialog.Title = "Select Project Folder to Add it Into Projects List";
             dialog.Filter = "Project Folder|*.Folder"; // Prevents displaying files
             dialog.FileName = "Project"; // Filename will then be "select.this.directory"
             if (dialog.ShowDialog() == true)
