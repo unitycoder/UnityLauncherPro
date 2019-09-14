@@ -128,5 +128,10 @@ namespace UnityLauncherPro
             notifyIcon.Visible = true;
             this.Hide();
         }
+
+        private void TestButton(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Click!");
+        }
     }
 }
