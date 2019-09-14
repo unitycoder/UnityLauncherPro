@@ -6,5 +6,4 @@ Current working version is here: https://github.com/unitycoder/UnityLauncher
 
 # Preview
 
-![image](https://user-images.githubusercontent.com/5438317/64891353-6af05400-d67a-11e9-9334-6a867f831d27.png)
-
+![image](https://user-images.githubusercontent.com/5438317/64906848-e17d6800-d6f3-11e9-869a-e75544b01d22.png)
