@@ -35,7 +35,7 @@
 			</Setter>
 		</Style>
 
-		<!-- datagrid -->
+		<!-- datagrid header -->
 		<Style x:Key="HeaderStyle" TargetType="DataGridColumnHeader">
 			<Setter Property="Background" Value="#4C3F3F46" />
 			<Setter Property="Foreground" Value="#FFB6B6B6" />
@@ -45,6 +45,37 @@
 			<Setter Property="HorizontalContentAlignment" Value="Left" />
 			<Setter Property="Height" Value="28" />
 			<Setter Property="Padding" Value="6,2,2,2" />
+		</Style>
+
+		<!-- datagrid row selection -->
+		<Style TargetType="DataGridRow">
+			<Setter Property="Background" Value="#FF3F3F46" />
+			<Setter Property="BorderBrush" Value="{x:Null}" />
+			<Setter Property="BorderThickness" Value="0,0,0,0" />
+			<Style.Triggers>
+				<Trigger Property="IsMouseOver" Value="True">
+					<Setter Property="Background" Value="#FF007ACC"/>
+					<Setter Property="Foreground" Value="White"/>
+				</Trigger>
+				<Trigger Property="IsSelected" Value="True">
+					<Setter Property="Background" Value="#FF007ACC" />
+					<Setter Property="Foreground" Value="White"/>
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+
+		<!-- datagrid hide selected cell borders -->
+		<Style TargetType="{x:Type DataGridCell}">
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="FocusVisualStyle" Value="{x:Null}" />
+			<Style.Triggers>
+				<Trigger Property="IsSelected" Value="True">
+					<Setter Property="Background" Value="Transparent" />
+				</Trigger>
+				<Trigger Property="IsSelected" Value="False">
+					<Setter Property="Background" Value="Transparent" />
+				</Trigger>
+			</Style.Triggers>
 		</Style>
 
 		<!-- custom buttons -->
@@ -72,27 +103,167 @@
 			</Setter>
 		</Style>
 
+		<!-- datagrid scrollbar customization -->
+
+		<!-- scrollbar top/bottom arrow buttons -->
+		<Style x:Key="ScrollBarLineButton" TargetType="{x:Type RepeatButton}">
+			<Setter Property="SnapsToDevicePixels" Value="True"/>
+			<Setter Property="OverridesDefaultStyle" Value="true"/>
+			<Setter Property="Focusable" Value="false"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type RepeatButton}">
+						<!-- button background -->
+						<Border Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="#FF303032" BorderBrush="{x:Null}">
+							<!-- arrow sign -->
+							<Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#FF5E5E64" Data="{Binding Path=Content,RelativeSource={RelativeSource TemplatedParent}}" />
+						</Border>
+						<ControlTemplate.Triggers>
+							<!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
+							<Trigger Property="IsMouseOver" Value="true">
+								<Setter TargetName="Border" Property="Background" Value="#FF3E3E3E" />
+							</Trigger>
+							<Trigger Property="IsPressed" Value="true">
+								<Setter TargetName="Border" Property="Background" Value="#FF838383" />
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="false">
+								<Setter Property="Foreground" Value="Black"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style x:Key="ScrollBarPageButton" TargetType="{x:Type RepeatButton}">
+			<Setter Property="SnapsToDevicePixels" Value="True"/>
+			<Setter Property="OverridesDefaultStyle" Value="true"/>
+			<Setter Property="IsTabStop" Value="false"/>
+			<Setter Property="Focusable" Value="false"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type RepeatButton}">
+						<Border Background="Transparent" />
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- scroll thumb bar -->
+		<Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
+			<Setter Property="SnapsToDevicePixels" Value="True"/>
+			<Setter Property="OverridesDefaultStyle" Value="true"/>
+			<Setter Property="IsTabStop" Value="false"/>
+			<Setter Property="Focusable" Value="false"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Thumb}">
+						<Border Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="true">
+								<Setter TargetName="Border" Property="Background" Value="#FF6A6969" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<ControlTemplate x:Key="VerticalScrollBar" TargetType="{x:Type ScrollBar}">
+			<Grid >
+				<Grid.RowDefinitions>
+					<RowDefinition MaxHeight="18"/>
+					<RowDefinition Height="0.00001*"/>
+					<RowDefinition MaxHeight="18"/>
+				</Grid.RowDefinitions>
+				<!-- scrollbar background -->
+				<Border Grid.RowSpan="3" CornerRadius="0" Background="#FF151515" />
+				<!-- scrollbar top button -->
+				<RepeatButton Grid.Row="0" Style="{StaticResource ScrollBarLineButton}" Height="18" Command="ScrollBar.LineUpCommand"  Content="M 0 4 L 8 4 L 4 0 Z" />
+				<Track Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
+					<Track.DecreaseRepeatButton>
+						<RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageUpCommand" />
+					</Track.DecreaseRepeatButton>
+					<Track.Thumb>
+						<!-- scrollbar foreground -->
+						<Thumb Style="{StaticResource ScrollBarThumb}" Margin="1,0,1,0" Background="#FF47474B" BorderBrush="{x:Null}"/>
+					</Track.Thumb>
+					<Track.IncreaseRepeatButton>
+						<RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageDownCommand" />
+					</Track.IncreaseRepeatButton>
+				</Track>
+				<!-- scrollbar bottom button -->
+				<RepeatButton Grid.Row="3" Style="{StaticResource ScrollBarLineButton}" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" />
+			</Grid>
+		</ControlTemplate>
+
+		<ControlTemplate x:Key="HorizontalScrollBar" TargetType="{x:Type ScrollBar}">
+			<Grid >
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition MaxWidth="18"/>
+					<ColumnDefinition Width="0.00001*"/>
+					<ColumnDefinition MaxWidth="18"/>
+				</Grid.ColumnDefinitions>
+				<Border Grid.ColumnSpan="3" CornerRadius="2" Background="#F0F0F0" />
+				<RepeatButton Grid.Column="0" Style="{StaticResource ScrollBarLineButton}" Width="18" Command="ScrollBar.LineLeftCommand" Content="M 4 0 L 4 8 L 0 4 Z" />
+				<Track Name="PART_Track" Grid.Column="1" IsDirectionReversed="False">
+					<Track.DecreaseRepeatButton>
+						<RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageLeftCommand" />
+					</Track.DecreaseRepeatButton>
+					<Track.Thumb>
+						<Thumb Style="{StaticResource ScrollBarThumb}" Margin="0,1,0,1" Background="#FF34587C" BorderBrush="Blue" />
+					</Track.Thumb>
+					<Track.IncreaseRepeatButton>
+						<RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageRightCommand" />
+					</Track.IncreaseRepeatButton>
+				</Track>
+				<RepeatButton Grid.Column="3" Style="{StaticResource ScrollBarLineButton}" Width="18" Command="ScrollBar.LineRightCommand" Content="M 0 0 L 4 4 L 0 8 Z"/>
+			</Grid>
+		</ControlTemplate>
+
+		<Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}">
+			<Setter Property="SnapsToDevicePixels" Value="True"/>
+			<Setter Property="OverridesDefaultStyle" Value="true"/>
+			<Style.Triggers>
+				<Trigger Property="Orientation" Value="Horizontal">
+					<Setter Property="Width" Value="Auto"/>
+					<Setter Property="Height" Value="18" />
+					<Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
+				</Trigger>
+				<Trigger Property="Orientation" Value="Vertical">
+					<Setter Property="Width" Value="18"/>
+					<Setter Property="Height" Value="Auto" />
+					<Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+
 	</Window.Resources>
 
+
+	<!-- UI -->
 	<Grid Margin="0">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="23" />
-			<RowDefinition />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="25" />
 		</Grid.RowDefinitions>
 
+		<!-- menubar -->
 		<Grid Grid.Row="0" UseLayoutRounding="False">
 			<Rectangle Fill="#FF0C0C0C" MouseDown="OnRectangleMouseDown" />
 			<Image Source="Images/icon.png" RenderOptions.BitmapScalingMode="NearestNeighbor" HorizontalAlignment="Left" Width="16" Height="16" Margin="4,0,0,0" SnapsToDevicePixels="True" UseLayoutRounding="True" />
 			<Label Content="UnityLauncherPro" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="#FFB8B8B8" FontSize="12" HorizontalAlignment="Left"  />
-			<Button Name="btnMinimize" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="{x:Null}" Click="BtnMinimize_Click" Margin="0,0,27,0">
-				<TextBlock Text="-" Margin="0,-5,0,0" FontSize="18" Foreground="#FFC3C3C3"/>
+			<Button Name="btnMinimize" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnMinimize_Click" Margin="0,0,27,0" Padding="2,0,2,8">
+				<TextBlock Text="–"   FontSize="15" Foreground="#FFC3C3C3" Padding="0" Height="23" HorizontalAlignment="Center"/>
 			</Button>
-			<Button Name="btnClose" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="{x:Null}" Click="BtnClose_Click">
-				<TextBlock Text="x" Margin="0,-5,0,0" FontSize="18" Foreground="#FFC3C3C3"/>
+			<Button Name="btnClose"    BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnClose_Click" Padding="0,2">
+				<TextBlock Text="❌" FontSize="10" Foreground="#FFC3C3C3" Padding="5,3,4,4" HorizontalAlignment="Center" />
 			</Button>
 		</Grid>
 
-		<TabControl Grid.Row="1" x:Name="tabControl"  Background="#FF262626" BorderBrush="{x:Null}" Padding="0">
+		<!-- main content : tabbar -->
+		<TabControl Grid.Row="1" x:Name="tabControl"  Background="#FF262626" BorderBrush="{x:Null}" Padding="0" Margin="0">
 			<TabItem Header="Projects" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
 				<Grid>
 					<TextBox x:Name="SearchTermTextBox" Height="19" TextWrapping="Wrap" Width="230" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,6,0,0" Background="#FF333337" Foreground="Gainsboro" BorderBrush="#FF434346" TextChanged="OnSearchTextChanged" PreviewKeyDown="OnSearchPreviewKeyDown"/>
@@ -110,10 +281,11 @@
 						</TextBlock.Style>
 					</TextBlock>
 
-					<Button Style="{StaticResource CustomButton}" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,34,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" />
-					<Button Style="{StaticResource CustomButton}" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}"/>
+					<Button Style="{StaticResource CustomButton}" ToolTip="Add existing project" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,34,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" />
+					<Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}"/>
 
-					<DataGrid x:Name="dataGrid" SelectionMode="Single" Margin="0,30,0,81" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000">
+					<DataGrid x:Name="dataGrid"  SelectionMode="Single" Margin="0,30,0,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000">
+
 						<DataGrid.Columns>
 							<DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="Project" IsReadOnly="True" MinWidth="123"/>
 							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True"/>
@@ -122,23 +294,45 @@
 							<DataGridTextColumn Binding="{Binding Arguments}" ClipboardContentBinding="{x:Null}" Header="Arguments" IsReadOnly="True"/>
 							<DataGridTextColumn Binding="{Binding GITBranch}" ClipboardContentBinding="{x:Null}" Header="GITBranch" IsReadOnly="True"/>
 						</DataGrid.Columns>
-						<DataGrid.RowStyle>
-							<Style TargetType="DataGridRow">
-								<Setter Property="Background" Value="#FF3F3F46" />
-								<Setter Property="BorderBrush" Value="{x:Null}" />
-								<Setter Property="BorderThickness" Value="0,0,0,0" />
-								<Style.Triggers>
-									<Trigger Property="IsMouseOver" Value="True">
-										<Setter Property="Background" Value="#FF007ACC"/>
-										<Setter Property="Foreground" Value="White"/>
-									</Trigger>
-								</Style.Triggers>
-							</Style>
-						</DataGrid.RowStyle>
+
+
+						<!-- sample data for testing -->
+						<local:Project GITBranch="" Modified="" Title="M dfgh dfghMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="asdgdfg" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="Mghdfghdf dfghdfgMO" Path="A:/temp" Version="2099.1.2.3"/>
 						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="fghdhdfgh" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MdfMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MdfgMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MdfghMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="ddfghfghdfgh" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMdfghO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MdfghMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="dfgh" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="Mdfg hMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMd fghO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="MMdfg hO" Path="A:/temp" Version="2099.1.2.3"/>
+						<local:Project GITBranch="" Modified="" Title="Md fghMO" Path="A:/temp" Version="2099.1.2.3"/>
 					</DataGrid>
 
-					<Grid VerticalAlignment="Bottom" Margin="4,0,8,30">
+					<!-- bottom buttoms row -->
+					<Grid VerticalAlignment="Bottom" Margin="4,0,8,5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="20*" />
 							<ColumnDefinition Width="20*" />
@@ -159,8 +353,13 @@
 			<TabItem Header="Packages" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black" />
 			<TabItem Header="Updates" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black" />
 			<TabItem Header="Settings" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black" />
-
-
 		</TabControl>
+
+		<Grid Grid.Row="2" UseLayoutRounding="False">
+			<StatusBar VerticalAlignment="Bottom" Margin="3,1,20,1" Background="{x:Null}" Foreground="#FF595959">
+				<TextBlock Margin="6,1,3,0"  VerticalAlignment="Center" Text="Ready"/>
+			</StatusBar>
+		</Grid>
+
 	</Grid>
 </Window>

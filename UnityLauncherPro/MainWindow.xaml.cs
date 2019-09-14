@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing; // for notifyicon
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace UnityLauncherPro
 {
@@ -33,10 +23,18 @@ namespace UnityLauncherPro
         void Start()
         {
             // test data
-            dataGrid.Items.Add(new Project { Title = "asdf", Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-            dataGrid.Items.Add(new Project { Title = "asdf asd", Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-            dataGrid.Items.Add(new Project { Title = "kuykkyu", Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-            dataGrid.Items.Add(new Project { Title = "RT435y", Version = "3333", Path = "X:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+            dataGrid.Items.Clear();
+            for (int i = 0; i < 6; i++)
+            {
+                dataGrid.Items.Add(new Project { Title = "asdf"+i, Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+                dataGrid.Items.Add(new Project { Title = "asdf asd", Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+                dataGrid.Items.Add(new Project { Title = "kuykkyu" + i*2, Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+                dataGrid.Items.Add(new Project { Title = "RT435y", Version = "3333", Path = "X:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+                dataGrid.Items.Add(new Project { Title = "asdf", Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+                dataGrid.Items.Add(new Project { Title = "asdf asd" + i*3, Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+                dataGrid.Items.Add(new Project { Title = "kuykkyu", Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+            }
+
 
             // build notifyicon
             notifyIcon = new System.Windows.Forms.NotifyIcon();
