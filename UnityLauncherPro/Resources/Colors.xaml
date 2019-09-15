@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:UnityLauncherPro">
+	<SolidColorBrush x:Key="DarkestBackground" Color="#FF121212"/>
+	<SolidColorBrush x:Key="DarkMenuBar" Color="#FF0C0C0C"/>
+	<SolidColorBrush x:Key="MainBackgroundColor" Color="#FF262626"/>
+	<SolidColorBrush x:Key="TextBoxBackground" Color="#FF333337"/>
+	<SolidColorBrush x:Key="ButtonBackground" Color="#FF3F3F46"/>
+
+</ResourceDictionary>
