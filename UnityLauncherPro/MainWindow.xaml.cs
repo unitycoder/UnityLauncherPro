@@ -3,6 +3,7 @@ using System.Drawing; // for notifyicon
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shell;
 
 namespace UnityLauncherPro
 {
@@ -22,16 +23,24 @@ namespace UnityLauncherPro
 
         void Start()
         {
+            // make window resizable (didnt work within xaml..)
+            WindowChrome Resizable_BorderLess_Chrome = new WindowChrome();
+            Resizable_BorderLess_Chrome.GlassFrameThickness = new Thickness(0);
+            Resizable_BorderLess_Chrome.CornerRadius = new CornerRadius(0);
+            Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
+            WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
+
+
             // test data
             dataGrid.Items.Clear();
             for (int i = 0; i < 6; i++)
             {
-                dataGrid.Items.Add(new Project { Title = "asdf"+i, Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+                dataGrid.Items.Add(new Project { Title = "asdf" + i, Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
                 dataGrid.Items.Add(new Project { Title = "asdf asd", Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-                dataGrid.Items.Add(new Project { Title = "kuykkyu" + i*2, Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+                dataGrid.Items.Add(new Project { Title = "kuykkyu" + i * 2, Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
                 dataGrid.Items.Add(new Project { Title = "RT435y", Version = "3333", Path = "X:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
                 dataGrid.Items.Add(new Project { Title = "asdf", Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-                dataGrid.Items.Add(new Project { Title = "asdf asd" + i*3, Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
+                dataGrid.Items.Add(new Project { Title = "asdf asd" + i * 3, Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
                 dataGrid.Items.Add(new Project { Title = "kuykkyu", Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
             }
 

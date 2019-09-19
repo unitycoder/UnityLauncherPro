@@ -4,10 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
-        mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="600" Width="500" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="500" MinHeight="300" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True">
+		mc:Ignorable="d"
+        Title="UnityLauncherPro" Height="600" Width="500" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="500" MinHeight="300" AllowsTransparency="True" WindowStyle="None" Margin="0"	>
 
-	<Window.Resources>
+<Window.Resources>
 		<!-- tabs -->
 		<Style x:Key="TabItemStyle1" TargetType="{x:Type TabItem}">
 			<Setter Property="Template">
@@ -45,16 +45,21 @@
 			<Setter Property="HorizontalContentAlignment" Value="Left" />
 			<Setter Property="Height" Value="28" />
 			<Setter Property="Padding" Value="6,2,2,2" />
+			<Style.Triggers>
+				<Trigger Property="IsMouseOver" Value="True">
+					<Setter Property="Background" Value="#FF3F3F46"/>
+				</Trigger>
+			</Style.Triggers>
 		</Style>
 
-		<!-- datagrid row selection -->
+		<!-- datagrid rows & row selection -->
 		<Style TargetType="DataGridRow">
 			<Setter Property="Background" Value="#FF3F3F46" />
 			<Setter Property="BorderBrush" Value="{x:Null}" />
 			<Setter Property="BorderThickness" Value="0,0,0,0" />
 			<Style.Triggers>
 				<Trigger Property="IsMouseOver" Value="True">
-					<Setter Property="Background" Value="#B2007ACC"/>
+					<Setter Property="Background" Value="#7F007ACC"/>
 					<Setter Property="Foreground" Value="White"/>
 				</Trigger>
 				<Trigger Property="IsSelected" Value="True">
@@ -68,6 +73,7 @@
 		<Style TargetType="{x:Type DataGridCell}">
 			<Setter Property="BorderBrush" Value="Transparent" />
 			<Setter Property="FocusVisualStyle" Value="{x:Null}" />
+			<Setter Property="Margin" Value="0,0.5,0,0.5" />
 			<Style.Triggers>
 				<Trigger Property="IsSelected" Value="True">
 					<Setter Property="Background" Value="Transparent" />
@@ -405,8 +411,5 @@
 				<TextBlock Margin="6,1,3,0"  VerticalAlignment="Center" Text="Ready"/>
 			</StatusBar>
 		</Grid>
-
-
-
 	</Grid>
 </Window>
