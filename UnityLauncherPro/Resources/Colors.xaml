@@ -6,5 +6,17 @@
 	<SolidColorBrush x:Key="MainBackgroundColor" Color="#FF262626"/>
 	<SolidColorBrush x:Key="TextBoxBackground" Color="#FF333337"/>
 	<SolidColorBrush x:Key="ButtonBackground" Color="#FF3F3F46"/>
+    <SolidColorBrush x:Key="DeactiveTabForeground" Color="#FFC1C1C1"/>
+    <SolidColorBrush x:Key="DeactiveTabBackground" Color="#FF1D1D1D"/>
+    <SolidColorBrush x:Key="DatagridHeaderBackground" Color="#4C3F3F46"/>
+    <SolidColorBrush x:Key="DatagridHeaderForeground" Color="#FFB6B6B6"/>
+    <SolidColorBrush x:Key="DatagridHeaderBorder" Color="#4C000000"/>
+    <SolidColorBrush x:Key="DataGridRowMouseOver" Color="#7F007ACC"/>
+    <SolidColorBrush x:Key="DataGridRowSelectedBackground" Color="#FF007ACC"/>
+    <SolidColorBrush x:Key="ScrollArrowPressed" Color="#FF838383"/>
+    <SolidColorBrush x:Key="ScrollArrowForeground" Color="#FF5E5E64"/>
+    <SolidColorBrush x:Key="ScrollBarThumbFill" Color="#FF6A6969"/>
+    <SolidColorBrush x:Key="ScrollBarBackground" Color="#FF151515"/>
+    <SolidColorBrush x:Key="ScrollBarFill" Color="#FF47474B"/>
 
 </ResourceDictionary>
