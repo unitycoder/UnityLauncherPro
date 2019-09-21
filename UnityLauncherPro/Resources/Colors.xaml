@@ -6,7 +6,8 @@
 	<SolidColorBrush x:Key="MainBackgroundColor" Color="#FF262626"/>
 	<SolidColorBrush x:Key="TextBoxBackground" Color="#FF333337"/>
 	<SolidColorBrush x:Key="ButtonBackground" Color="#FF3F3F46"/>
-    <SolidColorBrush x:Key="DeactiveTabForeground" Color="#FFC1C1C1"/>
+	<SolidColorBrush x:Key="ButtonForeground" Color="#FFC1C1C1"/>
+	<SolidColorBrush x:Key="DeactiveTabForeground" Color="#FFC1C1C1"/>
     <SolidColorBrush x:Key="DeactiveTabBackground" Color="#FF1D1D1D"/>
     <SolidColorBrush x:Key="DatagridHeaderBackground" Color="#4C3F3F46"/>
     <SolidColorBrush x:Key="DatagridHeaderForeground" Color="#FFB6B6B6"/>
