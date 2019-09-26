@@ -474,9 +474,8 @@
 					<DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000">
 
 						<DataGrid.Columns>
+							<DataGridTextColumn Binding="{Binding ReleaseDate}" ClipboardContentBinding="{x:Null}" Header="ReleaseDate" IsReadOnly="True"/>
 							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="123"/>
-							<DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True"/>
-							<DataGridTextColumn Binding="{Binding Installed}" ClipboardContentBinding="{x:Null}" Header="Installed" IsReadOnly="True"/>
 						</DataGrid.Columns>
 
 						<!-- right click context menu -->
@@ -485,9 +484,9 @@
 								<MenuItem Header="Copy Unity Version" />
 							</ContextMenu>
 						</DataGrid.ContextMenu>
+						<local:Updates ReleaseDate="2020-10-10" Version="5000.1.2.3"/>
 
 						<!-- sample data for testing -->
-						<local:UnityInstallations Version="3000.1.2f1" Path="c:/proggies/unity3000" Installed="12.12.2020" />
 					</DataGrid>
 
 					<!-- bottom buttoms row -->
@@ -536,7 +535,6 @@
 						</Border>
 					</Grid>
 				</Grid>
-
 			</TabItem>
 
 			<!-- Tab: Settings -->
@@ -557,15 +555,32 @@
 
 					<!-- top labels -->
 					<Label Grid.Row="0" Content="Unity Installation Parent Folders" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom"></Label>
-					<Label Grid.Row="0" Content=".. Installations" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Label>
+					<Label Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Label>
 					<!-- locations list -->
 					<ListBox Grid.Row="1" Background="#FF3C3C3C" Margin="4,0,2,0" />
 					<!-- locations add/remove -->
-					<Button Grid.Row="2" Style="{StaticResource CustomButton}" x:Name="btnASASDFasdf" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center">
-						<Label Foreground="{DynamicResource ButtonForeground}">_asdf</Label>
-					</Button>
+					<StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0" >
+						<Button Style="{StaticResource CustomButton}" x:Name="btnASASDFasdf" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center">
+							<Label Foreground="{DynamicResource ButtonForeground}">_Add Folder</Label>
+						</Button>
+						<Button Style="{StaticResource CustomButton}" x:Name="btnASASDFasdf2" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center">
+							<Label Foreground="{DynamicResource ButtonForeground}">_Remove Folder</Label>
+						</Button>
+					</StackPanel>
 					<!-- settings-->
+					<StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
+						<CheckBox Content="Minimize to taskbar" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
+						<CheckBox Content="Register Explorer context menu" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
+						<CheckBox Content="Close after opening project" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
+						<CheckBox Content="Close after launching from Explorer" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
+						<CheckBox Content="Show Arguments Column" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
+						<CheckBox Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
+					</StackPanel>
+
 					<!-- links-->
+					<Button Grid.Row="4" Style="{StaticResource CustomButton}" x:Name="btnASASDFasdf22" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center">
+						<Label Foreground="{DynamicResource ButtonForeground}">_View in Github</Label>
+					</Button>
 
 				</Grid>
 			</TabItem>
