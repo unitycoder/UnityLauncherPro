@@ -1,8 +1,7 @@
 # UnityLauncherPro
 
-This is work-in-progress new wpf version of the UnityLauncher.
-
-Current working version is here: https://github.com/unitycoder/UnityLauncher
+This is a Work-In-Progress, WPF version, of the UnityLauncher.
+Current (winforms) version is here: https://github.com/unitycoder/UnityLauncher
 
 # Preview
 
