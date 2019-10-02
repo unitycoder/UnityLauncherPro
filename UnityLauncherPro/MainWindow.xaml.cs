@@ -15,6 +15,8 @@ namespace UnityLauncherPro
 
         private System.Windows.Forms.NotifyIcon notifyIcon;
 
+        Project[] projectsSource;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -23,16 +25,16 @@ namespace UnityLauncherPro
 
         void Start()
         {
-            // make window resizable (didnt work within xaml..)
+            // make window resizable (this didnt work when used pure xaml to do this)
             WindowChrome Resizable_BorderLess_Chrome = new WindowChrome();
             Resizable_BorderLess_Chrome.GlassFrameThickness = new Thickness(0);
             Resizable_BorderLess_Chrome.CornerRadius = new CornerRadius(0);
             Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
             WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
 
-
-            // test data
+            // add test data
             dataGrid.Items.Clear();
+            /*
             for (int i = 0; i < 6; i++)
             {
                 dataGrid.Items.Add(new Project { Title = "asdf" + i, Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
@@ -42,10 +44,14 @@ namespace UnityLauncherPro
                 dataGrid.Items.Add(new Project { Title = "asdf", Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
                 dataGrid.Items.Add(new Project { Title = "asdf asd" + i * 3, Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
                 dataGrid.Items.Add(new Project { Title = "kuykkyu", Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-            }
+            }*/
+
+            //dataGrid.Items.Add(GetProjects.Scan());
+            projectsSource = GetProjects.Scan();
+            dataGrid.ItemsSource = projectsSource;
 
 
-            // build notifyicon
+            // build notifyicon (using windows.forms)
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Icon = new Icon(System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
@@ -58,6 +64,7 @@ namespace UnityLauncherPro
             notifyIcon.Visible = false;
         }
 
+        // hide/show notifyicon based on window state
         private void Window_StateChanged(object sender, EventArgs e)
         {
             if (this.WindowState == WindowState.Minimized)

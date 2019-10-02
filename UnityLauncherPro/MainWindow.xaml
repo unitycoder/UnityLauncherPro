@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="600" Width="500" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="500" MinHeight="300" AllowsTransparency="True" WindowStyle="None" Margin="0"	>
+        Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0"	>
 
 	<Window.Resources>
 		<!-- tabs -->
@@ -290,12 +290,12 @@
 					<DataGrid x:Name="dataGrid"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000">
 
 						<DataGrid.Columns>
-							<DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="Project" IsReadOnly="True" MinWidth="123"/>
-							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True"/>
-							<DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True"/>
-							<DataGridTextColumn Binding="{Binding Modified}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True"/>
-							<DataGridTextColumn Binding="{Binding Arguments}" ClipboardContentBinding="{x:Null}" Header="Arguments" IsReadOnly="True"/>
-							<DataGridTextColumn Binding="{Binding GITBranch}" ClipboardContentBinding="{x:Null}" Header="GITBranch" IsReadOnly="True"/>
+							<DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="Project" IsReadOnly="True" Width="150"/>
+							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" Width="72"/>
+							<DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True" Width="185"/>
+							<DataGridTextColumn Binding="{Binding Modified, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True" Width="120"/>
+							<DataGridTextColumn Binding="{Binding Arguments}" ClipboardContentBinding="{x:Null}" Header="Arguments" IsReadOnly="True" Width="100"/>
+							<DataGridTextColumn Binding="{Binding GITBranch}" ClipboardContentBinding="{x:Null}" Header="GITBranch" IsReadOnly="True" Width="100"/>
 						</DataGrid.Columns>
 
 						<!-- right click context menu -->
@@ -575,6 +575,7 @@
 						<CheckBox Content="Close after launching from Explorer" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
 						<CheckBox Content="Show Arguments Column" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
 						<CheckBox Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
+						<CheckBox Content="Show full modified time" Foreground="{DynamicResource ButtonForeground}" ToolTip="Full=dd/mm/yyyy hh:mm:ss, NotFull=x hours ago, x days ago.."></CheckBox>
 					</StackPanel>
 
 					<!-- links-->
