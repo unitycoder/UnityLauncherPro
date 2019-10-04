@@ -76,6 +76,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="GetProjects.cs" />
+    <Compile Include="GetUnityUpdates.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="UnityInstallations.cs" />
     <Compile Include="Updates.cs" />

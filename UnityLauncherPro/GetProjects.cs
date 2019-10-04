@@ -96,7 +96,7 @@ namespace UnityLauncherPro
 
                         // get last modified date
                         DateTime? lastUpdated = Tools.GetLastModifiedTime(csprojFile);
-                        Console.WriteLine(lastUpdated.ToString());
+                        //Console.WriteLine(lastUpdated.ToString());
 
                         // get project version
                         string projectVersion = Tools.GetProjectVersion(projectPath);

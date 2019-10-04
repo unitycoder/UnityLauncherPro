@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing; // for notifyicon
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,6 +18,7 @@ namespace UnityLauncherPro
         private System.Windows.Forms.NotifyIcon notifyIcon;
 
         Project[] projectsSource;
+        Updates[] updatesSource;
 
         public MainWindow()
         {
@@ -50,11 +53,16 @@ namespace UnityLauncherPro
             projectsSource = GetProjects.Scan();
             dataGrid.ItemsSource = projectsSource;
 
+            // updates grid
+            dataGridUpdates.Items.Clear();
+            //dataGridUpdates.ItemsSource = updatesSource;
 
             // build notifyicon (using windows.forms)
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Icon = new Icon(System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
+
+
         }
 
         void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -149,5 +157,21 @@ namespace UnityLauncherPro
         {
             MessageBox.Show("Click!");
         }
+
+
+        private async void OnGetUnityUpdatesClick(object sender, RoutedEventArgs e)
+        {
+            var button = (Button)sender;
+            button.IsEnabled = false;
+            var task = GetUnityUpdates.Scan();
+            var items = await task;
+            // TODO handle errors?
+            updatesSource = GetUnityUpdates.Parse(items);
+            dataGridUpdates.ItemsSource = updatesSource;
+            button.IsEnabled = true;
+        }
+
+
+
     }
 }
