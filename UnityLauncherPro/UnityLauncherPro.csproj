@@ -76,10 +76,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="GetProjects.cs" />
+    <Compile Include="GetUnityInstallations.cs" />
     <Compile Include="GetUnityUpdates.cs" />
     <Compile Include="Tools.cs" />
-    <Compile Include="UnityInstallations.cs" />
-    <Compile Include="Updates.cs" />
+    <Compile Include="Data\UnityInstallation.cs" />
+    <Compile Include="Data\Updates.cs" />
     <Page Include="Resources\Colors.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -98,7 +99,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Project.cs" />
+    <Compile Include="Data\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

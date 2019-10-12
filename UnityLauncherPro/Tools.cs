@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -102,6 +103,12 @@ namespace UnityLauncherPro
             return version;
         }
 
+        // returns unity version number string from file
+        public static string GetFileVersionData(string path)
+        {
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(path);
+            return fvi.ProductName.Replace("(64-bit)", "").Replace("Unity", "").Trim();
+        }
 
     } // class
 } // namespace

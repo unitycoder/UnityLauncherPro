@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0"	>
+        Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown"	>
 
 	<Window.Resources>
 		<!-- tabs -->
@@ -251,7 +251,7 @@
 					<!-- search box -->
 					<Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
 						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding ElementName=txtSearchBox, Path=Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}}" Height="24" />
-						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" />
+						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" TextChanged="OnSearchTextChanged" />
 						<Button Name="btnClearSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}">
 							<TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ButtonForeground}" Padding="5,3,4,4" HorizontalAlignment="Center">
 								<TextBlock.Style>
@@ -416,7 +416,7 @@
 						</DataGrid.ContextMenu>
 
 						<!-- sample data for testing -->
-						<local:UnityInstallations Version="3000.1.2f1" Path="c:/proggies/unity3000" Installed="12.12.2020" />
+						<local:UnityInstallation Version="3000.1.2f1" Path="c:/proggies/unity3000" Installed="12.12.2020" />
 					</DataGrid>
 
 					<!-- bottom buttoms row -->
@@ -474,7 +474,7 @@
 					<DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000" AutoGenerateColumns="False">
 
 						<DataGrid.Columns>
-							<DataGridTextColumn Binding="{Binding ReleaseDate,StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="ReleaseDate" IsReadOnly="True"/>
+							<DataGridTextColumn Binding="{Binding ReleaseDate,StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}" Header="ReleaseDate" IsReadOnly="True"/>
 							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="123"/>
 						</DataGrid.Columns>
 

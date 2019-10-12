@@ -2,11 +2,11 @@
 
 namespace UnityLauncherPro
 {
-    public class UnityInstallations
+    public class UnityInstallation
     {
         public string Version { set; get; }
         public string Path { set; get; }
-        public DateTime Installed { set; get; }
-        public string Platforms { set; get; }
+        public DateTime? Installed { set; get; }
+        //public string Platforms { set; get; }
     }
 }

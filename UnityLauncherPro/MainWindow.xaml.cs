@@ -19,6 +19,7 @@ namespace UnityLauncherPro
 
         Project[] projectsSource;
         Updates[] updatesSource;
+        UnityInstallation[] unityInstallationsSource;
 
         public MainWindow()
         {
@@ -35,22 +36,16 @@ namespace UnityLauncherPro
             Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
             WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
 
-            // add test data
-            dataGrid.Items.Clear();
-            /*
-            for (int i = 0; i < 6; i++)
-            {
-                dataGrid.Items.Add(new Project { Title = "asdf" + i, Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-                dataGrid.Items.Add(new Project { Title = "asdf asd", Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-                dataGrid.Items.Add(new Project { Title = "kuykkyu" + i * 2, Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-                dataGrid.Items.Add(new Project { Title = "RT435y", Version = "3333", Path = "X:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-                dataGrid.Items.Add(new Project { Title = "asdf", Version = "5000", Path = "A:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-                dataGrid.Items.Add(new Project { Title = "asdf asd" + i * 3, Version = "2", Path = "C:/", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-                dataGrid.Items.Add(new Project { Title = "kuykkyu", Version = "23.23.23", Path = "8,1", Modified = DateTime.Now, Arguments = "", GITBranch = "-" });
-            }*/
+
+            // get unity installations
+            var tempRootFolders = new string[] { "D:/Program Files/" };
+            unityInstallationsSource = GetUnityInstallations.Scan(tempRootFolders);
+            dataGridUnitys.Items.Clear();
+            dataGridUnitys.ItemsSource = unityInstallationsSource;
 
             //dataGrid.Items.Add(GetProjects.Scan());
             projectsSource = GetProjects.Scan();
+            dataGrid.Items.Clear();
             dataGrid.ItemsSource = projectsSource;
 
             // updates grid
@@ -61,7 +56,6 @@ namespace UnityLauncherPro
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Icon = new Icon(System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
-
 
         }
 
@@ -171,7 +165,36 @@ namespace UnityLauncherPro
             button.IsEnabled = true;
         }
 
+        private void OnWindowKeyDown(object sender, KeyEventArgs e)
+        {
+            // TODO if editing cells, dont focus on search
+            //if (gridRecent.IsCurrentCellInEditMode == true) return;
 
-
+            switch (e.Key)
+            {
+                case Key.Escape: // clear project search
+                    if (tabControl.SelectedIndex == 0 && txtSearchBox.Text != "")
+                    {
+                        txtSearchBox.Text = "";
+                    }
+                    // clear updates search
+                    else if (tabControl.SelectedIndex == 2 && txtSearchBoxUpdates.Text != "")
+                    {
+                        txtSearchBoxUpdates.Text = "";
+                    }
+                    break;
+                default: // any key
+                    // activate searchbar if not active and we are in tab#1
+                    if (tabControl.SelectedIndex == 0 && txtSearchBox.IsFocused == false)
+                    {
+                        // dont write tab key on search field
+                        if (e.Key == Key.Tab) break;
+                        txtSearchBox.Focus();
+                        txtSearchBox.Text += e.Key;
+                        txtSearchBox.Select(txtSearchBox.Text.Length, 0);
+                    }
+                    break;
+            }
+        }
     }
 }
