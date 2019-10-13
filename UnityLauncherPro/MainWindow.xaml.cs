@@ -157,11 +157,15 @@ namespace UnityLauncherPro
         {
             var button = (Button)sender;
             button.IsEnabled = false;
+
             var task = GetUnityUpdates.Scan();
             var items = await task;
             // TODO handle errors?
+            if (items == null) return;
             updatesSource = GetUnityUpdates.Parse(items);
+            if (updatesSource == null) return;
             dataGridUpdates.ItemsSource = updatesSource;
+
             button.IsEnabled = true;
         }
 
@@ -195,6 +199,39 @@ namespace UnityLauncherPro
                     }
                     break;
             }
+        }
+
+        private async void OnTabSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // if going into updates tab, fetch list (first time only)
+            if (((TabControl)sender).SelectedIndex == (int)Tabs.Updates)
+            {
+                if (updatesSource == null)
+                {
+                    var task = GetUnityUpdates.Scan();
+                    var items = await task;
+                    // TODO handle errors?
+                    if (items == null) return;
+                    updatesSource = GetUnityUpdates.Parse(items);
+                    if (updatesSource == null) return;
+                    dataGridUpdates.ItemsSource = updatesSource;
+                }
+            }
+        }
+
+        private void OnClearProjectSearchClick(object sender, RoutedEventArgs e)
+        {
+            txtSearchBox.Text = "";
+        }
+
+        private void OnClearUnitySearchClick(object sender, RoutedEventArgs e)
+        {
+            txtSearchBoxUnity.Text = "";
+        }
+
+        private void OnClearUpdateSearchClick(object sender, RoutedEventArgs e)
+        {
+            txtSearchBoxUpdates.Text = "";
         }
     }
 }

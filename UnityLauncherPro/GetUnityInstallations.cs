@@ -45,7 +45,7 @@ namespace UnityLauncherPro
                     unity.Path = exePath;
                     unity.Installed = installDate;
 
-                    // add to dictionary, if not there yet NOTE should notify that there are 2 same versions..? this might happen with preview builds..
+                    // add to list, if not there yet NOTE should notify that there are 2 same versions..? this might happen with preview builds..
                     if (results.Contains(unity) == true)
                     {
                         Console.WriteLine("Warning: 2 same versions found for " + version);
