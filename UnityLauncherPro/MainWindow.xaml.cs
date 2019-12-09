@@ -1,17 +1,15 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing; // for notifyicon
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Shell;
 
 namespace UnityLauncherPro
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
 
@@ -21,6 +19,8 @@ namespace UnityLauncherPro
         Updates[] updatesSource;
         UnityInstallation[] unityInstallationsSource;
 
+        string _filterString = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -29,9 +29,11 @@ namespace UnityLauncherPro
 
         void Start()
         {
+            LoadSettings();
+
             // make window resizable (this didnt work when used pure xaml to do this)
             WindowChrome Resizable_BorderLess_Chrome = new WindowChrome();
-            Resizable_BorderLess_Chrome.GlassFrameThickness = new Thickness(0);
+            //Resizable_BorderLess_Chrome.GlassFrameThickness = new Thickness(0);
             Resizable_BorderLess_Chrome.CornerRadius = new CornerRadius(0);
             Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
             WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
@@ -45,8 +47,8 @@ namespace UnityLauncherPro
 
             //dataGrid.Items.Add(GetProjects.Scan());
             projectsSource = GetProjects.Scan();
-            dataGrid.Items.Clear();
-            dataGrid.ItemsSource = projectsSource;
+            gridRecent.Items.Clear();
+            gridRecent.ItemsSource = projectsSource;
 
             // updates grid
             dataGridUpdates.Items.Clear();
@@ -93,6 +95,7 @@ namespace UnityLauncherPro
         private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textbox = (TextBox)sender;
+            FilterRecentProjects();
             //FilterProjects(textbox.Text);
         }
 
@@ -102,11 +105,24 @@ namespace UnityLauncherPro
             {
                 case Key.Escape:
                     ((TextBox)sender).Text = "";
-                    //FilterProjects(null);
                     break;
                 default:
                     break;
             }
+        }
+
+        void FilterRecentProjects()
+        {
+            // https://www.wpftutorial.net/DataViews.html
+            _filterString = txtSearchBox.Text;
+            ICollectionView collection = CollectionViewSource.GetDefaultView(projectsSource);
+            collection.Filter = ProjectFilter;
+        }
+
+        private bool ProjectFilter(object item)
+        {
+            Project proj = item as Project;
+            return (proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
         }
 
         private void BtnAddProjectFolder_Click(object sender, RoutedEventArgs e)
@@ -125,9 +141,9 @@ namespace UnityLauncherPro
                 path = path.Replace("\\Project.Folder", "");
                 path = path.Replace("Project.Folder", "");
                 // If user has changed the filename, create the new directory
-                if (!System.IO.Directory.Exists(path))
+                if (!Directory.Exists(path))
                 {
-                    System.IO.Directory.CreateDirectory(path);
+                    Directory.CreateDirectory(path);
                 }
                 // Our final value is in path
                 Console.WriteLine(path);
@@ -142,7 +158,7 @@ namespace UnityLauncherPro
         private void BtnMinimize_Click(object sender, RoutedEventArgs e)
         {
             // remove focus from minimize button
-            dataGrid.Focus();
+            gridRecent.Focus();
             notifyIcon.Visible = true;
             this.Hide();
         }
@@ -188,13 +204,15 @@ namespace UnityLauncherPro
                     }
                     break;
                 default: // any key
+
                     // activate searchbar if not active and we are in tab#1
                     if (tabControl.SelectedIndex == 0 && txtSearchBox.IsFocused == false)
                     {
                         // dont write tab key on search field
                         if (e.Key == Key.Tab) break;
+
                         txtSearchBox.Focus();
-                        txtSearchBox.Text += e.Key;
+                        //txtSearchBox.Text += e.Key;
                         txtSearchBox.Select(txtSearchBox.Text.Length, 0);
                     }
                     break;
@@ -232,6 +250,91 @@ namespace UnityLauncherPro
         private void OnClearUpdateSearchClick(object sender, RoutedEventArgs e)
         {
             txtSearchBoxUpdates.Text = "";
+        }
+
+        void LoadSettings()
+        {
+            // form size
+            this.Width = Properties.Settings.Default.windowWidth;
+            this.Height = Properties.Settings.Default.windowHeight;
+
+            /*
+            // update settings window
+            chkMinimizeToTaskbar.Checked = Properties.Settings.Default.minimizeToTaskbar;
+            chkQuitAfterCommandline.Checked = Properties.Settings.Default.closeAfterExplorer;
+            ChkQuitAfterOpen.Checked = Properties.Settings.Default.closeAfterProject;
+            chkShowLauncherArgumentsColumn.Checked = Properties.Settings.Default.showArgumentsColumn;
+            chkShowGitBranchColumn.Checked = Properties.Settings.Default.showGitBranchColumn;
+            chkDarkSkin.Checked = Properties.Settings.Default.useDarkSkin;
+
+            // update optional grid columns, hidden or visible
+            gridRecent.Columns["_launchArguments"].Visible = chkShowLauncherArgumentsColumn.Checked;
+            gridRecent.Columns["_gitBranch"].Visible = chkShowGitBranchColumn.Checked;
+
+            // update installations folder listbox
+            lstRootFolders.Items.Clear();
+            lstRootFolders.Items.AddRange(Properties.Settings.Default.rootFolders.Cast<string>().ToArray());
+            // update packages folder listbox
+            lstPackageFolders.Items.AddRange(Properties.Settings.Default.packageFolders.Cast<string>().ToArray());
+
+            // restore datagrid column widths
+            int[] gridColumnWidths = Properties.Settings.Default.gridColumnWidths;
+            if (gridColumnWidths != null)
+            {
+                for (int i = 0; i < gridColumnWidths.Length; ++i)
+                {
+                    gridRecent.Columns[i].Width = gridColumnWidths[i];
+                }
+            }
+            */
+
+
+        } // LoadSettings()
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            SaveSettingsOnExit();
+        }
+
+        private void SaveSettingsOnExit()
+        {
+            /*
+            // save list column widths
+            List<int> gridWidths;
+            if (Properties.Settings.Default.gridColumnWidths != null)
+            {
+                gridWidths = new List<int>(Properties.Settings.Default.gridColumnWidths);
+            }
+            else
+            {
+                gridWidths = new List<int>();
+            }
+
+            // restore data grid view widths
+            var colum = gridRecent.Columns[0];
+            for (int i = 0; i < gridRecent.Columns.Count; ++i)
+            {
+                if (Properties.Settings.Default.gridColumnWidths != null && Properties.Settings.Default.gridColumnWidths.Length > i)
+                {
+                    gridWidths[i] = gridRecent.Columns[i].Width;
+                }
+                else
+                {
+                    gridWidths.Add(gridRecent.Columns[i].Width);
+                }
+            }
+            Properties.Settings.Default.gridColumnWidths = gridWidths.ToArray();
+            Properties.Settings.Default.Save();
+            */
+        }
+
+        // save window size after resize
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var win = (Window)sender;
+            Properties.Settings.Default.windowWidth = (int)win.Width;
+            Properties.Settings.Default.windowHeight = (int)win.Height;
+            Properties.Settings.Default.Save();
         }
     }
 }
