@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
 using System.Windows;
@@ -336,5 +337,122 @@ namespace UnityLauncherPro
             Properties.Settings.Default.windowHeight = (int)win.Height;
             Properties.Settings.Default.Save();
         }
-    }
-}
+
+        private void BtnLaunchProject_Click(object sender, RoutedEventArgs e)
+        {
+            LaunchProject(GetSelectedProject());
+        }
+
+        void LaunchProject(Project proj)
+        {
+            // validate
+            if (proj == null) return;
+            if (Directory.Exists(proj.Path) == false) return;
+
+            Console.WriteLine("launching " + proj.Title);
+
+            // there is no assets path, probably we want to create new project then
+            var assetsFolder = Path.Combine(proj.Path, "Assets");
+            if (Directory.Exists(assetsFolder) == false)
+            {
+                // TODO could ask if want to create project..?
+                Directory.CreateDirectory(assetsFolder);
+            }
+
+            /*
+            // TODO when opening project, check for crashed backup scene first
+            if (openProject == true)
+            {
+                var cancelLaunch = CheckCrashBackupScene(projectPath);
+                if (cancelLaunch == true)
+                {
+                    return;
+                }
+            }*/
+
+
+            // we dont have this version installed (or no version info available)
+            var unityExePath = GetSelectedUnityExePath(proj.Version);
+            if (unityExePath == null)
+            {
+                Console.WriteLine("Missing unity version " + proj.Version);
+                // SetStatus("Missing Unity version: " + version);
+                // TODO
+                //if (openProject == true) DisplayUpgradeDialog(version, projectPath);
+                return;
+            }
+
+            /*
+            if (openProject == true)
+            {
+                SetStatus("Launching project in Unity " + version);
+            }
+            else
+            {
+                SetStatus("Launching Unity " + version);
+            }*/
+
+
+            try
+            {
+                Process myProcess = new Process();
+                var cmd = "\"" + unityExePath + "\"";
+                myProcess.StartInfo.FileName = cmd;
+
+                //if (openProject == true)
+                {
+                    var pars = " -projectPath " + "\"" + proj.Path + "\"";
+
+                    // TODO check for custom launch parameters and append them
+                    //string customArguments = GetSelectedRowData("_launchArguments");
+                    //if (string.IsNullOrEmpty(customArguments) == false)
+                    //{
+                    //    pars += " " + customArguments;
+                    //}
+
+                    myProcess.StartInfo.Arguments = pars;// TODO args + commandLineArguments;
+                }
+                myProcess.Start();
+
+                /*
+                if (Properties.Settings.Default.closeAfterProject)
+                {
+                    Environment.Exit(0);
+                }*/
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+
+        string GetSelectedUnityExePath(string version)
+        {
+            for (int i = 0, len = unityInstallationsSource.Length; i < len; i++)
+            {
+                if (version == unityInstallationsSource[i].Version) return unityInstallationsSource[i].Path;
+            }
+            return null;
+        }
+
+
+        Project GetSelectedProject()
+        {
+            return (Project)gridRecent.SelectedItem;
+        }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // override Enter for datagrid
+            if (e.Key == Key.Return && e.KeyboardDevice.Modifiers == ModifierKeys.None)
+            {
+                e.Handled = true;
+                LaunchProject(GetSelectedProject());
+                return;
+            }
+
+            base.OnKeyDown(e);
+        }
+    } // class
+} //namespace

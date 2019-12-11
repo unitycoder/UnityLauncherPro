@@ -5,9 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged"	>
+        Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" PreviewKeyDown="Window_PreviewKeyDown"	>
 
 	<Window.Resources>
+
+
 		<!-- tabs -->
 		<Style x:Key="TabItemStyle1" TargetType="{x:Type TabItem}">
 			<Setter Property="Template">
@@ -360,7 +362,7 @@
 							<Label Foreground="{DynamicResource ButtonForeground}">_Run Unity</Label>
 						</Button>
 
-						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" >
+						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchProject_Click" >
 							<Label Foreground="{DynamicResource ButtonForeground}">_Open Project</Label>
 						</Button>
 
