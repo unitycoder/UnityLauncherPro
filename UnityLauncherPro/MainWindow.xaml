@@ -287,7 +287,7 @@
 					</TextBlock>-->
 
 					<Button Style="{StaticResource CustomButton}" ToolTip="Add existing project" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,34,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" />
-					<Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}"/>
+					<Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshProjectList_Click"/>
 
 					<DataGrid x:Name="gridRecent" SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000" AutoGenerateColumns="False">
 
@@ -303,7 +303,7 @@
 						<!-- right click context menu -->
 						<DataGrid.ContextMenu>
 							<ContextMenu>
-								<MenuItem Header="Copy Unity Version" />
+								<MenuItem x:Name="menuItemCopyVersion" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
 								<Separator />
 								<MenuItem Header="Menu item asdf" />
 							</ContextMenu>
@@ -366,7 +366,7 @@
 							<Label Foreground="{DynamicResource ButtonForeground}">_Open Project</Label>
 						</Button>
 
-						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExplore" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" >
+						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExplore" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnExplore_Click" >
 							<Label Foreground="{DynamicResource ButtonForeground}">_Explore</Label>
 						</Button>
 
@@ -388,7 +388,6 @@
 										<Style.Triggers>
 											<DataTrigger Binding="{Binding ElementName=txtSearchBoxUnity, Path=Text}" Value="">
 												<Setter Property="Visibility" Value="Hidden"/>
-
 											</DataTrigger>
 											<DataTrigger Binding="{Binding ElementName=txtSearchBoxUnity, Path=Text}" Value="{x:Null}">
 												<Setter Property="Visibility" Value="Hidden"/>

@@ -454,5 +454,24 @@ namespace UnityLauncherPro
 
             base.OnKeyDown(e);
         }
+
+        private void BtnExplore_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            Tools.ExploreProjectFolder(proj);
+        }
+
+        // copy selected row unity version to clipboard
+        private void MenuItemCopyVersion_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            Clipboard.SetText(proj?.Version);
+        }
+
+        private void BtnRefreshProjectList_Click(object sender, RoutedEventArgs e)
+        {
+            projectsSource = GetProjects.Scan();
+            gridRecent.ItemsSource = projectsSource;
+        }
     } // class
 } //namespace

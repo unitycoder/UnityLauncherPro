@@ -110,5 +110,35 @@ namespace UnityLauncherPro
             return fvi.ProductName.Replace("(64-bit)", "").Replace("Unity", "").Trim();
         }
 
+        public static void ExploreProjectFolder(Project proj)
+        {
+            if (proj != null)
+            {
+                if (proj.Path != null)
+                {
+                    if (LaunchExplorer(proj.Path) == false)
+                    {
+                        //SetStatus("Error> Directory not found: " + folder);
+                    }
+                }
+            }
+        }
+
+        // opens Explorer to target folder
+        public static bool LaunchExplorer(string folder)
+        {
+            bool result = false;
+            if (Directory.Exists(folder) == true)
+            {
+                Process.Start(folder);
+                result = true;
+            }
+            else
+            {
+                result = false;
+            }
+            return result;
+        }
+
     } // class
 } // namespace
