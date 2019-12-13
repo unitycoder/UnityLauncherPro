@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing; // for notifyicon
@@ -13,18 +14,19 @@ namespace UnityLauncherPro
 {
     public partial class MainWindow : Window
     {
-
         private System.Windows.Forms.NotifyIcon notifyIcon;
 
         Project[] projectsSource;
         Updates[] updatesSource;
         UnityInstallation[] unityInstallationsSource;
+        public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>();
 
         string _filterString = null;
 
         public MainWindow()
         {
             InitializeComponent();
+            //this.DataContext = this;
             Start();
         }
 
@@ -45,6 +47,17 @@ namespace UnityLauncherPro
             unityInstallationsSource = GetUnityInstallations.Scan(tempRootFolders);
             dataGridUnitys.Items.Clear();
             dataGridUnitys.ItemsSource = unityInstallationsSource;
+            // make dictionary of installed unitys, to search faster
+            unityInstalledVersions.Clear();
+            for (int i = 0; i < unityInstallationsSource.Length; i++)
+            {
+                var version = unityInstallationsSource[i].Version;
+                if (unityInstalledVersions.ContainsKey(version) == false)
+                {
+                    unityInstalledVersions.Add(version, unityInstallationsSource[i].Path);
+                }
+            }
+
 
             //dataGrid.Items.Add(GetProjects.Scan());
             projectsSource = GetProjects.Scan();
@@ -429,11 +442,7 @@ namespace UnityLauncherPro
 
         string GetSelectedUnityExePath(string version)
         {
-            for (int i = 0, len = unityInstallationsSource.Length; i < len; i++)
-            {
-                if (version == unityInstallationsSource[i].Version) return unityInstallationsSource[i].Path;
-            }
-            return null;
+            return unityInstalledVersions.ContainsKey(version) ? unityInstalledVersions[version] : null;
         }
 
 
@@ -473,5 +482,10 @@ namespace UnityLauncherPro
             projectsSource = GetProjects.Scan();
             gridRecent.ItemsSource = projectsSource;
         }
+
+
+
     } // class
 } //namespace
+
+
