@@ -127,18 +127,28 @@ namespace UnityLauncherPro
         // opens Explorer to target folder
         public static bool LaunchExplorer(string folder)
         {
-            bool result = false;
             if (Directory.Exists(folder) == true)
             {
                 Process.Start(folder);
-                result = true;
+                return true;
             }
-            else
-            {
-                result = false;
-            }
-            return result;
+            return false;
         }
+
+        // run any exe
+        public static bool LaunchExe(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return false;
+
+            if (File.Exists(path) == true)
+            {
+                Process.Start(path);
+                return true;
+            }
+            return false;
+        }
+
+
 
     } // class
 } // namespace

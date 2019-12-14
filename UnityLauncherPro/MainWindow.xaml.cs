@@ -385,7 +385,7 @@ namespace UnityLauncherPro
 
 
             // we dont have this version installed (or no version info available)
-            var unityExePath = GetSelectedUnityExePath(proj.Version);
+            var unityExePath = GetUnityExePath(proj.Version);
             if (unityExePath == null)
             {
                 Console.WriteLine("Missing unity version " + proj.Version);
@@ -440,7 +440,7 @@ namespace UnityLauncherPro
         }
 
 
-        string GetSelectedUnityExePath(string version)
+        string GetUnityExePath(string version)
         {
             return unityInstalledVersions.ContainsKey(version) ? unityInstalledVersions[version] : null;
         }
@@ -483,7 +483,86 @@ namespace UnityLauncherPro
             gridRecent.ItemsSource = projectsSource;
         }
 
+        // run unity only
+        private void BtnLaunchUnity_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            var unitypath = GetUnityExePath(proj?.Version);
+            Tools.LaunchExe(unitypath);
+        }
 
+        private void BtnUpgradeProject_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            if (proj == null) return;
+
+            DisplayUpgradeDialog(proj);
+        }
+
+        void DisplayUpgradeDialog(Project proj)
+        {
+            UpgradeWindow modalWindow = new UpgradeWindow(proj.Version, proj.Path, proj.Arguments);
+            modalWindow.Owner = this;
+            modalWindow.ShowDialog();
+            var results = modalWindow.DialogResult.HasValue && modalWindow.DialogResult.Value;
+
+            if (results == true)
+            {
+                var upgradeToVersion = UpgradeWindow.upgradeVersion;
+                if (string.IsNullOrEmpty(upgradeToVersion)) return;
+
+                // get selected version to upgrade for
+                Console.WriteLine("Upgrade to " + upgradeToVersion);
+
+                // inject new version for this item
+                proj.Version = upgradeToVersion;
+                LaunchProject(proj);
+            }
+            else
+            {
+                Console.WriteLine("results = " + results);
+            }
+
+
+            /*
+            // display upgrade dialog (version selector)
+            Form2 upgradeDialog = new Form2();
+            Form2.currentVersion = currentVersion;
+
+            // check what user selected
+            var results = upgradeDialog.ShowDialog(this);
+            switch (results)
+            {
+                case DialogResult.Ignore: // view release notes page
+                    Tools.OpenReleaseNotes(currentVersion);
+                    // display window again for now..
+                    DisplayUpgradeDialog(currentVersion, projectPath, launchProject, commandLineArguments);
+                    break;
+                case DialogResult.Cancel: // cancelled
+                    SetStatus("Cancelled project upgrade");
+                    break;
+                case DialogResult.Retry: // download and install missing version
+                    SetStatus("Download and install missing version " + currentVersion);
+                    string url = Tools.GetUnityReleaseURL(currentVersion);
+                    if (string.IsNullOrEmpty(url) == false)
+                    {
+                        DownloadInBrowser(url, currentVersion);
+                    }
+                    else
+                    {
+                        SetStatus("Failed getting Unity Installer URL");
+                    }
+                    break;
+                case DialogResult.Yes: // upgrade
+                    SetStatus("Upgrading project to " + Form2.currentVersion);
+                    if (launchProject == true) LaunchProject(projectPath, Form2.currentVersion);
+                    break;
+                default:
+                    Console.WriteLine("Unknown DialogResult: " + results);
+                    break;
+            }
+            upgradeDialog.Close();*/
+        }
 
     } // class
 } //namespace

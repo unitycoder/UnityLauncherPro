@@ -1,0 +1,61 @@
+﻿<Window x:Class="UnityLauncherPro.UpgradeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnityLauncherPro"
+        mc:Ignorable="d"
+        Title="Upgrade Project Version" Height="533.165" Width="418.684" Background="{DynamicResource DarkestBackground}" MinWidth="319" MinHeight="555" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" HorizontalAlignment="Left" VerticalAlignment="Top">
+	<Window.Resources>
+		<!-- custom buttons -->
+		<Style x:Key="CustomButton" TargetType="{x:Type Button}">
+			<Setter Property="SnapsToDevicePixels" Value="true"/>
+			<Setter Property="OverridesDefaultStyle" Value="true"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Button}">
+						<Border x:Name="shortcutbutton" BorderThickness="0" BorderBrush="Black" Background="{TemplateBinding Background}">
+							<ContentPresenter Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="true">
+								<Setter TargetName="shortcutbutton" Property="Background" Value="#FF494949" />
+								<!--<Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="Blue"/>-->
+							</Trigger>
+							<Trigger Property="IsPressed" Value="true">
+								<Setter TargetName="shortcutbutton" Property="Background" Value="#FF0F0F0F" />
+								<!--<Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="Red"/>-->
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+	</Window.Resources>
+	<Grid>
+		<Label x:Name="lblCurrentVersion" Content="Project Current Version" HorizontalAlignment="Left" Margin="9,11,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ButtonForeground}" Width="139"/>
+		<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtCurrentVersion" Background="{DynamicResource DarkMenuBar}" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="173,16,37,0" UndoLimit="64" Text="Version" IsReadOnly="True" VerticalAlignment="Top" />
+
+		<Label x:Name="lblAvailableVersions" Content="Available Unity Versions" HorizontalAlignment="Left" Margin="9,94,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ButtonForeground}"/>
+		<Button Style="{StaticResource CustomButton}" x:Name="btnDownload" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="0,47,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="35" >
+			<Label Foreground="{DynamicResource ButtonForeground}" Content="_Download in Browser"/>
+		</Button>
+		<Button Style="{StaticResource CustomButton}" x:Name="btnOpenReleasePage" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="9,47,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="35" >
+			<Label Foreground="{DynamicResource ButtonForeground}" Content="_Open Release Page"/>
+		</Button>
+		<Button Style="{StaticResource CustomButton}" x:Name="btnCancelUpgrade" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="9,434,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" Width="111" VerticalAlignment="Top" Height="51" Click="BtnCancelUpgrade_Click" >
+			<Label Foreground="{DynamicResource ButtonForeground}" Content="_Cancel"/>
+		</Button>
+		<Button Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="0,434,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" Width="159" VerticalAlignment="Top" Height="51" Click="BtnUpgradeProject_Click" >
+			<Label Foreground="{DynamicResource ButtonForeground}" Content="_Upgrade Project"/>
+		</Button>
+		<DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" HorizontalAlignment="Left" Height="304" Margin="10,121,0,0" VerticalAlignment="Top" Width="393" HeadersVisibility="None" AutoGenerateColumns="False">
+			<DataGrid.Columns>
+				<DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" />
+				<DataGridTextColumn Header="Value" Binding="{Binding Value}" IsReadOnly="True" />
+			</DataGrid.Columns>
+		</DataGrid>
+
+	</Grid>
+</Window>

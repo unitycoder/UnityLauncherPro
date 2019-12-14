@@ -367,10 +367,10 @@
 						<Grid.RowDefinitions>
 							<RowDefinition Height="32" />
 						</Grid.RowDefinitions>
-						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="5,0,0,0" BorderBrush="{x:Null}">
+						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnUpgradeProject_Click">
 							<Label Foreground="{DynamicResource ButtonForeground}">_Upgrade</Label>
 						</Button>
-						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnLaunchUnity" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" >
+						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnLaunchUnity" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchUnity_Click" >
 							<Label Foreground="{DynamicResource ButtonForeground}">_Run Unity</Label>
 						</Button>
 
