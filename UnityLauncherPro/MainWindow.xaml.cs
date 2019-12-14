@@ -73,6 +73,9 @@ namespace UnityLauncherPro
             notifyIcon.Icon = new Icon(System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
 
+            gridRecent.Focus();
+            gridRecent.SelectedIndex = 0;
+
         }
 
         void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -216,6 +219,10 @@ namespace UnityLauncherPro
                     {
                         txtSearchBoxUpdates.Text = "";
                     }
+                    break;
+                case Key.Up:
+                    break;
+                case Key.Down:
                     break;
                 default: // any key
 
@@ -522,47 +529,14 @@ namespace UnityLauncherPro
             {
                 Console.WriteLine("results = " + results);
             }
-
-
-            /*
-            // display upgrade dialog (version selector)
-            Form2 upgradeDialog = new Form2();
-            Form2.currentVersion = currentVersion;
-
-            // check what user selected
-            var results = upgradeDialog.ShowDialog(this);
-            switch (results)
-            {
-                case DialogResult.Ignore: // view release notes page
-                    Tools.OpenReleaseNotes(currentVersion);
-                    // display window again for now..
-                    DisplayUpgradeDialog(currentVersion, projectPath, launchProject, commandLineArguments);
-                    break;
-                case DialogResult.Cancel: // cancelled
-                    SetStatus("Cancelled project upgrade");
-                    break;
-                case DialogResult.Retry: // download and install missing version
-                    SetStatus("Download and install missing version " + currentVersion);
-                    string url = Tools.GetUnityReleaseURL(currentVersion);
-                    if (string.IsNullOrEmpty(url) == false)
-                    {
-                        DownloadInBrowser(url, currentVersion);
-                    }
-                    else
-                    {
-                        SetStatus("Failed getting Unity Installer URL");
-                    }
-                    break;
-                case DialogResult.Yes: // upgrade
-                    SetStatus("Upgrading project to " + Form2.currentVersion);
-                    if (launchProject == true) LaunchProject(projectPath, Form2.currentVersion);
-                    break;
-                default:
-                    Console.WriteLine("Unknown DialogResult: " + results);
-                    break;
-            }
-            upgradeDialog.Close();*/
         }
+
+        // need to manually move into next/prev rows? https://stackoverflow.com/a/11652175/5452781
+        private void GridRecent_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            Tools.HandleDataGridScrollKeys(sender, e);
+        }
+
 
     } // class
 } //namespace

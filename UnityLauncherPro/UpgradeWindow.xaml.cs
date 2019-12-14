@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace UnityLauncherPro
 {
@@ -13,33 +11,57 @@ namespace UnityLauncherPro
     /// </summary>
     public partial class UpgradeWindow : Window
     {
-
         public static string upgradeVersion = null;
 
         public UpgradeWindow(string currentVersion, string projectPath, string commandLineArguments = null)
         {
             InitializeComponent();
-
             txtCurrentVersion.Text = currentVersion;
-
             gridAvailableVersions.ItemsSource = MainWindow.unityInstalledVersions;
 
-            //lstUnityVersionsForUpgrade.Items.Clear();
-            //lstUnityVersionsForUpgrade.Items.Add(MainWindow.unityInstalledVersions.ToArray());
+            gridAvailableVersions.SelectedItem = null;
 
-            //lstUnityVersionsForUpgrade.ItemsSource = MainWindow.unityInstalledVersions;
-            //lstUnityVersionsForUpgrade.DataValueField = "Key";
-            //lstUnityVersionsForUpgrade.DataTextField = "Value";
-            //lstUnityVersionsForUpgrade.DataBind();
+            // autoselect nearest one FIXME doesnt work with 5.x (should suggest next highest installed in 201x.x)
+            if (string.IsNullOrEmpty(currentVersion) == false)
+            {
+                // enable release and dl buttons
+                btnOpenReleasePage.IsEnabled = true;
+                btnDownload.IsEnabled = true;
 
+                // find nearest version
+                string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
+                if (nearestVersion != null)
+                {
+                    // get correct row for nearest version
+                    var obj = Tools.GetEntry(MainWindow.unityInstalledVersions, nearestVersion);
+                    int index = gridAvailableVersions.Items.IndexOf(obj);
+                    if (index > -1)
+                    {
+                        gridAvailableVersions.SelectedIndex = index;
+                    }
+                    else
+                    {
+                        // just select first item then
+                        gridAvailableVersions.SelectedIndex = 0;
+                    }
+                }
+            }
+            else // we dont have current version
+            {
+                btnOpenReleasePage.IsEnabled = false;
+                btnDownload.IsEnabled = false;
+                currentVersion = "None";
+                // just select first item then
+                if (gridAvailableVersions != null && gridAvailableVersions.Items.Count > 0) gridAvailableVersions.SelectedIndex = 0;
+            }
+
+            gridAvailableVersions.Focus();
         }
-
 
 
         private void BtnUpgradeProject_Click(object sender, RoutedEventArgs e)
         {
             var k = (gridAvailableVersions.SelectedItem) as KeyValuePair<string, string>?;
-            //Console.WriteLine(k.Value.Key);
             upgradeVersion = k.Value.Key;
             DialogResult = true;
         }
@@ -47,6 +69,45 @@ namespace UnityLauncherPro
         private void BtnCancelUpgrade_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+        }
+
+        private void BtnOpenReleasePage_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.OpenReleaseNotes(txtCurrentVersion.Text);
+        }
+
+        private void BtnDownload_Click(object sender, RoutedEventArgs e)
+        {
+            string url = Tools.GetUnityReleaseURL(txtCurrentVersion.Text);
+            if (string.IsNullOrEmpty(url) == false)
+            {
+                Tools.DownloadInBrowser(url, txtCurrentVersion.Text);
+            }
+            else
+            {
+                Console.WriteLine("Failed getting Unity Installer URL for " + txtCurrentVersion.Text);
+            }
+        }
+
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            // override Enter for datagrid
+            if (e.Key == Key.Return && e.KeyboardDevice.Modifiers == ModifierKeys.None)
+            {
+                e.Handled = true;
+                // TODO do upgrade with selected version
+                var k = (gridAvailableVersions.SelectedItem) as KeyValuePair<string, string>?;
+                upgradeVersion = k.Value.Key;
+                DialogResult = true;
+                return;
+            }
+
+            base.OnKeyDown(e);
+        }
+
+        private void GridAvailableVersions_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            Tools.HandleDataGridScrollKeys(sender, e);
         }
     }
 }
