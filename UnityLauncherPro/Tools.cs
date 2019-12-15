@@ -372,6 +372,7 @@ namespace UnityLauncherPro
 
         public static void HandleDataGridScrollKeys(object sender, KeyEventArgs e)
         {
+            /*
             DataGrid grid = sender as DataGrid;
             switch (e.Key)
             {
@@ -380,19 +381,25 @@ namespace UnityLauncherPro
                     {
                         grid.SelectedIndex--;
                     }
-                    else
-                    {
-                        grid.SelectedIndex = grid.Items.Count - 1;
-                    }
-                    e.Handled = true;
-                    break;
+                    // disable wrap around
+                    
+                    //else
+                    //{
+                     //   grid.SelectedIndex = grid.Items.Count - 1;
+                    //}
+            e.Handled = true;
+            break;
                 case Key.Down:
-                    grid.SelectedIndex = ++grid.SelectedIndex % grid.Items.Count;
-                    e.Handled = true;
-                    break;
+                    if (grid.SelectedIndex < grid.Items.Count)
+            {
+                grid.SelectedIndex++;
             }
-            grid.ScrollIntoView(grid.Items[grid.SelectedIndex]);
+            //grid.SelectedIndex = ++grid.SelectedIndex % grid.Items.Count;
+            e.Handled = true;
+            break;
         }
-
+        grid.ScrollIntoView(grid.Items[grid.SelectedIndex]);
+    */
+        }
     } // class
 } // namespace

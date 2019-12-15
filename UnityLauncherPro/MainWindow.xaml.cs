@@ -73,9 +73,8 @@ namespace UnityLauncherPro
             notifyIcon.Icon = new Icon(System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
 
-            gridRecent.Focus();
-            gridRecent.SelectedIndex = 0;
 
+            //gridRecent.CurrentCell = gridRecent.sele;
         }
 
         void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -206,7 +205,6 @@ namespace UnityLauncherPro
         {
             // TODO if editing cells, dont focus on search
             //if (gridRecent.IsCurrentCellInEditMode == true) return;
-
             switch (e.Key)
             {
                 case Key.Escape: // clear project search
@@ -534,11 +532,19 @@ namespace UnityLauncherPro
         // need to manually move into next/prev rows? https://stackoverflow.com/a/11652175/5452781
         private void GridRecent_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            Tools.HandleDataGridScrollKeys(sender, e);
+            //Tools.HandleDataGridScrollKeys(sender, e);
         }
 
-
+        private void GridRecent_Loaded(object sender, RoutedEventArgs e)
+        {
+            gridRecent.Focus();
+            gridRecent.SelectedIndex = 0;
+            // properly set focus to row
+            DataGridRow row = (DataGridRow)gridRecent.ItemContainerGenerator.ContainerFromIndex(0);
+            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+        }
     } // class
 } //namespace
+
 
 
