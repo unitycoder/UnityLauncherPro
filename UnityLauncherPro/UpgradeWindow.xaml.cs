@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace UnityLauncherPro
@@ -101,6 +102,17 @@ namespace UnityLauncherPro
                 DialogResult = true;
                 return;
             }
+            else // other keys
+            {
+                switch (e.Key)
+                {
+                    case Key.Escape:
+                        DialogResult = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             base.OnKeyDown(e);
         }
@@ -108,6 +120,13 @@ namespace UnityLauncherPro
         private void GridAvailableVersions_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             Tools.HandleDataGridScrollKeys(sender, e);
+        }
+
+        private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
+        {
+            gridAvailableVersions.Focus();
+            DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
+            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         }
     }
 }

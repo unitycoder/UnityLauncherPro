@@ -456,6 +456,11 @@ namespace UnityLauncherPro
             return (Project)gridRecent.SelectedItem;
         }
 
+        UnityInstallation GetSelectedUnity()
+        {
+            return (UnityInstallation)dataGridUnitys.SelectedItem;
+        }
+
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             // override Enter for datagrid
@@ -542,6 +547,33 @@ namespace UnityLauncherPro
             // properly set focus to row
             DataGridRow row = (DataGridRow)gridRecent.ItemContainerGenerator.ContainerFromIndex(0);
             row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+        }
+
+        private void BtnExploreUnity_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            var path = Path.GetDirectoryName(unity.Path);
+            Tools.LaunchExplorer(path);
+        }
+
+        private void BtnRunUnity_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.LaunchExe(unity.Path);
+        }
+
+        private void BtnReleaseNotes_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.OpenReleaseNotes(unity.Version);
+        }
+
+        private void BtnUpdateUnity_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO check for newer available version in Updates tab, select that row and jump to tab
         }
     } // class
 } //namespace

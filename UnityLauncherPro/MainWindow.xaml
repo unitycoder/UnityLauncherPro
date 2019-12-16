@@ -72,7 +72,7 @@
 		</Style>
 
 		<!-- datagrid hide selected cell borders -->
-		<!--<Style TargetType="{x:Type DataGridCell}">
+		<Style TargetType="{x:Type DataGridCell}">
 			<Setter Property="BorderBrush" Value="Transparent" />
 			<Setter Property="FocusVisualStyle" Value="{x:Null}" />
 			<Setter Property="Margin" Value="0,0.5,0,0.5" />
@@ -84,10 +84,10 @@
 					<Setter Property="Background" Value="Transparent" />
 				</Trigger>
 			</Style.Triggers>
-		</Style>-->
+		</Style>
 
 		<Style x:Key="NoFocusCellStyle" TargetType="DataGridCell">
-			<Setter Property="Focusable" Value="False"/>
+			<!--<Setter Property="Focusable" Value="False"/>-->
 		</Style>
 
 		<!-- custom buttons -->
@@ -225,8 +225,8 @@
 
 	</Window.Resources>
 
-	
-	
+
+
 
 	<!-- UI -->
 
@@ -387,7 +387,6 @@
 						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExplore" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnExplore_Click" >
 							<Label Foreground="{DynamicResource ButtonForeground}">_Explore</Label>
 						</Button>
-
 					</Grid>
 				</Grid>
 			</TabItem>
@@ -442,19 +441,24 @@
 					<Grid VerticalAlignment="Bottom" Margin="4,0,8,5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="20*" />
+							<ColumnDefinition Width="20*" />
 							<ColumnDefinition Width="45*" />
 							<ColumnDefinition Width="15*" />
+
 						</Grid.ColumnDefinitions>
 						<Grid.RowDefinitions>
 							<RowDefinition Height="32" />
 						</Grid.RowDefinitions>
-						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnRunUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}">
-							<Label Foreground="{DynamicResource ButtonForeground}">_Upgrade</Label>
+						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnReleaseNotes" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnReleaseNotes_Click">
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="Release Notes"/>
 						</Button>
-						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnReleaseNotes" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" >
+						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnUpdateUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnUpdateUnity_Click">
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="Update"/>
+						</Button>
+						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnRunUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnRunUnity_Click" >
 							<Label Foreground="{DynamicResource ButtonForeground}">_Run Unity</Label>
 						</Button>
-						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExploreUnity" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Foreground="{DynamicResource ButtonForeground}" >
+						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExploreUnity" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Foreground="{DynamicResource ButtonForeground}" Click="BtnExploreUnity_Click" >
 							<Label Foreground="{DynamicResource ButtonForeground}">_Explore</Label>
 						</Button>
 
