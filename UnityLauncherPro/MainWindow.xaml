@@ -261,7 +261,7 @@
 					<!-- search box -->
 					<Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
 						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding ElementName=txtSearchBox, Path=Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}}" Height="24" />
-						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" TextChanged="OnSearchTextChanged" />
+						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" TextChanged="OnSearchTextChanged" PreviewKeyDown="TxtSearchBox_PreviewKeyDown" />
 						<Button Name="btnClearSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearProjectSearchClick">
 							<TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ButtonForeground}" Padding="5,3,4,4" HorizontalAlignment="Center">
 								<TextBlock.Style>

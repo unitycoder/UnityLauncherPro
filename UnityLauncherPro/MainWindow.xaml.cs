@@ -127,12 +127,19 @@ namespace UnityLauncherPro
             }
         }
 
+        // main search
         void FilterRecentProjects()
         {
             // https://www.wpftutorial.net/DataViews.html
             _filterString = txtSearchBox.Text;
             ICollectionView collection = CollectionViewSource.GetDefaultView(projectsSource);
             collection.Filter = ProjectFilter;
+
+            // set first row selected (good, especially if only one results)
+            if (gridRecent.Items.Count > 0)
+            {
+                gridRecent.SelectedIndex = 0;
+            }
         }
 
         private bool ProjectFilter(object item)
@@ -574,6 +581,26 @@ namespace UnityLauncherPro
         private void BtnUpdateUnity_Click(object sender, RoutedEventArgs e)
         {
             // TODO check for newer available version in Updates tab, select that row and jump to tab
+        }
+
+
+
+        // if press up/down in search box, move to first item in results
+        private void TxtSearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                    //e.Handled = true; // if enabled, we enter to first row initially
+                    gridRecent.Focus();
+                    gridRecent.SelectedIndex = 0;
+                    DataGridRow row = (DataGridRow)gridRecent.ItemContainerGenerator.ContainerFromIndex(0);
+                    row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    break;
+                default:
+                    break;
+            }
         }
     } // class
 } //namespace
