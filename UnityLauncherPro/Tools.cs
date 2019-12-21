@@ -130,6 +130,95 @@ namespace UnityLauncherPro
             }
         }
 
+        public static void LaunchProject(Project proj)
+        {
+            // validate
+            if (proj == null) return;
+            if (Directory.Exists(proj.Path) == false) return;
+
+            Console.WriteLine("launching " + proj.Title);
+
+            // there is no assets path, probably we want to create new project then
+            var assetsFolder = Path.Combine(proj.Path, "Assets");
+            if (Directory.Exists(assetsFolder) == false)
+            {
+                // TODO could ask if want to create project..?
+                Directory.CreateDirectory(assetsFolder);
+            }
+
+            /*
+            // TODO when opening project, check for crashed backup scene first
+            if (openProject == true)
+            {
+                var cancelLaunch = CheckCrashBackupScene(projectPath);
+                if (cancelLaunch == true)
+                {
+                    return;
+                }
+            }*/
+
+            // we dont have this version installed (or no version info available)
+            //MainWindow.unityInstalledVersions;
+            var unityExePath = GetUnityExePath(proj.Version);
+            if (unityExePath == null)
+            {
+                Console.WriteLine("Missing unity version " + proj.Version);
+                // SetStatus("Missing Unity version: " + version);
+                // TODO
+                //if (openProject == true) DisplayUpgradeDialog(version, projectPath);
+                return;
+            }
+
+            /*
+            if (openProject == true)
+            {
+                SetStatus("Launching project in Unity " + version);
+            }
+            else
+            {
+                SetStatus("Launching Unity " + version);
+            }*/
+
+            try
+            {
+                Process myProcess = new Process();
+                var cmd = "\"" + unityExePath + "\"";
+                myProcess.StartInfo.FileName = cmd;
+
+                //if (openProject == true)
+                {
+                    var pars = " -projectPath " + "\"" + proj.Path + "\"";
+
+                    // TODO check for custom launch parameters and append them
+                    //string customArguments = GetSelectedRowData("_launchArguments");
+                    //if (string.IsNullOrEmpty(customArguments) == false)
+                    //{
+                    //    pars += " " + customArguments;
+                    //}
+
+                    myProcess.StartInfo.Arguments = pars;// TODO args + commandLineArguments;
+                }
+                myProcess.Start();
+
+                /*
+                if (Properties.Settings.Default.closeAfterProject)
+                {
+                    Environment.Exit(0);
+                }*/
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+
+        public static string GetUnityExePath(string version)
+        {
+            return MainWindow.unityInstalledVersions.ContainsKey(version) ? MainWindow.unityInstalledVersions[version] : null;
+        }
+
+
         // opens Explorer to target folder
         public static bool LaunchExplorer(string folder)
         {
@@ -399,7 +488,33 @@ namespace UnityLauncherPro
             break;
         }
         grid.ScrollIntoView(grid.Items[grid.SelectedIndex]);
-    */
+        */
         }
+
+        public static void DisplayUpgradeDialog(Project proj, MainWindow owner)
+        {
+            UpgradeWindow modalWindow = new UpgradeWindow(proj.Version, proj.Path, proj.Arguments);
+            modalWindow.Owner = owner;
+            modalWindow.ShowDialog();
+            var results = modalWindow.DialogResult.HasValue && modalWindow.DialogResult.Value;
+
+            if (results == true)
+            {
+                var upgradeToVersion = UpgradeWindow.upgradeVersion;
+                if (string.IsNullOrEmpty(upgradeToVersion)) return;
+
+                // get selected version to upgrade for
+                Console.WriteLine("Upgrade to " + upgradeToVersion);
+
+                // inject new version for this item
+                proj.Version = upgradeToVersion;
+                Tools.LaunchProject(proj);
+            }
+            else
+            {
+                Console.WriteLine("results = " + results);
+            }
+        }
+
     } // class
 } // namespace

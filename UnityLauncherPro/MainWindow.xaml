@@ -1,13 +1,16 @@
-﻿<Window x:Class="UnityLauncherPro.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
+		xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
         Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" PreviewKeyDown="Window_PreviewKeyDown"	>
 
 	<Window.Resources>
+
+		<!-- datagrid scrollbar customization -->
 
 		<!-- colors for unity missing installatios -->
 		<local:UnityInstallation x:Key="MyConverter"/>
@@ -40,7 +43,7 @@
 		</Style>
 
 		<!-- datagrid header -->
-		<Style x:Key="HeaderStyle" TargetType="DataGridColumnHeader">
+		<Style x:Key="HeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
 			<Setter Property="Background" Value="{StaticResource DatagridHeaderBackground}" />
 			<Setter Property="Foreground" Value="{StaticResource DatagridHeaderForeground}" />
 			<Setter Property="BorderBrush" Value="{StaticResource DatagridHeaderBorder}" />
@@ -57,7 +60,7 @@
 		</Style>
 
 		<!-- datagrid rows & row selection -->
-		<Style TargetType="DataGridRow">
+		<Style TargetType="{x:Type DataGridRow}">
 			<Setter Property="Background" Value="{StaticResource ButtonBackground}" />
 			<Setter Property="BorderBrush" Value="{x:Null}" />
 			<Setter Property="BorderThickness" Value="0,0,0,0" />
@@ -86,18 +89,18 @@
 			</Style.Triggers>
 		</Style>
 
-		<Style x:Key="NoFocusCellStyle" TargetType="DataGridCell">
+		<Style x:Key="NoFocusCellStyle" TargetType="{x:Type DataGridCell}">
 			<!--<Setter Property="Focusable" Value="False"/>-->
 		</Style>
 
 		<!-- custom buttons -->
-		<Style x:Key="CustomButton" TargetType="Button">
+		<Style x:Key="CustomButton" TargetType="{x:Type Button}">
 			<Setter Property="SnapsToDevicePixels" Value="true"/>
 			<Setter Property="OverridesDefaultStyle" Value="true"/>
 			<Setter Property="Template">
 				<Setter.Value>
-					<ControlTemplate TargetType="Button">
-						<Border Name="shortcutbutton" BorderThickness="0" BorderBrush="Black" Background="{TemplateBinding Background}">
+					<ControlTemplate TargetType="{x:Type Button}">
+						<Border x:Name="shortcutbutton" BorderThickness="0" BorderBrush="Black" Background="{TemplateBinding Background}">
 							<ContentPresenter Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
 						</Border>
 						<ControlTemplate.Triggers>
@@ -115,8 +118,6 @@
 			</Setter>
 		</Style>
 
-		<!-- datagrid scrollbar customization -->
-
 		<!-- scrollbar top/bottom arrow buttons -->
 		<Style x:Key="ScrollBarLineButton" TargetType="{x:Type RepeatButton}">
 			<Setter Property="SnapsToDevicePixels" Value="True"/>
@@ -126,9 +127,9 @@
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type RepeatButton}">
 						<!-- button background -->
-						<Border Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="{DynamicResource ButtonBackground}" BorderBrush="{x:Null}">
+						<Border x:Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="{DynamicResource ButtonBackground}" BorderBrush="{x:Null}">
 							<!-- arrow sign -->
-							<Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ScrollArrowForeground}" Data="{Binding Path=Content,RelativeSource={RelativeSource TemplatedParent}}" />
+							<Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ScrollArrowForeground}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" />
 						</Border>
 						<ControlTemplate.Triggers>
 							<!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
@@ -170,7 +171,7 @@
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type Thumb}">
-						<Border Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
+						<Border x:Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsMouseOver" Value="true">
 								<Setter TargetName="Border" Property="Background" Value="{StaticResource ScrollBarThumbFill}" />
@@ -192,7 +193,7 @@
 				<Border Grid.RowSpan="3" CornerRadius="0" Background="{DynamicResource ScrollBarBackground}" />
 				<!-- scrollbar top button -->
 				<RepeatButton Grid.Row="0" Style="{StaticResource ScrollBarLineButton}" Height="18" Command="ScrollBar.LineUpCommand"  Content="M 0 4 L 8 4 L 4 0 Z" />
-				<Track Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
+				<Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
 					<Track.DecreaseRepeatButton>
 						<RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageUpCommand" />
 					</Track.DecreaseRepeatButton>
@@ -243,11 +244,11 @@
 			<Image Source="Images/icon.png" RenderOptions.BitmapScalingMode="NearestNeighbor" HorizontalAlignment="Left" Width="16" Height="16" Margin="4,0,0,0" SnapsToDevicePixels="True" UseLayoutRounding="True" />
 			<Label Content="UnityLauncherPro" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="#FFB8B8B8" FontSize="12" HorizontalAlignment="Left"  />
 			<!-- minimize -->
-			<Button Name="btnMinimize" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnMinimize_Click" Margin="0,0,27,0" Padding="2,0,2,8" IsTabStop="False">
+			<Button x:Name="btnMinimize" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnMinimize_Click" Margin="0,0,27,0" Padding="2,0,2,8" IsTabStop="False">
 				<TextBlock Text="–"   FontSize="15" Foreground="#FFC3C3C3" Padding="0" Height="23" HorizontalAlignment="Center"/>
 			</Button>
 			<!-- close -->
-			<Button Name="btnClose"    BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnClose_Click" Padding="0,2" IsTabStop="False">
+			<Button x:Name="btnClose"    BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnClose_Click" Padding="0,2" IsTabStop="False">
 				<TextBlock Text="❌" FontSize="10" Foreground="#FFC3C3C3" Padding="5,3,4,4" HorizontalAlignment="Center" />
 			</Button>
 		</Grid>
@@ -260,18 +261,18 @@
 				<Grid>
 					<!-- search box -->
 					<Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding ElementName=txtSearchBox, Path=Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}}" Height="24" />
-						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" TextChanged="OnSearchTextChanged" PreviewKeyDown="TxtSearchBox_PreviewKeyDown" />
-						<Button Name="btnClearSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearProjectSearchClick">
+						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBox}" Height="24" />
+						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" TextChanged="OnSearchTextChanged" PreviewKeyDown="TxtSearchBox_PreviewKeyDown" />
+						<Button x:Name="btnClearSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearProjectSearchClick">
 							<TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ButtonForeground}" Padding="5,3,4,4" HorizontalAlignment="Center">
 								<TextBlock.Style>
-									<Style TargetType="TextBlock">
+									<Style TargetType="{x:Type TextBlock}">
 										<Style.Triggers>
-											<DataTrigger Binding="{Binding ElementName=txtSearchBox, Path=Text}" Value="">
+											<DataTrigger Binding="{Binding Text, ElementName=txtSearchBox}" Value="">
 												<Setter Property="Visibility" Value="Hidden"/>
 
 											</DataTrigger>
-											<DataTrigger Binding="{Binding ElementName=txtSearchBox, Path=Text}" Value="{x:Null}">
+											<DataTrigger Binding="{Binding Text, ElementName=txtSearchBox}" Value="{x:Null}">
 												<Setter Property="Visibility" Value="Hidden"/>
 											</DataTrigger>
 										</Style.Triggers>
@@ -374,18 +375,18 @@
 							<RowDefinition Height="32" />
 						</Grid.RowDefinitions>
 						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnUpgradeProject_Click">
-							<Label Foreground="{DynamicResource ButtonForeground}">_Upgrade</Label>
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Upgrade"/>
 						</Button>
 						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnLaunchUnity" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchUnity_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}">_Run Unity</Label>
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Run Unity"/>
 						</Button>
 
 						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchProject_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}">_Open Project</Label>
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Open Project"/>
 						</Button>
 
 						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExplore" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnExplore_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}">_Explore</Label>
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Explore"/>
 						</Button>
 					</Grid>
 				</Grid>
@@ -396,17 +397,17 @@
 				<Grid>
 					<!-- search box -->
 					<Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding ElementName=txtSearchBoxUnity, Path=Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}}" Height="24" />
-						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" Name="txtSearchBoxUnity" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" />
-						<Button Name="btnClearUnitySearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUnitySearchClick">
+						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUnity}" Height="24" />
+						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtSearchBoxUnity" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUnity_PreviewKeyDown" />
+						<Button x:Name="btnClearUnitySearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUnitySearchClick">
 							<TextBlock Text="❌" FontSize="8" Foreground="#FFC3C3C3" Padding="5,3,4,4" HorizontalAlignment="Center">
 								<TextBlock.Style>
-									<Style TargetType="TextBlock">
+									<Style TargetType="{x:Type TextBlock}">
 										<Style.Triggers>
-											<DataTrigger Binding="{Binding ElementName=txtSearchBoxUnity, Path=Text}" Value="">
+											<DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUnity}" Value="">
 												<Setter Property="Visibility" Value="Hidden"/>
 											</DataTrigger>
-											<DataTrigger Binding="{Binding ElementName=txtSearchBoxUnity, Path=Text}" Value="{x:Null}">
+											<DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUnity}" Value="{x:Null}">
 												<Setter Property="Visibility" Value="Hidden"/>
 											</DataTrigger>
 										</Style.Triggers>
@@ -456,10 +457,10 @@
 							<Label Foreground="{DynamicResource ButtonForeground}" Content="Update"/>
 						</Button>
 						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnRunUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnRunUnity_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}">_Run Unity</Label>
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Run Unity"/>
 						</Button>
 						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExploreUnity" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Foreground="{DynamicResource ButtonForeground}" Click="BtnExploreUnity_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}">_Explore</Label>
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Explore"/>
 						</Button>
 
 					</Grid>
@@ -471,18 +472,18 @@
 				<Grid>
 					<!-- search box -->
 					<Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding ElementName=txtSearchBoxUpdates, Path=Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}}" Height="24" />
-						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" Name="txtSearchBoxUpdates" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" />
-						<Button Name="btnClearUpdatesSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUpdateSearchClick">
+						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUpdates}" Height="24" />
+						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtSearchBoxUpdates" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" />
+						<Button x:Name="btnClearUpdatesSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUpdateSearchClick">
 							<TextBlock Text="❌" FontSize="8" Foreground="#FFC3C3C3" Padding="5,3,4,4" HorizontalAlignment="Center">
 								<TextBlock.Style>
-									<Style TargetType="TextBlock">
+									<Style TargetType="{x:Type TextBlock}">
 										<Style.Triggers>
-											<DataTrigger Binding="{Binding ElementName=txtSearchBoxUpdates, Path=Text}" Value="">
+											<DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUpdates}" Value="">
 												<Setter Property="Visibility" Value="Hidden"/>
 
 											</DataTrigger>
-											<DataTrigger Binding="{Binding ElementName=txtSearchBoxUpdates, Path=Text}" Value="{x:Null}">
+											<DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUpdates}" Value="{x:Null}">
 												<Setter Property="Visibility" Value="Hidden"/>
 											</DataTrigger>
 										</Style.Triggers>
@@ -497,7 +498,7 @@
 					<DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000" AutoGenerateColumns="False">
 
 						<DataGrid.Columns>
-							<DataGridTextColumn Binding="{Binding ReleaseDate,StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}" Header="ReleaseDate" IsReadOnly="True"/>
+							<DataGridTextColumn Binding="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}" Header="ReleaseDate" IsReadOnly="True"/>
 							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="123"/>
 						</DataGrid.Columns>
 
@@ -522,10 +523,10 @@
 							<RowDefinition Height="32" />
 						</Grid.RowDefinitions>
 						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnDonwloadInBrowser" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}">
-							<Label Foreground="{DynamicResource ButtonForeground}">_Download in browser</Label>
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Download in browser"/>
 						</Button>
 						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" >
-							<Label Foreground="{DynamicResource ButtonForeground}">_Release Notes</Label>
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Release Notes"/>
 						</Button>
 					</Grid>
 				</Grid>
@@ -546,16 +547,16 @@
 						<Border>
 							<StackPanel Orientation="Horizontal" Margin="10">
 								<Button Style="{StaticResource CustomButton}" x:Name="btnTemp1" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top">
-									<Label Foreground="{DynamicResource ButtonForeground}">_Editor Logs</Label>
+									<Label Foreground="{DynamicResource ButtonForeground}" Content="_Editor Logs"/>
 								</Button>
 								<Button Style="{StaticResource CustomButton}" x:Name="btnTemp2" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top">
-									<Label Foreground="{DynamicResource ButtonForeground}">_Player Logs</Label>
+									<Label Foreground="{DynamicResource ButtonForeground}" Content="_Player Logs"/>
 								</Button>
 								<Button Style="{StaticResource CustomButton}" x:Name="btnTemp3" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top">
-									<Label Foreground="{DynamicResource ButtonForeground}">_ADB logcat</Label>
+									<Label Foreground="{DynamicResource ButtonForeground}" Content="_ADB logcat"/>
 								</Button>
 								<Button Style="{StaticResource CustomButton}" x:Name="btnTemp4" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top">
-									<Label Foreground="{DynamicResource ButtonForeground}">_Bind Wifi</Label>
+									<Label Foreground="{DynamicResource ButtonForeground}" Content="_Bind Wifi"/>
 								</Button>
 							</StackPanel>
 						</Border>
@@ -580,33 +581,33 @@
 					</Grid.RowDefinitions>
 
 					<!-- top labels -->
-					<Label Grid.Row="0" Content="Unity Installation Parent Folders" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom"></Label>
-					<Label Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Label>
+					<Label Grid.Row="0" Content="Unity Installation Parent Folders" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+					<Label Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
 					<!-- locations list -->
-					<ListBox Grid.Row="1" Background="#FF3C3C3C" Margin="4,0,2,0" />
+					<ListBox x:Name="lstRootFolders" Grid.Row="1" Background="#FF3C3C3C" Margin="4,0,2,0" />
 					<!-- locations add/remove -->
 					<StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0" >
-						<Button Style="{StaticResource CustomButton}" x:Name="btnASASDFasdf" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center">
-							<Label Foreground="{DynamicResource ButtonForeground}">_Add Folder</Label>
+						<Button Style="{StaticResource CustomButton}" x:Name="btnAddInstallationFolder" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnAddInstallationFolder_Click">
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Add Folder"/>
 						</Button>
-						<Button Style="{StaticResource CustomButton}" x:Name="btnASASDFasdf2" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center">
-							<Label Foreground="{DynamicResource ButtonForeground}">_Remove Folder</Label>
+						<Button Style="{StaticResource CustomButton}" x:Name="btnRemoveInstallationFolder" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnRemoveInstallationFolder_Click">
+							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Remove Folder"/>
 						</Button>
 					</StackPanel>
 					<!-- settings-->
 					<StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
-						<CheckBox Content="Minimize to taskbar" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
-						<CheckBox Content="Register Explorer context menu" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
-						<CheckBox Content="Close after opening project" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
-						<CheckBox Content="Close after launching from Explorer" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
-						<CheckBox Content="Show Arguments Column" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
-						<CheckBox Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}"></CheckBox>
-						<CheckBox Content="Show full modified time" Foreground="{DynamicResource ButtonForeground}" ToolTip="Full=dd/mm/yyyy hh:mm:ss, NotFull=x hours ago, x days ago.."></CheckBox>
+						<CheckBox Content="Minimize to taskbar" Foreground="{DynamicResource ButtonForeground}"/>
+						<CheckBox Content="Register Explorer context menu" Foreground="{DynamicResource ButtonForeground}"/>
+						<CheckBox Content="Close after opening project" Foreground="{DynamicResource ButtonForeground}"/>
+						<CheckBox Content="Close after launching from Explorer" Foreground="{DynamicResource ButtonForeground}"/>
+						<CheckBox Content="Show Arguments Column" Foreground="{DynamicResource ButtonForeground}"/>
+						<CheckBox Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}"/>
+						<CheckBox Content="Show full modified time" Foreground="{DynamicResource ButtonForeground}" ToolTip="Full=dd/mm/yyyy hh:mm:ss, NotFull=x hours ago, x days ago.."/>
 					</StackPanel>
 
 					<!-- links-->
 					<Button Grid.Row="4" Style="{StaticResource CustomButton}" x:Name="btnASASDFasdf22" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center">
-						<Label Foreground="{DynamicResource ButtonForeground}">_View in Github</Label>
+						<Label Foreground="{DynamicResource ButtonForeground}" Content="_View in Github"/>
 					</Button>
 
 				</Grid>

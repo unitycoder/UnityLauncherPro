@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 
 namespace UnityLauncherPro
 {
@@ -29,12 +26,6 @@ namespace UnityLauncherPro
             // download list of Unity versions
             using (WebClient webClient = new WebClient())
             {
-                /*
-                webClient.DownloadStringCompleted += new DownloadStringCompletedEventHandler(UnityVersionsListDownloaded);
-                var unityVersionsURL = @"http://symbolserver.unity3d.com/000Admin/history.txt";
-                webClient.DownloadStringAsync(new Uri(unityVersionsURL));
-                */
-
                 var unityVersionsURL = @"http://symbolserver.unity3d.com/000Admin/history.txt";
                 Task<string> downloadStringTask = webClient.DownloadStringTaskAsync(new Uri(unityVersionsURL));
                 result = await downloadStringTask;

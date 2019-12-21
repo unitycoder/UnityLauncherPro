@@ -26,9 +26,10 @@ namespace UnityLauncherPro
         public MainWindow()
         {
             InitializeComponent();
-            //this.DataContext = this;
             Start();
         }
+
+
 
         void Start()
         {
@@ -43,10 +44,9 @@ namespace UnityLauncherPro
 
 
             // get unity installations
-            var tempRootFolders = new string[] { "D:/Program Files/" };
-            unityInstallationsSource = GetUnityInstallations.Scan(tempRootFolders);
             dataGridUnitys.Items.Clear();
-            dataGridUnitys.ItemsSource = unityInstallationsSource;
+            UpdateUnityInstallationsList();
+
             // make dictionary of installed unitys, to search faster
             unityInstalledVersions.Clear();
             for (int i = 0; i < unityInstallationsSource.Length; i++)
@@ -58,7 +58,6 @@ namespace UnityLauncherPro
                 }
             }
 
-
             //dataGrid.Items.Add(GetProjects.Scan());
             projectsSource = GetProjects.Scan();
             gridRecent.Items.Clear();
@@ -66,15 +65,156 @@ namespace UnityLauncherPro
 
             // updates grid
             dataGridUpdates.Items.Clear();
-            //dataGridUpdates.ItemsSource = updatesSource;
 
             // build notifyicon (using windows.forms)
             notifyIcon = new System.Windows.Forms.NotifyIcon();
-            notifyIcon.Icon = new Icon(System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
+            notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
+        }
 
+        // main search
+        void FilterRecentProjects()
+        {
+            // https://www.wpftutorial.net/DataViews.html
+            _filterString = txtSearchBox.Text;
+            ICollectionView collection = CollectionViewSource.GetDefaultView(projectsSource);
+            collection.Filter = ProjectFilter;
 
-            //gridRecent.CurrentCell = gridRecent.sele;
+            // set first row selected (good, especially if only one results)
+            if (gridRecent.Items.Count > 0)
+            {
+                gridRecent.SelectedIndex = 0;
+            }
+        }
+
+        private bool ProjectFilter(object item)
+        {
+            Project proj = item as Project;
+            return (proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+        }
+
+        void LoadSettings()
+        {
+            // form size
+            this.Width = Properties.Settings.Default.windowWidth;
+            this.Height = Properties.Settings.Default.windowHeight;
+
+            /*
+            // update settings window
+            chkMinimizeToTaskbar.Checked = Properties.Settings.Default.minimizeToTaskbar;
+            chkQuitAfterCommandline.Checked = Properties.Settings.Default.closeAfterExplorer;
+            ChkQuitAfterOpen.Checked = Properties.Settings.Default.closeAfterProject;
+            chkShowLauncherArgumentsColumn.Checked = Properties.Settings.Default.showArgumentsColumn;
+            chkShowGitBranchColumn.Checked = Properties.Settings.Default.showGitBranchColumn;
+            chkDarkSkin.Checked = Properties.Settings.Default.useDarkSkin;
+
+            // update optional grid columns, hidden or visible
+            gridRecent.Columns["_launchArguments"].Visible = chkShowLauncherArgumentsColumn.Checked;
+            gridRecent.Columns["_gitBranch"].Visible = chkShowGitBranchColumn.Checked;
+            */
+
+            // update installations folder listbox
+            lstRootFolders.Items.Clear();
+            lstRootFolders.ItemsSource = Properties.Settings.Default.rootFolders;
+            //lstRootFolders.Items.AddRange(Properties.Settings.Default.rootFolders.Cast<string>().ToArray());
+
+            /*
+            // update packages folder listbox
+            lstPackageFolders.Items.AddRange(Properties.Settings.Default.packageFolders.Cast<string>().ToArray());
+
+            // restore datagrid column widths
+            int[] gridColumnWidths = Properties.Settings.Default.gridColumnWidths;
+            if (gridColumnWidths != null)
+            {
+                for (int i = 0; i < gridColumnWidths.Length; ++i)
+                {
+                    gridRecent.Columns[i].Width = gridColumnWidths[i];
+                }
+            }
+            */
+        } // LoadSettings()
+
+        private void SaveSettingsOnExit()
+        {
+            /*
+            // save list column widths
+            List<int> gridWidths;
+            if (Properties.Settings.Default.gridColumnWidths != null)
+            {
+                gridWidths = new List<int>(Properties.Settings.Default.gridColumnWidths);
+            }
+            else
+            {
+                gridWidths = new List<int>();
+            }
+
+            // restore data grid view widths
+            var colum = gridRecent.Columns[0];
+            for (int i = 0; i < gridRecent.Columns.Count; ++i)
+            {
+                if (Properties.Settings.Default.gridColumnWidths != null && Properties.Settings.Default.gridColumnWidths.Length > i)
+                {
+                    gridWidths[i] = gridRecent.Columns[i].Width;
+                }
+                else
+                {
+                    gridWidths.Add(gridRecent.Columns[i].Width);
+                }
+            }
+            Properties.Settings.Default.gridColumnWidths = gridWidths.ToArray();
+            Properties.Settings.Default.Save();
+            */
+        }
+
+        void UpdateUnityInstallationsList()
+        {
+            unityInstallationsSource = GetUnityInstallations.Scan();
+            dataGridUnitys.ItemsSource = unityInstallationsSource;
+        }
+
+        Project GetSelectedProject()
+        {
+            return (Project)gridRecent.SelectedItem;
+        }
+
+        UnityInstallation GetSelectedUnity()
+        {
+            return (UnityInstallation)dataGridUnitys.SelectedItem;
+        }
+
+        void AddUnityInstallationRootFolder()
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            dialog.Description = "Select Unity installations root folder";
+
+            var result = dialog.ShowDialog();
+            var newRoot = dialog.SelectedPath;
+            Console.WriteLine(newRoot);
+            if (String.IsNullOrWhiteSpace(newRoot) == false && Directory.Exists(newRoot) == true)
+            {
+                Properties.Settings.Default.rootFolders.Add(newRoot);
+                lstRootFolders.Items.Refresh();
+                Properties.Settings.Default.Save();
+                UpdateUnityInstallationsList();
+            }
+        }
+
+        //
+        //
+        // EVENTS
+        //
+        //
+
+        private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    ((TextBox)sender).Text = "";
+                    break;
+                default:
+                    break;
+            }
         }
 
         void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -102,7 +242,6 @@ namespace UnityLauncherPro
             }
         }
 
-
         private void OnRectangleMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left) this.DragMove();
@@ -112,40 +251,6 @@ namespace UnityLauncherPro
         {
             TextBox textbox = (TextBox)sender;
             FilterRecentProjects();
-            //FilterProjects(textbox.Text);
-        }
-
-        private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Escape:
-                    ((TextBox)sender).Text = "";
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        // main search
-        void FilterRecentProjects()
-        {
-            // https://www.wpftutorial.net/DataViews.html
-            _filterString = txtSearchBox.Text;
-            ICollectionView collection = CollectionViewSource.GetDefaultView(projectsSource);
-            collection.Filter = ProjectFilter;
-
-            // set first row selected (good, especially if only one results)
-            if (gridRecent.Items.Count > 0)
-            {
-                gridRecent.SelectedIndex = 0;
-            }
-        }
-
-        private bool ProjectFilter(object item)
-        {
-            Project proj = item as Project;
-            return (proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
         }
 
         private void BtnAddProjectFolder_Click(object sender, RoutedEventArgs e)
@@ -185,12 +290,6 @@ namespace UnityLauncherPro
             notifyIcon.Visible = true;
             this.Hide();
         }
-
-        private void TestButton(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Click!");
-        }
-
 
         private async void OnGetUnityUpdatesClick(object sender, RoutedEventArgs e)
         {
@@ -278,81 +377,11 @@ namespace UnityLauncherPro
             txtSearchBoxUpdates.Text = "";
         }
 
-        void LoadSettings()
-        {
-            // form size
-            this.Width = Properties.Settings.Default.windowWidth;
-            this.Height = Properties.Settings.Default.windowHeight;
-
-            /*
-            // update settings window
-            chkMinimizeToTaskbar.Checked = Properties.Settings.Default.minimizeToTaskbar;
-            chkQuitAfterCommandline.Checked = Properties.Settings.Default.closeAfterExplorer;
-            ChkQuitAfterOpen.Checked = Properties.Settings.Default.closeAfterProject;
-            chkShowLauncherArgumentsColumn.Checked = Properties.Settings.Default.showArgumentsColumn;
-            chkShowGitBranchColumn.Checked = Properties.Settings.Default.showGitBranchColumn;
-            chkDarkSkin.Checked = Properties.Settings.Default.useDarkSkin;
-
-            // update optional grid columns, hidden or visible
-            gridRecent.Columns["_launchArguments"].Visible = chkShowLauncherArgumentsColumn.Checked;
-            gridRecent.Columns["_gitBranch"].Visible = chkShowGitBranchColumn.Checked;
-
-            // update installations folder listbox
-            lstRootFolders.Items.Clear();
-            lstRootFolders.Items.AddRange(Properties.Settings.Default.rootFolders.Cast<string>().ToArray());
-            // update packages folder listbox
-            lstPackageFolders.Items.AddRange(Properties.Settings.Default.packageFolders.Cast<string>().ToArray());
-
-            // restore datagrid column widths
-            int[] gridColumnWidths = Properties.Settings.Default.gridColumnWidths;
-            if (gridColumnWidths != null)
-            {
-                for (int i = 0; i < gridColumnWidths.Length; ++i)
-                {
-                    gridRecent.Columns[i].Width = gridColumnWidths[i];
-                }
-            }
-            */
-
-
-        } // LoadSettings()
-
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             SaveSettingsOnExit();
         }
 
-        private void SaveSettingsOnExit()
-        {
-            /*
-            // save list column widths
-            List<int> gridWidths;
-            if (Properties.Settings.Default.gridColumnWidths != null)
-            {
-                gridWidths = new List<int>(Properties.Settings.Default.gridColumnWidths);
-            }
-            else
-            {
-                gridWidths = new List<int>();
-            }
-
-            // restore data grid view widths
-            var colum = gridRecent.Columns[0];
-            for (int i = 0; i < gridRecent.Columns.Count; ++i)
-            {
-                if (Properties.Settings.Default.gridColumnWidths != null && Properties.Settings.Default.gridColumnWidths.Length > i)
-                {
-                    gridWidths[i] = gridRecent.Columns[i].Width;
-                }
-                else
-                {
-                    gridWidths.Add(gridRecent.Columns[i].Width);
-                }
-            }
-            Properties.Settings.Default.gridColumnWidths = gridWidths.ToArray();
-            Properties.Settings.Default.Save();
-            */
-        }
 
         // save window size after resize
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -365,107 +394,7 @@ namespace UnityLauncherPro
 
         private void BtnLaunchProject_Click(object sender, RoutedEventArgs e)
         {
-            LaunchProject(GetSelectedProject());
-        }
-
-        void LaunchProject(Project proj)
-        {
-            // validate
-            if (proj == null) return;
-            if (Directory.Exists(proj.Path) == false) return;
-
-            Console.WriteLine("launching " + proj.Title);
-
-            // there is no assets path, probably we want to create new project then
-            var assetsFolder = Path.Combine(proj.Path, "Assets");
-            if (Directory.Exists(assetsFolder) == false)
-            {
-                // TODO could ask if want to create project..?
-                Directory.CreateDirectory(assetsFolder);
-            }
-
-            /*
-            // TODO when opening project, check for crashed backup scene first
-            if (openProject == true)
-            {
-                var cancelLaunch = CheckCrashBackupScene(projectPath);
-                if (cancelLaunch == true)
-                {
-                    return;
-                }
-            }*/
-
-
-            // we dont have this version installed (or no version info available)
-            var unityExePath = GetUnityExePath(proj.Version);
-            if (unityExePath == null)
-            {
-                Console.WriteLine("Missing unity version " + proj.Version);
-                // SetStatus("Missing Unity version: " + version);
-                // TODO
-                //if (openProject == true) DisplayUpgradeDialog(version, projectPath);
-                return;
-            }
-
-            /*
-            if (openProject == true)
-            {
-                SetStatus("Launching project in Unity " + version);
-            }
-            else
-            {
-                SetStatus("Launching Unity " + version);
-            }*/
-
-
-            try
-            {
-                Process myProcess = new Process();
-                var cmd = "\"" + unityExePath + "\"";
-                myProcess.StartInfo.FileName = cmd;
-
-                //if (openProject == true)
-                {
-                    var pars = " -projectPath " + "\"" + proj.Path + "\"";
-
-                    // TODO check for custom launch parameters and append them
-                    //string customArguments = GetSelectedRowData("_launchArguments");
-                    //if (string.IsNullOrEmpty(customArguments) == false)
-                    //{
-                    //    pars += " " + customArguments;
-                    //}
-
-                    myProcess.StartInfo.Arguments = pars;// TODO args + commandLineArguments;
-                }
-                myProcess.Start();
-
-                /*
-                if (Properties.Settings.Default.closeAfterProject)
-                {
-                    Environment.Exit(0);
-                }*/
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-
-
-        string GetUnityExePath(string version)
-        {
-            return unityInstalledVersions.ContainsKey(version) ? unityInstalledVersions[version] : null;
-        }
-
-
-        Project GetSelectedProject()
-        {
-            return (Project)gridRecent.SelectedItem;
-        }
-
-        UnityInstallation GetSelectedUnity()
-        {
-            return (UnityInstallation)dataGridUnitys.SelectedItem;
+            Tools.LaunchProject(GetSelectedProject());
         }
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -474,7 +403,7 @@ namespace UnityLauncherPro
             if (e.Key == Key.Return && e.KeyboardDevice.Modifiers == ModifierKeys.None)
             {
                 e.Handled = true;
-                LaunchProject(GetSelectedProject());
+                Tools.LaunchProject(GetSelectedProject());
                 return;
             }
 
@@ -504,7 +433,7 @@ namespace UnityLauncherPro
         private void BtnLaunchUnity_Click(object sender, RoutedEventArgs e)
         {
             var proj = GetSelectedProject();
-            var unitypath = GetUnityExePath(proj?.Version);
+            var unitypath = Tools.GetUnityExePath(proj?.Version);
             Tools.LaunchExe(unitypath);
         }
 
@@ -513,32 +442,7 @@ namespace UnityLauncherPro
             var proj = GetSelectedProject();
             if (proj == null) return;
 
-            DisplayUpgradeDialog(proj);
-        }
-
-        void DisplayUpgradeDialog(Project proj)
-        {
-            UpgradeWindow modalWindow = new UpgradeWindow(proj.Version, proj.Path, proj.Arguments);
-            modalWindow.Owner = this;
-            modalWindow.ShowDialog();
-            var results = modalWindow.DialogResult.HasValue && modalWindow.DialogResult.Value;
-
-            if (results == true)
-            {
-                var upgradeToVersion = UpgradeWindow.upgradeVersion;
-                if (string.IsNullOrEmpty(upgradeToVersion)) return;
-
-                // get selected version to upgrade for
-                Console.WriteLine("Upgrade to " + upgradeToVersion);
-
-                // inject new version for this item
-                proj.Version = upgradeToVersion;
-                LaunchProject(proj);
-            }
-            else
-            {
-                Console.WriteLine("results = " + results);
-            }
+            Tools.DisplayUpgradeDialog(proj, this);
         }
 
         // need to manually move into next/prev rows? https://stackoverflow.com/a/11652175/5452781
@@ -571,6 +475,7 @@ namespace UnityLauncherPro
             Tools.LaunchExe(unity.Path);
         }
 
+
         private void BtnReleaseNotes_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUnity();
@@ -582,8 +487,6 @@ namespace UnityLauncherPro
         {
             // TODO check for newer available version in Updates tab, select that row and jump to tab
         }
-
-
 
         // if press up/down in search box, move to first item in results
         private void TxtSearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -600,6 +503,39 @@ namespace UnityLauncherPro
                     break;
                 default:
                     break;
+            }
+        }
+
+        private void TxtSearchBoxUnity_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                    //e.Handled = true; // if enabled, we enter to first row initially
+                    dataGridUnitys.Focus();
+                    dataGridUnitys.SelectedIndex = 0;
+                    DataGridRow row = (DataGridRow)dataGridUnitys.ItemContainerGenerator.ContainerFromIndex(0);
+                    row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void BtnAddInstallationFolder_Click(object sender, RoutedEventArgs e)
+        {
+            AddUnityInstallationRootFolder();
+        }
+
+        private void BtnRemoveInstallationFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (lstRootFolders.SelectedIndex > -1)
+            {
+                Properties.Settings.Default.rootFolders.Remove(lstRootFolders.Items[lstRootFolders.SelectedIndex].ToString());
+                Properties.Settings.Default.Save();
+                lstRootFolders.Items.Refresh();
+                UpdateUnityInstallationsList();
             }
         }
     } // class

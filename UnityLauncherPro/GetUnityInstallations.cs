@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace UnityLauncherPro
 {
@@ -10,8 +9,12 @@ namespace UnityLauncherPro
     /// </summary>
     public static class GetUnityInstallations
     {
-        public static UnityInstallation[] Scan(string[] rootFolders)
+        //public static UnityInstallation[] Scan(string[] rootFolders)
+        public static UnityInstallation[] Scan()
         {
+            // convert settings list to string array
+            var rootFolders = Properties.Settings.Default.rootFolders;
+
             // unityversion, exe_path
             //Dictionary<string, UnityInstallation> results = new ictionary<string, UnityInstallation>();
             List<UnityInstallation> results = new List<UnityInstallation>();
