@@ -396,19 +396,31 @@ namespace UnityLauncherPro
         {
             Tools.LaunchProject(GetSelectedProject());
         }
-
+        /*
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             // override Enter for datagrid
-            if (e.Key == Key.Return && e.KeyboardDevice.Modifiers == ModifierKeys.None)
+            switch (tabControl.SelectedIndex)
             {
-                e.Handled = true;
-                Tools.LaunchProject(GetSelectedProject());
-                return;
+                case 0: // projects
+
+                    //Tools.LaunchProject(GetSelectedProject());
+                    break;
+                case 1: // unitys
+                    break;
+                case 2: // updates
+                    break;
+                case 3: // tools
+                    break;
+                case 4: // settings
+                    break;
+                default:
+                    break;
             }
 
+
             base.OnKeyDown(e);
-        }
+        }*/
 
         private void BtnExplore_Click(object sender, RoutedEventArgs e)
         {
@@ -443,12 +455,6 @@ namespace UnityLauncherPro
             if (proj == null) return;
 
             Tools.DisplayUpgradeDialog(proj, this);
-        }
-
-        // need to manually move into next/prev rows? https://stackoverflow.com/a/11652175/5452781
-        private void GridRecent_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            //Tools.HandleDataGridScrollKeys(sender, e);
         }
 
         private void GridRecent_Loaded(object sender, RoutedEventArgs e)
@@ -536,6 +542,51 @@ namespace UnityLauncherPro
                 Properties.Settings.Default.Save();
                 lstRootFolders.Items.Refresh();
                 UpdateUnityInstallationsList();
+            }
+        }
+
+        // need to manually move into next/prev rows? https://stackoverflow.com/a/11652175/5452781
+        private void GridRecent_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                e.Handled = true;
+                Tools.LaunchProject(GetSelectedProject());
+            }
+        }
+
+        private void DataGridUnitys_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                e.Handled = true;
+                // TODO launchunity
+            }
+        }
+
+        private void DataGridUpdates_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                e.Handled = true;
+                // TODO open release page?
+            }
+        }
+
+        private void TxtSearchBoxUpdates_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                    //e.Handled = true; // if enabled, we enter to first row initially
+                    dataGridUpdates.Focus();
+                    dataGridUpdates.SelectedIndex = 0;
+                    DataGridRow row = (DataGridRow)dataGridUpdates.ItemContainerGenerator.ContainerFromIndex(0);
+                    row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    break;
+                default:
+                    break;
             }
         }
     } // class
