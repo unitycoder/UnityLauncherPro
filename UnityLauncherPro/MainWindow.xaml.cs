@@ -199,6 +199,16 @@ namespace UnityLauncherPro
             }
         }
 
+        void SetFocusToGrid(DataGrid targetGrid)
+        {
+            //e.Handled = true; // if enabled, we enter to first row initially
+            targetGrid.Focus();
+            targetGrid.SelectedIndex = 0;
+            DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(0);
+            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+        }
+
+
         //
         //
         // EVENTS
@@ -333,11 +343,7 @@ namespace UnityLauncherPro
                     // activate searchbar if not active and we are in tab#1
                     if (tabControl.SelectedIndex == 0 && txtSearchBox.IsFocused == false)
                     {
-                        // dont write tab key on search field
-                        if (e.Key == Key.Tab) break;
-
                         txtSearchBox.Focus();
-                        //txtSearchBox.Text += e.Key;
                         txtSearchBox.Select(txtSearchBox.Text.Length, 0);
                     }
                     break;
@@ -396,31 +402,6 @@ namespace UnityLauncherPro
         {
             Tools.LaunchProject(GetSelectedProject());
         }
-        /*
-        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            // override Enter for datagrid
-            switch (tabControl.SelectedIndex)
-            {
-                case 0: // projects
-
-                    //Tools.LaunchProject(GetSelectedProject());
-                    break;
-                case 1: // unitys
-                    break;
-                case 2: // updates
-                    break;
-                case 3: // tools
-                    break;
-                case 4: // settings
-                    break;
-                default:
-                    break;
-            }
-
-
-            base.OnKeyDown(e);
-        }*/
 
         private void BtnExplore_Click(object sender, RoutedEventArgs e)
         {
@@ -459,11 +440,7 @@ namespace UnityLauncherPro
 
         private void GridRecent_Loaded(object sender, RoutedEventArgs e)
         {
-            gridRecent.Focus();
-            gridRecent.SelectedIndex = 0;
-            // properly set focus to row
-            DataGridRow row = (DataGridRow)gridRecent.ItemContainerGenerator.ContainerFromIndex(0);
-            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            SetFocusToGrid(gridRecent);
         }
 
         private void BtnExploreUnity_Click(object sender, RoutedEventArgs e)
@@ -499,13 +476,10 @@ namespace UnityLauncherPro
         {
             switch (e.Key)
             {
+                case Key.Tab:
                 case Key.Up:
                 case Key.Down:
-                    //e.Handled = true; // if enabled, we enter to first row initially
-                    gridRecent.Focus();
-                    gridRecent.SelectedIndex = 0;
-                    DataGridRow row = (DataGridRow)gridRecent.ItemContainerGenerator.ContainerFromIndex(0);
-                    row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    SetFocusToGrid(gridRecent);
                     break;
                 default:
                     break;
@@ -518,11 +492,7 @@ namespace UnityLauncherPro
             {
                 case Key.Up:
                 case Key.Down:
-                    //e.Handled = true; // if enabled, we enter to first row initially
-                    dataGridUnitys.Focus();
-                    dataGridUnitys.SelectedIndex = 0;
-                    DataGridRow row = (DataGridRow)dataGridUnitys.ItemContainerGenerator.ContainerFromIndex(0);
-                    row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    SetFocusToGrid(dataGridUnitys);
                     break;
                 default:
                     break;
@@ -579,15 +549,66 @@ namespace UnityLauncherPro
             {
                 case Key.Up:
                 case Key.Down:
-                    //e.Handled = true; // if enabled, we enter to first row initially
-                    dataGridUpdates.Focus();
-                    dataGridUpdates.SelectedIndex = 0;
-                    DataGridRow row = (DataGridRow)dataGridUpdates.ItemContainerGenerator.ContainerFromIndex(0);
-                    row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    SetFocusToGrid(dataGridUpdates);
                     break;
                 default:
                     break;
             }
+        }
+
+        private void BtnOpenEditorLogsFolder_Click(object sender, RoutedEventArgs e)
+        {
+            var logfolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Unity", "Editor");
+            if (Directory.Exists(logfolder) == true)
+            {
+                if (Tools.LaunchExplorer(logfolder) == false)
+                {
+                    Console.WriteLine("Cannot open folder.." + logfolder);
+                }
+            }
+        }
+
+        private void BtnOpenPlayerLogs_Click(object sender, RoutedEventArgs e)
+        {
+            var logfolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/../LocalLow");
+            if (Directory.Exists(logfolder) == true)
+            {
+                if (Tools.LaunchExplorer(logfolder) == false)
+                {
+                    Console.WriteLine("Error> Directory not found: " + logfolder);
+                }
+            }
+        }
+
+        private void BtnOpenADBLogCat_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process myProcess = new Process();
+                var cmd = "cmd.exe";
+                myProcess.StartInfo.FileName = cmd;
+                // NOTE windows 10 cmd line supports ansi colors, otherwise remove -v color
+                var pars = " /c adb logcat -s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
+                myProcess.StartInfo.Arguments = pars;
+                myProcess.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
+        private void BtnAdbBindWifi_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO async
+            //// check if your device is present
+            //adb devices
+            //// get device ip address (see inet row)
+            //adb shell ip addr show wlan0
+            //// enable tcpip and port
+            //adb tcpip 5555
+            //// connect device (use your device ip address)
+            //adb connect IP_HERE:5555
         }
     } // class
 } //namespace
