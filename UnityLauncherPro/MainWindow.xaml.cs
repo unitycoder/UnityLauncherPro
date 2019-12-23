@@ -94,23 +94,19 @@ namespace UnityLauncherPro
             // update settings window
             chkQuitAfterCommandline.Checked = Properties.Settings.Default.closeAfterExplorer;
             ChkQuitAfterOpen.Checked = Properties.Settings.Default.closeAfterProject;
-            chkShowLauncherArgumentsColumn.Checked = Properties.Settings.Default.showArgumentsColumn;
-            chkShowGitBranchColumn.Checked = Properties.Settings.Default.showGitBranchColumn;
-            chkDarkSkin.Checked = Properties.Settings.Default.useDarkSkin;
+            */
+
+            chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
+            chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
 
             // update optional grid columns, hidden or visible
-            gridRecent.Columns["_launchArguments"].Visible = chkShowLauncherArgumentsColumn.Checked;
-            gridRecent.Columns["_gitBranch"].Visible = chkShowGitBranchColumn.Checked;
-            */
+            gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+            gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+
 
             // update installations folder listbox
             lstRootFolders.Items.Clear();
             lstRootFolders.ItemsSource = Properties.Settings.Default.rootFolders;
-            //lstRootFolders.Items.AddRange(Properties.Settings.Default.rootFolders.Cast<string>().ToArray());
-
-            /*
-            // update packages folder listbox
-            lstPackageFolders.Items.AddRange(Properties.Settings.Default.packageFolders.Cast<string>().ToArray());
 
             // restore datagrid column widths
             int[] gridColumnWidths = Properties.Settings.Default.gridColumnWidths;
@@ -121,12 +117,11 @@ namespace UnityLauncherPro
                     gridRecent.Columns[i].Width = gridColumnWidths[i];
                 }
             }
-            */
         } // LoadSettings()
 
         private void SaveSettingsOnExit()
         {
-            /*
+
             // save list column widths
             List<int> gridWidths;
             if (Properties.Settings.Default.gridColumnWidths != null)
@@ -144,16 +139,16 @@ namespace UnityLauncherPro
             {
                 if (Properties.Settings.Default.gridColumnWidths != null && Properties.Settings.Default.gridColumnWidths.Length > i)
                 {
-                    gridWidths[i] = gridRecent.Columns[i].Width;
+                    gridWidths[i] = (int)gridRecent.Columns[i].Width.Value;
                 }
                 else
                 {
-                    gridWidths.Add(gridRecent.Columns[i].Width);
+                    gridWidths.Add((int)gridRecent.Columns[i].Width.Value);
                 }
             }
             Properties.Settings.Default.gridColumnWidths = gridWidths.ToArray();
             Properties.Settings.Default.Save();
-            */
+
         }
 
         void UpdateUnityInstallationsList()
@@ -728,8 +723,19 @@ namespace UnityLauncherPro
             Properties.Settings.Default.registerExplorerMenu = (bool)chkRegisterExplorerMenu.IsChecked;
             Properties.Settings.Default.Save();
         }
+
+        private void ChkShowLauncherArgumentsColumn_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.showArgumentsColumn = (bool)chkShowLauncherArgumentsColumn.IsChecked;
+            Properties.Settings.Default.Save();
+            gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void ChkShowGitBranchColumn_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.showGitBranchColumn = (bool)chkShowGitBranchColumn.IsChecked;
+            Properties.Settings.Default.Save();
+            gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+        }
     } // class
 } //namespace
-
-
-

@@ -600,8 +600,8 @@
 						<CheckBox x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged"/>
 						<CheckBox Content="Close after opening project" Foreground="{DynamicResource ButtonForeground}"/>
 						<CheckBox Content="Close after launching from Explorer" Foreground="{DynamicResource ButtonForeground}"/>
-						<CheckBox Content="Show Arguments Column" Foreground="{DynamicResource ButtonForeground}"/>
-						<CheckBox Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}"/>
+						<CheckBox x:Name="chkShowLauncherArgumentsColumn" Content="Show Arguments Column" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged"/>
+						<CheckBox x:Name="chkShowGitBranchColumn" Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged"/>
 						<CheckBox Content="Show full modified time" Foreground="{DynamicResource ButtonForeground}" ToolTip="Full=dd/mm/yyyy hh:mm:ss, NotFull=x hours ago, x days ago.."/>
 					</StackPanel>
 

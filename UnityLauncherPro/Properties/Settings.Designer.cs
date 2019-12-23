@@ -84,5 +84,64 @@ namespace UnityLauncherPro.Properties {
                 this["registerExplorerMenu"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool closeAfterProject {
+            get {
+                return ((bool)(this["closeAfterProject"]));
+            }
+            set {
+                this["closeAfterProject"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool closeAfterExplorer {
+            get {
+                return ((bool)(this["closeAfterExplorer"]));
+            }
+            set {
+                this["closeAfterExplorer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool showArgumentsColumn {
+            get {
+                return ((bool)(this["showArgumentsColumn"]));
+            }
+            set {
+                this["showArgumentsColumn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool showGitBranchColumn {
+            get {
+                return ((bool)(this["showGitBranchColumn"]));
+            }
+            set {
+                this["showGitBranchColumn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int[] gridColumnWidths {
+            get {
+                return ((int[])(this["gridColumnWidths"]));
+            }
+            set {
+                this["gridColumnWidths"] = value;
+            }
+        }
     }
 }
