@@ -60,5 +60,29 @@ namespace UnityLauncherPro.Properties {
                 this["rootFolders"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool minimizeToTaskbar {
+            get {
+                return ((bool)(this["minimizeToTaskbar"]));
+            }
+            set {
+                this["minimizeToTaskbar"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool registerExplorerMenu {
+            get {
+                return ((bool)(this["registerExplorerMenu"]));
+            }
+            set {
+                this["registerExplorerMenu"] = value;
+            }
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace UnityLauncherPro
         Updates[] updatesSource;
         UnityInstallation[] unityInstallationsSource;
         public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>();
-
+        const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         string _filterString = null;
 
         public MainWindow()
@@ -47,18 +47,6 @@ namespace UnityLauncherPro
             dataGridUnitys.Items.Clear();
             UpdateUnityInstallationsList();
 
-            // make dictionary of installed unitys, to search faster
-            unityInstalledVersions.Clear();
-            for (int i = 0; i < unityInstallationsSource.Length; i++)
-            {
-                var version = unityInstallationsSource[i].Version;
-                if (unityInstalledVersions.ContainsKey(version) == false)
-                {
-                    unityInstalledVersions.Add(version, unityInstallationsSource[i].Path);
-                }
-            }
-
-            //dataGrid.Items.Add(GetProjects.Scan());
             projectsSource = GetProjects.Scan();
             gridRecent.Items.Clear();
             gridRecent.ItemsSource = projectsSource;
@@ -99,9 +87,11 @@ namespace UnityLauncherPro
             this.Width = Properties.Settings.Default.windowWidth;
             this.Height = Properties.Settings.Default.windowHeight;
 
+            chkMinimizeToTaskbar.IsChecked = Properties.Settings.Default.minimizeToTaskbar;
+            chkRegisterExplorerMenu.IsChecked = Properties.Settings.Default.registerExplorerMenu;
+
             /*
             // update settings window
-            chkMinimizeToTaskbar.Checked = Properties.Settings.Default.minimizeToTaskbar;
             chkQuitAfterCommandline.Checked = Properties.Settings.Default.closeAfterExplorer;
             ChkQuitAfterOpen.Checked = Properties.Settings.Default.closeAfterProject;
             chkShowLauncherArgumentsColumn.Checked = Properties.Settings.Default.showArgumentsColumn;
@@ -170,6 +160,17 @@ namespace UnityLauncherPro
         {
             unityInstallationsSource = GetUnityInstallations.Scan();
             dataGridUnitys.ItemsSource = unityInstallationsSource;
+
+            // make dictionary of installed unitys, to search faster
+            unityInstalledVersions.Clear();
+            for (int i = 0; i < unityInstallationsSource.Length; i++)
+            {
+                var version = unityInstallationsSource[i].Version;
+                if (unityInstalledVersions.ContainsKey(version) == false)
+                {
+                    unityInstalledVersions.Add(version, unityInstallationsSource[i].Path);
+                }
+            }
         }
 
         Project GetSelectedProject()
@@ -182,6 +183,11 @@ namespace UnityLauncherPro
             return (UnityInstallation)dataGridUnitys.SelectedItem;
         }
 
+        Updates GetSelectedUpdate()
+        {
+            return (Updates)dataGridUpdates.SelectedItem;
+        }
+
         void AddUnityInstallationRootFolder()
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
@@ -189,7 +195,6 @@ namespace UnityLauncherPro
 
             var result = dialog.ShowDialog();
             var newRoot = dialog.SelectedPath;
-            Console.WriteLine(newRoot);
             if (String.IsNullOrWhiteSpace(newRoot) == false && Directory.Exists(newRoot) == true)
             {
                 Properties.Settings.Default.rootFolders.Add(newRoot);
@@ -202,12 +207,24 @@ namespace UnityLauncherPro
         void SetFocusToGrid(DataGrid targetGrid)
         {
             //e.Handled = true; // if enabled, we enter to first row initially
+            if (targetGrid.Items.Count < 1) return;
             targetGrid.Focus();
             targetGrid.SelectedIndex = 0;
             DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(0);
             row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         }
 
+        async void CallGetUnityUpdates()
+        {
+            dataGridUpdates.ItemsSource = null;
+            var task = GetUnityUpdates.Scan();
+            var items = await task;
+            // TODO handle errors?
+            if (items == null) return;
+            updatesSource = GetUnityUpdates.Parse(items);
+            if (updatesSource == null) return;
+            dataGridUpdates.ItemsSource = updatesSource;
+        }
 
         //
         //
@@ -297,8 +314,15 @@ namespace UnityLauncherPro
         {
             // remove focus from minimize button
             gridRecent.Focus();
-            notifyIcon.Visible = true;
-            this.Hide();
+            if (chkMinimizeToTaskbar.IsChecked == true)
+            {
+                notifyIcon.Visible = true;
+                this.Hide();
+            }
+            else
+            {
+                this.WindowState = WindowState.Minimized;
+            }
         }
 
         private async void OnGetUnityUpdatesClick(object sender, RoutedEventArgs e)
@@ -306,13 +330,7 @@ namespace UnityLauncherPro
             var button = (Button)sender;
             button.IsEnabled = false;
 
-            var task = GetUnityUpdates.Scan();
-            var items = await task;
-            // TODO handle errors?
-            if (items == null) return;
-            updatesSource = GetUnityUpdates.Parse(items);
-            if (updatesSource == null) return;
-            dataGridUpdates.ItemsSource = updatesSource;
+            CallGetUnityUpdates();
 
             button.IsEnabled = true;
         }
@@ -321,33 +339,63 @@ namespace UnityLauncherPro
         {
             // TODO if editing cells, dont focus on search
             //if (gridRecent.IsCurrentCellInEditMode == true) return;
-            switch (e.Key)
-            {
-                case Key.Escape: // clear project search
-                    if (tabControl.SelectedIndex == 0 && txtSearchBox.Text != "")
-                    {
-                        txtSearchBox.Text = "";
-                    }
-                    // clear updates search
-                    else if (tabControl.SelectedIndex == 2 && txtSearchBoxUpdates.Text != "")
-                    {
-                        txtSearchBoxUpdates.Text = "";
-                    }
-                    break;
-                case Key.Up:
-                    break;
-                case Key.Down:
-                    break;
-                default: // any key
 
-                    // activate searchbar if not active and we are in tab#1
-                    if (tabControl.SelectedIndex == 0 && txtSearchBox.IsFocused == false)
+            switch (tabControl.SelectedIndex)
+            {
+                case 0: // Projects
+
+                    switch (e.Key)
                     {
-                        txtSearchBox.Focus();
-                        txtSearchBox.Select(txtSearchBox.Text.Length, 0);
+                        case Key.F5: // refresh projects
+                            projectsSource = GetProjects.Scan();
+                            gridRecent.ItemsSource = projectsSource;
+                            break;
+                        case Key.Escape: // clear project search
+                            txtSearchBox.Text = "";
+                            break;
+                        default: // any key
+                            // activate searchbar if not active and we are in tab#1
+                            if (txtSearchBox.IsFocused == false)
+                            {
+                                txtSearchBox.Focus();
+                                txtSearchBox.Select(txtSearchBox.Text.Length, 0);
+                            }
+                            break;
                     }
+
+                    break;
+                case 1: // Unitys
+
+                    switch (e.Key)
+                    {
+                        case Key.F5: // refresh unitys
+                            UpdateUnityInstallationsList(); break;
+                        case Key.Escape: // clear project search
+                            txtSearchBoxUnity.Text = "";
+                            break;
+                        default: // any key
+                            break;
+                    }
+                    break;
+
+                case 2: // Updates
+
+                    switch (e.Key)
+                    {
+                        case Key.F5: // refresh unitys
+                            CallGetUnityUpdates();
+                            break;
+                        case Key.Escape: // clear project search
+                            txtSearchBoxUpdates.Text = "";
+                            break;
+                        default: // any key
+                            break;
+                    }
+                    break;
+                default:
                     break;
             }
+
         }
 
         private async void OnTabSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -412,8 +460,22 @@ namespace UnityLauncherPro
         // copy selected row unity version to clipboard
         private void MenuItemCopyVersion_Click(object sender, RoutedEventArgs e)
         {
-            var proj = GetSelectedProject();
-            Clipboard.SetText(proj?.Version);
+            string copy = null;
+            if (tabControl.SelectedIndex == 0)
+            {
+                var proj = GetSelectedProject();
+                copy = proj?.Version;
+            }
+            else if (tabControl.SelectedIndex == 1)
+            {
+                var unity = GetSelectedUnity();
+                copy = unity?.Version;
+            }
+            else if (tabControl.SelectedIndex == 2)
+            {
+                //var update = getselect
+            }
+            if (copy != null) Clipboard.SetText(copy);
         }
 
         private void BtnRefreshProjectList_Click(object sender, RoutedEventArgs e)
@@ -518,10 +580,20 @@ namespace UnityLauncherPro
         // need to manually move into next/prev rows? https://stackoverflow.com/a/11652175/5452781
         private void GridRecent_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Return)
+            switch (e.Key)
             {
-                e.Handled = true;
-                Tools.LaunchProject(GetSelectedProject());
+                case Key.Tab:
+                    if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                    {
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.Return:
+                    e.Handled = true;
+                    Tools.LaunchProject(GetSelectedProject());
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -609,6 +681,52 @@ namespace UnityLauncherPro
             //adb tcpip 5555
             //// connect device (use your device ip address)
             //adb connect IP_HERE:5555
+        }
+
+        private void BtnRefreshUnityList_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateUnityInstallationsList();
+        }
+
+        private void BtnDonwloadInBrowser_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            string url = Tools.GetUnityReleaseURL(unity?.Version);
+            if (string.IsNullOrEmpty(url) == false)
+            {
+                Tools.DownloadInBrowser(url, unity.Version);
+            }
+            else
+            {
+                Console.WriteLine("Failed getting Unity Installer URL for " + unity.Version);
+            }
+        }
+
+        private void BtnOpenWebsite_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            Tools.OpenReleaseNotes(unity?.Version);
+        }
+
+        private void ChkMinimizeToTaskbar_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.minimizeToTaskbar = (bool)chkMinimizeToTaskbar.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void ChkRegisterExplorerMenu_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if ((bool)chkRegisterExplorerMenu.IsChecked)
+            {
+                Tools.AddContextMenuRegistry(contextRegRoot);
+            }
+            else // remove
+            {
+                Tools.RemoveContextMenuRegistry(contextRegRoot);
+            }
+
+            Properties.Settings.Default.registerExplorerMenu = (bool)chkRegisterExplorerMenu.IsChecked;
+            Properties.Settings.Default.Save();
         }
     } // class
 } //namespace

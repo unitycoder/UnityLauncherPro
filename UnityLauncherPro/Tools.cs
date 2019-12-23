@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -246,8 +248,10 @@ namespace UnityLauncherPro
 
         public static string GetUnityReleaseURL(string version)
         {
+            if (string.IsNullOrEmpty(version)) return null;
+
             string url = "";
-            if (VersionIsArchived(version))
+            if (VersionIsArchived(version) == true)
             {
                 // remove f#
                 version = Regex.Replace(version, @"f.", "", RegexOptions.IgnoreCase);
@@ -263,26 +267,24 @@ namespace UnityLauncherPro
                 if (version.Contains("2017.4.")) padding = ""; //  doesnt work for all versions
                 if (version.Contains("2018.4.")) padding = "";
                 if (version.Contains("2019")) padding = "";
+                if (version.Contains("2020")) padding = "";
                 url = "https://unity3d.com/unity/" + whatsnew + "/" + padding + version;
             }
             else
-            if (VersionIsPatch(version))
+            if (VersionIsPatch(version) == true)
             {
                 url = "https://unity3d.com/unity/qa/patch-releases/" + version;
             }
             else
-            if (VersionIsBeta(version))
+            if (VersionIsBeta(version) == true)
             {
                 url = "https://unity3d.com/unity/beta/" + version;
             }
             else
-            if (VersionIsAlpha(version))
+            if (VersionIsAlpha(version) == true)
             {
                 url = "https://unity3d.com/unity/alpha/" + version;
             }
-
-            Console.WriteLine(url);
-
             return url;
         }
 
@@ -311,15 +313,13 @@ namespace UnityLauncherPro
         public static bool OpenReleaseNotes(string version)
         {
             bool result = false;
+            if (string.IsNullOrEmpty(version)) return false;
+
             var url = Tools.GetUnityReleaseURL(version);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Process.Start(url);
-                result = true;
-            }
-            else
-            {
-            }
+            if (string.IsNullOrEmpty(url)) return false;
+
+            Process.Start(url);
+            result = true;
             return result;
         }
 
@@ -513,6 +513,68 @@ namespace UnityLauncherPro
             else
             {
                 Console.WriteLine("results = " + results);
+            }
+        }
+
+        /// <summary>
+        /// install context menu item to registry
+        /// </summary>
+        /// <param name="contextRegRoot"></param>
+        public static void AddContextMenuRegistry(string contextRegRoot)
+        {
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(contextRegRoot, true);
+
+            // add folder if missing
+            if (key == null)
+            {
+                key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\Directory\Background\Shell");
+            }
+
+            if (key != null)
+            {
+                var appName = "UnityLauncherPro";
+                key.CreateSubKey(appName);
+
+                key = key.OpenSubKey(appName, true);
+                key.SetValue("", "Open with " + appName);
+                key.SetValue("Icon", "\"" + Process.GetCurrentProcess().MainModule.FileName + "\"");
+
+                key.CreateSubKey("command");
+                key = key.OpenSubKey("command", true);
+                var executeString = "\"" + Process.GetCurrentProcess().MainModule.FileName + "\"";
+                executeString += " -projectPath \"%V\"";
+                key.SetValue("", executeString);
+            }
+            else
+            {
+                Console.WriteLine("Error> Cannot find registry key: " + contextRegRoot);
+            }
+        }
+
+        /// <summary>
+        /// uninstall context menu item from registry
+        /// </summary>
+        /// <param name="contextRegRoot"></param>
+        public static void RemoveContextMenuRegistry(string contextRegRoot)
+        {
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(contextRegRoot, true);
+            if (key != null)
+            {
+                var appName = "UnityLauncher";
+                RegistryKey appKey = Registry.CurrentUser.OpenSubKey(contextRegRoot + "\\" + appName, false);
+                if (appKey != null)
+                {
+                    key.DeleteSubKeyTree(appName);
+                    //SetStatus("Removed context menu registry items");
+                }
+                else
+                {
+                    //SetStatus("Nothing to uninstall..");
+                }
+            }
+            else
+            {
+                //SetStatus("Error> Cannot find registry key: " + contextRegRoot);
             }
         }
 
