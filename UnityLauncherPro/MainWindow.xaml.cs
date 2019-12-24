@@ -21,6 +21,7 @@ namespace UnityLauncherPro
         UnityInstallation[] unityInstallationsSource;
         public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>();
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
+        public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
         string _filterString = null;
 
         public MainWindow()
@@ -28,8 +29,6 @@ namespace UnityLauncherPro
             InitializeComponent();
             Start();
         }
-
-
 
         void Start()
         {
@@ -42,12 +41,14 @@ namespace UnityLauncherPro
             Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
             WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
 
-
             // get unity installations
             dataGridUnitys.Items.Clear();
             UpdateUnityInstallationsList();
 
-            projectsSource = GetProjects.Scan();
+            HandleCommandLineLaunch();
+
+            // update projects list
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked);
             gridRecent.Items.Clear();
             gridRecent.ItemsSource = projectsSource;
 
@@ -58,6 +59,79 @@ namespace UnityLauncherPro
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
+        }
+
+        void HandleCommandLineLaunch()
+        {
+            // check if received -projectPath argument (that means opening from explorer / cmdline)
+            string[] args = Environment.GetCommandLineArgs();
+            if (args != null && args.Length > 2)
+            {
+                // first argument needs to be -projectPath
+                var commandLineArgs = args[1];
+                if (commandLineArgs == "-projectPath")
+                {
+                    Console.WriteLine("Launching from commandline ...");
+
+                    // path
+                    var projectPathArgument = args[2];
+
+                    // resolve full path if path parameter isn't a rooted path
+                    if (!Path.IsPathRooted(projectPathArgument))
+                    {
+                        projectPathArgument = Directory.GetCurrentDirectory() + projectPathArgument;
+                    }
+
+                    var version = Tools.GetProjectVersion(projectPathArgument);
+
+                    // take extra arguments also
+                    var commandLineArguments = "";
+                    for (int i = 3, len = args.Length; i < len; i++)
+                    {
+                        commandLineArguments += " " + args[i];
+                    }
+
+
+                    var proj = new Project();
+                    proj.Version = version;
+                    proj.Path = projectPathArgument;
+                    proj.Arguments = commandLineArguments;
+
+                    // check if force-update button is down
+                    // NOTE if keydown, window doesnt become active and focused
+                    if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
+                    {
+                        //DisplayUpgradeDialog(version, projectPathArgument, launchProject: true, commandLineArguments: commandLineArguments);
+                        //MessageBox.Show("Do you want to Save?", "3", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                        //this.ShowActivated = false;
+                        //Hide();'
+                        //Show();
+                        //Height = 10;
+                        //Width = 10;
+                        //Topmost = true;
+                        Tools.DisplayUpgradeDialog(proj, null);
+                    }
+                    else
+                    {
+                        //MessageBox.Show("Do you want to Save?", "2", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                        // try launching it
+                        //LaunchProject(projectPathArgument, version, openProject: true, commandLineArguments: commandLineArguments);
+                        Tools.LaunchProject(proj);
+                    }
+
+                    // quit after launch if enabled in settings
+                    if (Properties.Settings.Default.closeAfterExplorer == true)
+                    {
+                        //MessageBox.Show("Do you want to Save?", "quit", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                        //Environment.Exit(0);
+                    }
+                    //SetStatus("Ready");
+                }
+                else
+                {
+                    Console.WriteLine("Error> Invalid arguments:" + args[1]);
+                }
+            }
         }
 
         // main search
@@ -90,14 +164,12 @@ namespace UnityLauncherPro
             chkMinimizeToTaskbar.IsChecked = Properties.Settings.Default.minimizeToTaskbar;
             chkRegisterExplorerMenu.IsChecked = Properties.Settings.Default.registerExplorerMenu;
 
-            /*
             // update settings window
-            chkQuitAfterCommandline.Checked = Properties.Settings.Default.closeAfterExplorer;
-            ChkQuitAfterOpen.Checked = Properties.Settings.Default.closeAfterProject;
-            */
-
+            chkQuitAfterCommandline.IsChecked = Properties.Settings.Default.closeAfterExplorer;
+            chkQuitAfterOpen.IsChecked = Properties.Settings.Default.closeAfterProject;
             chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
             chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
+            chkShowFullTime.IsChecked = Properties.Settings.Default.showFullModifiedTime;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -342,7 +414,7 @@ namespace UnityLauncherPro
                     switch (e.Key)
                     {
                         case Key.F5: // refresh projects
-                            projectsSource = GetProjects.Scan();
+                            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked);
                             gridRecent.ItemsSource = projectsSource;
                             break;
                         case Key.Escape: // clear project search
@@ -475,7 +547,7 @@ namespace UnityLauncherPro
 
         private void BtnRefreshProjectList_Click(object sender, RoutedEventArgs e)
         {
-            projectsSource = GetProjects.Scan();
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked);
             gridRecent.ItemsSource = projectsSource;
         }
 
@@ -737,5 +809,24 @@ namespace UnityLauncherPro
             Properties.Settings.Default.Save();
             gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
         }
+
+        private void ChkQuitAfterOpen_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.closeAfterProject = (bool)chkQuitAfterOpen.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void ChkQuitAfterCommandline_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.closeAfterExplorer = (bool)chkQuitAfterCommandline.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void ChkShowFullTime_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.showFullModifiedTime = (bool)chkShowFullTime.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
     } // class
 } //namespace

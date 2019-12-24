@@ -128,5 +128,6 @@ namespace UnityLauncherPro
             DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
             row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         }
+
     }
 }

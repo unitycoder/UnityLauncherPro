@@ -202,11 +202,11 @@ namespace UnityLauncherPro
                 }
                 myProcess.Start();
 
-                /*
+
                 if (Properties.Settings.Default.closeAfterProject)
                 {
                     Environment.Exit(0);
-                }*/
+                }
             }
             catch (Exception e)
             {
@@ -494,6 +494,13 @@ namespace UnityLauncherPro
         public static void DisplayUpgradeDialog(Project proj, MainWindow owner)
         {
             UpgradeWindow modalWindow = new UpgradeWindow(proj.Version, proj.Path, proj.Arguments);
+
+            modalWindow.ShowInTaskbar = owner == null;
+            modalWindow.WindowStartupLocation = owner == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
+            //modalWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            modalWindow.Topmost = owner == null;
+            //modalWindow.Topmost = true;
+            modalWindow.ShowActivated = true;
             modalWindow.Owner = owner;
             modalWindow.ShowDialog();
             var results = modalWindow.DialogResult.HasValue && modalWindow.DialogResult.Value;
@@ -576,6 +583,70 @@ namespace UnityLauncherPro
             {
                 //SetStatus("Error> Cannot find registry key: " + contextRegRoot);
             }
+        }
+
+        /// <summary>
+        /// reads .git/HEAD file from the project to get current branch name
+        /// </summary>
+        /// <param name="projectPath"></param>
+        /// <returns></returns>
+        public static string ReadGitBranchInfo(string projectPath)
+        {
+            string results = null;
+            DirectoryInfo gitDirectory = FindDir(".git", projectPath);
+            if (gitDirectory != null)
+            {
+                string branchFile = Path.Combine(gitDirectory.FullName, "HEAD");
+                if (File.Exists(branchFile))
+                {
+                    // removes extra end of line
+                    results = string.Join(" ", File.ReadAllLines(branchFile));
+                    // get branch only
+                    int pos = results.LastIndexOf("/") + 1;
+                    results = results.Substring(pos, results.Length - pos);
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Searches for a directory beginning with "startPath".
+        /// If the directory is not found, then parent folders are searched until
+        /// either it is found or the root folder has been reached.
+        /// Null is returned if the directory was not found.
+        /// </summary>
+        /// <param name="dirName"></param>
+        /// <param name="startPath"></param>
+        /// <returns></returns>
+        public static DirectoryInfo FindDir(string dirName, string startPath)
+        {
+            DirectoryInfo dirInfo = new DirectoryInfo(Path.Combine(startPath, dirName));
+            while (!dirInfo.Exists)
+            {
+                if (dirInfo.Parent.Parent == null)
+                {
+                    return null;
+                }
+                dirInfo = new DirectoryInfo(Path.Combine(dirInfo.Parent.Parent.FullName, dirName));
+            }
+            return dirInfo;
+        }
+
+        /// <summary>
+        /// reads LauncherArguments.txt file from ProjectSettings-folder
+        /// </summary>
+        /// <param name="projectPath">full project root path</param>
+        /// <param name="launcherArgumentsFile">default filename is "LauncherArguments.txt"</param>
+        /// <returns></returns>
+        public static string ReadCustomLaunchArguments(string projectPath, string launcherArgumentsFile)
+        {
+            string results = null;
+            string argumentsFile = Path.Combine(projectPath, "ProjectSettings", launcherArgumentsFile);
+            if (File.Exists(argumentsFile) == true)
+            {
+                results = string.Join(" ", File.ReadAllLines(argumentsFile));
+            }
+            return results;
         }
 
     } // class

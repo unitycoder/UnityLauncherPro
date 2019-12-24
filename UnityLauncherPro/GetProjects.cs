@@ -11,7 +11,7 @@ namespace UnityLauncherPro
         // which registries we want to scan for projects
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
-        public static Project[] Scan()
+        public static Project[] Scan(bool getGitBranch = false, bool getArguments = false)
         {
             List<Project> projectsFound = new List<Project>();
 
@@ -101,29 +101,27 @@ namespace UnityLauncherPro
                         // get project version
                         string projectVersion = Tools.GetProjectVersion(projectPath);
 
-                        /*
-                        // TODO
                         // get custom launch arguments, only if column in enabled
                         string customArgs = "";
-                        if (chkShowLauncherArgumentsColumn.Checked == true)
+                        if (getArguments == true)
                         {
-                            customArgs = Tools.ReadCustomLaunchArguments(projectPath, launcherArgumentsFile);
+                            customArgs = Tools.ReadCustomLaunchArguments(projectPath, MainWindow.launcherArgumentsFile);
                         }
+
                         // get git branchinfo, only if column in enabled
                         string gitBranch = "";
-                        if (chkShowGitBranchColumn.Checked == true)
+                        if (getGitBranch == true)
                         {
                             gitBranch = Tools.ReadGitBranchInfo(projectPath);
                         }
-                        */
 
                         var p = new Project();
                         p.Title = projectName;
                         p.Version = projectVersion;
                         p.Path = projectPath;
                         p.Modified = lastUpdated;
-                        //p.Arguments = customArgs;
-                        //p.GITBranch = gitBranch;
+                        p.Arguments = customArgs;
+                        p.GITBranch = gitBranch;
 
                         projectsFound.Add(p);
                     } // valid key

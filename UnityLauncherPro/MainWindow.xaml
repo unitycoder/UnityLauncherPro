@@ -227,8 +227,6 @@
 	</Window.Resources>
 
 
-
-
 	<!-- UI -->
 
 	<Grid Margin="0">
@@ -596,13 +594,13 @@
 					</StackPanel>
 					<!-- settings-->
 					<StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
-						<CheckBox x:Name="chkMinimizeToTaskbar" Content="Minimize to taskbar" Foreground="{DynamicResource ButtonForeground}" Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged"/>
-						<CheckBox x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged"/>
-						<CheckBox Content="Close after opening project" Foreground="{DynamicResource ButtonForeground}"/>
-						<CheckBox Content="Close after launching from Explorer" Foreground="{DynamicResource ButtonForeground}"/>
-						<CheckBox x:Name="chkShowLauncherArgumentsColumn" Content="Show Arguments Column" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged"/>
-						<CheckBox x:Name="chkShowGitBranchColumn" Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged"/>
-						<CheckBox Content="Show full modified time" Foreground="{DynamicResource ButtonForeground}" ToolTip="Full=dd/mm/yyyy hh:mm:ss, NotFull=x hours ago, x days ago.."/>
+						<CheckBox x:Name="chkMinimizeToTaskbar" Content="Minimize to taskbar" Foreground="{DynamicResource ButtonForeground}" Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged" Margin="0,0,0,3"/>
+						<CheckBox x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" Margin="0,0,0,3"/>
+						<CheckBox x:Name="chkQuitAfterOpen" Content="Close after opening project" Foreground="{DynamicResource ButtonForeground}" Checked="ChkQuitAfterOpen_CheckedChanged" Unchecked="ChkQuitAfterOpen_CheckedChanged" Margin="0,0,0,3"/>
+						<CheckBox x:Name="chkQuitAfterCommandline" Content="Close after launching from Explorer" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkQuitAfterCommandline_CheckedChanged" Checked="ChkQuitAfterCommandline_CheckedChanged" Margin="0,0,0,3"/>
+						<CheckBox x:Name="chkShowLauncherArgumentsColumn" Content="Show Arguments Column" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" Margin="0,0,0,3"/>
+						<CheckBox x:Name="chkShowGitBranchColumn" Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged" Margin="0,0,0,3"/>
+						<CheckBox x:Name="chkShowFullTime" Content="Show full modified time" Foreground="{DynamicResource ButtonForeground}" ToolTip="Full=dd/mm/yyyy hh:mm:ss, NotFull=x hours ago, x days ago.." Margin="0,0,0,3" Checked="ChkShowFullTime_CheckedChanged" Unchecked="ChkShowFullTime_CheckedChanged"/>
 					</StackPanel>
 
 					<!-- links-->
