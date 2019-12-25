@@ -1,4 +1,5 @@
-# UnityLauncherPro
+# UnityLauncherPro 
+[![](https://ci.appveyor.com/api/projects/status/hajcaavcsg7904rx?svg=true)](#)
 
 This is a Work-In-Progress, WPF version, of the UnityLauncher.
 Current (winforms) version is here: https://github.com/unitycoder/UnityLauncher
