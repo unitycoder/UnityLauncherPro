@@ -2,6 +2,8 @@ version: 1.0.{build}
 skip_tags: true
 image: Visual Studio 2017
 configuration: Release
+only_commits:
+  message: /#build/
 build:
   verbosity: minimal
 after_build:
