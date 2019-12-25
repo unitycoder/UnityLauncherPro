@@ -101,29 +101,18 @@ namespace UnityLauncherPro
                     // NOTE if keydown, window doesnt become active and focused
                     if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
                     {
-                        //DisplayUpgradeDialog(version, projectPathArgument, launchProject: true, commandLineArguments: commandLineArguments);
-                        //MessageBox.Show("Do you want to Save?", "3", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                        //this.ShowActivated = false;
-                        //Hide();'
-                        //Show();
-                        //Height = 10;
-                        //Width = 10;
-                        //Topmost = true;
                         Tools.DisplayUpgradeDialog(proj, null);
                     }
                     else
                     {
-                        //MessageBox.Show("Do you want to Save?", "2", MessageBoxButton.YesNo, MessageBoxImage.Question);
                         // try launching it
-                        //LaunchProject(projectPathArgument, version, openProject: true, commandLineArguments: commandLineArguments);
                         Tools.LaunchProject(proj);
                     }
 
                     // quit after launch if enabled in settings
                     if (Properties.Settings.Default.closeAfterExplorer == true)
                     {
-                        //MessageBox.Show("Do you want to Save?", "quit", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                        //Environment.Exit(0);
+                        Environment.Exit(0);
                     }
                     //SetStatus("Ready");
                 }
@@ -169,7 +158,6 @@ namespace UnityLauncherPro
             chkQuitAfterOpen.IsChecked = Properties.Settings.Default.closeAfterProject;
             chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
             chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
-            chkShowFullTime.IsChecked = Properties.Settings.Default.showFullModifiedTime;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -230,7 +218,7 @@ namespace UnityLauncherPro
 
             // make dictionary of installed unitys, to search faster
             unityInstalledVersions.Clear();
-            for (int i = 0; i < unityInstallationsSource.Length; i++)
+            for (int i = 0, len = unityInstallationsSource.Length; i < len; i++)
             {
                 var version = unityInstallationsSource[i].Version;
                 if (unityInstalledVersions.ContainsKey(version) == false)
@@ -238,6 +226,7 @@ namespace UnityLauncherPro
                     unityInstalledVersions.Add(version, unityInstallationsSource[i].Path);
                 }
             }
+            lblFoundXInstallations.Content = "Found " + unityInstallationsSource.Length + " installations";
         }
 
         Project GetSelectedProject()
@@ -292,6 +281,7 @@ namespace UnityLauncherPro
             if (updatesSource == null) return;
             dataGridUpdates.ItemsSource = updatesSource;
         }
+
 
         //
         //
@@ -822,11 +812,21 @@ namespace UnityLauncherPro
             Properties.Settings.Default.Save();
         }
 
-        private void ChkShowFullTime_CheckedChanged(object sender, RoutedEventArgs e)
+        private void MenuItemShowProjectInExplorer_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.showFullModifiedTime = (bool)chkShowFullTime.IsChecked;
-            Properties.Settings.Default.Save();
+            string folder = null;
+            if (tabControl.SelectedIndex == 0)
+            {
+                var proj = GetSelectedProject();
+                folder = proj.Path;
+            }
+            else if (tabControl.SelectedIndex == 1)
+            {
+                var unity = GetSelectedUnity();
+                if (unity == null) return;
+                folder = Path.GetDirectoryName(unity.Path);
+            }
+            Tools.LaunchExplorer(folder);
         }
-
     } // class
 } //namespace

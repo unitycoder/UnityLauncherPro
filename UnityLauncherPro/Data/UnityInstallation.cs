@@ -10,7 +10,7 @@ namespace UnityLauncherPro
         public string Version { set; get; }
         public string Path { set; get; }
         public DateTime? Installed { set; get; }
-        //public string Platforms { set; get; }
+        public string Platforms { set; get; }
 
         // color project unity version cells, depending if have that version installed
         // https://stackoverflow.com/a/5551986/5452781

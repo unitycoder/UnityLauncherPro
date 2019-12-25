@@ -148,26 +148,19 @@ namespace UnityLauncherPro
                 Directory.CreateDirectory(assetsFolder);
             }
 
-            /*
-            // TODO when opening project, check for crashed backup scene first
-            if (openProject == true)
-            {
-                var cancelLaunch = CheckCrashBackupScene(projectPath);
-                if (cancelLaunch == true)
-                {
-                    return;
-                }
-            }*/
 
-            // we dont have this version installed (or no version info available)
-            //MainWindow.unityInstalledVersions;
+            // when opening project, check for crashed backup scene first
+            var cancelLaunch = CheckCrashBackupScene(proj.Path);
+            if (cancelLaunch == true)
+            {
+                return;
+            }
+
             var unityExePath = GetUnityExePath(proj.Version);
             if (unityExePath == null)
             {
-                Console.WriteLine("Missing unity version " + proj.Version);
-                // SetStatus("Missing Unity version: " + version);
-                // TODO
-                //if (openProject == true) DisplayUpgradeDialog(version, projectPath);
+                //Console.WriteLine("Missing unity version " + proj.Version);
+                DisplayUpgradeDialog(proj, null);
                 return;
             }
 
@@ -214,6 +207,40 @@ namespace UnityLauncherPro
             }
         }
 
+        static bool CheckCrashBackupScene(string projectPath)
+        {
+            var cancelRunningUnity = false;
+            var recoveryFile = Path.Combine(projectPath, "Temp", "__Backupscenes", "0.backup");
+            if (File.Exists(recoveryFile))
+            {
+                var result = MessageBox.Show("Crash recovery scene found, do you want to copy it into Assets/_Recovery/-folder?", "UnityLauncherPro - Scene Recovery", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                {
+                    var restoreFolder = Path.Combine(projectPath, "Assets", "_Recovery");
+                    if (Directory.Exists(restoreFolder) == false)
+                    {
+                        Directory.CreateDirectory(restoreFolder);
+                    }
+                    if (Directory.Exists(restoreFolder) == true)
+                    {
+                        Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                        var uniqueFileName = "Recovered_Scene" + unixTimestamp + ".unity";
+                        File.Copy(recoveryFile, Path.Combine(restoreFolder, uniqueFileName));
+                        Console.WriteLine("Recovered crashed scene into: " + restoreFolder);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: Failed to create restore folder: " + restoreFolder);
+                        cancelRunningUnity = true;
+                    }
+                }
+                else if (result == MessageBoxResult.Cancel) // dont do restore, but run Unity
+                {
+                    cancelRunningUnity = true;
+                }
+            }
+            return cancelRunningUnity;
+        }
 
         public static string GetUnityExePath(string version)
         {

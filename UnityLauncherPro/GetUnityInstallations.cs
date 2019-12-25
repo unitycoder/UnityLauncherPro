@@ -9,7 +9,7 @@ namespace UnityLauncherPro
     /// </summary>
     public static class GetUnityInstallations
     {
-        //public static UnityInstallation[] Scan(string[] rootFolders)
+        // returns unity installations
         public static UnityInstallation[] Scan()
         {
             // convert settings list to string array
@@ -48,6 +48,10 @@ namespace UnityLauncherPro
                     unity.Path = exePath;
                     unity.Installed = installDate;
 
+                    // TEST get platforms, NOTE if this is slow, do it later, or skip for commandline
+                    var platforms = GetPlatforms(dataFolder);
+                    unity.Platforms = string.Join(", ", platforms);
+
                     // add to list, if not there yet NOTE should notify that there are 2 same versions..? this might happen with preview builds..
                     if (results.Contains(unity) == true)
                     {
@@ -56,7 +60,6 @@ namespace UnityLauncherPro
                     }
 
                     results.Add(unity);
-
                 } // got folders
             } // all root folders
 
@@ -65,6 +68,21 @@ namespace UnityLauncherPro
 
             return results.ToArray();
         } // scan()
+
+        //static Dictionary<string, string> platformNames = new Dictionary<string, string> { windowsstandalonesupport};
+        static string[] GetPlatforms(string dataFolder)
+        {
+            // get all folders inside
+            var directories = Directory.GetDirectories(Path.Combine(dataFolder, "PlaybackEngines"));
+            // TODO get all platform names from those folders
+            // TODO get platform foldername only
+            for (int i = 0; i < directories.Length; i++)
+            {
+                directories[i] = Path.GetFileName(directories[i]);
+            }
+
+            return directories;
+        }
 
         // string to float 2017.4.1f1 > 2017.411
         static float VersionAsFloat(string version)

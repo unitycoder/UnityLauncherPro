@@ -143,17 +143,5 @@ namespace UnityLauncherPro.Properties {
                 this["gridColumnWidths"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool showFullModifiedTime {
-            get {
-                return ((bool)(this["showFullModifiedTime"]));
-            }
-            set {
-                this["showFullModifiedTime"] = value;
-            }
-        }
     }
 }

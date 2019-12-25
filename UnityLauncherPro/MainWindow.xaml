@@ -321,8 +321,8 @@
 						<DataGrid.ContextMenu>
 							<ContextMenu>
 								<MenuItem x:Name="menuItemCopyVersion" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
-								<Separator />
-								<MenuItem Header="Menu item asdf" />
+								<!--<Separator />-->
+								<MenuItem x:Name="menuItemShowProjectInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
 							</ContextMenu>
 						</DataGrid.ContextMenu>
 
@@ -422,13 +422,15 @@
 						<DataGrid.Columns>
 							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="123"/>
 							<DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True"/>
-							<DataGridTextColumn Binding="{Binding Installed}" ClipboardContentBinding="{x:Null}" Header="Installed" IsReadOnly="True"/>
+							<DataGridTextColumn Binding="{Binding Installed, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Installed" IsReadOnly="True"/>
+							<DataGridTextColumn Binding="{Binding Platforms}" ClipboardContentBinding="{x:Null}" Header="Platforms" IsReadOnly="True"/>
 						</DataGrid.Columns>
 
 						<!-- right click context menu -->
 						<DataGrid.ContextMenu>
 							<ContextMenu>
 								<MenuItem x:Name="menuItemCopyVersionInstalled" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
+								<MenuItem x:Name="menuItemShowUnityInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
 							</ContextMenu>
 						</DataGrid.ContextMenu>
 
@@ -497,7 +499,17 @@
 
 						<DataGrid.Columns>
 							<DataGridTextColumn Binding="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}" Header="ReleaseDate" IsReadOnly="True"/>
-							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="123"/>
+							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="123">
+								<DataGridTextColumn.CellStyle>
+									<Style TargetType="{x:Type DataGridCell}">
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding Version, Converter={StaticResource MyConverter}}" Value="true">
+												<Setter Property="Foreground" Value="#FF00C500" />
+											</DataTrigger>
+										</Style.Triggers>
+									</Style>
+								</DataGridTextColumn.CellStyle>
+							</DataGridTextColumn>
 						</DataGrid.Columns>
 
 						<!-- right click context menu -->
@@ -580,7 +592,7 @@
 
 					<!-- top labels -->
 					<Label Grid.Row="0" Content="Unity Installation Parent Folders" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-					<Label Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+					<Label x:Name="lblFoundXInstallations" Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
 					<!-- locations list -->
 					<ListBox x:Name="lstRootFolders" Grid.Row="1" Background="#FF3C3C3C" Margin="4,0,2,0" />
 					<!-- locations add/remove -->
@@ -600,7 +612,6 @@
 						<CheckBox x:Name="chkQuitAfterCommandline" Content="Close after launching from Explorer" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkQuitAfterCommandline_CheckedChanged" Checked="ChkQuitAfterCommandline_CheckedChanged" Margin="0,0,0,3"/>
 						<CheckBox x:Name="chkShowLauncherArgumentsColumn" Content="Show Arguments Column" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" Margin="0,0,0,3"/>
 						<CheckBox x:Name="chkShowGitBranchColumn" Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged" Margin="0,0,0,3"/>
-						<CheckBox x:Name="chkShowFullTime" Content="Show full modified time" Foreground="{DynamicResource ButtonForeground}" ToolTip="Full=dd/mm/yyyy hh:mm:ss, NotFull=x hours ago, x days ago.." Margin="0,0,0,3" Checked="ChkShowFullTime_CheckedChanged" Unchecked="ChkShowFullTime_CheckedChanged"/>
 					</StackPanel>
 
 					<!-- links-->
