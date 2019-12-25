@@ -1,0 +1,16 @@
+version: 1.0.{build}
+skip_tags: true
+image: Visual Studio 2017
+configuration: Release
+build:
+  verbosity: minimal
+after_build:
+- cmd: 7z a UnityLauncherPro.zip %APPVEYOR_BUILD_FOLDER%\UnityLauncherPro\bin\Release\*.exe %APPVEYOR_BUILD_FOLDER%\UnityLauncherPro\bin\Release\*.exe.config
+artifacts:
+- path: UnityLauncherPro.zip
+  name: deploy
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: XUgG0RFw9cyw0BUHekUQp4w29rJ/NSCXaiNhxmUGqXJ6KJxOvgtlDDXh/i3I33fsggGEuB67sA9xxfNd5/C8r9S+dsoVYVcL8alZNN5S/Xs=
+  artifact: deploy
