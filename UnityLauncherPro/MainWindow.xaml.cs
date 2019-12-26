@@ -23,6 +23,7 @@ namespace UnityLauncherPro
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
         string _filterString = null;
+        const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
 
         public MainWindow()
         {
@@ -410,7 +411,13 @@ namespace UnityLauncherPro
                         case Key.Escape: // clear project search
                             txtSearchBox.Text = "";
                             break;
+                        case Key.F2: // edit arguments
+                            break;
                         default: // any key
+                            // cancel if editing cell
+                            IEditableCollectionView itemsView = gridRecent.Items;
+                            if (itemsView.IsAddingNew || itemsView.IsEditingItem) return;
+
                             // activate searchbar if not active and we are in tab#1
                             if (txtSearchBox.IsFocused == false)
                             {
@@ -646,8 +653,13 @@ namespace UnityLauncherPro
                     }
                     break;
                 case Key.Return:
+                    // cancel if editing cell
+                    IEditableCollectionView itemsView = gridRecent.Items;
+                    if (itemsView.IsAddingNew || itemsView.IsEditingItem) return;
+
                     e.Handled = true;
-                    Tools.LaunchProject(GetSelectedProject());
+                    var proj = GetSelectedProject();
+                    Tools.LaunchProject(proj);
                     break;
                 default:
                     break;
@@ -729,7 +741,7 @@ namespace UnityLauncherPro
 
         private void BtnAdbBindWifi_Click(object sender, RoutedEventArgs e)
         {
-            // TODO async
+            // TODO
             //// check if your device is present
             //adb devices
             //// get device ip address (see inet row)
@@ -738,7 +750,52 @@ namespace UnityLauncherPro
             //adb tcpip 5555
             //// connect device (use your device ip address)
             //adb connect IP_HERE:5555
+
+            // get device ip address
+            //Process process = new Process();
+            //process.StartInfo.FileName = "adb";
+            //process.StartInfo.Arguments = "shell ip route";
+            //process.StartInfo.UseShellExecute = false;
+            //process.StartInfo.RedirectStandardOutput = true;
+            //process.StartInfo.RedirectStandardError = true;
+            //process.OutputDataReceived += new DataReceivedEventHandler(OutputHandler1);
+            //process.ErrorDataReceived += new DataReceivedEventHandler(OutputHandler1);
+            //process.Start();
+            //process.BeginOutputReadLine();
+            //process.BeginErrorReadLine();
+            //process.WaitForExit();
         }
+
+        //static void OutputHandler1(object sendingProcess, DataReceivedEventArgs outLine)
+        //{
+        //    string outputData = outLine.Data;
+        //    //Console.WriteLine("adboutput=" + outputData);
+        //    if (string.IsNullOrEmpty(outputData)) return;
+
+        //    // check if its wlan row
+        //    if (outputData.IndexOf("wlan0") > -1)
+        //    {
+        //        // parse ip address
+        //        var getip = outputData.Trim().Split(' ');
+        //        if (getip == null || getip.Length < 1) return;
+
+        //        Console.WriteLine("device ip=" + getip[getip.Length - 1]);
+
+        //        // next, call adb connect to that ip address
+        //        Process process = new Process();
+        //        process.StartInfo.FileName = "adb";
+        //        process.StartInfo.Arguments = "connet " + getip[getip.Length - 1] + ":5555";
+        //        process.StartInfo.UseShellExecute = false;
+        //        process.StartInfo.RedirectStandardOutput = true;
+        //        process.StartInfo.RedirectStandardError = true;
+        //        process.OutputDataReceived += new DataReceivedEventHandler(OutputHandler1);
+        //        process.ErrorDataReceived += new DataReceivedEventHandler(OutputHandler1);
+        //        process.Start();
+        //        process.BeginOutputReadLine();
+        //        process.BeginErrorReadLine();
+        //        process.WaitForExit();
+        //    }
+        //}
 
         private void BtnRefreshUnityList_Click(object sender, RoutedEventArgs e)
         {
@@ -827,6 +884,51 @@ namespace UnityLauncherPro
                 folder = Path.GetDirectoryName(unity.Path);
             }
             Tools.LaunchExplorer(folder);
+        }
+
+        private void BtnOpenGithub_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(githubURL);
+        }
+
+        private void GridRecent_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            // get current row data
+            var proj = GetSelectedProject();
+
+            // check that folder exists
+            string path = proj.Path;
+            if (string.IsNullOrEmpty(path)) return;
+
+            // get current arguments, after editing
+            TextBox t = e.EditingElement as TextBox;
+            string arguments = t.Text.ToString();
+
+            string projSettingsFolder = "ProjectSettings";
+
+            // check if projectsettings folder exists, if not then add
+            string outputFolder = Path.Combine(path, projSettingsFolder);
+            if (Directory.Exists(outputFolder) == false)
+            {
+                Directory.CreateDirectory(outputFolder);
+            }
+
+            // save arguments to projectsettings folder
+            string outputFile = Path.Combine(path, projSettingsFolder, launcherArgumentsFile);
+
+            try
+            {
+                StreamWriter sw = new StreamWriter(outputFile);
+                sw.WriteLine(arguments);
+                sw.Close();
+            }
+            catch (Exception ex)
+            {
+                //SetStatus("File error: " + exception.Message);
+                Console.WriteLine(ex);
+            }
+
+            // TODO select the same row again
         }
     } // class
 } //namespace
