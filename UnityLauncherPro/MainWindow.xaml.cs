@@ -728,7 +728,7 @@ namespace UnityLauncherPro
                 Process myProcess = new Process();
                 var cmd = "cmd.exe";
                 myProcess.StartInfo.FileName = cmd;
-                // NOTE windows 10 cmd line supports ansi colors, otherwise remove -v color
+                // NOTE windows10 cmd line supports ansi colors, otherwise remove -v color
                 var pars = " /c adb logcat -s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
                 myProcess.StartInfo.Arguments = pars;
                 myProcess.Start();
