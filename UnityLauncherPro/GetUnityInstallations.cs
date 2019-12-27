@@ -50,7 +50,7 @@ namespace UnityLauncherPro
 
                     // TEST get platforms, NOTE if this is slow, do it later, or skip for commandline
                     var platforms = GetPlatforms(dataFolder);
-                    unity.Platforms = string.Join(", ", platforms);
+                    if (platforms != null) unity.Platforms = string.Join(", ", platforms);
 
                     // add to list, if not there yet NOTE should notify that there are 2 same versions..? this might happen with preview builds..
                     if (results.Contains(unity) == true)
@@ -73,7 +73,9 @@ namespace UnityLauncherPro
         static string[] GetPlatforms(string dataFolder)
         {
             // get all folders inside
-            var directories = Directory.GetDirectories(Path.Combine(dataFolder, "PlaybackEngines"));
+            var platformFolder = Path.Combine(dataFolder, "PlaybackEngines");
+            if (Directory.Exists(platformFolder) == false) return null;
+            var directories = Directory.GetDirectories(platformFolder);
             // TODO get all platform names from those folders
             // TODO get platform foldername only
             for (int i = 0; i < directories.Length; i++)
