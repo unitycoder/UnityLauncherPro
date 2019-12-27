@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Unity Project Launcher by https://unitycoder.com
+// Sources https://github.com/unitycoder/UnityLauncherPro
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -35,9 +38,11 @@ namespace UnityLauncherPro
         {
             LoadSettings();
 
+            // disable accesskeys without alt
+            CoreCompatibilityPreferences.IsAltKeyRequiredInAccessKeyDefaultScope = true;
+
             // make window resizable (this didnt work when used pure xaml to do this)
             WindowChrome Resizable_BorderLess_Chrome = new WindowChrome();
-            //Resizable_BorderLess_Chrome.GlassFrameThickness = new Thickness(0);
             Resizable_BorderLess_Chrome.CornerRadius = new CornerRadius(0);
             Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
             WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
@@ -131,11 +136,32 @@ namespace UnityLauncherPro
             _filterString = txtSearchBox.Text;
             ICollectionView collection = CollectionViewSource.GetDefaultView(projectsSource);
             collection.Filter = ProjectFilter;
-
-            // set first row selected (good, especially if only one results)
+            // set first row selected
             if (gridRecent.Items.Count > 0)
             {
                 gridRecent.SelectedIndex = 0;
+            }
+        }
+
+        void FilterUpdates()
+        {
+            _filterString = txtSearchBoxUpdates.Text;
+            ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUpdates.ItemsSource);
+            collection.Filter = UpdatesFilter;
+            if (dataGridUpdates.Items.Count > 0)
+            {
+                dataGridUpdates.SelectedIndex = 0;
+            }
+        }
+
+        void FilterUnitys()
+        {
+            _filterString = txtSearchBoxUnity.Text;
+            ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUnitys.ItemsSource);
+            collection.Filter = UnitysFilter;
+            if (dataGridUnitys.Items.Count > 0)
+            {
+                dataGridUnitys.SelectedIndex = 0;
             }
         }
 
@@ -143,6 +169,18 @@ namespace UnityLauncherPro
         {
             Project proj = item as Project;
             return (proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+        }
+
+        private bool UpdatesFilter(object item)
+        {
+            Updates unity = item as Updates;
+            return (unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+        }
+
+        private bool UnitysFilter(object item)
+        {
+            UnityInstallation unity = item as UnityInstallation;
+            return (unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
         }
 
         void LoadSettings()
@@ -276,7 +314,6 @@ namespace UnityLauncherPro
             dataGridUpdates.ItemsSource = null;
             var task = GetUnityUpdates.Scan();
             var items = await task;
-            // TODO handle errors?
             if (items == null) return;
             updatesSource = GetUnityUpdates.Parse(items);
             if (updatesSource == null) return;
@@ -334,7 +371,6 @@ namespace UnityLauncherPro
 
         private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBox textbox = (TextBox)sender;
             FilterRecentProjects();
         }
 
@@ -383,7 +419,7 @@ namespace UnityLauncherPro
             }
         }
 
-        private async void OnGetUnityUpdatesClick(object sender, RoutedEventArgs e)
+        private void OnGetUnityUpdatesClick(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
             button.IsEnabled = false;
@@ -395,8 +431,12 @@ namespace UnityLauncherPro
 
         private void OnWindowKeyDown(object sender, KeyEventArgs e)
         {
-            // TODO if editing cells, dont focus on search
-            //if (gridRecent.IsCurrentCellInEditMode == true) return;
+            // disable alt key?
+            /*
+            if (Keyboard.Modifiers == ModifierKeys.Alt)
+            {
+                e.Handled = true;
+            }*/
 
             switch (tabControl.SelectedIndex)
             {
@@ -417,6 +457,9 @@ namespace UnityLauncherPro
                             // cancel if editing cell
                             IEditableCollectionView itemsView = gridRecent.Items;
                             if (itemsView.IsAddingNew || itemsView.IsEditingItem) return;
+
+                            // skip these keys
+                            if (Keyboard.Modifiers == ModifierKeys.Alt) return;
 
                             // activate searchbar if not active and we are in tab#1
                             if (txtSearchBox.IsFocused == false)
@@ -537,8 +580,10 @@ namespace UnityLauncherPro
             }
             else if (tabControl.SelectedIndex == 2)
             {
-                //var update = getselect
+                var unity = GetSelectedUpdate();
+                copy = unity?.Version;
             }
+
             if (copy != null) Clipboard.SetText(copy);
         }
 
@@ -927,8 +972,17 @@ namespace UnityLauncherPro
                 //SetStatus("File error: " + exception.Message);
                 Console.WriteLine(ex);
             }
-
             // TODO select the same row again
+        }
+
+        private void TxtSearchBoxUpdates_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            FilterUpdates();
+        }
+
+        private void TxtSearchBoxUnity_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            FilterUnitys();
         }
     } // class
 } //namespace

@@ -16,7 +16,6 @@ namespace UnityLauncherPro
             var rootFolders = Properties.Settings.Default.rootFolders;
 
             // unityversion, exe_path
-            //Dictionary<string, UnityInstallation> results = new ictionary<string, UnityInstallation>();
             List<UnityInstallation> results = new List<UnityInstallation>();
 
             // iterate all root folders

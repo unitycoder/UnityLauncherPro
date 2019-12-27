@@ -385,7 +385,7 @@
 							<Label Content="_Run Unity" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 
-						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchProject_Click" >
+						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchProject_Click" AutomationProperties.AccessKey="o" >
 							<Label Content="_Open Project" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 
@@ -402,7 +402,7 @@
 					<!-- search box -->
 					<Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
 						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUnity}" Height="24" />
-						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtSearchBoxUnity" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUnity_PreviewKeyDown" />
+						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtSearchBoxUnity" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUnity_PreviewKeyDown" TextChanged="TxtSearchBoxUnity_TextChanged" />
 						<Button x:Name="btnClearUnitySearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUnitySearchClick">
 							<TextBlock Text="❌" FontSize="8" Foreground="#FFC3C3C3" Padding="5,3,4,4" HorizontalAlignment="Center">
 								<TextBlock.Style>
@@ -457,7 +457,7 @@
 							<RowDefinition Height="32" />
 						</Grid.RowDefinitions>
 						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnReleaseNotes" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnReleaseNotes_Click">
-							<Label Content="Release Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+							<Label Content="Release _Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnUpdateUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnUpdateUnity_Click">
 							<Label Content="Update" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
@@ -479,7 +479,7 @@
 					<!-- search box -->
 					<Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
 						<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="#7F919191" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUpdates}" Height="24" />
-						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtSearchBoxUpdates" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUpdates_PreviewKeyDown" />
+						<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtSearchBoxUpdates" Background="Transparent" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUpdates_PreviewKeyDown" TextChanged="TxtSearchBoxUpdates_TextChanged" />
 						<Button x:Name="btnClearUpdatesSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUpdateSearchClick">
 							<TextBlock Text="❌" FontSize="8" Foreground="#FFC3C3C3" Padding="5,3,4,4" HorizontalAlignment="Center">
 								<TextBlock.Style>
@@ -504,7 +504,7 @@
 					<DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000" AutoGenerateColumns="False" PreviewKeyDown="DataGridUpdates_PreviewKeyDown">
 
 						<DataGrid.Columns>
-							<DataGridTextColumn Binding="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}" Header="ReleaseDate" IsReadOnly="True"/>
+							<DataGridTextColumn Binding="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}"  MinWidth="100" Header="ReleaseDate" IsReadOnly="True"/>
 							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="123">
 								<DataGridTextColumn.CellStyle>
 									<Style TargetType="{x:Type DataGridCell}">
@@ -542,7 +542,7 @@
 							<Label Content="_Download in browser" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
-							<Label Content="_Release Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+							<Label Content="Release _Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 					</Grid>
 				</Grid>
