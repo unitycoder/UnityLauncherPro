@@ -98,6 +98,8 @@
 		<Style x:Key="CustomButton" TargetType="{x:Type Button}">
 			<Setter Property="SnapsToDevicePixels" Value="true"/>
 			<Setter Property="OverridesDefaultStyle" Value="true"/>
+			<Setter Property="Background" Value="{DynamicResource ButtonBackground}"/>
+			<Setter Property="Foreground" Value="{DynamicResource ButtonForeground}"/>
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type Button}">
@@ -105,13 +107,16 @@
 							<ContentPresenter Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
 						</Border>
 						<ControlTemplate.Triggers>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter Property="Foreground" Value="#FF707070" />
+							</Trigger>
 							<Trigger Property="IsMouseOver" Value="true">
 								<Setter TargetName="shortcutbutton" Property="Background" Value="#FF494949" />
-								<!--<Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="Blue"/>-->
+								<Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="White"/>
 							</Trigger>
 							<Trigger Property="IsPressed" Value="true">
 								<Setter TargetName="shortcutbutton" Property="Background" Value="#FF0F0F0F" />
-								<!--<Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="Red"/>-->
+								<Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="White"/>
 							</Trigger>
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
@@ -244,10 +249,10 @@
 			<Label Content="UnityLauncherPro" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="#FFB8B8B8" FontSize="12" HorizontalAlignment="Left"  />
 			<!-- minimize -->
 			<Button x:Name="btnMinimize" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnMinimize_Click" Margin="0,0,27,0" Padding="2,0,2,8" IsTabStop="False">
-				<TextBlock Text="–"   FontSize="15" Foreground="#FFC3C3C3" Padding="0" Height="23" HorizontalAlignment="Center"/>
+				<TextBlock Text="–" FontSize="15" Foreground="#FFC3C3C3" Padding="0" Height="23" HorizontalAlignment="Center"/>
 			</Button>
 			<!-- close -->
-			<Button x:Name="btnClose"    BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnClose_Click" Padding="0,2" IsTabStop="False">
+			<Button x:Name="btnClose" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnClose_Click" Padding="0,2" IsTabStop="False">
 				<TextBlock Text="❌" FontSize="10" Foreground="#FFC3C3C3" Padding="5,3,4,4" HorizontalAlignment="Center" />
 			</Button>
 		</Grid>
@@ -374,18 +379,18 @@
 							<RowDefinition Height="32" />
 						</Grid.RowDefinitions>
 						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnUpgradeProject_Click">
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Upgrade"/>
+							<Label Content="_Upgrade" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnLaunchUnity" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchUnity_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Run Unity"/>
+							<Label Content="_Run Unity" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 
 						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchProject_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Open Project"/>
+							<Label Content="_Open Project" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 
 						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExplore" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnExplore_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Explore"/>
+							<Label Content="_Explore" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 					</Grid>
 				</Grid>
@@ -452,16 +457,16 @@
 							<RowDefinition Height="32" />
 						</Grid.RowDefinitions>
 						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnReleaseNotes" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnReleaseNotes_Click">
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="Release Notes"/>
+							<Label Content="Release Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnUpdateUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnUpdateUnity_Click">
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="Update"/>
+							<Label Content="Update" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnRunUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnRunUnity_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Run Unity"/>
+							<Label Content="_Run Unity" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExploreUnity" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Foreground="{DynamicResource ButtonForeground}" Click="BtnExploreUnity_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Explore"/>
+							<Label Content="_Explore" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 
 					</Grid>
@@ -534,10 +539,10 @@
 							<RowDefinition Height="32" />
 						</Grid.RowDefinitions>
 						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnDonwloadInBrowser" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnDonwloadInBrowser_Click">
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Download in browser"/>
+							<Label Content="_Download in browser" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Release Notes"/>
+							<Label Content="_Release Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 					</Grid>
 				</Grid>
@@ -557,17 +562,17 @@
 					<Grid Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Left">
 						<Border>
 							<StackPanel Orientation="Horizontal" Margin="10">
-								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click">
-									<Label Foreground="{DynamicResource ButtonForeground}" Content="_Editor Logs"/>
+								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Open Editor logs folder in Explorer">
+									<Label Content="_Editor Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 								</Button>
-								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenPlayerLogs" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenPlayerLogs_Click">
-									<Label Foreground="{DynamicResource ButtonForeground}" Content="_Player Logs"/>
+								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenPlayerLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenPlayerLogs_Click" ToolTip="Open Player logs folder in Explorer">
+									<Label Content="_Player Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 								</Button>
-								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click">
-									<Label Foreground="{DynamicResource ButtonForeground}" Content="_ADB logcat"/>
+								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click" ToolTip="Start ADB logcat commandline">
+									<Label Content="_ADB logcat" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 								</Button>
-								<Button Style="{StaticResource CustomButton}" x:Name="btnAdbBindWifi" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnAdbBindWifi_Click">
-									<Label Foreground="{DynamicResource ButtonForeground}" Content="_Bind Wifi"/>
+								<Button Style="{StaticResource CustomButton}" x:Name="btnAdbBindWifi" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnAdbBindWifi_Click" IsEnabled="False" ToolTip="Bind Android device to wireless ADB">
+									<Label Content="_Bind Wifi" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 								</Button>
 							</StackPanel>
 						</Border>
@@ -601,10 +606,10 @@
 					<!-- locations add/remove -->
 					<StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0" >
 						<Button Style="{StaticResource CustomButton}" x:Name="btnAddInstallationFolder" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,4,0,3" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnAddInstallationFolder_Click" Width="116">
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Add Folder"/>
+							<Label Content="_Add Folder" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Style="{StaticResource CustomButton}" x:Name="btnRemoveInstallationFolder" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnRemoveInstallationFolder_Click">
-							<Label Foreground="{DynamicResource ButtonForeground}" Content="_Remove Folder"/>
+							<Label Content="_Remove Folder" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 					</StackPanel>
 					<!-- settings-->
@@ -618,8 +623,8 @@
 					</StackPanel>
 
 					<!-- links-->
-					<Button Grid.Row="4" Style="{StaticResource CustomButton}" x:Name="btnOpenGithub" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="10,0,0,10" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnOpenGithub_Click">
-						<Label Foreground="{DynamicResource ButtonForeground}" Content="_View in Github"/>
+					<Button Grid.Row="4" Style="{StaticResource CustomButton}" x:Name="btnOpenGithub" Margin="10,0,0,10" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnOpenGithub_Click">
+						<Label Content="_View in Github" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 					</Button>
 
 				</Grid>
