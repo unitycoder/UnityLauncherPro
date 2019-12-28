@@ -647,6 +647,10 @@ namespace UnityLauncherPro
         {
             switch (e.Key)
             {
+                case Key.Return: // open selected project
+                    var proj = GetSelectedProject();
+                    if (proj != null) Tools.LaunchProject(proj);
+                    break;
                 case Key.Tab:
                 case Key.Up:
                 case Key.Down:
@@ -701,7 +705,6 @@ namespace UnityLauncherPro
                     // cancel if editing cell
                     IEditableCollectionView itemsView = gridRecent.Items;
                     if (itemsView.IsAddingNew || itemsView.IsEditingItem) return;
-
                     e.Handled = true;
                     var proj = GetSelectedProject();
                     Tools.LaunchProject(proj);
