@@ -11,7 +11,7 @@ namespace UnityLauncherPro
         // which registries we want to scan for projects
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
-        public static Project[] Scan(bool getGitBranch = false, bool getArguments = false)
+        public static Project[] Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false)
         {
             List<Project> projectsFound = new List<Project>();
 
@@ -49,10 +49,8 @@ namespace UnityLauncherPro
                             projectPath = (string)key.GetValue(valueName);
                         }
 
-                        //Console.WriteLine("projectPath=" + projectPath);
-
                         // first check if whole folder exists, if not, skip
-                        if (Directory.Exists(projectPath) == false)
+                        if (showMissingFolders == false && Directory.Exists(projectPath) == false)
                         {
                             //Console.WriteLine("Recent project directory not found, skipping: " + projectPath);
                             continue;

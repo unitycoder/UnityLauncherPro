@@ -143,5 +143,29 @@ namespace UnityLauncherPro.Properties {
                 this["gridColumnWidths"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool showProjectsMissingFolder {
+            get {
+                return ((bool)(this["showProjectsMissingFolder"]));
+            }
+            set {
+                this["showProjectsMissingFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AllowSingleInstanceOnly {
+            get {
+                return ((bool)(this["AllowSingleInstanceOnly"]));
+            }
+            set {
+                this["AllowSingleInstanceOnly"] = value;
+            }
+        }
     }
 }

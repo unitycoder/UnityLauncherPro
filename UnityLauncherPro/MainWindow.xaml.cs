@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,6 +20,16 @@ namespace UnityLauncherPro
     public partial class MainWindow : Window
     {
         private System.Windows.Forms.NotifyIcon notifyIcon;
+        const string appName = "UnityLauncherPro";
+
+        [DllImport("user32", CharSet = CharSet.Unicode)]
+        static extern IntPtr FindWindow(string cls, string win);
+        [DllImport("user32")]
+        static extern IntPtr SetForegroundWindow(IntPtr hWnd);
+        [DllImport("user32")]
+        static extern bool IsIconic(IntPtr hWnd);
+        [DllImport("user32")]
+        static extern bool OpenIcon(IntPtr hWnd);
 
         Project[] projectsSource;
         Updates[] updatesSource;
@@ -27,6 +39,8 @@ namespace UnityLauncherPro
         public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
         string _filterString = null;
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
+
+        Mutex myMutex;
 
         public MainWindow()
         {
@@ -53,8 +67,20 @@ namespace UnityLauncherPro
 
             HandleCommandLineLaunch();
 
+            // check for duplicate instance, and activate that instead
+            if (chkAllowSingleInstanceOnly.IsChecked == true)
+            {
+                bool aIsNewInstance = false;
+                myMutex = new Mutex(true, appName, out aIsNewInstance);
+                if (!aIsNewInstance)
+                {
+                    ActivateOtherWindow();
+                    App.Current.Shutdown();
+                }
+            }
+
             // update projects list
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
             gridRecent.Items.Clear();
             gridRecent.ItemsSource = projectsSource;
 
@@ -65,6 +91,18 @@ namespace UnityLauncherPro
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
+        }
+
+        // bring old window to front, but needs matching appname.. https://stackoverflow.com/a/36804161/5452781
+        private static void ActivateOtherWindow()
+        {
+            var other = FindWindow(null, appName);
+            if (other != IntPtr.Zero)
+            {
+                SetForegroundWindow(other);
+                if (IsIconic(other))
+                    OpenIcon(other);
+            }
         }
 
         void HandleCommandLineLaunch()
@@ -197,6 +235,8 @@ namespace UnityLauncherPro
             chkQuitAfterOpen.IsChecked = Properties.Settings.Default.closeAfterProject;
             chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
             chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
+            chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
+            chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -445,7 +485,7 @@ namespace UnityLauncherPro
                     switch (e.Key)
                     {
                         case Key.F5: // refresh projects
-                            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked);
+                            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
                             gridRecent.ItemsSource = projectsSource;
                             break;
                         case Key.Escape: // clear project search
@@ -589,7 +629,7 @@ namespace UnityLauncherPro
 
         private void BtnRefreshProjectList_Click(object sender, RoutedEventArgs e)
         {
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
             gridRecent.ItemsSource = projectsSource;
         }
 
@@ -639,7 +679,25 @@ namespace UnityLauncherPro
 
         private void BtnUpdateUnity_Click(object sender, RoutedEventArgs e)
         {
-            // TODO check for newer available version in Updates tab, select that row and jump to tab
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            // NOTE for now, just select the same version.. then user can see what has been released after this
+            // NOTE if updates are not loaded, should wait for that
+            if (dataGridUpdates.ItemsSource != null)
+            {
+                tabControl.SelectedIndex = 2;
+                // find matching version
+                for (int i = 0; i < dataGridUpdates.Items.Count; i++)
+                {
+                    Updates row = (Updates)dataGridUpdates.Items[i];
+                    if (row.Version == unity.Version)
+                    {
+                        dataGridUpdates.SelectedIndex = i;
+                        dataGridUpdates.ScrollIntoView(row);
+                        break;
+                    }
+                }
+            }
         }
 
         // if press up/down in search box, move to first item in results
@@ -986,6 +1044,36 @@ namespace UnityLauncherPro
         private void TxtSearchBoxUnity_TextChanged(object sender, TextChangedEventArgs e)
         {
             FilterUnitys();
+        }
+
+        private void GridRecent_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Tools.LaunchProject(GetSelectedProject());
+        }
+
+        private void DataGridUnitys_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            var unitypath = Tools.GetUnityExePath(unity?.Version);
+            Tools.LaunchExe(unitypath);
+        }
+
+        private void DataGridUpdates_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            Tools.OpenReleaseNotes(unity?.Version);
+        }
+
+        private void ChkShowMissingFolderProjects_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.showProjectsMissingFolder = (bool)chkShowMissingFolderProjects.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void ChkAllowSingleInstanceOnly_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.AllowSingleInstanceOnly = (bool)chkAllowSingleInstanceOnly.IsChecked;
+            Properties.Settings.Default.Save();
         }
     } // class
 } //namespace
