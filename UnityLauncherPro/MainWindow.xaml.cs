@@ -367,17 +367,23 @@ namespace UnityLauncherPro
         //
         //
 
-        private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Escape:
-                    ((TextBox)sender).Text = "";
-                    break;
-                default:
-                    break;
-            }
-        }
+        //private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
+        //{
+        //    switch (e.Key)
+        //    {
+        //        case Key.Escape:
+        //            if (((TextBox)sender).Text == "")
+        //            {
+        //                Console.WriteLine(1);
+        //                Keyboard.Focus(gridRecent);
+        //                e.Handled = true;
+        //            }
+        //            ((TextBox)sender).Text = "";
+        //            break;
+        //        default:
+        //            break;
+        //    }
+        //}
 
         void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
         {
@@ -489,6 +495,10 @@ namespace UnityLauncherPro
                             gridRecent.ItemsSource = projectsSource;
                             break;
                         case Key.Escape: // clear project search
+                            if (txtSearchBox.Text == "")
+                            {
+                                SetFocusToGrid(gridRecent);
+                            }
                             txtSearchBox.Text = "";
                             break;
                         case Key.F2: // edit arguments
@@ -1074,6 +1084,16 @@ namespace UnityLauncherPro
         {
             Properties.Settings.Default.AllowSingleInstanceOnly = (bool)chkAllowSingleInstanceOnly.IsChecked;
             Properties.Settings.Default.Save();
+        }
+
+        private void BtnAssetPackages_Click(object sender, RoutedEventArgs e)
+        {
+            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Unity", "Asset Store-5.x");
+            if (Directory.Exists(folder) == false) return;
+            if (Tools.LaunchExplorer(folder) == false)
+            {
+                Console.WriteLine("Cannot open folder.." + folder);
+            }
         }
     } // class
 } //namespace
