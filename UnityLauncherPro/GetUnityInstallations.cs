@@ -9,6 +9,8 @@ namespace UnityLauncherPro
     /// </summary>
     public static class GetUnityInstallations
     {
+        static Dictionary<string, string> platformNames = new Dictionary<string, string> { { "androidplayer", "Android" }, { "windowsstandalonesupport", "Windows" }, { "LinuxStandalone", "Linux" }, { "OSXStandalone", "Mac" } };
+
         // returns unity installations
         public static UnityInstallation[] Scan()
         {
@@ -75,11 +77,19 @@ namespace UnityLauncherPro
             var platformFolder = Path.Combine(dataFolder, "PlaybackEngines");
             if (Directory.Exists(platformFolder) == false) return null;
             var directories = Directory.GetDirectories(platformFolder);
-            // TODO get all platform names from those folders
-            // TODO get platform foldername only
             for (int i = 0; i < directories.Length; i++)
             {
-                directories[i] = Path.GetFileName(directories[i]);
+                var foldername = Path.GetFileName(directories[i]).ToLower();
+                // check if have better name in dictionary
+                if (platformNames.ContainsKey(foldername))
+                {
+                    directories[i] = platformNames[foldername];
+                }
+                else
+                {
+                    directories[i] = foldername;
+                }
+                //Console.WriteLine(directories[i]);
             }
 
             return directories;

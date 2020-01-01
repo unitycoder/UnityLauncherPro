@@ -628,7 +628,7 @@
 					</StackPanel>
 
 					<!-- links-->
-					<Button Grid.Row="4" Style="{StaticResource CustomButton}" x:Name="btnOpenGithub" Margin="10,0,0,10" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnOpenGithub_Click">
+					<Button Grid.Row="4" Style="{StaticResource CustomButton}" x:Name="btnOpenGithub" Margin="0,0,15,10" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnOpenGithub_Click">
 						<Label Content="_View in Github" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 					</Button>
 
