@@ -39,7 +39,7 @@ namespace UnityLauncherPro
         public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
         string _filterString = null;
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
-
+        int lastSelectedProjectIndex = 0;
         Mutex myMutex;
 
         public MainWindow()
@@ -339,14 +339,20 @@ namespace UnityLauncherPro
             }
         }
 
-        void SetFocusToGrid(DataGrid targetGrid)
+        void SetFocusToGrid(DataGrid targetGrid, int index = 0)
         {
             //e.Handled = true; // if enabled, we enter to first row initially
             if (targetGrid.Items.Count < 1) return;
             targetGrid.Focus();
-            targetGrid.SelectedIndex = 0;
-            DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(0);
+            DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
+            if (row == null)
+            {
+                gridRecent.UpdateLayout();
+                gridRecent.ScrollIntoView(gridRecent.Items[index]);
+                row = (DataGridRow)gridRecent.ItemContainerGenerator.ContainerFromIndex(index);
+            }
             row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            targetGrid.SelectedIndex = index;
         }
 
         async void CallGetUnityUpdates()
@@ -490,10 +496,6 @@ namespace UnityLauncherPro
 
                     switch (e.Key)
                     {
-                        case Key.F5: // refresh projects
-                            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
-                            gridRecent.ItemsSource = projectsSource;
-                            break;
                         case Key.Escape: // clear project search
                             if (txtSearchBox.Text == "")
                             {
@@ -501,6 +503,13 @@ namespace UnityLauncherPro
                             }
                             txtSearchBox.Text = "";
                             break;
+                        case Key.F5:
+                            txtSearchBox.Text = "";
+                            break;
+                        case Key.Up:
+                        case Key.Left:
+                        case Key.Right:
+                        case Key.Down:
                         case Key.F2: // edit arguments
                             break;
                         default: // any key
@@ -563,8 +572,8 @@ namespace UnityLauncherPro
                 if (updatesSource == null)
                 {
                     var task = GetUnityUpdates.Scan();
+                    if (task.IsCompleted == false) return;
                     var items = await task;
-                    // TODO handle errors?
                     if (items == null) return;
                     updatesSource = GetUnityUpdates.Parse(items);
                     if (updatesSource == null) return;
@@ -661,6 +670,7 @@ namespace UnityLauncherPro
 
         private void GridRecent_Loaded(object sender, RoutedEventArgs e)
         {
+            //Console.WriteLine("GridRecent_Loaded");
             SetFocusToGrid(gridRecent);
         }
 
@@ -763,6 +773,17 @@ namespace UnityLauncherPro
         {
             switch (e.Key)
             {
+                case Key.Up:
+                case Key.Down:
+                    break;
+
+                case Key.F5: // refresh projects
+                    txtSearchBox.Text = "";
+                    lastSelectedProjectIndex = gridRecent.SelectedIndex;
+                    projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
+                    gridRecent.ItemsSource = projectsSource;
+                    SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
+                    break;
                 case Key.Tab:
                     if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
                     {
