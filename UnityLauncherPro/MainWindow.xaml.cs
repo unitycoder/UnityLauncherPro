@@ -40,6 +40,7 @@ namespace UnityLauncherPro
         string _filterString = null;
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
         int lastSelectedProjectIndex = 0;
+        public static string preferredVersion = "none";
         Mutex myMutex;
 
         public MainWindow()
@@ -174,11 +175,11 @@ namespace UnityLauncherPro
             _filterString = txtSearchBox.Text;
             ICollectionView collection = CollectionViewSource.GetDefaultView(projectsSource);
             collection.Filter = ProjectFilter;
-            // set first row selected
-            if (gridRecent.Items.Count > 0)
-            {
-                gridRecent.SelectedIndex = 0;
-            }
+            // set first row selected, if only 1 row
+            //if (gridRecent.Items.Count == 1)
+            //{
+            //    gridRecent.SelectedIndex = 0;
+            //}
         }
 
         void FilterUpdates()
@@ -242,7 +243,6 @@ namespace UnityLauncherPro
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
             gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
 
-
             // update installations folder listbox
             lstRootFolders.Items.Clear();
             lstRootFolders.ItemsSource = Properties.Settings.Default.rootFolders;
@@ -256,6 +256,10 @@ namespace UnityLauncherPro
                     gridRecent.Columns[i].Width = gridColumnWidths[i];
                 }
             }
+
+            // other setting vars
+            preferredVersion = Properties.Settings.Default.preferredVersion;
+
         } // LoadSettings()
 
         private void SaveSettingsOnExit()
@@ -292,6 +296,9 @@ namespace UnityLauncherPro
 
         void UpdateUnityInstallationsList()
         {
+            // reset preferred string, if user changed it
+            //preferredVersion = "none";
+
             unityInstallationsSource = GetUnityInstallations.Scan();
             dataGridUnitys.ItemsSource = unityInstallationsSource;
 
@@ -300,7 +307,7 @@ namespace UnityLauncherPro
             for (int i = 0, len = unityInstallationsSource.Length; i < len; i++)
             {
                 var version = unityInstallationsSource[i].Version;
-                if (string.IsNullOrEmpty(version)==false && unityInstalledVersions.ContainsKey(version) == false)
+                if (string.IsNullOrEmpty(version) == false && unityInstalledVersions.ContainsKey(version) == false)
                 {
                     unityInstalledVersions.Add(version, unityInstallationsSource[i].Path);
                 }
@@ -339,13 +346,13 @@ namespace UnityLauncherPro
             }
         }
 
-
-
+        // waits for unity update results and assigns to datagrid
         async void CallGetUnityUpdates()
         {
             dataGridUpdates.ItemsSource = null;
             var task = GetUnityUpdates.Scan();
             var items = await task;
+            Console.WriteLine(items == null);
             if (items == null) return;
             updatesSource = GetUnityUpdates.Parse(items);
             if (updatesSource == null) return;
@@ -485,7 +492,7 @@ namespace UnityLauncherPro
                         case Key.Escape: // clear project search
                             if (txtSearchBox.Text == "")
                             {
-                                Tools.SetFocusToGrid(gridRecent);
+                                if (txtSearchBox.IsFocused) Tools.SetFocusToGrid(gridRecent);
                             }
                             txtSearchBox.Text = "";
                             break;
@@ -555,11 +562,12 @@ namespace UnityLauncherPro
             // if going into updates tab, fetch list (first time only)
             if (((TabControl)sender).SelectedIndex == (int)Tabs.Updates)
             {
+                // if we dont have previous results yet, TODO scan again if previous was 24hrs ago
                 if (updatesSource == null)
                 {
                     var task = GetUnityUpdates.Scan();
-                    if (task.IsCompleted == false) return;
                     var items = await task;
+                    if (task.IsCompleted == false || task.IsFaulted == true) return;
                     if (items == null) return;
                     updatesSource = GetUnityUpdates.Parse(items);
                     if (updatesSource == null) return;
@@ -601,12 +609,14 @@ namespace UnityLauncherPro
         private void BtnLaunchProject_Click(object sender, RoutedEventArgs e)
         {
             Tools.LaunchProject(GetSelectedProject());
+            Tools.SetFocusToGrid(gridRecent);
         }
 
         private void BtnExplore_Click(object sender, RoutedEventArgs e)
         {
             var proj = GetSelectedProject();
             Tools.ExploreProjectFolder(proj);
+            Tools.SetFocusToGrid(gridRecent);
         }
 
         // copy selected row unity version to clipboard
@@ -719,6 +729,7 @@ namespace UnityLauncherPro
                 case Key.Up:
                 case Key.Down:
                     Tools.SetFocusToGrid(gridRecent);
+                    e.Handled = true; // to stay in first row
                     break;
                 default:
                     break;
@@ -814,6 +825,7 @@ namespace UnityLauncherPro
                 case Key.Up:
                 case Key.Down:
                     Tools.SetFocusToGrid(dataGridUpdates);
+                    e.Handled = true;
                     break;
                 default:
                     break;
@@ -935,7 +947,7 @@ namespace UnityLauncherPro
             }
             else
             {
-                Console.WriteLine("Failed getting Unity Installer URL for " + unity.Version);
+                Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
             }
         }
 
@@ -1106,10 +1118,13 @@ namespace UnityLauncherPro
         // sets selected unity version as preferred main unity version (to be preselected in case of unknown version projects, when creating new empty project, etc)
         private void MenuItemSetPreferredUnityVersion_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.preferredVersion = GetSelectedUnity().Version;
+            var ver = GetSelectedUnity().Version;
+            Properties.Settings.Default.preferredVersion = ver;
             Properties.Settings.Default.Save();
-            
-            // TODO set star icon
+
+            preferredVersion = ver;
+            // TODO update unity list or just set value?
+            UpdateUnityInstallationsList();
 
         }
     } // class

@@ -15,7 +15,7 @@ namespace UnityLauncherPro
         {
             if (isDownloadingUnityList == true)
             {
-                //SetStatus("We are already downloading ...");
+                Console.WriteLine("We are already downloading ...");
                 return null;
             }
 
@@ -28,8 +28,8 @@ namespace UnityLauncherPro
 
                 Task<string> downloadStringTask = webClient.DownloadStringTaskAsync(new Uri(unityVersionsURL));
                 result = await downloadStringTask;
+                isDownloadingUnityList = false;
             }
-
             return result;
         }
 
