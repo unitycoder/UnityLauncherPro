@@ -437,6 +437,7 @@
 							<ContextMenu>
 								<MenuItem x:Name="menuItemCopyVersionInstalled" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
 								<MenuItem x:Name="menuItemShowUnityInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
+								<MenuItem x:Name="menuItemSetPreferredUnityVersion" Header="Set as Preferred Version" Click="MenuItemSetPreferredUnityVersion_Click"/>
 							</ContextMenu>
 						</DataGrid.ContextMenu>
 

@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace UnityLauncherPro
@@ -107,6 +108,7 @@ namespace UnityLauncherPro
                     }
                 }
             }
+
             return version;
         }
 
@@ -138,7 +140,7 @@ namespace UnityLauncherPro
             if (proj == null) return;
             if (Directory.Exists(proj.Path) == false) return;
 
-            Console.WriteLine("launch project " + proj.Title);
+            Console.WriteLine("launch project " + proj.Title+" "+proj.Version);
 
             // there is no assets path, probably we want to create new project then
             var assetsFolder = Path.Combine(proj.Path, "Assets");
@@ -158,7 +160,6 @@ namespace UnityLauncherPro
             var unityExePath = GetUnityExePath(proj.Version);
             if (unityExePath == null)
             {
-                //Console.WriteLine("Missing unity version " + proj.Version);
                 DisplayUpgradeDialog(proj, null);
                 return;
             }
@@ -660,6 +661,22 @@ namespace UnityLauncherPro
                 results = string.Join(" ", File.ReadAllLines(argumentsFile));
             }
             return results;
+        }
+
+        public static void SetFocusToGrid(DataGrid targetGrid, int index = 0)
+        {
+            //e.Handled = true; // if enabled, we enter to first row initially
+            if (targetGrid.Items.Count < 1) return;
+            targetGrid.Focus();
+            DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
+            if (row == null)
+            {
+                targetGrid.UpdateLayout();
+                targetGrid.ScrollIntoView(targetGrid.Items[index]);
+                row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
+            }
+            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            targetGrid.SelectedIndex = index;
         }
 
     } // class

@@ -300,7 +300,7 @@ namespace UnityLauncherPro
             for (int i = 0, len = unityInstallationsSource.Length; i < len; i++)
             {
                 var version = unityInstallationsSource[i].Version;
-                if (unityInstalledVersions.ContainsKey(version) == false)
+                if (string.IsNullOrEmpty(version)==false && unityInstalledVersions.ContainsKey(version) == false)
                 {
                     unityInstalledVersions.Add(version, unityInstallationsSource[i].Path);
                 }
@@ -339,21 +339,7 @@ namespace UnityLauncherPro
             }
         }
 
-        void SetFocusToGrid(DataGrid targetGrid, int index = 0)
-        {
-            //e.Handled = true; // if enabled, we enter to first row initially
-            if (targetGrid.Items.Count < 1) return;
-            targetGrid.Focus();
-            DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
-            if (row == null)
-            {
-                gridRecent.UpdateLayout();
-                gridRecent.ScrollIntoView(gridRecent.Items[index]);
-                row = (DataGridRow)gridRecent.ItemContainerGenerator.ContainerFromIndex(index);
-            }
-            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-            targetGrid.SelectedIndex = index;
-        }
+
 
         async void CallGetUnityUpdates()
         {
@@ -499,7 +485,7 @@ namespace UnityLauncherPro
                         case Key.Escape: // clear project search
                             if (txtSearchBox.Text == "")
                             {
-                                SetFocusToGrid(gridRecent);
+                                Tools.SetFocusToGrid(gridRecent);
                             }
                             txtSearchBox.Text = "";
                             break;
@@ -671,7 +657,7 @@ namespace UnityLauncherPro
         private void GridRecent_Loaded(object sender, RoutedEventArgs e)
         {
             //Console.WriteLine("GridRecent_Loaded");
-            SetFocusToGrid(gridRecent);
+            Tools.SetFocusToGrid(gridRecent);
         }
 
         private void BtnExploreUnity_Click(object sender, RoutedEventArgs e)
@@ -732,7 +718,7 @@ namespace UnityLauncherPro
                 case Key.Tab:
                 case Key.Up:
                 case Key.Down:
-                    SetFocusToGrid(gridRecent);
+                    Tools.SetFocusToGrid(gridRecent);
                     break;
                 default:
                     break;
@@ -745,7 +731,7 @@ namespace UnityLauncherPro
             {
                 case Key.Up:
                 case Key.Down:
-                    SetFocusToGrid(dataGridUnitys);
+                    Tools.SetFocusToGrid(dataGridUnitys);
                     break;
                 default:
                     break;
@@ -782,7 +768,7 @@ namespace UnityLauncherPro
                     lastSelectedProjectIndex = gridRecent.SelectedIndex;
                     projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
                     gridRecent.ItemsSource = projectsSource;
-                    SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
+                    Tools.SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
                     break;
                 case Key.Tab:
                     if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
@@ -827,7 +813,7 @@ namespace UnityLauncherPro
             {
                 case Key.Up:
                 case Key.Down:
-                    SetFocusToGrid(dataGridUpdates);
+                    Tools.SetFocusToGrid(dataGridUpdates);
                     break;
                 default:
                     break;
@@ -1115,6 +1101,16 @@ namespace UnityLauncherPro
             {
                 Console.WriteLine("Cannot open folder.." + folder);
             }
+        }
+
+        // sets selected unity version as preferred main unity version (to be preselected in case of unknown version projects, when creating new empty project, etc)
+        private void MenuItemSetPreferredUnityVersion_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.preferredVersion = GetSelectedUnity().Version;
+            Properties.Settings.Default.Save();
+            
+            // TODO set star icon
+
         }
     } // class
 } //namespace

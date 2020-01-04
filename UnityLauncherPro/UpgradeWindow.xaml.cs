@@ -124,9 +124,10 @@ namespace UnityLauncherPro
 
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
         {
-            gridAvailableVersions.Focus();
-            DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
-            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            Tools.SetFocusToGrid(gridAvailableVersions);
+            //            gridAvailableVersions.Focus();
+            //            DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
+            //            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         }
 
     }

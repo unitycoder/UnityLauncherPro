@@ -167,5 +167,17 @@ namespace UnityLauncherPro.Properties {
                 this["AllowSingleInstanceOnly"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string preferredVersion {
+            get {
+                return ((string)(this["preferredVersion"]));
+            }
+            set {
+                this["preferredVersion"] = value;
+            }
+        }
     }
 }
