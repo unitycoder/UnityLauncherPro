@@ -140,7 +140,7 @@ namespace UnityLauncherPro
             if (proj == null) return;
             if (Directory.Exists(proj.Path) == false) return;
 
-            Console.WriteLine("launch project " + proj.Title+" "+proj.Version);
+            Console.WriteLine("launch project " + proj.Title + " " + proj.Version);
 
             // there is no assets path, probably we want to create new project then
             var assetsFolder = Path.Combine(proj.Path, "Assets");
@@ -663,10 +663,12 @@ namespace UnityLauncherPro
             return results;
         }
 
-        public static void SetFocusToGrid(DataGrid targetGrid, int index = 0)
+        public static void SetFocusToGrid(DataGrid targetGrid, int index = -1)
         {
-            //e.Handled = true; // if enabled, we enter to first row initially
             if (targetGrid.Items.Count < 1) return;
+            if (index == -1 && targetGrid.SelectedIndex > -1) index = targetGrid.SelectedIndex; // keep current row selected
+            if (index == -1) index = 0;
+
             targetGrid.Focus();
             DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
             if (row == null)
