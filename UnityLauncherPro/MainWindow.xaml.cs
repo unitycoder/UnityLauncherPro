@@ -320,6 +320,11 @@ namespace UnityLauncherPro
             return (Project)gridRecent.SelectedItem;
         }
 
+        int GetSelectedProjectIndex()
+        {
+            return gridRecent.SelectedIndex;
+        }
+
         UnityInstallation GetSelectedUnity()
         {
             return (UnityInstallation)dataGridUnitys.SelectedItem;
@@ -359,12 +364,27 @@ namespace UnityLauncherPro
             dataGridUpdates.ItemsSource = updatesSource;
         }
 
+        void RefreshRecentProjects()
+        {
+            // clear search
+            txtSearchBox.Text = "";
+            // take currently selected project row
+            lastSelectedProjectIndex = gridRecent.SelectedIndex;
+            // rescan recent projects
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
+            gridRecent.ItemsSource = projectsSource;
+            // focus back
+            Tools.SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
+        }
+
+
 
         //
         //
         // EVENTS
         //
         //
+
 
         //private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
         //{
@@ -644,8 +664,7 @@ namespace UnityLauncherPro
 
         private void BtnRefreshProjectList_Click(object sender, RoutedEventArgs e)
         {
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
-            gridRecent.ItemsSource = projectsSource;
+            RefreshRecentProjects();
         }
 
         // run unity only
@@ -727,8 +746,19 @@ namespace UnityLauncherPro
                     break;
                 case Key.Tab:
                 case Key.Up:
-                case Key.Down:
                     Tools.SetFocusToGrid(gridRecent);
+                    e.Handled = true;
+                    break;
+                case Key.Down:
+                    // TODO move to 2nd row if first is already selected
+                    //if (GetSelectedProjectIndex() == 0)
+                    //{
+                    //    Tools.SetFocusToGrid(gridRecent, 1);
+                    //}
+                    //else
+                    //{
+                        Tools.SetFocusToGrid(gridRecent);
+//                    }
                     e.Handled = true; // to stay in first row
                     break;
                 default:
@@ -775,11 +805,7 @@ namespace UnityLauncherPro
                     break;
 
                 case Key.F5: // refresh projects
-                    txtSearchBox.Text = "";
-                    lastSelectedProjectIndex = gridRecent.SelectedIndex;
-                    projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
-                    gridRecent.ItemsSource = projectsSource;
-                    Tools.SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
+                    RefreshRecentProjects();
                     break;
                 case Key.Tab:
                     if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
