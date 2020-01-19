@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:UnityLauncherPro"
 		xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico"	>
+        Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" Activated="Window_Activated"	>
 
 	<Window.Resources>
 

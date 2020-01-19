@@ -665,20 +665,37 @@ namespace UnityLauncherPro
 
         public static void SetFocusToGrid(DataGrid targetGrid, int index = -1)
         {
+            // set main component focus
+            //targetGrid.Focus();
+            //Keyboard.Focus(targetGrid);
+
+            // no items
             if (targetGrid.Items.Count < 1) return;
-            if (index == -1 && targetGrid.SelectedIndex > -1) index = targetGrid.SelectedIndex; // keep current row selected
+
+            // keep current row selected
+            if (index == -1 && targetGrid.SelectedIndex > -1) index = targetGrid.SelectedIndex;
+
+            // if no item selected, pick first
             if (index == -1) index = 0;
 
-            targetGrid.Focus();
+            targetGrid.SelectedIndex = index;
+
+            // set full focus
             DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
             if (row == null)
             {
                 targetGrid.UpdateLayout();
+                // scroll to view if outside
                 targetGrid.ScrollIntoView(targetGrid.Items[index]);
                 row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
             }
-            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-            targetGrid.SelectedIndex = index;
+            // NOTE does this causes move below?
+            //row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up)); // works better than Up
+
+            row.Focus();
+            Keyboard.Focus(row);
+
         }
 
     } // class

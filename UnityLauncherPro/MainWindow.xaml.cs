@@ -385,48 +385,14 @@ namespace UnityLauncherPro
         //
         //
 
-
-        //private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
-        //{
-        //    switch (e.Key)
-        //    {
-        //        case Key.Escape:
-        //            if (((TextBox)sender).Text == "")
-        //            {
-        //                Console.WriteLine(1);
-        //                Keyboard.Focus(gridRecent);
-        //                e.Handled = true;
-        //            }
-        //            ((TextBox)sender).Text = "";
-        //            break;
-        //        default:
-        //            break;
-        //    }
-        //}
-
+        // maximize window
         void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             this.Show();
             this.WindowState = WindowState.Normal;
             notifyIcon.Visible = false;
-        }
-
-        // hide/show notifyicon based on window state
-        private void Window_StateChanged(object sender, EventArgs e)
-        {
-            if (this.WindowState == WindowState.Minimized)
-            {
-                this.ShowInTaskbar = false;
-                notifyIcon.BalloonTipTitle = "Minimize Sucessful";
-                notifyIcon.BalloonTipText = "Minimized the app ";
-                notifyIcon.ShowBalloonTip(400);
-                notifyIcon.Visible = true;
-            }
-            else if (this.WindowState == WindowState.Normal)
-            {
-                notifyIcon.Visible = false;
-                this.ShowInTaskbar = true;
-            }
+            // NOTE workaround for grid not focused when coming back from minimized window
+            Tools.SetFocusToGrid(gridRecent, GetSelectedProjectIndex());
         }
 
         private void OnRectangleMouseDown(object sender, MouseButtonEventArgs e)
@@ -512,9 +478,14 @@ namespace UnityLauncherPro
                         case Key.Escape: // clear project search
                             if (txtSearchBox.Text == "")
                             {
-                                if (txtSearchBox.IsFocused) Tools.SetFocusToGrid(gridRecent);
+                                // its already clear
                             }
-                            txtSearchBox.Text = "";
+                            else // we have text in searchbox
+                            {
+                                txtSearchBox.Text = "";
+                            }
+                            // try to keep selected row selected and in view
+                            Tools.SetFocusToGrid(gridRecent);
                             break;
                         case Key.F5:
                             txtSearchBox.Text = "";
@@ -523,6 +494,7 @@ namespace UnityLauncherPro
                         case Key.Left:
                         case Key.Right:
                         case Key.Down:
+                            break;
                         case Key.F2: // edit arguments
                             break;
                         default: // any key
@@ -757,8 +729,8 @@ namespace UnityLauncherPro
                     //}
                     //else
                     //{
-                        Tools.SetFocusToGrid(gridRecent);
-//                    }
+                    Tools.SetFocusToGrid(gridRecent);
+                    //                    }
                     e.Handled = true; // to stay in first row
                     break;
                 default:
@@ -795,15 +767,11 @@ namespace UnityLauncherPro
             }
         }
 
-        // need to manually move into next/prev rows? https://stackoverflow.com/a/11652175/5452781
+        // need to manually move into next/prev rows? Not using https://stackoverflow.com/a/11652175/5452781
         private void GridRecent_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
-                case Key.Up:
-                case Key.Down:
-                    break;
-
                 case Key.F5: // refresh projects
                     RefreshRecentProjects();
                     break;
@@ -1152,6 +1120,12 @@ namespace UnityLauncherPro
             // TODO update unity list or just set value?
             UpdateUnityInstallationsList();
 
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            //Console.WriteLine("gridRecent.IsFocused=" + gridRecent.IsFocused);
+            //Console.WriteLine("gridRecent.IsFocused=" + gridRecent.IsKeyboardFocused);
         }
     } // class
 } //namespace
