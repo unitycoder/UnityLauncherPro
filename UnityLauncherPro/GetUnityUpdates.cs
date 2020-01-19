@@ -21,13 +21,24 @@ namespace UnityLauncherPro
 
             isDownloadingUnityList = true;
             //SetStatus("Downloading list of Unity versions ...");
-            string result;
+            string result = null;
             // download list of Unity versions
             using (WebClient webClient = new WebClient())
             {
-
                 Task<string> downloadStringTask = webClient.DownloadStringTaskAsync(new Uri(unityVersionsURL));
-                result = await downloadStringTask;
+                try
+                {
+                    result = await downloadStringTask;
+                }
+                catch (WebException)
+                {
+                    Console.WriteLine("It's a web exception");
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("It's not a web exception");
+                }
+
                 isDownloadingUnityList = false;
             }
             return result;
