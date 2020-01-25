@@ -1127,5 +1127,17 @@ namespace UnityLauncherPro
             //Console.WriteLine("gridRecent.IsFocused=" + gridRecent.IsFocused);
             //Console.WriteLine("gridRecent.IsFocused=" + gridRecent.IsKeyboardFocused);
         }
+
+        private void MenuItemCopyPath_Click(object sender, RoutedEventArgs e)
+        {
+            string copy = null;
+            if (tabControl.SelectedIndex == 0)
+            {
+                var proj = GetSelectedProject();
+                // fix slashes so that it works in save dialogs
+                copy = proj?.Path.Replace('/','\\');
+            }
+            if (copy != null) Clipboard.SetText(copy);
+        }
     } // class
 } //namespace
