@@ -9,6 +9,7 @@ using System.Drawing; // for notifyicon
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -352,7 +353,7 @@ namespace UnityLauncherPro
         }
 
         // waits for unity update results and assigns to datagrid
-        async void CallGetUnityUpdates()
+        async Task CallGetUnityUpdates()
         {
             dataGridUpdates.ItemsSource = null;
             var task = GetUnityUpdates.Scan();
@@ -362,6 +363,32 @@ namespace UnityLauncherPro
             updatesSource = GetUnityUpdates.Parse(items);
             if (updatesSource == null) return;
             dataGridUpdates.ItemsSource = updatesSource;
+        }
+
+        async void GoLookForUpdatesForThisUnity()
+        {
+            // call for updates list fetch
+            await CallGetUnityUpdates();
+
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            // NOTE for now, just select the same version.. then user can see what has been released after this
+            // NOTE if updates are not loaded, should wait for that
+            if (dataGridUpdates.ItemsSource != null)
+            {
+                tabControl.SelectedIndex = 2;
+                // find matching version
+                for (int i = 0; i < dataGridUpdates.Items.Count; i++)
+                {
+                    Updates row = (Updates)dataGridUpdates.Items[i];
+                    if (row.Version == unity.Version)
+                    {
+                        dataGridUpdates.SelectedIndex = i;
+                        dataGridUpdates.ScrollIntoView(row);
+                        break;
+                    }
+                }
+            }
         }
 
         void RefreshRecentProjects()
@@ -636,6 +663,8 @@ namespace UnityLauncherPro
 
         private void BtnRefreshProjectList_Click(object sender, RoutedEventArgs e)
         {
+            // we want to refresh unity installs also, to make sure version colors are correct
+            UpdateUnityInstallationsList();
             RefreshRecentProjects();
         }
 
@@ -686,26 +715,10 @@ namespace UnityLauncherPro
 
         private void BtnUpdateUnity_Click(object sender, RoutedEventArgs e)
         {
-            var unity = GetSelectedUnity();
-            if (unity == null) return;
-            // NOTE for now, just select the same version.. then user can see what has been released after this
-            // NOTE if updates are not loaded, should wait for that
-            if (dataGridUpdates.ItemsSource != null)
-            {
-                tabControl.SelectedIndex = 2;
-                // find matching version
-                for (int i = 0; i < dataGridUpdates.Items.Count; i++)
-                {
-                    Updates row = (Updates)dataGridUpdates.Items[i];
-                    if (row.Version == unity.Version)
-                    {
-                        dataGridUpdates.SelectedIndex = i;
-                        dataGridUpdates.ScrollIntoView(row);
-                        break;
-                    }
-                }
-            }
+            GoLookForUpdatesForThisUnity();
         }
+
+
 
         // if press up/down in search box, move to first item in results
         private void TxtSearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -1135,7 +1148,7 @@ namespace UnityLauncherPro
             {
                 var proj = GetSelectedProject();
                 // fix slashes so that it works in save dialogs
-                copy = proj?.Path.Replace('/','\\');
+                copy = proj?.Path.Replace('/', '\\');
             }
             if (copy != null) Clipboard.SetText(copy);
         }

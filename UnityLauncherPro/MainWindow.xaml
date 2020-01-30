@@ -475,7 +475,7 @@
 							<Label Content="Release _Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnUpdateUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnUpdateUnity_Click">
-							<Label Content="Update" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+							<Label Content="Go to Updates" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnRunUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnRunUnity_Click" >
 							<Label Content="_Run Unity" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
