@@ -62,9 +62,7 @@ namespace UnityLauncherPro
 
         private void BtnUpgradeProject_Click(object sender, RoutedEventArgs e)
         {
-            var k = (gridAvailableVersions.SelectedItem) as KeyValuePair<string, string>?;
-            upgradeVersion = k.Value.Key;
-            DialogResult = true;
+            Upgrade();
         }
 
         private void BtnCancelUpgrade_Click(object sender, RoutedEventArgs e)
@@ -128,6 +126,18 @@ namespace UnityLauncherPro
             //            gridAvailableVersions.Focus();
             //            DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
             //            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+        }
+
+        private void GridAvailableVersions_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Upgrade();
+        }
+
+        void Upgrade()
+        {
+            var k = (gridAvailableVersions.SelectedItem) as KeyValuePair<string, string>?;
+            upgradeVersion = k.Value.Key;
+            DialogResult = true;
         }
 
     }

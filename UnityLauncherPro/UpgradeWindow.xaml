@@ -189,7 +189,7 @@
 		<Button Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="0,434,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" Width="159" VerticalAlignment="Top" Height="51" Click="BtnUpgradeProject_Click" >
 			<Label Foreground="{DynamicResource ButtonForeground}" Content="_Upgrade Project"/>
 		</Button>
-		<DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" HorizontalAlignment="Left" Height="304" Margin="10,121,0,0" VerticalAlignment="Top" Width="393" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ButtonForeground}" Background="{DynamicResource MainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded">
+		<DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" HorizontalAlignment="Left" Height="304" Margin="10,121,0,0" VerticalAlignment="Top" Width="393" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ButtonForeground}" Background="{DynamicResource MainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" />
 				<DataGridTextColumn Header="Value" Binding="{Binding Value}" IsReadOnly="True" />

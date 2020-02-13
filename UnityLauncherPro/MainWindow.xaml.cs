@@ -145,7 +145,7 @@ namespace UnityLauncherPro
 
                     // check if force-update button is down
                     // NOTE if keydown, window doesnt become active and focused
-                    if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
+                    if (string.IsNullOrEmpty(version) || (Keyboard.Modifiers & ModifierKeys.Shift) != 0)
                     {
                         Tools.DisplayUpgradeDialog(proj, null);
                     }
@@ -785,7 +785,18 @@ namespace UnityLauncherPro
         {
             switch (e.Key)
             {
+                case Key.Home: // override home
+                    gridRecent.SelectedIndex = 0;
+                    gridRecent.ScrollIntoView(gridRecent.SelectedItem);
+                    e.Handled = true;
+                    break;
+                case Key.End: // override end
+                    gridRecent.SelectedIndex = gridRecent.Items.Count - 1;
+                    gridRecent.ScrollIntoView(gridRecent.SelectedItem);
+                    e.Handled = true;
+                    break;
                 case Key.F5: // refresh projects
+                    UpdateUnityInstallationsList();
                     RefreshRecentProjects();
                     break;
                 case Key.Tab:
