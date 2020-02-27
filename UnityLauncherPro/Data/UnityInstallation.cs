@@ -11,15 +11,12 @@ namespace UnityLauncherPro
         public string Platforms { set; get; }
         public bool IsPreferred { set; get; }
 
-        // color project unity version cells, depending if have that version installed
         // https://stackoverflow.com/a/5551986/5452781
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             string version = value as string;
-            //return MainWindow.unityInstalledVersions.ContainsKey(version) ? Brushes.Yellow : Brushes.Red;
-            return MainWindow.unityInstalledVersions.ContainsKey(version);// ? "Red" : "Blue";
-            //return Brushes.Yellow;
-            // DependencyProperty.UnsetValue
+            if (string.IsNullOrEmpty(version)) return null;
+            return MainWindow.unityInstalledVersions.ContainsKey(version);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -371,10 +371,11 @@
 					<!-- bottom buttoms row -->
 					<Grid VerticalAlignment="Bottom" Margin="4,0,8,5">
 						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="12*" />
 							<ColumnDefinition Width="20*" />
-							<ColumnDefinition Width="20*" />
-							<ColumnDefinition Width="50*" />
 							<ColumnDefinition Width="15*" />
+							<ColumnDefinition Width="50*" />
+							<ColumnDefinition Width="12*" />
 						</Grid.ColumnDefinitions>
 						<Grid.RowDefinitions>
 							<RowDefinition Height="32" />
@@ -382,15 +383,16 @@
 						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnUpgradeProject_Click">
 							<Label Content="_Upgrade" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
-						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnLaunchUnity" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchUnity_Click" >
+						<Button Grid.Column="1" ToolTip="With selected Unity" Style="{StaticResource CustomButton}" x:Name="btnCreateEmptyProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnCreateEmptyProject_Click" >
+							<Label Content="_Fast Create" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+						</Button>
+						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchUnity" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchUnity_Click" >
 							<Label Content="_Run Unity" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
-
-						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchProject_Click" AutomationProperties.AccessKey="o" >
+						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchProject_Click" AutomationProperties.AccessKey="o" >
 							<Label Content="_Open Project" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
-
-						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExplore" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnExplore_Click" >
+						<Button Grid.Column="4" Style="{StaticResource CustomButton}" x:Name="btnExplore" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnExplore_Click" >
 							<Label Content="_Explore" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 					</Grid>
@@ -463,24 +465,29 @@
 					<Grid VerticalAlignment="Bottom" Margin="4,0,8,5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="20*" />
-							<ColumnDefinition Width="20*" />
-							<ColumnDefinition Width="45*" />
 							<ColumnDefinition Width="15*" />
-
+							<ColumnDefinition Width="20*" />
+							<ColumnDefinition Width="40*" />
+							<ColumnDefinition Width="15*" />
 						</Grid.ColumnDefinitions>
+
 						<Grid.RowDefinitions>
 							<RowDefinition Height="32" />
 						</Grid.RowDefinitions>
+
 						<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnReleaseNotes" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnReleaseNotes_Click">
 							<Label Content="Release _Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
-						<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnUpdateUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnUpdateUnity_Click">
-							<Label Content="Go to Updates" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+						<Button Grid.Column="1" ToolTip="With selected Unity" Style="{StaticResource CustomButton}" x:Name="btnCreateEmptyProjectUnity" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnCreateEmptyProjectUnity_Click" >
+							<Label Content="_Fast Create" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
-						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnRunUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnRunUnity_Click" >
+						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnUpdateUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnUpdateUnity_Click">
+							<Label Content="Check Updates" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+						</Button>
+						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnRunUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnRunUnity_Click" >
 							<Label Content="_Run Unity" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
-						<Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnExploreUnity" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Foreground="{DynamicResource ButtonForeground}" Click="BtnExploreUnity_Click" >
+						<Button Grid.Column="4" Style="{StaticResource CustomButton}" x:Name="btnExploreUnity" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Foreground="{DynamicResource ButtonForeground}" Click="BtnExploreUnity_Click" >
 							<Label Content="_Explore" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 
@@ -639,6 +646,12 @@
 						<CheckBox x:Name="chkShowGitBranchColumn" Content="Show Git Branch Column" Foreground="{DynamicResource ButtonForeground}" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged" Margin="0,0,0,3"/>
 						<CheckBox x:Name="chkShowMissingFolderProjects" Content="Show projects that dont exist on disk" Foreground="{DynamicResource ButtonForeground}" Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" Margin="0,0,0,3" ToolTip="List recent projects, even if the project folder is missing"/>
 						<CheckBox x:Name="chkAllowSingleInstanceOnly" Content="Allow single instance only" Foreground="{DynamicResource ButtonForeground}" Checked="ChkAllowSingleInstanceOnly_CheckedChanged" Unchecked="ChkAllowSingleInstanceOnly_CheckedChanged" Margin="0,0,0,3" ToolTip="Activates already running instance, instead of starting new exe"/>
+
+						<StackPanel Grid.Row="3" Orientation="Horizontal">
+							<Label Content="Root Folder for New Projects" Foreground="{DynamicResource ButtonForeground}" />
+							<TextBox x:Name="txtRootFolderForNewProjects" MinWidth="250" ToolTip="When you click &quot;Create Project&quot; in main page, new project is generated under this path+UnityVersion (eg. /2017a/)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
+							<Button x:Name="btnBrowseProjectRootFolder" Content="..." Margin="6,0,0,0" MinWidth="32" Click="BtnBrowseProjectRootFolder_Click" />
+						</StackPanel>
 					</StackPanel>
 
 					<!-- links-->

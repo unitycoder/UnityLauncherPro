@@ -695,8 +695,91 @@ namespace UnityLauncherPro
 
             row.Focus();
             Keyboard.Focus(row);
-
         }
+
+        public static string BrowseForOutputFolder(string title)
+        {
+            // https://stackoverflow.com/a/50261723/5452781
+            // Create a "Save As" dialog for selecting a directory (HACK)
+            var dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.InitialDirectory = "c:"; // Use current value for initial dir
+            dialog.Title = title;
+            dialog.Filter = "Project Folder|*.Folder"; // Prevents displaying files
+            dialog.FileName = "Project"; // Filename will then be "select.this.directory"
+            if (dialog.ShowDialog() == true)
+            {
+                string path = dialog.FileName;
+                // Remove fake filename from resulting path
+                path = path.Replace("\\Project.Folder", "");
+                path = path.Replace("Project.Folder", "");
+                // If user has changed the filename, create the new directory
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                return path;
+            }
+            return null;
+        }
+
+        public static void FastCreateProject(string version, string baseFolder)
+        {
+            // check for base folders in settings tab
+            //string baseFolder = txtRootFolderForNewProjects.Text;
+            if (string.IsNullOrEmpty(baseFolder))
+            {
+                Console.WriteLine("Missing txtRootFolderForNewProjects");
+                //tabControl.SelectedIndex = tabControl.Items.Count - 1;
+                return;
+            }
+
+            // check if base folder exists
+            if (Directory.Exists(baseFolder) == false)
+            {
+                Console.WriteLine("Missing txtRootFolderForNewProjects folder");
+                //tabControl.SelectedIndex = tabControl.Items.Count - 1;
+                return;
+            }
+
+            // check selected unity version
+            //var currentProject = GetSelectedProject();
+            if (string.IsNullOrEmpty(version) == true)
+            {
+                Console.WriteLine("Missing unity version");
+                return;
+            }
+
+            // find next free character folder a-z
+            var unityBaseVersion = version.Substring(0, version.IndexOf('.'));
+            for (int i = 97; i < 122; i++)
+            {
+                var newProject = unityBaseVersion + "_" + ((char)i);
+                var path = Path.Combine(baseFolder, newProject);
+                if (Directory.Exists(path))
+                {
+                    Console.WriteLine("directory exists..trying again");
+                }
+                else // its available
+                {
+                    Console.WriteLine("create folder: " + path);
+                    Directory.CreateDirectory(path);
+
+                    // create project version file, to avoid wrong version warning
+                    var settingsPath = Path.Combine(path, "ProjectSettings");
+                    Directory.CreateDirectory(settingsPath);
+                    var settingsFile = Path.Combine(settingsPath, "ProjectVersion.txt");
+                    File.WriteAllText(settingsFile, "m_EditorVersion: " + version);
+
+                    // launch project
+                    var p = new Project();
+                    p.Path = path;
+                    p.Version = version;
+                    Tools.LaunchProject(p);
+                    break;
+                }
+            }
+        }
+
 
     } // class
 } // namespace

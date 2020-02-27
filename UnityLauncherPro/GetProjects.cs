@@ -11,7 +11,7 @@ namespace UnityLauncherPro
         // which registries we want to scan for projects
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
-        public static Project[] Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false)
+        public static List<Project> Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false)
         {
             List<Project> projectsFound = new List<Project>();
 
@@ -125,7 +125,7 @@ namespace UnityLauncherPro
                 } // each key
             } // for each registry root
 
-            return projectsFound.ToArray();
+            return projectsFound;
         } // Scan()
 
     } // class

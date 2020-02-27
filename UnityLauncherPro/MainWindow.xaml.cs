@@ -32,7 +32,10 @@ namespace UnityLauncherPro
         [DllImport("user32")]
         static extern bool OpenIcon(IntPtr hWnd);
 
-        Project[] projectsSource;
+        //Project[] projectsSource;
+        List<Project> projectsSource;
+
+
         Updates[] updatesSource;
         UnityInstallation[] unityInstallationsSource;
         public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>();
@@ -239,6 +242,7 @@ namespace UnityLauncherPro
             chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
             chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
             chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
+            txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -265,7 +269,6 @@ namespace UnityLauncherPro
 
         private void SaveSettingsOnExit()
         {
-
             // save list column widths
             List<int> gridWidths;
             if (Properties.Settings.Default.gridColumnWidths != null)
@@ -434,26 +437,13 @@ namespace UnityLauncherPro
 
         private void BtnAddProjectFolder_Click(object sender, RoutedEventArgs e)
         {
-            // https://stackoverflow.com/a/50261723/5452781
-            // Create a "Save As" dialog for selecting a directory (HACK)
-            var dialog = new Microsoft.Win32.SaveFileDialog();
-            dialog.InitialDirectory = "c:"; // Use current value for initial dir
-            dialog.Title = "Select Project Folder to Add it Into Projects List";
-            dialog.Filter = "Project Folder|*.Folder"; // Prevents displaying files
-            dialog.FileName = "Project"; // Filename will then be "select.this.directory"
-            if (dialog.ShowDialog() == true)
+            var folder = Tools.BrowseForOutputFolder("Select Project Folder to Add it Into Projects List");
+            if (string.IsNullOrEmpty(folder) == false)
             {
-                string path = dialog.FileName;
-                // Remove fake filename from resulting path
-                path = path.Replace("\\Project.Folder", "");
-                path = path.Replace("Project.Folder", "");
-                // If user has changed the filename, create the new directory
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                // Our final value is in path
-                Console.WriteLine(path);
+                var p = new Project();
+                p.Path = folder;
+                projectsSource.Insert(0, p);
+                gridRecent.Items.Refresh();
             }
         }
 
@@ -1162,6 +1152,36 @@ namespace UnityLauncherPro
                 copy = proj?.Path.Replace('/', '\\');
             }
             if (copy != null) Clipboard.SetText(copy);
+        }
+
+        // creates empty project into default project root with selected unity version
+        private void BtnCreateEmptyProject_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.FastCreateProject(GetSelectedProject().Version, txtRootFolderForNewProjects.Text);
+        }
+
+        private void BtnBrowseProjectRootFolder_Click(object sender, RoutedEventArgs e)
+        {
+            var folder = Tools.BrowseForOutputFolder("Select root folder for New Projects");
+            if (string.IsNullOrEmpty(folder) == false)
+            {
+                txtRootFolderForNewProjects.Text = folder;
+                Properties.Settings.Default.newProjectsRoot = folder;
+                Properties.Settings.Default.Save();
+            }
+            // save to prefs when? onchange
+        }
+
+        private void TxtRootFolderForNewProjects_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Properties.Settings.Default.newProjectsRoot = txtRootFolderForNewProjects.Text;
+            Properties.Settings.Default.Save();
+        }
+
+
+        private void BtnCreateEmptyProjectUnity_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.FastCreateProject(GetSelectedUnity().Version, txtRootFolderForNewProjects.Text);
         }
     } // class
 } //namespace
