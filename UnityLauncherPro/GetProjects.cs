@@ -120,6 +120,10 @@ namespace UnityLauncherPro
                         p.Arguments = customArgs;
                         p.GITBranch = gitBranch;
 
+                        // if want to hide project and folder path for screenshot
+                        //p.Title = "Hidden Project";
+                        //p.Path = "C:/Hidden Path/";
+
                         projectsFound.Add(p);
                     } // valid key
                 } // each key

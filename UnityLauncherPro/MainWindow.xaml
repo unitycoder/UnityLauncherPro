@@ -384,7 +384,7 @@
 							<Label Content="_Upgrade" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="1" ToolTip="With selected Unity" Style="{StaticResource CustomButton}" x:Name="btnCreateEmptyProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnCreateEmptyProject_Click" >
-							<Label Content="_Fast Create" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+							<Label Content="_Quick Project" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchUnity" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchUnity_Click" >
 							<Label Content="_Run Unity" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
@@ -465,7 +465,7 @@
 					<Grid VerticalAlignment="Bottom" Margin="4,0,8,5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="20*" />
-							<ColumnDefinition Width="15*" />
+							<ColumnDefinition Width="18*" />
 							<ColumnDefinition Width="20*" />
 							<ColumnDefinition Width="40*" />
 							<ColumnDefinition Width="15*" />
@@ -479,7 +479,7 @@
 							<Label Content="Release _Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="1" ToolTip="With selected Unity" Style="{StaticResource CustomButton}" x:Name="btnCreateEmptyProjectUnity" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnCreateEmptyProjectUnity_Click" >
-							<Label Content="_Fast Create" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+							<Label Content="_Quick Project" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 						</Button>
 						<Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnUpdateUnity" Background="{DynamicResource ButtonBackground}" Foreground="{DynamicResource ButtonForeground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnUpdateUnity_Click">
 							<Label Content="Check Updates" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
