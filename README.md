@@ -18,6 +18,9 @@ Handle all your Unity versions and Projects easily!
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
 
+## Forum Thread
+https://forum.unity.com/threads/unity-launcher-launch-correct-unity-versions-for-each-project-automatically.488718/
+
 # Screenshots
 
 ![image](https://user-images.githubusercontent.com/5438317/71485879-184b3a00-281c-11ea-97db-73c5dfa9bb4e.png)
