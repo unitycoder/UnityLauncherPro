@@ -13,7 +13,11 @@ Handle all your Unity versions and Projects easily!
 - Can enable Explorer context menu item to launch project from folder
 - Use custom commandline launcher arguments per project (optional)
 - Show project git branch info (optional)
-- Show list of released Unity versions/updates
+- Show list of released Unity versions/updates and view release notes page
+- 1-Click create new project with selected Unity version
+- Option to show missing projects in the list (if folder was removed)
+- 1-Click Start ADB Logcat with colors in command prompt
+- 1-Click browse editor log folder, browse asset downloads folder, browse player logs folder
 
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
