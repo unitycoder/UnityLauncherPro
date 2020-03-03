@@ -79,12 +79,19 @@
     <Compile Include="GetProjects.cs" />
     <Compile Include="GetUnityInstallations.cs" />
     <Compile Include="GetUnityUpdates.cs" />
+    <Compile Include="NewProject.xaml.cs">
+      <DependentUpon>NewProject.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools.cs" />
     <Compile Include="Data\UnityInstallation.cs" />
     <Compile Include="Data\Updates.cs" />
     <Compile Include="UpgradeWindow.xaml.cs">
       <DependentUpon>UpgradeWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="NewProject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\Colors.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

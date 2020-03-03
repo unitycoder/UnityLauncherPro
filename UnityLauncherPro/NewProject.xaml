@@ -1,0 +1,54 @@
+﻿<Window x:Class="UnityLauncherPro.NewProject"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnityLauncherPro"
+        mc:Ignorable="d"
+        Title="Create New Project" Height="200" Width="300" Background="{DynamicResource DarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown">
+	<Window.Resources>
+		<!-- custom buttons -->
+		<Style x:Key="CustomButton" TargetType="{x:Type Button}">
+			<Setter Property="SnapsToDevicePixels" Value="true"/>
+			<Setter Property="OverridesDefaultStyle" Value="true"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Button}">
+						<Border x:Name="shortcutbutton" BorderThickness="0" BorderBrush="Black" Background="{TemplateBinding Background}">
+							<ContentPresenter Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="true">
+								<Setter TargetName="shortcutbutton" Property="Background" Value="#FF494949" />
+							</Trigger>
+							<Trigger Property="IsPressed" Value="true">
+								<Setter TargetName="shortcutbutton" Property="Background" Value="#FF0F0F0F" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</Window.Resources>
+
+	<Grid>
+		<StackPanel Margin="10,3">
+			<Label Content="Unity Version " Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" />
+			<TextBox x:Name="txtNewProjectVersion" VerticalAlignment="Center" Margin="0,0,0,3" IsEnabled="False" IsReadOnly="True" IsUndoEnabled="False" />
+			<Label Content="Project Name:" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" />
+			<TextBox x:Name="txtNewProjectName" VerticalAlignment="Center" Margin="0,0,0,3" IsUndoEnabled="True" TextChanged="TxtNewProjectName_TextChanged" />
+			<Grid HorizontalAlignment="Stretch" Margin="0,15,0,0">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="3,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" >
+					<Label Foreground="{DynamicResource ButtonForeground}" Content="Cancel"/>
+				</Button>
+				<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="3,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click">
+					<Label Foreground="{DynamicResource ButtonForeground}" Content="_Create"/>
+				</Button>
+			</Grid>
+		</StackPanel>
+	</Grid>
+</Window>

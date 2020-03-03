@@ -508,12 +508,9 @@ namespace UnityLauncherPro
         public static void DisplayUpgradeDialog(Project proj, MainWindow owner)
         {
             UpgradeWindow modalWindow = new UpgradeWindow(proj.Version, proj.Path, proj.Arguments);
-
             modalWindow.ShowInTaskbar = owner == null;
             modalWindow.WindowStartupLocation = owner == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
-            //modalWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             modalWindow.Topmost = owner == null;
-            //modalWindow.Topmost = true;
             modalWindow.ShowActivated = true;
             modalWindow.Owner = owner;
             modalWindow.ShowDialog();
@@ -722,62 +719,91 @@ namespace UnityLauncherPro
             return null;
         }
 
-        public static void FastCreateProject(string version, string baseFolder)
+        public static void FastCreateProject(string version, string baseFolder, string projectName = null)
         {
             // check for base folders in settings tab
-            //string baseFolder = txtRootFolderForNewProjects.Text;
-            if (string.IsNullOrEmpty(baseFolder))
+            if (string.IsNullOrEmpty(baseFolder) == true)
             {
-                Console.WriteLine("Missing txtRootFolderForNewProjects");
-                //tabControl.SelectedIndex = tabControl.Items.Count - 1;
+                Console.WriteLine("Missing baseFolder value");
                 return;
             }
 
             // check if base folder exists
             if (Directory.Exists(baseFolder) == false)
             {
-                Console.WriteLine("Missing txtRootFolderForNewProjects folder");
-                //tabControl.SelectedIndex = tabControl.Items.Count - 1;
+                Console.WriteLine("Missing baseFolder: " + baseFolder);
                 return;
             }
 
             // check selected unity version
-            //var currentProject = GetSelectedProject();
             if (string.IsNullOrEmpty(version) == true)
             {
                 Console.WriteLine("Missing unity version");
                 return;
             }
 
-            // find next free character folder a-z
+            string newPath = null;
+            // if we didnt have name yet
+            if (string.IsNullOrEmpty(projectName) == true)
+            {
+                Console.WriteLine(version);
+                Console.WriteLine(baseFolder);
+                projectName = GetSuggestedProjectName(version, baseFolder);
+                // failed getting new path a-z
+                if (projectName == null) return;
+            }
+            newPath = Path.Combine(baseFolder, projectName);
+
+            // create folder
+            CreateEmptyProjectFolder(newPath, version);
+
+            // launch empty project
+            var p = new Project();
+            p.Path = Path.Combine(baseFolder, newPath);
+            p.Version = version;
+            Tools.LaunchProject(p);
+
+        } // FastCreateProject
+
+
+        public static string GetSuggestedProjectName(string version, string baseFolder)
+        {
+            // check for base folders in settings tab, could use currently selected project folder parent as base?
+            if (string.IsNullOrEmpty(baseFolder))
+            {
+                Console.WriteLine("Missing txtRootFolderForNewProjects");
+                return null;
+            }
+
+            // find next free folder checking all "unityversion_a-z" characters
             var unityBaseVersion = version.Substring(0, version.IndexOf('.'));
             for (int i = 97; i < 122; i++)
             {
                 var newProject = unityBaseVersion + "_" + ((char)i);
                 var path = Path.Combine(baseFolder, newProject);
+
                 if (Directory.Exists(path))
                 {
-                    Console.WriteLine("directory exists..trying again");
+                    //Console.WriteLine("directory exists..trying again");
                 }
                 else // its available
                 {
-                    Console.WriteLine("create folder: " + path);
-                    Directory.CreateDirectory(path);
-
-                    // create project version file, to avoid wrong version warning
-                    var settingsPath = Path.Combine(path, "ProjectSettings");
-                    Directory.CreateDirectory(settingsPath);
-                    var settingsFile = Path.Combine(settingsPath, "ProjectVersion.txt");
-                    File.WriteAllText(settingsFile, "m_EditorVersion: " + version);
-
-                    // launch project
-                    var p = new Project();
-                    p.Path = path;
-                    p.Version = version;
-                    Tools.LaunchProject(p);
-                    break;
+                    return newProject;
                 }
             }
+            return null;
+        }
+
+        static void CreateEmptyProjectFolder(string path, string version)
+        {
+            Console.WriteLine("Create new project folder: " + path);
+            Directory.CreateDirectory(path);
+
+            // create project version file, to avoid wrong version warning
+            var settingsPath = Path.Combine(path, "ProjectSettings");
+            Directory.CreateDirectory(settingsPath);
+            var settingsFile = Path.Combine(settingsPath, "ProjectVersion.txt");
+            File.WriteAllText(settingsFile, "m_EditorVersion: " + version);
         }
 
 

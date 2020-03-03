@@ -89,7 +89,7 @@ namespace UnityLauncherPro
             gridRecent.Items.Clear();
             gridRecent.ItemsSource = projectsSource;
 
-            // updates grid
+            // clear updates grid
             dataGridUpdates.Items.Clear();
 
             // build notifyicon (using windows.forms)
@@ -243,6 +243,7 @@ namespace UnityLauncherPro
             chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
             chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
             txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
+            chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -1157,7 +1158,7 @@ namespace UnityLauncherPro
         // creates empty project into default project root with selected unity version
         private void BtnCreateEmptyProject_Click(object sender, RoutedEventArgs e)
         {
-            Tools.FastCreateProject(GetSelectedProject().Version, txtRootFolderForNewProjects.Text);
+            CreateNewEmptyProject();
         }
 
         private void BtnBrowseProjectRootFolder_Click(object sender, RoutedEventArgs e)
@@ -1181,7 +1182,76 @@ namespace UnityLauncherPro
 
         private void BtnCreateEmptyProjectUnity_Click(object sender, RoutedEventArgs e)
         {
-            Tools.FastCreateProject(GetSelectedUnity().Version, txtRootFolderForNewProjects.Text);
+            CreateNewEmptyProject();
+        }
+
+        void CreateNewEmptyProject()
+        {
+            if (chkAskNameForQuickProject.IsChecked == true)
+            {
+                // ask name
+                string newVersion = null;
+
+                // if in maintab
+                if (tabControl.SelectedIndex == 0)
+                {
+                    newVersion = GetSelectedProject().Version == null ? preferredVersion : GetSelectedProject().Version;
+                }
+                else // unity tab
+                {
+                    newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
+                }
+
+                if (string.IsNullOrEmpty(newVersion))
+                {
+                    Console.WriteLine("Missing selected unity version");
+                    return;
+                }
+
+                NewProject modalWindow = new NewProject(newVersion, Tools.GetSuggestedProjectName(newVersion, txtRootFolderForNewProjects.Text));
+                modalWindow.ShowInTaskbar = this == null;
+                modalWindow.WindowStartupLocation = this == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
+                modalWindow.Topmost = this == null;
+                modalWindow.ShowActivated = true;
+                modalWindow.Owner = this;
+                modalWindow.ShowDialog();
+                var results = modalWindow.DialogResult.HasValue && modalWindow.DialogResult.Value;
+
+                if (results == true)
+                {
+                    var projectPath = txtRootFolderForNewProjects.Text;
+                    Console.WriteLine("create project " + projectPath);
+                    if (string.IsNullOrEmpty(projectPath)) return;
+
+                    Tools.FastCreateProject(newVersion, projectPath, NewProject.newProjectName);
+                }
+                else // false, cancel
+                {
+                    Console.WriteLine("Cancellled project creation..");
+                }
+
+            }
+            else // use automatic name
+            {
+                string newVersion = null;
+                // if in maintab
+                if (tabControl.SelectedIndex == 0)
+                {
+                    newVersion = GetSelectedProject().Version == null ? preferredVersion : GetSelectedProject().Version;
+                }
+                else // unity tab
+                {
+                    newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
+                }
+                Tools.FastCreateProject(newVersion, txtRootFolderForNewProjects.Text);
+            }
+
+        }
+
+        private void ChkAskNameForQuickProject_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.askNameForQuickProject = (bool)chkAskNameForQuickProject.IsChecked;
+            Properties.Settings.Default.Save();
         }
     } // class
 } //namespace

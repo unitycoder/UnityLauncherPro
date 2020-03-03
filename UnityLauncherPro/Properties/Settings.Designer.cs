@@ -191,5 +191,17 @@ namespace UnityLauncherPro.Properties {
                 this["newProjectsRoot"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool askNameForQuickProject {
+            get {
+                return ((bool)(this["askNameForQuickProject"]));
+            }
+            set {
+                this["askNameForQuickProject"] = value;
+            }
+        }
     }
 }
