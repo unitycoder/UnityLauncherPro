@@ -317,6 +317,7 @@ namespace UnityLauncherPro
                     unityInstalledVersions.Add(version, unityInstallationsSource[i].Path);
                 }
             }
+
             lblFoundXInstallations.Content = "Found " + unityInstallationsSource.Length + " installations";
         }
 

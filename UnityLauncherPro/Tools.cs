@@ -426,22 +426,52 @@ namespace UnityLauncherPro
             return url;
         }
 
-
         public static string FindNearestVersion(string currentVersion, List<string> allAvailable)
         {
-            if (currentVersion.Contains("2019"))
+            string result = null;
+
+            // add current version to list
+            allAvailable.Add(currentVersion);
+
+            // sort list
+            allAvailable.Sort((s1, s2) => VersionAsInt(s2).CompareTo(VersionAsInt(s1)));
+
+            // check version above our current version
+            int currentIndex = allAvailable.IndexOf(currentVersion);
+            // if its index 0, we select that row anyways later
+            if (currentIndex > 0 && currentIndex < allAvailable.Count)
             {
-                return FindNearestVersionFromSimilarVersions(currentVersion, allAvailable.Where(x => x.Contains("2019")));
+                result = allAvailable[currentIndex - 1];
             }
-            if (currentVersion.Contains("2018"))
+
+            return result;
+        }
+
+        // string to integer for sorting by version 2017.1.5f1 > 2017010501
+        public static int VersionAsInt(string version)
+        {
+            int result = 0;
+            if (string.IsNullOrEmpty(version)) return result;
+
+            // remove a,b,f,p
+            string cleanVersion = version.Replace("a", ".");
+            cleanVersion = cleanVersion.Replace("b", ".");
+            cleanVersion = cleanVersion.Replace("f", ".");
+            cleanVersion = cleanVersion.Replace("p", ".");
+
+            // split values
+            string[] splitted = cleanVersion.Split('.');
+            if (splitted != null && splitted.Length > 0)
             {
-                return FindNearestVersionFromSimilarVersions(currentVersion, allAvailable.Where(x => x.Contains("2018")));
+                int multiplier = 1;
+                for (int i = 0, length = splitted.Length; i < length; i++)
+                {
+                    int n = int.Parse(splitted[splitted.Length - 1 - i]);
+                    result += n * multiplier;
+                    multiplier *= 100;
+                }
             }
-            if (currentVersion.Contains("2017"))
-            {
-                return FindNearestVersionFromSimilarVersions(currentVersion, allAvailable.Where(x => x.Contains("2017")));
-            }
-            return FindNearestVersionFromSimilarVersions(currentVersion, allAvailable.Where(x => !x.Contains("2017")));
+            return result;
         }
 
         private static string FindNearestVersionFromSimilarVersions(string version, IEnumerable<string> allAvailable)
@@ -526,11 +556,11 @@ namespace UnityLauncherPro
 
                 // inject new version for this item
                 proj.Version = upgradeToVersion;
-                Tools.LaunchProject(proj);
+                LaunchProject(proj);
             }
             else
             {
-                Console.WriteLine("results = " + results);
+                //Console.WriteLine("results = " + results);
             }
         }
 

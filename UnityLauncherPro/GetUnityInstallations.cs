@@ -65,13 +65,11 @@ namespace UnityLauncherPro
                 } // got folders
             } // all root folders
 
-            // sort by unity version NOTE we might want to sort by install date also..
-            results.Sort((s1, s2) => VersionAsFloat(s2.Version).CompareTo(VersionAsFloat(s1.Version)));
+            results.Sort((s1, s2) => Tools.VersionAsInt(s2.Version).CompareTo(Tools.VersionAsInt(s1.Version)));
 
             return results.ToArray();
         } // scan()
 
-        //static Dictionary<string, string> platformNames = new Dictionary<string, string> { windowsstandalonesupport};
         static string[] GetPlatforms(string dataFolder)
         {
             // get all folders inside
@@ -90,38 +88,9 @@ namespace UnityLauncherPro
                 {
                     directories[i] = foldername;
                 }
-                //Console.WriteLine(directories[i]);
             }
 
             return directories;
-        }
-
-        // string to float 2017.4.1f1 > 2017.411
-        static float VersionAsFloat(string version)
-        {
-            float result = 0;
-            if (string.IsNullOrEmpty(version)) return result;
-
-            // remove a,b,f,p
-            string cleanVersion = version.Replace("a", ".");
-            cleanVersion = cleanVersion.Replace("b", ".");
-            cleanVersion = cleanVersion.Replace("f", ".");
-            cleanVersion = cleanVersion.Replace("p", ".");
-
-            // split values
-            string[] splitted = cleanVersion.Split('.');
-            if (splitted != null && splitted.Length > 0)
-            {
-                // get float
-                float multiplier = 1;
-                for (int i = 0, length = splitted.Length; i < length; i++)
-                {
-                    int n = int.Parse(splitted[i]);
-                    result += n * multiplier;
-                    multiplier /= 10;
-                }
-            }
-            return result;
         }
 
     } // class
