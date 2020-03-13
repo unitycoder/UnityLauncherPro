@@ -494,6 +494,9 @@ namespace UnityLauncherPro
 
                     switch (e.Key)
                     {
+                        case Key.LeftCtrl: // used for ctrl+c
+                            break;
+
                         case Key.Escape: // clear project search
                             if (txtSearchBox.Text == "")
                             {
@@ -1254,5 +1257,36 @@ namespace UnityLauncherPro
             Properties.Settings.Default.askNameForQuickProject = (bool)chkAskNameForQuickProject.IsChecked;
             Properties.Settings.Default.Save();
         }
+
+        // copies project folder, or unity exe folder, or unity version from current datagrid
+        public void CopyRowFolderToClipBoard(object sender, ExecutedRoutedEventArgs e)
+        {
+            string path = null;
+            if (tabControl.SelectedIndex == 0) // projects
+            {
+                path = GetSelectedProject()?.Path;
+            }
+            else if (tabControl.SelectedIndex == 1) // installed unitys
+            {
+                path = Path.GetDirectoryName(GetSelectedUnity()?.Path);
+            }
+            else if (tabControl.SelectedIndex == 2) // updates
+            {
+                path = GetSelectedUpdate()?.Version; // TODO copy url instead
+            }
+            Console.WriteLine(path);
+
+            if (string.IsNullOrEmpty(path) == false) Clipboard.SetText(path);
+        }
+
+        public void CanExecute_Copy(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
     } // class
 } //namespace
+
+
+
+
