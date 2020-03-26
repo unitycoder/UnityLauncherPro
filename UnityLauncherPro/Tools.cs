@@ -368,6 +368,9 @@ namespace UnityLauncherPro
                 if (Tools.VersionIsBeta(version)) website = "https://unity3d.com/unity/beta/" + version;
                 if (Tools.VersionIsAlpha(version)) website = "https://unity3d.com/unity/alpha/" + version;
 
+                // fix unity server problem, page says 404 found if no url params
+                website += "?unitylauncherpro";
+
                 // download html
                 string sourceHTML = client.DownloadString(website);
                 string[] lines = sourceHTML.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
