@@ -231,6 +231,7 @@ namespace UnityLauncherPro
 
         public static string GetUnityExePath(string version)
         {
+            if (string.IsNullOrEmpty(version) == true) return null;
             return MainWindow.unityInstalledVersions.ContainsKey(version) ? MainWindow.unityInstalledVersions[version] : null;
         }
 

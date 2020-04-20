@@ -140,7 +140,6 @@ namespace UnityLauncherPro
                         commandLineArguments += " " + args[i];
                     }
 
-
                     var proj = new Project();
                     proj.Version = version;
                     proj.Path = projectPathArgument;
@@ -442,10 +441,16 @@ namespace UnityLauncherPro
             var folder = Tools.BrowseForOutputFolder("Select Project Folder to Add it Into Projects List");
             if (string.IsNullOrEmpty(folder) == false)
             {
+                // create new project item
                 var p = new Project();
                 p.Path = folder;
+                p.Title = Path.GetFileName(folder);
+                p.Version = Tools.GetProjectVersion(folder);
+                p.Arguments = Tools.ReadCustomLaunchArguments(folder, MainWindow.launcherArgumentsFile);
+                // add to list
                 projectsSource.Insert(0, p);
                 gridRecent.Items.Refresh();
+                gridRecent.SelectedIndex = 0;
             }
         }
 
