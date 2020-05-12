@@ -1359,6 +1359,18 @@ namespace UnityLauncherPro
         {
             isDirtyCell = true;
         }
+
+        private void BtnOpenCrashLogs_Click(object sender, RoutedEventArgs e)
+        {
+            var logfolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Unity", "Editor", "Crashes");
+            if (Directory.Exists(logfolder) == true)
+            {
+                if (Tools.LaunchExplorer(logfolder) == false)
+                {
+                    Console.WriteLine("Cannot open folder.." + logfolder);
+                }
+            }
+        }
     } // class
 } //namespace
 
