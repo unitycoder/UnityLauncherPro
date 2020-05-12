@@ -522,7 +522,17 @@ namespace UnityLauncherPro
                         case Key.Right:
                         case Key.Down:
                             break;
-                        case Key.F2: // edit arguments
+                        case Key.F2: // edit arguments or project name
+                            // if in first cell (or no cell)
+                            var cell = gridRecent.CurrentCell;
+                            if (cell.Column.DisplayIndex == 0)
+                            {
+                                // enable cell edit
+                                cell.Column.IsReadOnly = false;
+                                // start editing that cell
+                                gridRecent.CurrentCell = new DataGridCellInfo(gridRecent.Items[gridRecent.SelectedIndex], gridRecent.Columns[cell.Column.DisplayIndex]);
+                                gridRecent.BeginEdit();
+                            }
                             break;
                         default: // any key
                             // cancel if editing cell
@@ -1044,9 +1054,14 @@ namespace UnityLauncherPro
             Process.Start(githubURL);
         }
 
+        // finished editing project name cell or launcher argument cell
         private void GridRecent_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            // get current row data
+            // avoid ending event running twice
+            if (isDirtyCell == false) return;
+            isDirtyCell = false;
+
+            // get selected row data
             var proj = GetSelectedProject();
 
             // check that folder exists
@@ -1055,31 +1070,81 @@ namespace UnityLauncherPro
 
             // get current arguments, after editing
             TextBox t = e.EditingElement as TextBox;
-            string arguments = t.Text.ToString();
+            string newcellValue = t.Text.ToString();
 
-            string projSettingsFolder = "ProjectSettings";
-
-            // check if projectsettings folder exists, if not then add
-            string outputFolder = Path.Combine(path, projSettingsFolder);
-            if (Directory.Exists(outputFolder) == false)
+            // check if we edited project name, or launcher arguments
+            if (e.Column.DisplayIndex == 0)
             {
-                Directory.CreateDirectory(outputFolder);
+                // restore read only
+                e.Column.IsReadOnly = true;
+                // TODO validate filename
+                if (string.IsNullOrEmpty(newcellValue))
+                {
+                    Console.WriteLine("Invalid new project name: " + newcellValue);
+                    return;
+                }
+
+                var newPath = Path.Combine(Directory.GetParent(path).ToString(), newcellValue);
+
+                //Console.WriteLine("Old folder: " + path);
+                //Console.WriteLine("New folder: " + newPath);
+
+                // check if same as before (need to replace mismatch slashes)
+                if (path.Replace('/', '\\') == newPath.Replace('/', '\\'))
+                {
+                    Console.WriteLine("Rename cancelled..");
+                    return;
+                }
+
+                // check if new folder already exists
+                if (Directory.Exists(newPath))
+                {
+                    Console.WriteLine("Directory already exists: " + newPath);
+                    return;
+                }
+
+                // try rename project folder
+                Directory.Move(path, newPath);
+
+                // check if success
+                if (Directory.Exists(newPath))
+                {
+                    proj.Path = newPath;
+                    // TODO save to registry (otherwise not listed in recent projects, unless opened)
+                }
+                else
+                {
+                    Console.WriteLine("Failed to rename directory..");
+                }
+
+            }
+            else // it was launcher arguments
+            {
+
+                string projSettingsFolder = "ProjectSettings";
+
+                // check if projectsettings folder exists, if not then add
+                string outputFolder = Path.Combine(path, projSettingsFolder);
+                if (Directory.Exists(outputFolder) == false)
+                {
+                    Directory.CreateDirectory(outputFolder);
+                }
+
+                // save arguments to projectsettings folder
+                string outputFile = Path.Combine(path, projSettingsFolder, launcherArgumentsFile);
+
+                try
+                {
+                    StreamWriter sw = new StreamWriter(outputFile);
+                    sw.WriteLine(newcellValue);
+                    sw.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error saving launcher arguments: " + ex);
+                }
             }
 
-            // save arguments to projectsettings folder
-            string outputFile = Path.Combine(path, projSettingsFolder, launcherArgumentsFile);
-
-            try
-            {
-                StreamWriter sw = new StreamWriter(outputFile);
-                sw.WriteLine(arguments);
-                sw.Close();
-            }
-            catch (Exception ex)
-            {
-                //SetStatus("File error: " + exception.Message);
-                Console.WriteLine(ex);
-            }
             // TODO select the same row again
         }
 
@@ -1289,6 +1354,11 @@ namespace UnityLauncherPro
             e.CanExecute = true;
         }
 
+        bool isDirtyCell = false;
+        private void GridRecent_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            isDirtyCell = true;
+        }
     } // class
 } //namespace
 
