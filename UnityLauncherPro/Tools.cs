@@ -192,6 +192,10 @@ namespace UnityLauncherPro
             {
                 Console.WriteLine(e);
             }
+
+            // move as first, since its opened, disabled for now, more used to it staying in place..
+            // MainWindow wnd = (MainWindow)Application.Current.MainWindow;
+            // wnd.MoveRecentGridItem(0);
         }
 
         static bool CheckCrashBackupScene(string projectPath)
@@ -806,8 +810,7 @@ namespace UnityLauncherPro
             var p = new Project();
             p.Path = Path.Combine(baseFolder, newPath);
             p.Version = version;
-            Tools.LaunchProject(p);
-
+            LaunchProject(p);
         } // FastCreateProject
 
 

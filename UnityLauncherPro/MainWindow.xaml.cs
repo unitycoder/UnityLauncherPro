@@ -179,10 +179,10 @@ namespace UnityLauncherPro
             ICollectionView collection = CollectionViewSource.GetDefaultView(projectsSource);
             collection.Filter = ProjectFilter;
             // set first row selected, if only 1 row
-            //if (gridRecent.Items.Count == 1)
-            //{
-            //    gridRecent.SelectedIndex = 0;
-            //}
+            if (gridRecent.Items.Count == 1)
+            {
+                gridRecent.SelectedIndex = 0;
+            }
         }
 
         void FilterUpdates()
@@ -243,6 +243,7 @@ namespace UnityLauncherPro
             chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
             txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
             chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
+            chkEnableProjectRename.IsChecked = Properties.Settings.Default.enableProjectRename;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -450,7 +451,9 @@ namespace UnityLauncherPro
                 // add to list
                 projectsSource.Insert(0, p);
                 gridRecent.Items.Refresh();
+                Tools.SetFocusToGrid(gridRecent); // force focus
                 gridRecent.SelectedIndex = 0;
+
             }
         }
 
@@ -523,6 +526,7 @@ namespace UnityLauncherPro
                         case Key.Down:
                             break;
                         case Key.F2: // edit arguments or project name
+                            if (chkEnableProjectRename.IsChecked == false) return; //if rename not enabled
                             // if in first cell (or no cell)
                             var cell = gridRecent.CurrentCell;
                             if (cell.Column.DisplayIndex == 0)
@@ -796,29 +800,36 @@ namespace UnityLauncherPro
             switch (e.Key)
             {
                 case Key.Home: // override home
+                    // if edit mode, dont override keys
+                    if (IsEditingCell(gridRecent) == true) return;
                     gridRecent.SelectedIndex = 0;
                     gridRecent.ScrollIntoView(gridRecent.SelectedItem);
                     e.Handled = true;
                     break;
                 case Key.End: // override end
+                    // if edit mode, dont override keys
+                    if (IsEditingCell(gridRecent) == true) return;
                     gridRecent.SelectedIndex = gridRecent.Items.Count - 1;
                     gridRecent.ScrollIntoView(gridRecent.SelectedItem);
                     e.Handled = true;
                     break;
                 case Key.F5: // refresh projects
+                    // if edit mode, dont override keys
+                    if (IsEditingCell(gridRecent) == true) return;
                     UpdateUnityInstallationsList();
                     RefreshRecentProjects();
                     break;
                 case Key.Tab:
+                    // if edit mode, dont override keys
+                    if (IsEditingCell(gridRecent) == true) return;
                     if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
                     {
                         e.Handled = true;
                     }
                     break;
                 case Key.Return:
-                    // cancel if editing cell
-                    IEditableCollectionView itemsView = gridRecent.Items;
-                    if (itemsView.IsAddingNew || itemsView.IsEditingItem) return;
+                    // if edit mode, dont override keys
+                    if (IsEditingCell(gridRecent) == true) return;
                     e.Handled = true;
                     var proj = GetSelectedProject();
                     Tools.LaunchProject(proj);
@@ -828,12 +839,19 @@ namespace UnityLauncherPro
             }
         }
 
+        bool IsEditingCell(DataGrid targetGrid)
+        {
+            IEditableCollectionView itemsView = targetGrid.Items;
+            var res = itemsView.IsAddingNew || itemsView.IsEditingItem;
+            return res;
+        }
+
         private void DataGridUnitys_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Return)
             {
                 e.Handled = true;
-                // TODO launchunity
+                // TODO launch unity?
             }
         }
 
@@ -1077,17 +1095,29 @@ namespace UnityLauncherPro
             {
                 // restore read only
                 e.Column.IsReadOnly = true;
-                // TODO validate filename
+
                 if (string.IsNullOrEmpty(newcellValue))
                 {
-                    Console.WriteLine("Invalid new project name: " + newcellValue);
+                    Console.WriteLine("Project name is null: " + newcellValue);
                     return;
                 }
 
+                // cannot allow / or \ or . as last character (otherwise might have issues going parent folder?)
+                if (newcellValue.EndsWith("\\") || newcellValue.EndsWith("/") || newcellValue.EndsWith("."))
+                {
+                    Console.WriteLine("Project name cannot end with / or \\ or . ");
+                    return;
+                }
+
+                // get new path
                 var newPath = Path.Combine(Directory.GetParent(path).ToString(), newcellValue);
 
-                //Console.WriteLine("Old folder: " + path);
-                //Console.WriteLine("New folder: " + newPath);
+                // check if has invalid characters for full path
+                if (newPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+                {
+                    Console.WriteLine("Invalid project path: " + newPath);
+                    return;
+                }
 
                 // check if same as before (need to replace mismatch slashes)
                 if (path.Replace('/', '\\') == newPath.Replace('/', '\\'))
@@ -1103,13 +1133,15 @@ namespace UnityLauncherPro
                     return;
                 }
 
-                // try rename project folder
+                // try rename project folder by moving directory to new name
                 Directory.Move(path, newPath);
 
-                // check if success
+                // check if move was success
                 if (Directory.Exists(newPath))
                 {
-                    proj.Path = newPath;
+                    // force ending edit (otherwise only ends on enter or esc)
+                    gridRecent.CommitEdit(DataGridEditingUnit.Row, true);
+
                     // TODO save to registry (otherwise not listed in recent projects, unless opened)
                 }
                 else
@@ -1160,6 +1192,13 @@ namespace UnityLauncherPro
 
         private void GridRecent_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            // cancel if editing cell, because often try to double click to edit
+            if (IsEditingCell(gridRecent)) return;
+
+            // cancel run if double click arguments editable field
+            var currentColumnCell = gridRecent.CurrentCell.Column.DisplayIndex;
+            if (currentColumnCell == 4) return;
+
             Tools.LaunchProject(GetSelectedProject());
         }
 
@@ -1370,6 +1409,22 @@ namespace UnityLauncherPro
                     Console.WriteLine("Cannot open folder.." + logfolder);
                 }
             }
+        }
+
+        // reorder grid item by index
+        public void MoveRecentGridItem(int to)
+        {
+            var source = (Project)gridRecent.Items[gridRecent.SelectedIndex];
+            projectsSource.RemoveAt(gridRecent.SelectedIndex);
+            projectsSource.Insert(to, source);
+            gridRecent.Items.Refresh();
+            gridRecent.SelectedIndex = to;
+        }
+
+        private void ChkEnableProjectRename_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.enableProjectRename = (bool)chkEnableProjectRename.IsChecked;
+            Properties.Settings.Default.Save();
         }
     } // class
 } //namespace

@@ -203,5 +203,17 @@ namespace UnityLauncherPro.Properties {
                 this["askNameForQuickProject"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enableProjectRename {
+            get {
+                return ((bool)(this["enableProjectRename"]));
+            }
+            set {
+                this["enableProjectRename"] = value;
+            }
+        }
     }
 }
