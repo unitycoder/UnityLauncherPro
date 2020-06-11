@@ -36,7 +36,7 @@ namespace UnityLauncherPro
         /// <returns></returns>
         public static string GetProjectVersion(string path)
         {
-            var version = "";
+            string version = null;
 
             if (File.Exists(Path.Combine(path, "ProjectVersionOverride.txt")))
             {
@@ -75,16 +75,16 @@ namespace UnityLauncherPro
                         Console.WriteLine("Invalid projectversion data found in '" + versionPath + "'.\n\nFile Content:\n" + string.Join("\n", data).ToString());
                     }
                 }
-                else // maybe its 4.x
+                else // maybe its 4.x?
                 {
                     versionPath = Path.Combine(path, "ProjectSettings", "ProjectSettings.asset");
                     if (File.Exists(versionPath) == true)
                     {
                         // first try if its ascii format
                         var data = File.ReadAllLines(versionPath);
-                        if (data != null && data.Length > 0 && data[0].IndexOf("YAML") > -1)
+                        if (data != null && data.Length > 0 && data[0].IndexOf("YAML") > -1) // we have ascii
                         {
-                            // in text format, then we need to try library file instead
+                            // check library if available
                             var newVersionPath = Path.Combine(path, "Library", "AnnotationManager");
                             if (File.Exists(newVersionPath) == true)
                             {
@@ -103,8 +103,17 @@ namespace UnityLauncherPro
                             {
                                 bytes[i] = binData[startIndex + i];
                             }
-                            version = Encoding.UTF8.GetString(bytes);
+                            var vertemp = Encoding.UTF8.GetString(bytes);
+                            // probably failed if no dots
+                            if (vertemp.IndexOf(".") > -1) version = vertemp;
+
                         }
+                        // if still nothing, take a quess based on yaml year info, lets say 2011 is unity 3.5
+                        if (string.IsNullOrEmpty(version) == true && data[1].ToLower().IndexOf("unity3d.com,2011") > -1)
+                        {
+                            version = "3.5.7f1";
+                        }
+
                     }
                 }
             }
@@ -627,7 +636,7 @@ namespace UnityLauncherPro
             RegistryKey key = Registry.CurrentUser.OpenSubKey(contextRegRoot, true);
             if (key != null)
             {
-                var appName = "UnityLauncher";
+                var appName = "UnityLauncherPro";
                 RegistryKey appKey = Registry.CurrentUser.OpenSubKey(contextRegRoot + "\\" + appName, false);
                 if (appKey != null)
                 {
