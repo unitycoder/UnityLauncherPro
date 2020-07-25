@@ -597,7 +597,7 @@
 								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenPlayerLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenPlayerLogs_Click" ToolTip="Open Player logs folder in Explorer">
 									<Label Content="_Player Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 								</Button>
-								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenCrashLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenCrashLogs_Click" ToolTip="Open Player logs folder in Explorer">
+								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenCrashLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenCrashLogs_Click" ToolTip="Open Crash logs folder in Explorer">
 									<Label Content="_Crash Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
 								</Button>
 								<Button Style="{StaticResource CustomButton}" x:Name="btnAssetPackages" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Open assetstore downloads folder in Explorer" Click="BtnAssetPackages_Click">
@@ -678,7 +678,7 @@
 
 		<Grid Grid.Row="2" UseLayoutRounding="False">
 			<StatusBar VerticalAlignment="Bottom" Margin="3,1,20,1" Background="{x:Null}" Foreground="#FF595959">
-				<TextBlock Margin="6,1,3,0"  VerticalAlignment="Center" Text="Ready"/>
+				<TextBlock x:Name="txtStatus" Margin="6,1,3,0"  VerticalAlignment="Center" Text="Ready"/>
 			</StatusBar>
 		</Grid>
 	</Grid>

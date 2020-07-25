@@ -125,7 +125,8 @@ namespace UnityLauncherPro
         public static string GetFileVersionData(string path)
         {
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(path);
-            return fvi.ProductName.Replace("(64-bit)", "").Replace("Unity", "").Trim();
+            var res = fvi.ProductName.Replace("(64-bit)", "").Replace("(32-bit)", "").Replace("Unity", "").Trim();
+            return res;
         }
 
         public static void ExploreProjectFolder(Project proj)
@@ -481,8 +482,11 @@ namespace UnityLauncherPro
             int result = 0;
             if (string.IsNullOrEmpty(version)) return result;
 
+            // cleanup 32bit version name
+            string cleanVersion = version.Replace("(32-bit)", "");
+
             // remove a,b,f,p
-            string cleanVersion = version.Replace("a", ".");
+            cleanVersion = cleanVersion.Replace("a", ".");
             cleanVersion = cleanVersion.Replace("b", ".");
             cleanVersion = cleanVersion.Replace("f", ".");
             cleanVersion = cleanVersion.Replace("p", ".");
