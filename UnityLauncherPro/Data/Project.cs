@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace UnityLauncherPro
 {
@@ -10,5 +11,6 @@ namespace UnityLauncherPro
         public DateTime? Modified { set; get; }
         public string Arguments { set; get; }
         public string GITBranch { set; get; }
+        public Process Process; // launched unity exe
     }
 }

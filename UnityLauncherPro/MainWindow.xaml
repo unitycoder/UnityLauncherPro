@@ -301,10 +301,11 @@
 					<Button Style="{StaticResource CustomButton}" ToolTip="Add existing project" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,34,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" TabIndex="10" />
 					<Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshProjectList_Click" TabIndex="11"/>
 
-					<DataGrid x:Name="gridRecent" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" BeginningEdit="GridRecent_BeginningEdit" >
+					<DataGrid x:Name="gridRecent" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" BeginningEdit="GridRecent_BeginningEdit" ContextMenuOpening="GridRecent_ContextMenuOpening" >
 
 						<DataGrid.CommandBindings>
 							<CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
+							<CommandBinding Command="{x:Static local:MainWindow.KillProcessCommand}" Executed="KillSelectedProcess"/>
 						</DataGrid.CommandBindings>
 
 						<DataGrid.Columns>
@@ -332,8 +333,9 @@
 							<ContextMenu>
 								<MenuItem x:Name="menuItemCopyVersion" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
 								<MenuItem x:Name="menuItemCopyPath" Header="Copy Project Path" Click="MenuItemCopyPath_Click" />
-								<!--<Separator />-->
 								<MenuItem x:Name="menuItemShowProjectInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
+								<Separator/>
+								<MenuItem x:Name="menuItemKillProcess" Header="Kill Process" Click="MenuItemKillProcess_Click" />
 							</ContextMenu>
 						</DataGrid.ContextMenu>
 

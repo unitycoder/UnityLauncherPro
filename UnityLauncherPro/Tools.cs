@@ -144,11 +144,11 @@ namespace UnityLauncherPro
         }
 
         // NOTE holding alt key (when using alt+o) brings up unity project selector
-        public static void LaunchProject(Project proj)
+        public static Process LaunchProject(Project proj)
         {
             // validate
-            if (proj == null) return;
-            if (Directory.Exists(proj.Path) == false) return;
+            if (proj == null) return null;
+            if (Directory.Exists(proj.Path) == false) return null;
 
             Console.WriteLine("launch project " + proj.Title + " " + proj.Version);
 
@@ -164,23 +164,24 @@ namespace UnityLauncherPro
             var cancelLaunch = CheckCrashBackupScene(proj.Path);
             if (cancelLaunch == true)
             {
-                return;
+                return null;
             }
 
             var unityExePath = GetUnityExePath(proj.Version);
             if (unityExePath == null)
             {
                 DisplayUpgradeDialog(proj, null);
-                return;
+                return null;
             }
 
             // SetStatus("Launching project in Unity " + version);
 
+            Process newProcess = new Process();
+
             try
             {
-                Process myProcess = new Process();
                 var cmd = "\"" + unityExePath + "\"";
-                myProcess.StartInfo.FileName = cmd;
+                newProcess.StartInfo.FileName = cmd;
 
                 var unitycommandlineparameters = " -projectPath " + "\"" + proj.Path + "\"";
 
@@ -190,8 +191,8 @@ namespace UnityLauncherPro
                     unitycommandlineparameters += " " + customArguments;
                 }
 
-                myProcess.StartInfo.Arguments = unitycommandlineparameters;
-                myProcess.Start();
+                newProcess.StartInfo.Arguments = unitycommandlineparameters;
+                newProcess.Start();
 
                 if (Properties.Settings.Default.closeAfterProject)
                 {
@@ -206,6 +207,9 @@ namespace UnityLauncherPro
             // move as first, since its opened, disabled for now, more used to it staying in place..
             // MainWindow wnd = (MainWindow)Application.Current.MainWindow;
             // wnd.MoveRecentGridItem(0);
+
+            return newProcess;
+
         }
 
         static bool CheckCrashBackupScene(string projectPath)
@@ -588,7 +592,8 @@ namespace UnityLauncherPro
 
                 // inject new version for this item
                 proj.Version = upgradeToVersion;
-                LaunchProject(proj);
+                var proc = LaunchProject(proj);
+                proj.Process = proc;
             }
             else
             {
@@ -820,10 +825,11 @@ namespace UnityLauncherPro
             CreateEmptyProjectFolder(newPath, version);
 
             // launch empty project
-            var p = new Project();
-            p.Path = Path.Combine(baseFolder, newPath);
-            p.Version = version;
-            LaunchProject(p);
+            var proj = new Project();
+            proj.Path = Path.Combine(baseFolder, newPath);
+            proj.Version = version;
+            var proc = LaunchProject(proj);
+            proj.Process = proc;
         } // FastCreateProject
 
 

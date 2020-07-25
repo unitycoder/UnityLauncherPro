@@ -32,12 +32,11 @@ namespace UnityLauncherPro
         [DllImport("user32")]
         static extern bool OpenIcon(IntPtr hWnd);
 
-        //Project[] projectsSource;
+        // datagrid sources
         List<Project> projectsSource;
-
-
         Updates[] updatesSource;
         UnityInstallation[] unityInstallationsSource;
+
         public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>();
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
@@ -154,7 +153,8 @@ namespace UnityLauncherPro
                     else
                     {
                         // try launching it
-                        Tools.LaunchProject(proj);
+                        var proc = Tools.LaunchProject(proj);
+                        proj.Process = proc;
                     }
 
                     // quit after launch if enabled in settings
@@ -641,7 +641,9 @@ namespace UnityLauncherPro
 
         private void BtnLaunchProject_Click(object sender, RoutedEventArgs e)
         {
-            Tools.LaunchProject(GetSelectedProject());
+            var proj = GetSelectedProject();
+            var proc = Tools.LaunchProject(proj);
+            proj.Process = proc;
             Tools.SetFocusToGrid(gridRecent);
         }
 
@@ -741,7 +743,8 @@ namespace UnityLauncherPro
             {
                 case Key.Return: // open selected project
                     var proj = GetSelectedProject();
-                    if (proj != null) Tools.LaunchProject(proj);
+                    var proc = Tools.LaunchProject(proj);
+                    proj.Process = proc;
                     break;
                 case Key.Tab:
                 case Key.Up:
@@ -832,7 +835,8 @@ namespace UnityLauncherPro
                     if (IsEditingCell(gridRecent) == true) return;
                     e.Handled = true;
                     var proj = GetSelectedProject();
-                    Tools.LaunchProject(proj);
+                    var proc = Tools.LaunchProject(proj);
+                    proj.Process = proc;
                     break;
                 default:
                     break;
@@ -1090,6 +1094,7 @@ namespace UnityLauncherPro
             TextBox t = e.EditingElement as TextBox;
             string newcellValue = t.Text.ToString();
 
+
             // check if we edited project name, or launcher arguments
             if (e.Column.DisplayIndex == 0)
             {
@@ -1150,7 +1155,7 @@ namespace UnityLauncherPro
                 }
 
             }
-            else // it was launcher arguments
+            else // edit launcher arguments
             {
 
                 string projSettingsFolder = "ProjectSettings";
@@ -1199,7 +1204,9 @@ namespace UnityLauncherPro
             var currentColumnCell = gridRecent.CurrentCell.Column.DisplayIndex;
             if (currentColumnCell == 4) return;
 
-            Tools.LaunchProject(GetSelectedProject());
+            var proj = GetSelectedProject();
+            var proc = Tools.LaunchProject(proj);
+            proj.Process = proc;
         }
 
         private void DataGridUnitys_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -1426,6 +1433,41 @@ namespace UnityLauncherPro
             Properties.Settings.Default.enableProjectRename = (bool)chkEnableProjectRename.IsChecked;
             Properties.Settings.Default.Save();
         }
+
+        private void MenuItemKillProcess_Click(object sender, RoutedEventArgs e)
+        {
+            if (tabControl.SelectedIndex == 0)
+            {
+                KillSelectedProcess(null, null);
+            }
+        }
+
+        void KillSelectedProcess(object sender, ExecutedRoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            if (proj.Process != null)
+            {
+                proj.Process.Kill();
+                proj.Process = null;
+            }
+        }
+
+        private void GridRecent_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (tabControl.SelectedIndex == 0)
+            {
+                var proj = GetSelectedProject();
+                menuItemKillProcess.IsEnabled = proj.Process != null;
+            }
+        }
+
+        // add alt+Q shortcut for killing process
+        // https://stackoverflow.com/a/29817712/5452781
+        public static readonly RoutedCommand KillProcessCommand = new RoutedUICommand("None", "KillProcessCommand", typeof(MainWindow), new InputGestureCollection(new InputGesture[]
+        {
+            new KeyGesture(Key.Q, ModifierKeys.Alt)
+        }));
+
     } // class
 } //namespace
 
