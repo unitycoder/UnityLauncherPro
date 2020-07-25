@@ -1,5 +1,5 @@
 # UnityLauncherPro 
-[![](https://ci.appveyor.com/api/projects/status/hajcaavcsg7904rx?svg=true)](#)
+[![](https://ci.appveyor.com/api/projects/status/hajcaavcsg7904rx?svg=true)](#)[](https://discord.gg/cXT97hU)<div><a href="https://discord.gg/cXT97hU"><img src="https://img.shields.io/discord/337579253866692608.svg"></a></div>
 
 Handle all your Unity versions and Projects easily!
 
