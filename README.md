@@ -17,7 +17,11 @@ Handle all your Unity versions and Projects easily!
 - 1-Click create new project with selected Unity version
 - Option to show missing projects in the list (if folder was removed)
 - 1-Click Start ADB Logcat with colors in command prompt
-- 1-Click browse editor log folder, browse asset downloads folder, browse player logs folder
+- 1-Click browse editor log folder, crash logs folder, browse asset downloads folder, browse player logs folder
+- Easy Project version string copy (ctrl+c in selected project row or right click context menu)
+- Optional: Quick Project folder rename with F2
+- Quick Unity Editor Process Kill (alt+q in selected project row or right click context menu)
+
 
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
