@@ -1447,7 +1447,13 @@ namespace UnityLauncherPro
             var proj = GetSelectedProject();
             if (proj.Process != null)
             {
-                proj.Process.Kill();
+                try
+                {
+                    proj.Process.Kill();
+                }
+                catch (Exception)
+                {
+                }
                 proj.Process = null;
             }
         }
