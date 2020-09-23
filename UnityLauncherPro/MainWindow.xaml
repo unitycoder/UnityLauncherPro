@@ -309,7 +309,7 @@
 						</DataGrid.CommandBindings>
 
 						<DataGrid.Columns>
-							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="Project" IsReadOnly="True" Width="150"/>
+							<DataGridTextColumn x:Name="txtColumnTitle"  CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="Project" IsReadOnly="True" Width="150"/>
 							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" Width="72">
 								<DataGridTextColumn.CellStyle>
 									<Style TargetType="{x:Type DataGridCell}">
@@ -322,7 +322,7 @@
 									</Style>
 								</DataGridTextColumn.CellStyle>
 							</DataGridTextColumn>
-							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True" Width="185"/>
+							<DataGridTextColumn x:Name="txtColumnName" CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True" Width="185"/>
 							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Modified, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True" Width="120"/>
 							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Arguments}" ClipboardContentBinding="{x:Null}" Header="Arguments" IsReadOnly="False" Width="100"/>
 							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding GITBranch}" ClipboardContentBinding="{x:Null}" Header="GITBranch" IsReadOnly="True" Width="100"/>
@@ -661,6 +661,7 @@
 						<CheckBox x:Name="chkAllowSingleInstanceOnly" Content="Allow single instance only" Foreground="{DynamicResource ButtonForeground}" Checked="ChkAllowSingleInstanceOnly_CheckedChanged" Unchecked="ChkAllowSingleInstanceOnly_CheckedChanged" Margin="0,0,0,3" ToolTip="Activates already running instance, instead of starting new exe (not working if app is minized to taskbar)"/>
 						<CheckBox x:Name="chkEnableProjectRename" Content="Enable Project Renaming (Not recommended for beginners)" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="Can use F2 to rename project folders, Note that project will disappears from list on refresh, unless you open it (since its new path, not in unity recent projects registry)" Checked="ChkEnableProjectRename_Checked" Unchecked="ChkEnableProjectRename_Checked"/>
 						<CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project" Foreground="{DynamicResource ButtonForeground}" Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" Margin="0,0,0,3" ToolTip="If disabled, uses automatic quick project naming"/>
+						<CheckBox x:Name="chkStreamerMode" Content="Streamer Mode (hide project names and folders)" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" Checked="ChkStreamerMode_Checked" Unchecked="ChkStreamerMode_Checked"/>
 
 						<StackPanel Grid.Row="3" Orientation="Horizontal">
 							<Label Content="Root Folder for New Projects" Foreground="{DynamicResource ButtonForeground}" />

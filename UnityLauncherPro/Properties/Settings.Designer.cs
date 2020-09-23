@@ -215,5 +215,17 @@ namespace UnityLauncherPro.Properties {
                 this["enableProjectRename"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool streamerMode {
+            get {
+                return ((bool)(this["streamerMode"]));
+            }
+            set {
+                this["streamerMode"] = value;
+            }
+        }
     }
 }

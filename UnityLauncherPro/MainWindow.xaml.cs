@@ -95,6 +95,8 @@ namespace UnityLauncherPro
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
+
+            isInitializing = false;
         }
 
         // bring old window to front, but needs matching appname.. https://stackoverflow.com/a/36804161/5452781
@@ -244,6 +246,7 @@ namespace UnityLauncherPro
             txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
             chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
             chkEnableProjectRename.IsChecked = Properties.Settings.Default.enableProjectRename;
+            chkStreamerMode.IsChecked = Properties.Settings.Default.streamerMode;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -265,7 +268,6 @@ namespace UnityLauncherPro
 
             // other setting vars
             preferredVersion = Properties.Settings.Default.preferredVersion;
-
         } // LoadSettings()
 
         private void SaveSettingsOnExit()
@@ -408,8 +410,6 @@ namespace UnityLauncherPro
             // focus back
             Tools.SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
         }
-
-
 
         //
         //
@@ -1374,6 +1374,27 @@ namespace UnityLauncherPro
             Properties.Settings.Default.Save();
         }
 
+        bool isInitializing = true; // used to avoid doing things while still starting up
+        private void ChkStreamerMode_Checked(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (bool)chkStreamerMode.IsChecked;
+
+            Properties.Settings.Default.streamerMode = isChecked;
+            Properties.Settings.Default.Save();
+
+            // Create cellstyle and assign if enabled
+            Style cellStyle = new Style(typeof(DataGridCell));
+            cellStyle.Setters.Add(new Setter(FontSizeProperty, 1.0));
+            txtColumnTitle.CellStyle = isChecked ? cellStyle : null;
+            txtColumnName.CellStyle = isChecked ? cellStyle : null;
+
+            // need to reload list if user clicked
+            if (isInitializing == false)
+            {
+                RefreshRecentProjects();
+            }
+        }
+
         // copies project folder, or unity exe folder, or unity version from current datagrid
         public void CopyRowFolderToClipBoard(object sender, ExecutedRoutedEventArgs e)
         {
@@ -1473,6 +1494,7 @@ namespace UnityLauncherPro
         {
             new KeyGesture(Key.Q, ModifierKeys.Alt)
         }));
+
 
     } // class
 } //namespace

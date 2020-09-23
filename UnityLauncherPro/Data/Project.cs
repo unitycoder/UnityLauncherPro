@@ -12,5 +12,11 @@ namespace UnityLauncherPro
         public string Arguments { set; get; }
         public string GITBranch { set; get; }
         public Process Process; // launched unity exe
+
+        public override string ToString()
+        {
+            return $"{Title} {Version} {Path} {Modified} {Arguments} {GITBranch} ";
+        }
+
     }
 }

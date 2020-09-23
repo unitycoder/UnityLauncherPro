@@ -112,7 +112,6 @@ namespace UnityLauncherPro
                             gitBranch = Tools.ReadGitBranchInfo(projectPath);
                         }
 
-
                         var p = new Project();
                         p.Title = projectName;
                         p.Version = projectVersion;
@@ -132,6 +131,5 @@ namespace UnityLauncherPro
 
             return projectsFound;
         } // Scan()
-
     } // class
 } // namespace
