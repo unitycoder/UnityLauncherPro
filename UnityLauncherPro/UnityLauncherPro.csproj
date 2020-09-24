@@ -75,6 +75,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Data\BuildReport.cs" />
     <Compile Include="Data\Tabs.cs" />
     <Compile Include="GetProjects.cs" />
     <Compile Include="GetUnityInstallations.cs" />

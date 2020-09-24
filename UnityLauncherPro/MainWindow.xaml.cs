@@ -91,6 +91,9 @@ namespace UnityLauncherPro
             // clear updates grid
             dataGridUpdates.Items.Clear();
 
+            // clear buildreport grid
+            gridBuildReport.Items.Clear();
+
             // build notifyicon (using windows.forms)
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
@@ -884,7 +887,7 @@ namespace UnityLauncherPro
 
         private void BtnOpenEditorLogsFolder_Click(object sender, RoutedEventArgs e)
         {
-            var logfolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Unity", "Editor");
+            var logfolder = Tools.GetEditorLogsFolder();
             if (Directory.Exists(logfolder) == true)
             {
                 if (Tools.LaunchExplorer(logfolder) == false)
@@ -1495,7 +1498,100 @@ namespace UnityLauncherPro
             new KeyGesture(Key.Q, ModifierKeys.Alt)
         }));
 
+        private void BtnRefreshBuildReport_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO keep previous build report (total size?) so can compare to current one
 
+            var logFile = Path.Combine(Tools.GetEditorLogsFolder(), "Editor.log");
+            //Console.WriteLine("read editor log: " + logFile);
+
+            // TODO use streamreader to scan.. some log files are huge
+
+            string[] rows;
+
+            try
+            {
+                rows = File.ReadAllLines(logFile);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            if (rows == null)
+            {
+                Console.WriteLine("Failed to open editor log: " + logFile);
+                return;
+            }
+
+            // TODO parse project folder info also, so can browse to selected file
+
+            int startRow = -1;
+            int endRow = -1;
+            // loop backwards to find latest report
+            for (int i = rows.Length - 1; i >= 0; i--)
+            {
+                // find start of build report
+                //if (rows[i].IndexOf("Build Report") == 0) // TODO take overview also
+                if (rows[i].IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
+                {
+                    startRow = i + 1;
+
+                    // find end of report
+                    for (int k = i; k < rows.Length; k++)
+                    {
+                        if (rows[k].IndexOf("-------------------------------------------------------------------------------") == 0)
+                        {
+                            endRow = k - 1;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (startRow == -1 || endRow == -1)
+            {
+                Console.WriteLine("Failed to parse Build Report, start= " + startRow + " end= " + endRow);
+                return;
+            }
+
+            //Console.WriteLine("buildreport at " + startRow + " - " + endRow);
+
+            var reportSource = new BuildReport[endRow - startRow];
+
+            // get report rows
+            int index = 0;
+            for (int i = startRow; i < endRow; i++)
+            {
+                //Console.WriteLine(rows[i]);
+                var d = rows[i].Trim();
+
+                // get tab after kb
+                var space1 = d.IndexOf('\t');
+                // get % between % and path
+                var space2 = d.IndexOf('%');
+
+                if (space1 == -1 || space2 == -1)
+                {
+                    Console.WriteLine("Failed to parse build report row: " + d);
+                    continue;
+                }
+
+                var r = new BuildReport();
+                r.Size = d.Substring(0, space1);
+                r.Percentage = d.Substring(space1 + 2, space2 - space1 - 1);
+                r.Path = d.Substring(space2 + 2, d.Length - space2 - 2);
+                reportSource[index++] = r;
+            }
+            gridBuildReport.ItemsSource = reportSource;
+
+        }
+
+        private void BtnClearBuildReport_Click(object sender, RoutedEventArgs e)
+        {
+            gridBuildReport.ItemsSource = null;
+        }
     } // class
 } //namespace
 

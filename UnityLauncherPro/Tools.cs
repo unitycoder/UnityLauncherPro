@@ -873,6 +873,10 @@ namespace UnityLauncherPro
             File.WriteAllText(settingsFile, "m_EditorVersion: " + version);
         }
 
+        public static string GetEditorLogsFolder()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Unity", "Editor");
+        }
 
     } // class
 } // namespace

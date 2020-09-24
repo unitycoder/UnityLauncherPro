@@ -584,36 +584,63 @@
 			<TabItem Header="Tools" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
 				<Grid>
 					<Grid.RowDefinitions>
-						<RowDefinition Height="50*" />
+						<RowDefinition Height="15*" />
 						<RowDefinition Height="50*" />
 					</Grid.RowDefinitions>
 					<!-- 1st part -->
-
-					<!-- 2nd part -->
-					<Grid Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Left">
-						<Border>
-							<StackPanel Orientation="Horizontal" Margin="10">
-								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Open Editor logs folder in Explorer">
-									<Label Content="_Editor Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-								</Button>
-								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenPlayerLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenPlayerLogs_Click" ToolTip="Open Player logs folder in Explorer">
-									<Label Content="_Player Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-								</Button>
-								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenCrashLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenCrashLogs_Click" ToolTip="Open Crash logs folder in Explorer">
-									<Label Content="_Crash Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-								</Button>
-								<Button Style="{StaticResource CustomButton}" x:Name="btnAssetPackages" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Open assetstore downloads folder in Explorer" Click="BtnAssetPackages_Click">
-									<Label Content="A_sset packages" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-								</Button>
-								<Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click" ToolTip="Start ADB logcat commandline">
-									<Label Content="_ADB logcat" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-								</Button>
-								<Button Style="{StaticResource CustomButton}" x:Name="btnAdbBindWifi" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnAdbBindWifi_Click" IsEnabled="False" ToolTip="Bind Android device to wireless ADB">
-									<Label Content="_Bind Wifi" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-								</Button>
-							</StackPanel>
-						</Border>
+					<Grid Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+						<StackPanel Orientation="Vertical" Margin="10">
+							<Border HorizontalAlignment="Left" VerticalAlignment="Top">
+								<StackPanel Orientation="Horizontal" Margin="10">
+									<Label Content="Folders" Foreground="{DynamicResource ButtonForeground}" />
+									<Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Browse Editor logs folder">
+										<Label Content="_Editor Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+									</Button>
+									<Button Style="{StaticResource CustomButton}" x:Name="btnOpenPlayerLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenPlayerLogs_Click" ToolTip="Browse Player logs folder">
+										<Label Content="_Player Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+									</Button>
+									<Button Style="{StaticResource CustomButton}" x:Name="btnOpenCrashLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenCrashLogs_Click" ToolTip="Browse Crash logs folder">
+										<Label Content="_Crash Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+									</Button>
+									<Button Style="{StaticResource CustomButton}" x:Name="btnAssetPackages" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse AssetStore downloads folder" Click="BtnAssetPackages_Click">
+										<Label Content="A_sset packages" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+									</Button>
+								</StackPanel>
+							</Border>
+							<Border HorizontalAlignment="Left" VerticalAlignment="Top">
+								<StackPanel Orientation="Horizontal" Margin="10">
+									<Label Content="Tools" Foreground="{DynamicResource ButtonForeground}" />
+									<Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click" ToolTip="Start ADB logcat commandline">
+										<Label Content="_ADB logcat" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+									</Button>
+									<Button Style="{StaticResource CustomButton}" x:Name="btnAdbBindWifi" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnAdbBindWifi_Click" IsEnabled="False" ToolTip="Bind Android device to wireless ADB">
+										<Label Content="_Bind Wifi" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+									</Button>
+								</StackPanel>
+							</Border>
+						</StackPanel>
 					</Grid>
+					<!-- 2nd part -->
+					<Grid Grid.Row="1" VerticalAlignment="Top">
+						<StackPanel Orientation="Horizontal" Margin="0">
+							<Label Content="Build Report" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" />
+							<Button x:Name="btnClearBuildReport" Style="{StaticResource CustomButton}" ToolTip="Clear report" Content="🗑" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnClearBuildReport_Click" />
+							<Button x:Name="btnRefreshBuildReport" Style="{StaticResource CustomButton}" ToolTip="Get latest Build Report from Editor.log" Content="⟳" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16" Background="#FF3F3F46" Foreground="#FFC1C1C1" Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshBuildReport_Click"/>
+							<!--<CheckBox x:Name="chkAutoUpdateBuildReport" Content="AutoUpdate" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" HorizontalAlignment="Right" VerticalAlignment="Top" Height="26" VerticalContentAlignment="Center" IsEnabled="False"/>-->
+						</StackPanel>
+						<DataGrid x:Name="gridBuildReport"  SelectionMode="Single" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="#FFD8D8D8" HorizontalGridLinesBrush="#4C000000" VerticalGridLinesBrush="#19000000" AutoGenerateColumns="False" VerticalAlignment="Top">
+							<DataGrid.Columns>
+								<DataGridTextColumn Binding="{Binding Size}" ClipboardContentBinding="{x:Null}" Header="Size" IsReadOnly="True" MinWidth="75"/>
+								<DataGridTextColumn Binding="{Binding Percentage}" ClipboardContentBinding="{x:Null}" Header="%" IsReadOnly="True" MinWidth="55" />
+								<DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True"/>
+							</DataGrid.Columns>
+
+							<!-- sample data for testing -->
+							<local:BuildReport Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
+						</DataGrid>
+
+					</Grid>
+
 				</Grid>
 			</TabItem>
 
