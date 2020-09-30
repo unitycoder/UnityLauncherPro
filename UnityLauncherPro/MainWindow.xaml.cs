@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -1505,16 +1506,25 @@ namespace UnityLauncherPro
             var logFile = Path.Combine(Tools.GetEditorLogsFolder(), "Editor.log");
             //Console.WriteLine("read editor log: " + logFile);
 
-            // TODO use streamreader to scan.. some log files are huge
-
-            string[] rows;
+            List<string> rows = new List<string>();
 
             try
             {
-                rows = File.ReadAllLines(logFile);
+                using (var fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var sr = new StreamReader(fs, Encoding.Default))
+                {
+                    while (sr.EndOfStream == false)
+                    {
+                        // TODO only start collecting when find build report start, and need to reset list if another build report later
+                        var r = sr.ReadLine();
+                        rows.Add(r);
+                    }
+                }
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 throw;
             }
 
@@ -1529,7 +1539,7 @@ namespace UnityLauncherPro
             int startRow = -1;
             int endRow = -1;
             // loop backwards to find latest report
-            for (int i = rows.Length - 1; i >= 0; i--)
+            for (int i = rows.Count - 1; i >= 0; i--)
             {
                 // find start of build report
                 //if (rows[i].IndexOf("Build Report") == 0) // TODO take overview also
@@ -1538,7 +1548,7 @@ namespace UnityLauncherPro
                     startRow = i + 1;
 
                     // find end of report
-                    for (int k = i; k < rows.Length; k++)
+                    for (int k = i; k < rows.Count; k++)
                     {
                         if (rows[k].IndexOf("-------------------------------------------------------------------------------") == 0)
                         {
