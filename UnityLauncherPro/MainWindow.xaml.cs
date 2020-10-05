@@ -1,5 +1,5 @@
 ﻿// Unity Project Launcher by https://unitycoder.com
-// Sources https://github.com/unitycoder/UnityLauncherPro
+// https://github.com/unitycoder/UnityLauncherPro
 
 using System;
 using System.Collections.Generic;
@@ -1323,7 +1323,7 @@ namespace UnityLauncherPro
                 }
                 else // unity tab
                 {
-                    newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
+                    newVersion = (GetSelectedUnity() == null || GetSelectedUnity().Version == null) ? preferredVersion : GetSelectedUnity().Version;
                 }
 
                 if (string.IsNullOrEmpty(newVersion))
@@ -1332,7 +1332,7 @@ namespace UnityLauncherPro
                     return;
                 }
 
-                NewProject modalWindow = new NewProject(newVersion, Tools.GetSuggestedProjectName(newVersion, txtRootFolderForNewProjects.Text));
+                NewProject modalWindow = new NewProject(newVersion, Tools.GetSuggestedProjectName(newVersion, txtRootFolderForNewProjects.Text), txtRootFolderForNewProjects.Text);
                 modalWindow.ShowInTaskbar = this == null;
                 modalWindow.WindowStartupLocation = this == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
                 modalWindow.Topmost = this == null;
@@ -1344,14 +1344,14 @@ namespace UnityLauncherPro
                 if (results == true)
                 {
                     var projectPath = txtRootFolderForNewProjects.Text;
-                    Console.WriteLine("create project " + projectPath);
+                    Console.WriteLine("Create project " + NewProject.newVersion + " : " + projectPath);
                     if (string.IsNullOrEmpty(projectPath)) return;
 
-                    Tools.FastCreateProject(newVersion, projectPath, NewProject.newProjectName);
+                    Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName);
                 }
                 else // false, cancel
                 {
-                    Console.WriteLine("Cancellled project creation..");
+                    Console.WriteLine("Cancelled project creation..");
                 }
 
             }

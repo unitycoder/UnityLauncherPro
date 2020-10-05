@@ -1,19 +1,38 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace UnityLauncherPro
 {
     public partial class NewProject : Window
     {
         public static string newProjectName = null;
+        public static string newVersion = null;
+        public static string newName = null;
 
-        public NewProject(string unityVersion, string suggestedName)
+        public NewProject(string unityVersion, string suggestedName, string targetFolder)
         {
             InitializeComponent();
 
             // get version
-            txtNewProjectVersion.Text = unityVersion;
-            txtNewProjectName.Text = suggestedName;
+            newVersion = unityVersion;
+            newName = suggestedName;
+
+            txtNewProjectName.Text = newName;
+            lblNewProjectFolder.Content = targetFolder;
+
+            // fill available versions, TODO could show which modules are installed
+            gridAvailableVersions.ItemsSource = MainWindow.unityInstalledVersions;
+
+            var item = Tools.GetEntry(MainWindow.unityInstalledVersions, unityVersion);
+            int index = gridAvailableVersions.Items.IndexOf(item);
+            if (index > -1)
+            {
+                gridAvailableVersions.SelectedIndex = index;
+                gridAvailableVersions.ScrollIntoView(item);
+            }
 
             // select projectname text so can overwrite if needed
             txtNewProjectName.Focus();
@@ -23,6 +42,7 @@ namespace UnityLauncherPro
 
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
+            UpdateSelectedVersion();
             DialogResult = true;
         }
 
@@ -31,13 +51,13 @@ namespace UnityLauncherPro
             DialogResult = false;
         }
 
+
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
-                // TODO allow typing anywhere
-
                 case Key.Enter: // enter accept
+                    UpdateSelectedVersion();
                     DialogResult = true;
                     e.Handled = true;
                     break;
@@ -50,9 +70,57 @@ namespace UnityLauncherPro
             }
         }
 
+        void UpdateSelectedVersion()
+        {
+            var k = gridAvailableVersions.SelectedItem as KeyValuePair<string, string>?;
+            if (k != null && k.Value.Key != newVersion)
+            {
+                newVersion = k.Value.Key;
+            }
+        }
+
         private void TxtNewProjectName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             newProjectName = txtNewProjectName.Text;
+        }
+
+        private void TxtNewProjectName_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.PageUp:
+                case Key.PageDown:
+                case Key.Up:
+                case Key.Down:
+                    Tools.SetFocusToGrid(gridAvailableVersions);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void GenerateNewName()
+        {
+            var newProj = Tools.GetSuggestedProjectName(newVersion, lblNewProjectFolder.Content.ToString());
+            txtNewProjectName.Text = newProj;
+        }
+
+        private void GridAvailableVersions_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (gridAvailableVersions.SelectedItem == null) return;
+            // new row selected, generate new project name for this version
+            var k = gridAvailableVersions.SelectedItem as KeyValuePair<string, string>?;
+            newVersion = k.Value.Key;
+            GenerateNewName();
+        }
+
+        private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
+        {
+            // set initial default row color
+            DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
+            //row.Background = Brushes.Green;
+            row.Foreground = Brushes.White;
+            row.FontWeight = FontWeights.Bold;
         }
     }
 }

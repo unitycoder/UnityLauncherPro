@@ -94,7 +94,6 @@ namespace UnityLauncherPro
             if (e.Key == Key.Return && e.KeyboardDevice.Modifiers == ModifierKeys.None)
             {
                 e.Handled = true;
-                // TODO do upgrade with selected version
                 var k = (gridAvailableVersions.SelectedItem) as KeyValuePair<string, string>?;
                 upgradeVersion = k.Value.Key;
                 DialogResult = true;
@@ -123,9 +122,6 @@ namespace UnityLauncherPro
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
         {
             Tools.SetFocusToGrid(gridAvailableVersions);
-            //            gridAvailableVersions.Focus();
-            //            DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
-            //            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         }
 
         private void GridAvailableVersions_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
