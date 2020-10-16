@@ -535,7 +535,7 @@
 							<CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
 						</DataGrid.CommandBindings>
 						<DataGrid.Columns>
-							<DataGridTextColumn Binding="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}"  MinWidth="100" Header="ReleaseDate" IsReadOnly="True"/>
+							<DataGridTextColumn Binding="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}"  MinWidth="100" Header="Released" IsReadOnly="True"/>
 							<DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="222">
 								<DataGridTextColumn.CellStyle>
 									<Style TargetType="{x:Type DataGridCell}">

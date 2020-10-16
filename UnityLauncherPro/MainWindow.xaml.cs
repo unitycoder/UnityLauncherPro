@@ -486,6 +486,9 @@ namespace UnityLauncherPro
             var button = (Button)sender;
             button.IsEnabled = false;
 
+            // refresh installations, if already added some new ones
+            UpdateUnityInstallationsList();
+
             CallGetUnityUpdates();
 
             button.IsEnabled = true;
