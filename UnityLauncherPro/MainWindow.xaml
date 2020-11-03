@@ -406,7 +406,7 @@
 			</TabItem>
 
 			<!-- Tab: Unitys -->
-			<TabItem Header="Unitys" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
+			<TabItem Header="Editors" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
 				<Grid>
 					<!-- search box -->
 					<Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
