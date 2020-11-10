@@ -9,7 +9,7 @@ namespace UnityLauncherPro
     /// </summary>
     public static class GetUnityInstallations
     {
-        static Dictionary<string, string> platformNames = new Dictionary<string, string> { { "androidplayer", "Android" }, { "windowsstandalonesupport", "Windows" }, { "LinuxStandalone", "Linux" }, { "OSXStandalone", "Mac" } };
+        static Dictionary<string, string> platformNames = new Dictionary<string, string> { { "androidplayer", "Android" }, { "windowsstandalonesupport", "Windows" }, { "LinuxStandalone", "Linux" }, { "OSXStandalone", "Mac" }, { "webglsupport", "WebGL" }, { "metrosupport", "UWP" } };
 
         // returns unity installations
         public static UnityInstallation[] Scan()
