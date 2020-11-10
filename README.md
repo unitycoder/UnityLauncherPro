@@ -36,11 +36,11 @@ https://github.com/unitycoder/UnityLauncherPro/wiki
 
 ![image](https://user-images.githubusercontent.com/5438317/71485879-184b3a00-281c-11ea-97db-73c5dfa9bb4e.png)
 
-![image](https://user-images.githubusercontent.com/5438317/71485888-200ade80-281c-11ea-90bd-a9631ae247e1.png)
+![image](https://user-images.githubusercontent.com/5438317/98661052-ace45b00-234e-11eb-84c0-089b3afd3814.png)
 
-![image](https://user-images.githubusercontent.com/5438317/71485892-2436fc00-281c-11ea-966c-39a09d06bd9e.png)
+![image](https://user-images.githubusercontent.com/5438317/98661095-b968b380-234e-11eb-93bc-ea1b396c7205.png)
 
-![image](https://user-images.githubusercontent.com/5438317/71485895-26995600-281c-11ea-99f4-a1e4c13710a2.png)
+![image](https://user-images.githubusercontent.com/5438317/98661151-cc7b8380-234e-11eb-9874-103dae5fc2bf.png)
 
-![image](https://user-images.githubusercontent.com/5438317/71485899-29944680-281c-11ea-86de-bbd9f75785d4.png)
+![image](https://user-images.githubusercontent.com/5438317/98661193-d4d3be80-234e-11eb-9028-94a51d61b2d1.png)
 
