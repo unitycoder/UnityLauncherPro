@@ -628,6 +628,7 @@ namespace UnityLauncherPro
 
         private void OnClearUpdateSearchClick(object sender, RoutedEventArgs e)
         {
+            // FIXME doesnt hide button, becaus button should have opposite of Text.IsEmpty, or custom style to hide when not empty
             txtSearchBoxUpdates.Text = "";
         }
 

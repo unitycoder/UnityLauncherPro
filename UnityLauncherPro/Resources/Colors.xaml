@@ -20,4 +20,32 @@
     <SolidColorBrush x:Key="ScrollBarBackground" Color="#FF151515"/>
     <SolidColorBrush x:Key="ScrollBarFill" Color="#FF47474B"/>
 
+	<!--custom components-->
+	<SolidColorBrush x:Key="ButtonForegroundDisabled" Color="#FF707070"/>
+	<SolidColorBrush x:Key="ButtonBackgroundMouseOver" Color="#FF494949"/>
+	<SolidColorBrush x:Key="ButtonWhiteText" Color="#FFFFFFFF"/>
+	<SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#FF0F0F0F"/>
+	<SolidColorBrush x:Key="MainTitle" Color="#FFB8B8B8"/>
+	<SolidColorBrush x:Key="ScrollBarEnabledForeground" Color="#FF000000"/>
+
+	<!--search-->
+	<SolidColorBrush x:Key="SearchPlaceholder" Color="#7F919191"/>
+	<SolidColorBrush x:Key="SearchClose" Color="#A3C1C1C1"/>
+	<SolidColorBrush x:Key="SearchCaret" Color="#FFE2E2E2"/>
+	<SolidColorBrush x:Key="SearchForeground" Color="#FFC7C7C7"/>
+	<SolidColorBrush x:Key="SearchSelection" Color="#FF003966"/>
+
+	<!--window-->
+	<SolidColorBrush x:Key="WindowMinClose" Color="#FFC3C3C3"/>
+	
+	<!--grids-->
+	<SolidColorBrush x:Key="GridForeground" Color="#FFD8D8D8"/>
+	<SolidColorBrush x:Key="GridHorizontalGridLines" Color="#4C000000"/>
+	<SolidColorBrush x:Key="GridVerticalGridLines" Color="#19000000"/>
+	<SolidColorBrush x:Key="GridGreenText" Color="#FF00C500"/>
+	<SolidColorBrush x:Key="GridRedText" Color="#FFF54F4F"/>
+
+	<!--statusbar-->
+	<SolidColorBrush x:Key="StatusText" Color="#FF595959"/>
+
 </ResourceDictionary>
