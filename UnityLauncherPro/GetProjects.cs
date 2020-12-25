@@ -11,7 +11,7 @@ namespace UnityLauncherPro
         // which registries we want to scan for projects
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
-        public static List<Project> Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false)
+        public static List<Project> Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false)
         {
             List<Project> projectsFound = new List<Project>();
 
@@ -86,7 +86,7 @@ namespace UnityLauncherPro
                             csprojFile = Path.Combine(projectPath, projectName + ".Editor.csproj");
                         }
 
-                        // maybe 4.x project
+                        // maybe 4.x project, NOTE recent versions also have this as default
                         if (File.Exists(csprojFile) == false)
                         {
                             csprojFile = Path.Combine(projectPath, "Assembly-CSharp.csproj");
@@ -112,6 +112,37 @@ namespace UnityLauncherPro
                             gitBranch = Tools.ReadGitBranchInfo(projectPath);
                         }
 
+                        // TODO add option to disable check
+                        string targetPlatform = "";
+                        if (showTargetPlatform == true)
+                        {
+                            // get buildtarget from .csproj
+                            // <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
+                            // get main csproj file
+                            var csproj = Path.Combine(projectPath, "Assembly-CSharp.csproj");
+                            // TODO check projname also, if no assembly-.., NOTE already checked above
+                            //var csproj = Path.Combine(projectPath, projectName + ".csproj");
+                            if (File.Exists(csproj))
+                            {
+                                var csprojtxt = File.ReadAllText(csproj);
+                                var csprojsplit = csprojtxt.Split(new[] { "<UnityBuildTarget>" }, StringSplitOptions.None);
+                                if (csprojsplit != null && csprojsplit.Length > 1)
+                                {
+                                    var endrow = csprojsplit[1].IndexOf(":");
+                                    if (endrow > -1)
+                                    {
+                                        Console.WriteLine("build target: " + csprojsplit[1].Substring(0, endrow));
+                                        // 5.6 : win32, win64, osx, linux, linux64, ios, android, web, webstreamed, webgl, xboxone, ps4, psp2, wsaplayer, tizen, samsungtv
+                                        // 2017: standalone, Win, Win64, OSXUniversal, Linux, Linux64, LinuxUniversal, iOS, Android, Web, WebStreamed, WebGL, XboxOne, PS4, PSP2, WindowsStoreApps, Switch, WiiU, N3DS, tvOS, PSM
+                                        // 2018: standalone, Win, Win64, OSXUniversal, Linux, Linux64, LinuxUniversal, iOS, Android, Web, WebStreamed, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, N3DS, tvOS
+                                        // 2019: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
+                                        // 2020: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
+                                        targetPlatform = csprojsplit[1].Substring(0, endrow);
+                                    }
+                                }
+                            }
+                        }
+
                         var p = new Project();
                         p.Title = projectName;
                         p.Version = projectVersion;
@@ -119,6 +150,7 @@ namespace UnityLauncherPro
                         p.Modified = lastUpdated;
                         p.Arguments = customArgs;
                         p.GITBranch = gitBranch;
+                        p.TargetPlatform = targetPlatform;
 
                         // if want to hide project and folder path for screenshot
                         //p.Title = "Hidden Project";

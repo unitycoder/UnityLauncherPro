@@ -227,5 +227,17 @@ namespace UnityLauncherPro.Properties {
                 this["streamerMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool showTargetPlatform {
+            get {
+                return ((bool)(this["showTargetPlatform"]));
+            }
+            set {
+                this["showTargetPlatform"] = value;
+            }
+        }
     }
 }

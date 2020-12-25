@@ -322,7 +322,9 @@
 							<DataGridTextColumn x:Name="txtColumnName" CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True" Width="185"/>
 							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Modified, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True" Width="120"/>
 							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Arguments}" ClipboardContentBinding="{x:Null}" Header="Arguments" IsReadOnly="False" Width="100"/>
-							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding GITBranch}" ClipboardContentBinding="{x:Null}" Header="GITBranch" IsReadOnly="True" Width="100"/>
+							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding GITBranch}" ClipboardContentBinding="{x:Null}" Header="Branch" IsReadOnly="True" Width="100"/>
+							<!--TODO platform as dropdown?-->
+							<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding TargetPlatform}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>
 						</DataGrid.Columns>
 
 						<!-- right click context menu -->
@@ -686,6 +688,7 @@
 						<CheckBox x:Name="chkEnableProjectRename" Content="Enable Project Renaming (Not recommended for beginners)" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="Can use F2 to rename project folders, Note that project will disappears from list on refresh, unless you open it (since its new path, not in unity recent projects registry)" Checked="ChkEnableProjectRename_Checked" Unchecked="ChkEnableProjectRename_Checked"/>
 						<CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project" Foreground="{DynamicResource ButtonForeground}" Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" Margin="0,0,0,3" ToolTip="If disabled, uses automatic quick project naming"/>
 						<CheckBox x:Name="chkStreamerMode" Content="Streamer Mode (hide project names and folders)" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" Checked="ChkStreamerMode_Checked" Unchecked="ChkStreamerMode_Checked"/>
+						<CheckBox x:Name="chkShowPlatform" Content="Show current target platform (if exists in .csproj)" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" Checked="ChkShowPlatform_Checked" Unchecked="ChkShowPlatform_Checked"/>
 
 						<StackPanel Grid.Row="3" Orientation="Horizontal">
 							<Label Content="Root Folder for New Projects" Foreground="{DynamicResource ButtonForeground}" />

@@ -85,7 +85,7 @@ namespace UnityLauncherPro
             }
 
             // update projects list
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
             gridRecent.Items.Clear();
             gridRecent.ItemsSource = projectsSource;
 
@@ -251,10 +251,12 @@ namespace UnityLauncherPro
             chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
             chkEnableProjectRename.IsChecked = Properties.Settings.Default.enableProjectRename;
             chkStreamerMode.IsChecked = Properties.Settings.Default.streamerMode;
+            chkShowPlatform.IsChecked = Properties.Settings.Default.showTargetPlatform;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
             gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+            gridRecent.Columns[6].Visibility = (bool)chkShowPlatform.IsChecked ? Visibility.Visible : Visibility.Collapsed;
 
             // update installations folder listbox
             lstRootFolders.Items.Clear();
@@ -409,7 +411,7 @@ namespace UnityLauncherPro
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
             gridRecent.ItemsSource = projectsSource;
             // focus back
             Tools.SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
@@ -1050,6 +1052,7 @@ namespace UnityLauncherPro
             gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
         }
 
+
         private void ChkQuitAfterOpen_CheckedChanged(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.closeAfterProject = (bool)chkQuitAfterOpen.IsChecked;
@@ -1385,7 +1388,7 @@ namespace UnityLauncherPro
         bool isInitializing = true; // used to avoid doing things while still starting up
         private void ChkStreamerMode_Checked(object sender, RoutedEventArgs e)
         {
-            var isChecked = (bool)chkStreamerMode.IsChecked;
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             Properties.Settings.Default.streamerMode = isChecked;
             Properties.Settings.Default.Save();
@@ -1396,7 +1399,23 @@ namespace UnityLauncherPro
             txtColumnTitle.CellStyle = isChecked ? cellStyle : null;
             txtColumnName.CellStyle = isChecked ? cellStyle : null;
 
-            // need to reload list if user clicked
+            // need to reload list if user changed setting
+            if (isInitializing == false)
+            {
+                RefreshRecentProjects();
+            }
+        }
+
+        private void ChkShowPlatform_Checked(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+
+            Properties.Settings.Default.showTargetPlatform = isChecked;
+            Properties.Settings.Default.Save();
+
+            gridRecent.Columns[6].Visibility = (bool)chkShowPlatform.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+
+            // need to reload list if user changed setting
             if (isInitializing == false)
             {
                 RefreshRecentProjects();
@@ -1606,6 +1625,8 @@ namespace UnityLauncherPro
         {
             gridBuildReport.ItemsSource = null;
         }
+
+
     } // class
 } //namespace
 
