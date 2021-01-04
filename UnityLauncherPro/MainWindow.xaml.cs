@@ -84,6 +84,10 @@ namespace UnityLauncherPro
                 }
             }
 
+            // TEST platform combobox
+            // var test = new string[] { "1", "2", "3" };
+            // cmbPlatform.ItemsSource = test;
+
             // update projects list
             projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
             gridRecent.Items.Clear();
@@ -454,6 +458,9 @@ namespace UnityLauncherPro
                 p.Title = Path.GetFileName(folder);
                 p.Version = Tools.GetProjectVersion(folder);
                 p.Arguments = Tools.ReadCustomLaunchArguments(folder, MainWindow.launcherArgumentsFile);
+                if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.ParseTargetPlatform(folder);
+                if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
+
                 // add to list
                 projectsSource.Insert(0, p);
                 gridRecent.Items.Refresh();
@@ -1388,6 +1395,8 @@ namespace UnityLauncherPro
         bool isInitializing = true; // used to avoid doing things while still starting up
         private void ChkStreamerMode_Checked(object sender, RoutedEventArgs e)
         {
+            // TODO add "(streamer mode)" text in statusbar
+
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             Properties.Settings.Default.streamerMode = isChecked;
