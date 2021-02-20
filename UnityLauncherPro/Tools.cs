@@ -262,6 +262,20 @@ namespace UnityLauncherPro
                 Process.Start(folder);
                 return true;
             }
+            else // original folder is missing, try to find parent folder that we can go into
+            {
+                for (int i = folder.Length - 1; i > -1; i--)
+                {
+                    if (folder[i] == '/')
+                    {
+                        if (Directory.Exists(folder.Substring(0, i)))
+                        {
+                            Process.Start(folder.Substring(0, i) + "/");
+                            break;
+                        }
+                    }
+                }
+            }
             return false;
         }
 

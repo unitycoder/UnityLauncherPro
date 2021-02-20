@@ -37,6 +37,7 @@ namespace UnityLauncherPro
                 {
                     if (valueName.IndexOf("RecentlyUsedProjectPaths-") == 0)
                     {
+                        bool folderExists = false;
                         string projectPath = "";
                         // check if binary or not
                         var valueKind = key.GetValueKind(valueName);
@@ -51,7 +52,8 @@ namespace UnityLauncherPro
                         }
 
                         // first check if whole folder exists, if not, skip
-                        if (showMissingFolders == false && Directory.Exists(projectPath) == false)
+                        folderExists = Directory.Exists(projectPath);
+                        if (showMissingFolders == false && folderExists == false)
                         {
                             //Console.WriteLine("Recent project directory not found, skipping: " + projectPath);
                             continue;
@@ -76,48 +78,48 @@ namespace UnityLauncherPro
                         string csprojFile = Path.Combine(projectPath, projectName + ".csproj");
 
                         // solution only
-                        if (File.Exists(csprojFile) == false)
+                        if (folderExists == true && File.Exists(csprojFile) == false)
                         {
                             csprojFile = Path.Combine(projectPath, projectName + ".sln");
                         }
 
                         // editor only project
-                        if (File.Exists(csprojFile) == false)
+                        if (folderExists == true && File.Exists(csprojFile) == false)
                         {
                             csprojFile = Path.Combine(projectPath, projectName + ".Editor.csproj");
                         }
 
                         // maybe 4.x project, NOTE recent versions also have this as default
-                        if (File.Exists(csprojFile) == false)
+                        if (folderExists == true && File.Exists(csprojFile) == false)
                         {
                             csprojFile = Path.Combine(projectPath, "Assembly-CSharp.csproj");
                         }
 
                         // get last modified date
-                        DateTime? lastUpdated = Tools.GetLastModifiedTime(csprojFile);
+                        DateTime? lastUpdated = folderExists ? Tools.GetLastModifiedTime(csprojFile) : null;
 
                         // get project version
-                        string projectVersion = Tools.GetProjectVersion(projectPath);
+                        string projectVersion = folderExists ? Tools.GetProjectVersion(projectPath) : null;
 
                         // get custom launch arguments, only if column in enabled
                         string customArgs = "";
                         if (getArguments == true)
                         {
-                            customArgs = Tools.ReadCustomLaunchArguments(projectPath, MainWindow.launcherArgumentsFile);
+                            customArgs = folderExists ? Tools.ReadCustomLaunchArguments(projectPath, MainWindow.launcherArgumentsFile) : null;
                         }
 
                         // get git branchinfo, only if column in enabled
                         string gitBranch = "";
                         if (getGitBranch == true)
                         {
-                            gitBranch = Tools.ReadGitBranchInfo(projectPath);
+                            gitBranch = folderExists ? Tools.ReadGitBranchInfo(projectPath) : null;
                         }
 
                         // TODO add option to disable check
                         string targetPlatform = "";
                         if (showTargetPlatform == true)
                         {
-                            targetPlatform = Tools.ParseTargetPlatform(projectPath);
+                            targetPlatform = folderExists ? Tools.ParseTargetPlatform(projectPath) : null;
                         }
 
                         var p = new Project();
@@ -128,6 +130,7 @@ namespace UnityLauncherPro
                         p.Arguments = customArgs;
                         p.GITBranch = gitBranch;
                         p.TargetPlatform = targetPlatform;
+                        p.folderExists = folderExists;
 
                         // if want to hide project and folder path for screenshot
                         //p.Title = "Hidden Project";
