@@ -38,7 +38,7 @@ namespace UnityLauncherPro
         Updates[] updatesSource;
         UnityInstallation[] unityInstallationsSource;
 
-        public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>();
+        public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>(); // versionID and installation folder
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
         string _filterString = null;
@@ -1635,7 +1635,52 @@ namespace UnityLauncherPro
             gridBuildReport.ItemsSource = null;
         }
 
+        private void MenuStartWebGLServer_Click(object sender, RoutedEventArgs e)
+        {
+            // runs unity SimpleWebServer.exe and launches default Browser into project build/ folder'
+            // TODO add setting for your default webgl folder inside Builds/ (examples, Builds/ or Builds/webgl/)
+            if (tabControl.SelectedIndex != 0) return;
 
+            var proj = GetSelectedProject();
+            var projPath = proj?.Path.Replace('/', '\\');
+
+            if (string.IsNullOrEmpty(projPath) == true) return;
+
+            var buildPath = Path.Combine(projPath, "Builds");
+            if (Directory.Exists(buildPath) == false) return;
+
+            if (unityInstalledVersions.ContainsKey(proj.Version) == false) return;
+
+            // get mono and server exe paths
+            var editorPath = Path.GetDirectoryName(unityInstalledVersions[proj.Version]);
+
+            var monoToolsPath = Path.Combine(editorPath, "Data/MonoBleedingEdge/bin");
+            if (Directory.Exists(monoToolsPath) == false) return;
+
+            var webglToolsPath = Path.Combine(editorPath, "Data/PlaybackEngines/WebGLSupport/BuildTools");
+            if (Directory.Exists(webglToolsPath) == false) return;
+
+            var monoExe = Path.Combine(monoToolsPath, "mono.exe");
+            if (File.Exists(monoExe) == false) return;
+
+            var webExe = Path.Combine(webglToolsPath, "SimpleWebServer.exe");
+            if (File.Exists(webExe) == false) return;
+
+            // pick random port for server
+            Random rnd = new Random();
+            int port = rnd.Next(50000, 61000);
+
+            // take process id from unity, if have it (then webserver closes automatically when unity is closed)
+            int pid = proj.Process == null ? -1 : proj.Process.Id;
+            var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+
+            // then open browser
+            var serverLaunched = Tools.LaunchExe(monoExe, param);
+            if (serverLaunched == true)
+            {
+                Tools.OpenURL("http://localhost:" + port);
+            }
+        }
     } // class
 } //namespace
 

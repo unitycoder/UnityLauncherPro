@@ -280,13 +280,31 @@ namespace UnityLauncherPro
         }
 
         // run any exe
-        public static bool LaunchExe(string path)
+        public static bool LaunchExe(string path, string param = null)
         {
             if (string.IsNullOrEmpty(path)) return false;
 
             if (File.Exists(path) == true)
             {
-                Process.Start(path);
+                if (string.IsNullOrEmpty(param) == true)
+                {
+                    Console.WriteLine(path);
+                    Process.Start(path);
+                }
+                else
+                {
+                    var newProcess = new Process();
+                    try
+                    {
+                        newProcess.StartInfo.FileName = "\"" + path + "\"";
+                        newProcess.StartInfo.Arguments = param;
+                        newProcess.Start();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
                 return true;
             }
             return false;
@@ -365,9 +383,14 @@ namespace UnityLauncherPro
             var url = Tools.GetUnityReleaseURL(version);
             if (string.IsNullOrEmpty(url)) return false;
 
-            Process.Start(url);
+            OpenURL(url);
             result = true;
             return result;
+        }
+
+        public static void OpenURL(string url)
+        {
+            Process.Start(url);
         }
 
         public static void DownloadInBrowser(string url, string version)
