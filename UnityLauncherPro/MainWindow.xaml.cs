@@ -251,11 +251,12 @@ namespace UnityLauncherPro
             chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
             chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
             chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
-            txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
             chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
             chkEnableProjectRename.IsChecked = Properties.Settings.Default.enableProjectRename;
             chkStreamerMode.IsChecked = Properties.Settings.Default.streamerMode;
             chkShowPlatform.IsChecked = Properties.Settings.Default.showTargetPlatform;
+            txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
+            txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -1646,7 +1647,7 @@ namespace UnityLauncherPro
 
             if (string.IsNullOrEmpty(projPath) == true) return;
 
-            var buildPath = Path.Combine(projPath, "Builds");
+            var buildPath = Path.Combine(projPath, "Builds", txtWebglRelativePath.Text);
             if (Directory.Exists(buildPath) == false) return;
 
             if (unityInstalledVersions.ContainsKey(proj.Version) == false) return;
@@ -1680,6 +1681,12 @@ namespace UnityLauncherPro
             {
                 Tools.OpenURL("http://localhost:" + port);
             }
+        }
+
+        private void TxtWebglRelativePath_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Properties.Settings.Default.newProjectsRoot = txtWebglRelativePath.Text;
+            Properties.Settings.Default.Save();
         }
     } // class
 } //namespace

@@ -239,5 +239,17 @@ namespace UnityLauncherPro.Properties {
                 this["showTargetPlatform"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string webglBuildPath {
+            get {
+                return ((string)(this["webglBuildPath"]));
+            }
+            set {
+                this["webglBuildPath"] = value;
+            }
+        }
     }
 }
