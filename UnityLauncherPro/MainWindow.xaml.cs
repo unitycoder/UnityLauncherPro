@@ -273,6 +273,7 @@ namespace UnityLauncherPro
             {
                 for (int i = 0; i < gridColumnWidths.Length; ++i)
                 {
+                    if (i >= gridRecent.Columns.Count) break; // too many columns were saved, probably some test columns
                     gridRecent.Columns[i].Width = gridColumnWidths[i];
                 }
             }
@@ -1685,7 +1686,7 @@ namespace UnityLauncherPro
 
         private void TxtWebglRelativePath_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Properties.Settings.Default.newProjectsRoot = txtWebglRelativePath.Text;
+            Properties.Settings.Default.webglBuildPath = txtWebglRelativePath.Text;
             Properties.Settings.Default.Save();
         }
     } // class

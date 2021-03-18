@@ -339,7 +339,7 @@
                             <!--TODO platform as dropdown?-->
                             <DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding TargetPlatform}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>
                             <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" SelectedItemBinding="{Binding TargetPlatform, NotifyOnSourceUpdated=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
-                            <DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>
+                            <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
                         </DataGrid.Columns>
 
                         <!-- right click context menu -->
