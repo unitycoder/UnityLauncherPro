@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Shell;
 
 namespace UnityLauncherPro
@@ -56,6 +57,9 @@ namespace UnityLauncherPro
         void Start()
         {
             LoadSettings();
+            
+            // TEST
+            //ApplySkin();
 
             // disable accesskeys without alt
             CoreCompatibilityPreferences.IsAltKeyRequiredInAccessKeyDefaultScope = true;
@@ -1714,6 +1718,35 @@ namespace UnityLauncherPro
                 break;
             }
         }
+
+        void ApplySkin()
+        {
+            // TODO dont load, if skinning is disabled in settings
+            // TODO load current skin (or could save them into preferences from settings panel, so that it doesnt need to parse file everytime! and have reset colors button to reset them)
+            // TODO set colors to resources
+
+            // TEST
+            var themefile = "theme.ini";
+
+            if (File.Exists(themefile))
+            {
+                var colors = File.ReadAllLines(themefile);
+
+                // parse lines
+                for (int i = 0, length = colors.Length; i < length; i++)
+                {
+                    // skip comments
+                    if (colors[i].IndexOf('#') == 0) continue;
+                    // split row (name and color)
+                    var row = colors[i].Split('=');
+                    // skip bad rows
+                    if (row.Length != 2) continue;
+                    // apply color
+                    Application.Current.Resources[row[0]] = (SolidColorBrush)(new BrushConverter().ConvertFrom(row[1]));
+                }
+            }
+        } // loadskin()
+
     } // class
 } //namespace
 

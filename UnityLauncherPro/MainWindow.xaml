@@ -714,7 +714,7 @@
                             <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ButtonForeground}" />
                         </StackPanel>
                         <StackPanel Grid.Row="3" Orientation="Horizontal">
-                            <TextBox x:Name="txtWebglRelativePath" MinWidth="200" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. User for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
+                            <TextBox x:Name="txtWebglRelativePath" MinWidth="200" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. Used for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
                             <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ButtonForeground}" />
                         </StackPanel>
                     </StackPanel>
