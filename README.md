@@ -21,7 +21,8 @@ Handle all your Unity versions and Projects easily!
 - Easy Project version string copy (ctrl+c in selected project row or right click context menu)
 - Optional: Quick Project folder rename with F2
 - Quick Unity Editor Process Kill (alt+q in selected project row or right click context menu)
-
+- 1-Click start web server and launch WebGL build in browser
+- 1-Click browse project Application.persistentDataPath for selected project
 
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
