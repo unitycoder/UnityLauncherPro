@@ -348,6 +348,7 @@
                                 <MenuItem x:Name="menuItemCopyVersion" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
                                 <MenuItem x:Name="menuItemCopyPath" Header="Copy Project Path" Click="MenuItemCopyPath_Click" />
                                 <MenuItem x:Name="menuItemShowProjectInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
+                                <MenuItem x:Name="menuItemBrowsePersistentDataPath" Header="Open PersistentDataPath" Click="MenuItemBrowsePersistentDataPath_Click" />
                                 <Separator/>
                                 <MenuItem x:Name="menuItemKillProcess" Header="Kill Process" Click="MenuItemKillProcess_Click" />
                                 <Separator/>

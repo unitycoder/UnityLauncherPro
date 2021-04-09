@@ -1640,12 +1640,9 @@ namespace UnityLauncherPro
         private void MenuStartWebGLServer_Click(object sender, RoutedEventArgs e)
         {
             // runs unity SimpleWebServer.exe and launches default Browser into project build/ folder'
-            // TODO add setting for your default webgl folder inside Builds/ (examples, Builds/ or Builds/webgl/)
-            if (tabControl.SelectedIndex != 0) return;
 
             var proj = GetSelectedProject();
             var projPath = proj?.Path.Replace('/', '\\');
-
             if (string.IsNullOrEmpty(projPath) == true) return;
 
             var buildPath = Path.Combine(projPath, "Builds", txtWebglRelativePath.Text);
@@ -1688,6 +1685,34 @@ namespace UnityLauncherPro
         {
             Properties.Settings.Default.webglBuildPath = txtWebglRelativePath.Text;
             Properties.Settings.Default.Save();
+        }
+
+        private void MenuItemBrowsePersistentDataPath_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            var projPath = proj?.Path.Replace('/', '\\');
+            if (string.IsNullOrEmpty(projPath) == true) return;
+
+            var psPath = Path.Combine(projPath, "ProjectSettings", "ProjectSettings.asset");
+            if (File.Exists(psPath) == false) return;
+            // read project settings
+            var rows = File.ReadAllLines(psPath);
+
+            // search company and product name rows
+            for (int i = 0, len = rows.Length; i < len; i++)
+            {
+                // skip rows until companyname
+                if (rows[i].IndexOf("companyName:") == -1) continue;
+
+                var companyName = rows[i].Split(new[] { "companyName: " }, StringSplitOptions.None)[1];
+                var productName = rows[i + 1].Split(new[] { "productName: " }, StringSplitOptions.None)[1];
+
+                // open folder from %userprofile%\AppData\LocalLow\<companyname>\<productname>
+                var dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/../LocalLow");
+                var psFullPath = Path.Combine(dataFolder, companyName, productName);
+                Tools.LaunchExplorer(psFullPath);
+                break;
+            }
         }
     } // class
 } //namespace
