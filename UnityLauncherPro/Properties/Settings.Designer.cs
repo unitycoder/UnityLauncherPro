@@ -251,5 +251,17 @@ namespace UnityLauncherPro.Properties {
                 this["webglBuildPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useCustomTheme {
+            get {
+                return ((bool)(this["useCustomTheme"]));
+            }
+            set {
+                this["useCustomTheme"] = value;
+            }
+        }
     }
 }

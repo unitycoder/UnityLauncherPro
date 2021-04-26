@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:UnityLauncherPro"
 		xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource DarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" Activated="Window_Activated">
+        Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" Activated="Window_Activated">
     <Window.Resources>
 
         <!-- colors for unity missing installatios -->
@@ -24,15 +24,15 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="False">
-                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{StaticResource DeactiveTabForeground}"/>
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource DeactiveTabBackground}" />
+                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{StaticResource ThemeDeactiveTabForeground}"/>
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeDeactiveTabBackground}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{StaticResource ButtonWhiteText}"/>
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource MainBackgroundColor}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{StaticResource ThemeButtonWhiteText}"/>
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeMainBackgroundColor}"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource MainBackgroundColor}"/>
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeMainBackgroundColor}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -42,9 +42,9 @@
 
         <!-- datagrid header -->
         <Style x:Key="HeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
-            <Setter Property="Background" Value="{StaticResource DatagridHeaderBackground}" />
-            <Setter Property="Foreground" Value="{StaticResource DatagridHeaderForeground}" />
-            <Setter Property="BorderBrush" Value="{StaticResource DatagridHeaderBorder}" />
+            <Setter Property="Background" Value="{StaticResource ThemeDatagridHeaderBackground}" />
+            <Setter Property="Foreground" Value="{StaticResource ThemeDatagridHeaderForeground}" />
+            <Setter Property="BorderBrush" Value="{StaticResource ThemeDatagridHeaderBorder}" />
             <Setter Property="BorderThickness" Value="0,0,1,1" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -52,22 +52,22 @@
             <Setter Property="Padding" Value="6,2,2,2" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource ButtonBackground}"/>
+                    <Setter Property="Background" Value="{StaticResource ThemeButtonBackground}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <!-- datagrid rows & row selection -->
         <Style TargetType="{x:Type DataGridRow}">
-            <Setter Property="Background" Value="{StaticResource ButtonBackground}" />
+            <Setter Property="Background" Value="{StaticResource ThemeButtonBackground}" />
             <Setter Property="BorderBrush" Value="{x:Null}" />
             <Setter Property="BorderThickness" Value="0,0,0,0" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource DataGridRowMouseOver}"/>
+                    <Setter Property="Background" Value="{StaticResource ThemeDataGridRowMouseOver}"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource DataGridRowSelectedBackground}" />
+                    <Setter Property="Background" Value="{StaticResource ThemeDataGridRowSelectedBackground}" />
                 </Trigger>
             </Style.Triggers>
             <Style.Resources>
@@ -98,8 +98,8 @@
         <Style x:Key="CustomButton" TargetType="{x:Type Button}">
             <Setter Property="SnapsToDevicePixels" Value="true"/>
             <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="Background" Value="{DynamicResource ButtonBackground}"/>
-            <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForeground}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -108,15 +108,15 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="{StaticResource ButtonForegroundDisabled}" />
+                                <Setter Property="Foreground" Value="{StaticResource ThemeButtonForegroundDisabled}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="Background" Value="{StaticResource ButtonBackgroundMouseOver}" />
-                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{StaticResource ButtonWhiteText}"/>
+                                <Setter TargetName="shortcutbutton" Property="Background" Value="{StaticResource ThemeButtonBackgroundMouseOver}" />
+                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{StaticResource ThemeButtonWhiteText}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="Background" Value="{StaticResource ButtonBackgroundPressed}" />
-                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{StaticResource ButtonWhiteText}"/>
+                                <Setter TargetName="shortcutbutton" Property="Background" Value="{StaticResource ThemeButtonBackgroundPressed}" />
+                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{StaticResource ThemeButtonWhiteText}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -140,13 +140,13 @@
                         <ControlTemplate.Triggers>
                             <!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource TextBoxBackground}" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeTextBoxBackground}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ScrollArrowPressed}" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollArrowPressed}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Foreground" Value="{StaticResource ScrollBarEnabledForeground}"/>
+                                <Setter Property="Foreground" Value="{StaticResource ThemeScrollBarEnabledForeground}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -180,7 +180,7 @@
                         <Border x:Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ScrollBarThumbFill}" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollBarThumbFill}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -244,29 +244,29 @@
 
         <!-- menubar -->
         <Grid Grid.Row="0" UseLayoutRounding="False">
-            <Rectangle Fill="{DynamicResource DarkMenuBar}" MouseDown="OnRectangleMouseDown" />
+            <Rectangle Fill="{DynamicResource ThemeDarkMenuBar}" MouseDown="OnRectangleMouseDown" />
             <Image Source="Images/icon.png" RenderOptions.BitmapScalingMode="NearestNeighbor" HorizontalAlignment="Left" Width="16" Height="16" Margin="4,0,0,0" SnapsToDevicePixels="True" UseLayoutRounding="True" />
-            <Label Content="UnityLauncherPro" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="{DynamicResource MainTitle}" FontSize="12" HorizontalAlignment="Left"  />
+            <Label Content="UnityLauncherPro" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="{DynamicResource ThemeMainTitle}" FontSize="12" HorizontalAlignment="Left"  />
             <!-- minimize -->
             <Button x:Name="btnMinimize" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnMinimize_Click" Margin="0,0,27,0" Padding="2,0,2,8" IsTabStop="False">
-                <TextBlock Text="–" FontSize="15" Foreground="{DynamicResource WindowMinClose}" Padding="0" Height="23" HorizontalAlignment="Center"/>
+                <TextBlock Text="–" FontSize="15" Foreground="{DynamicResource ThemeWindowMinClose}" Padding="0" Height="23" HorizontalAlignment="Center"/>
             </Button>
             <!-- close -->
             <Button x:Name="btnClose" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnClose_Click" Padding="0,2" IsTabStop="False">
-                <TextBlock Text="❌" FontSize="10" Foreground="{DynamicResource WindowMinClose}" Padding="5,3,4,4" HorizontalAlignment="Center" />
+                <TextBlock Text="❌" FontSize="10" Foreground="{DynamicResource ThemeWindowMinClose}" Padding="5,3,4,4" HorizontalAlignment="Center" />
             </Button>
         </Grid>
 
         <!-- main content : Tabs -->
-        <TabControl Grid.Row="1" x:Name="tabControl"  Background="{DynamicResource MainBackgroundColor}" BorderBrush="{x:Null}" Padding="0" Margin="0" SelectionChanged="OnTabSelectionChanged">
+        <TabControl Grid.Row="1" x:Name="tabControl"  Background="{DynamicResource ThemeMainBackgroundColor}" BorderBrush="{x:Null}" Padding="0" Margin="0" SelectionChanged="OnTabSelectionChanged">
 
             <!-- Tab: Projects-->
             <TabItem Header="Projects" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}">
                 <Grid>
                     <!-- search box -->
-                    <Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource SearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBox}" Height="24" />
-                        <TextBox MinWidth="100" CaretBrush="{DynamicResource SearchCaret}" x:Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource SearchForeground}" SelectionBrush="{DynamicResource SearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" TextChanged="OnSearchTextChanged" PreviewKeyDown="TxtSearchBox_PreviewKeyDown" TabIndex="1" />
+                    <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
+                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBox}" Height="24" />
+                        <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" TextChanged="OnSearchTextChanged" PreviewKeyDown="TxtSearchBox_PreviewKeyDown" TabIndex="1" />
                         <Button x:Name="btnClearSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2"  BorderBrush="{x:Null}" Click="OnClearProjectSearchClick" IsTabStop="False">
                             <!--<Button.Style>
 								<Style TargetType="{x:Type Button}">
@@ -280,7 +280,7 @@
 									</Style.Triggers>
 								</Style>
 							</Button.Style>-->
-                            <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource SearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
+                            <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Style.Triggers>
@@ -300,7 +300,7 @@
                     <Button Style="{StaticResource CustomButton}" ToolTip="Add existing project" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="0,4,34,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" TabIndex="10" />
                     <Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshProjectList_Click" TabIndex="11"/>
 
-                    <DataGrid x:Name="gridRecent" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource GridForeground}" HorizontalGridLinesBrush="{DynamicResource GridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource GridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" BeginningEdit="GridRecent_BeginningEdit" ContextMenuOpening="GridRecent_ContextMenuOpening" >
+                    <DataGrid x:Name="gridRecent" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" BeginningEdit="GridRecent_BeginningEdit" ContextMenuOpening="GridRecent_ContextMenuOpening" >
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                             <CommandBinding Command="{x:Static local:MainWindow.KillProcessCommand}" Executed="KillSelectedProcess"/>
@@ -312,10 +312,10 @@
                             <DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" Width="72">
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
-                                        <Setter Property="Foreground" Value="{StaticResource GridRedText}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ThemeGridRedText}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Version, Converter={StaticResource VersionInstalledConverter}}" Value="true">
-                                                <Setter Property="Foreground" Value="{StaticResource GridGreenText}" />
+                                                <Setter Property="Foreground" Value="{StaticResource ThemeGridGreenText}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -327,7 +327,7 @@
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding folderExists, Converter={StaticResource ProjectExistsConverter}}" Value="false">
-                                                <Setter Property="Foreground" Value="{StaticResource GridRedText}" />
+                                                <Setter Property="Foreground" Value="{StaticResource ThemeGridRedText}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -403,19 +403,19 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="32" />
                         </Grid.RowDefinitions>
-                        <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ButtonBackground}" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnUpgradeProject_Click">
+                        <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ThemeButtonBackground}" Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnUpgradeProject_Click">
                             <Label Content="_Upgrade" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
-                        <Button Grid.Column="1" ToolTip="With selected Unity" Style="{StaticResource CustomButton}" x:Name="btnCreateEmptyProject" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnCreateEmptyProject_Click" >
+                        <Button Grid.Column="1" ToolTip="With selected Unity" Style="{StaticResource CustomButton}" x:Name="btnCreateEmptyProject" Background="{DynamicResource ThemeButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnCreateEmptyProject_Click" >
                             <Label Content="_New Project" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
-                        <Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchUnity" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchUnity_Click" >
+                        <Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnLaunchUnity" Background="{DynamicResource ThemeButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchUnity_Click" >
                             <Label Content="_Run Unity" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
-                        <Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchProject_Click" AutomationProperties.AccessKey="o" >
+                        <Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnLaunchProject" Background="{DynamicResource ThemeButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnLaunchProject_Click" AutomationProperties.AccessKey="o" >
                             <Label Content="_Open Project" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
-                        <Button Grid.Column="4" Style="{StaticResource CustomButton}" x:Name="btnExplore" Background="{DynamicResource ButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnExplore_Click" >
+                        <Button Grid.Column="4" Style="{StaticResource CustomButton}" x:Name="btnExplore" Background="{DynamicResource ThemeButtonBackground}" Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnExplore_Click" >
                             <Label Content="_Explore" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
                     </Grid>
@@ -426,11 +426,11 @@
             <TabItem Header="Editors" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
                 <Grid>
                     <!-- search box -->
-                    <Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource SearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUnity}" Height="24" />
-                        <TextBox MinWidth="100" CaretBrush="{DynamicResource SearchCaret}" x:Name="txtSearchBoxUnity" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource SearchForeground}" SelectionBrush="{DynamicResource SearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUnity_PreviewKeyDown" TextChanged="TxtSearchBoxUnity_TextChanged" />
+                    <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
+                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUnity}" Height="24" />
+                        <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxUnity" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUnity_PreviewKeyDown" TextChanged="TxtSearchBoxUnity_TextChanged" />
                         <Button x:Name="btnClearUnitySearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUnitySearchClick">
-                            <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource SearchCaret}" Padding="5,3,4,4" HorizontalAlignment="Center">
+                            <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchCaret}" Padding="5,3,4,4" HorizontalAlignment="Center">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Style.Triggers>
@@ -449,7 +449,7 @@
 
                     <Button Style="{StaticResource CustomButton}" ToolTip="Refresh installations (F5)" x:Name="btnRefreshUnityList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshUnityList_Click"/>
 
-                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource GridForeground}" HorizontalGridLinesBrush="{DynamicResource GridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource GridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick">
+                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick">
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                         </DataGrid.CommandBindings>
@@ -524,11 +524,11 @@
             <TabItem Header="Updates" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black" >
                 <Grid>
                     <!-- search box -->
-                    <Grid Background="{DynamicResource TextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource SearchForeground}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUpdates}" Height="24" />
-                        <TextBox MinWidth="100" CaretBrush="{DynamicResource SearchCaret}" x:Name="txtSearchBoxUpdates" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource SearchForeground}" SelectionBrush="{DynamicResource SearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUpdates_PreviewKeyDown" TextChanged="TxtSearchBoxUpdates_TextChanged" />
+                    <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
+                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchForeground}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUpdates}" Height="24" />
+                        <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxUpdates" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUpdates_PreviewKeyDown" TextChanged="TxtSearchBoxUpdates_TextChanged" />
                         <Button x:Name="btnClearUpdatesSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUpdateSearchClick">
-                            <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource SearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
+                            <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Style.Triggers>
@@ -547,7 +547,7 @@
                     </Grid>
 
                     <Button Style="{StaticResource CustomButton}" ToolTip="Fetch released versions" x:Name="btnRefreshUpdatesList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="OnGetUnityUpdatesClick"/>
-                    <DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource GridForeground}" HorizontalGridLinesBrush="{DynamicResource GridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource GridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUpdates_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUpdates_PreviewMouseDoubleClick">
+                    <DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUpdates_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUpdates_PreviewMouseDoubleClick">
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                         </DataGrid.CommandBindings>
@@ -558,7 +558,7 @@
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Version, Converter={StaticResource VersionInstalledConverter}}" Value="true">
-                                                <Setter Property="Foreground" Value="{StaticResource GridGreenText}" />
+                                                <Setter Property="Foreground" Value="{StaticResource ThemeGridGreenText}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -609,7 +609,7 @@
                         <StackPanel Orientation="Vertical" Margin="10">
                             <Border HorizontalAlignment="Left" VerticalAlignment="Top">
                                 <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Label Content="Folders" Foreground="{DynamicResource ButtonForeground}" />
+                                    <Label Content="Folders" Foreground="{DynamicResource ThemeButtonForeground}" />
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Browse Editor logs folder">
                                         <Label Content="_Editor Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
@@ -626,7 +626,7 @@
                             </Border>
                             <Border HorizontalAlignment="Left" VerticalAlignment="Top">
                                 <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Label Content="Tools" Foreground="{DynamicResource ButtonForeground}" />
+                                    <Label Content="Tools" Foreground="{DynamicResource ThemeButtonForeground}" />
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click" ToolTip="Start ADB logcat commandline">
                                         <Label Content="_ADB logcat" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
@@ -640,12 +640,12 @@
                     <!-- 2nd part -->
                     <Grid Grid.Row="1" VerticalAlignment="Top">
                         <StackPanel Orientation="Horizontal" Margin="0">
-                            <Label Content="Build Report" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" />
+                            <Label Content="Build Report" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" />
                             <Button x:Name="btnClearBuildReport" Style="{StaticResource CustomButton}" ToolTip="Clear report" Content="🗑" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"  Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnClearBuildReport_Click" />
                             <Button x:Name="btnRefreshBuildReport" Style="{StaticResource CustomButton}" ToolTip="Get latest Build Report from Editor.log" Content="⟳" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshBuildReport_Click"/>
                             <!--<CheckBox x:Name="chkAutoUpdateBuildReport" Content="AutoUpdate" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" HorizontalAlignment="Right" VerticalAlignment="Top" Height="26" VerticalContentAlignment="Center" IsEnabled="False"/>-->
                         </StackPanel>
-                        <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource GridForeground}" HorizontalGridLinesBrush="{DynamicResource GridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource GridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top">
+                        <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Size}" ClipboardContentBinding="{x:Null}" Header="Size" IsReadOnly="True" MinWidth="75"/>
                                 <DataGridTextColumn Binding="{Binding Percentage}" ClipboardContentBinding="{x:Null}" Header="%" IsReadOnly="True" MinWidth="55" />
@@ -678,10 +678,10 @@
                     </Grid.RowDefinitions>
 
                     <!-- top labels -->
-                    <Label Grid.Row="0" Content="Unity Installation Parent Folders" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom" ToolTip="Search will try to find Unity installations under these folders"/>
-                    <Label x:Name="lblFoundXInstallations" Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                    <Label Grid.Row="0" Content="Unity Installation Parent Folders" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom" ToolTip="Search will try to find Unity installations under these folders"/>
+                    <Label x:Name="lblFoundXInstallations" Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                     <!-- locations list -->
-                    <ListBox x:Name="lstRootFolders" Grid.Row="1" Background="{DynamicResource ButtonBackground}" Margin="4,0,2,0" Foreground="{DynamicResource ButtonForeground}" >
+                    <ListBox x:Name="lstRootFolders" Grid.Row="1" Background="{DynamicResource ThemeButtonBackground}" Margin="4,0,2,0" Foreground="{DynamicResource ThemeButtonForeground}" >
                         <System:String>c:\Program Files</System:String>
                     </ListBox>
                     <!-- locations add/remove -->
@@ -695,27 +695,28 @@
                     </StackPanel>
                     <!-- settings-->
                     <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
-                        <CheckBox x:Name="chkMinimizeToTaskbar" Content="Minimize to tray" Foreground="{DynamicResource ButtonForeground}" Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged" Margin="0,0,0,4" ToolTip="When window is minimized, hides application into taskbar icon area"/>
-                        <CheckBox x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" Margin="0,0,0,4" ToolTip="Install registry entry for Explorer context menu"/>
-                        <CheckBox x:Name="chkQuitAfterOpen" Content="Close after opening project" Foreground="{DynamicResource ButtonForeground}" Checked="ChkQuitAfterOpen_CheckedChanged" Unchecked="ChkQuitAfterOpen_CheckedChanged" Margin="0,0,0,4" ToolTip="Closes launcher after running project (not really useful)"/>
-                        <CheckBox x:Name="chkQuitAfterCommandline" Content="Close after launching from Explorer" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkQuitAfterCommandline_CheckedChanged" Checked="ChkQuitAfterCommandline_CheckedChanged" Margin="0,0,0,4" ToolTip="Close launcher after running from commandline or Explorer (recommended)"/>
-                        <CheckBox x:Name="chkShowLauncherArgumentsColumn" Content="Show commandline arguments column" Foreground="{DynamicResource ButtonForeground}" Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" Margin="0,0,0,4" ToolTip="Shows column for custom project commandline params"/>
-                        <CheckBox x:Name="chkShowGitBranchColumn" Content="Show git branch column" Foreground="{DynamicResource ButtonForeground}" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged" Margin="0,0,0,4" ToolTip="Shows column for project git branch info"/>
-                        <CheckBox x:Name="chkShowMissingFolderProjects" Content="Show projects that don't exist on disk" Foreground="{DynamicResource ButtonForeground}" Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" Margin="0,0,0,4" ToolTip="List in recent projects, even if the project folder is missing"/>
-                        <CheckBox x:Name="chkAllowSingleInstanceOnly" Content="Allow single instance only" Foreground="{DynamicResource ButtonForeground}" Checked="ChkAllowSingleInstanceOnly_CheckedChanged" Unchecked="ChkAllowSingleInstanceOnly_CheckedChanged" Margin="0,0,0,4" ToolTip="Activates already running instance, instead of starting new exe (not working if app is minized to taskbar)"/>
-                        <CheckBox x:Name="chkEnableProjectRename" Content="Enable Project Rename F2 (Not recommended for beginners)" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,4" ToolTip="Can use F2 to rename project folders, Note that project will disappears from list on refresh, unless you open it (since its new path, not in unity recent projects registry)" Checked="ChkEnableProjectRename_Checked" Unchecked="ChkEnableProjectRename_Checked"/>
-                        <CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project" Foreground="{DynamicResource ButtonForeground}" Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" Margin="0,0,0,4" ToolTip="If disabled, uses automatic quick project naming"/>
-                        <CheckBox x:Name="chkStreamerMode" Content="Streamer Mode (hide project names and folders)" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,4" ToolTip="Hide project names and folders in main view" Checked="ChkStreamerMode_Checked" Unchecked="ChkStreamerMode_Checked"/>
-                        <CheckBox x:Name="chkShowPlatform" Content="Show current target platform (if exists in .csproj)" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,4" ToolTip="Shows target platform column" Checked="ChkShowPlatform_Checked" Unchecked="ChkShowPlatform_Checked"/>
+                        <CheckBox x:Name="chkMinimizeToTaskbar" Content="Minimize to tray" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged" Margin="0,0,0,4" ToolTip="When window is minimized, hides application into taskbar icon area"/>
+                        <CheckBox x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" Margin="0,0,0,4" ToolTip="Install registry entry for Explorer context menu"/>
+                        <CheckBox x:Name="chkQuitAfterOpen" Content="Close after opening project" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkQuitAfterOpen_CheckedChanged" Unchecked="ChkQuitAfterOpen_CheckedChanged" Margin="0,0,0,4" ToolTip="Closes launcher after running project (not really useful)"/>
+                        <CheckBox x:Name="chkQuitAfterCommandline" Content="Close after launching from Explorer" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkQuitAfterCommandline_CheckedChanged" Checked="ChkQuitAfterCommandline_CheckedChanged" Margin="0,0,0,4" ToolTip="Close launcher after running from commandline or Explorer (recommended)"/>
+                        <CheckBox x:Name="chkShowLauncherArgumentsColumn" Content="Show commandline arguments column" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" Margin="0,0,0,4" ToolTip="Shows column for custom project commandline params"/>
+                        <CheckBox x:Name="chkShowGitBranchColumn" Content="Show git branch column" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged" Margin="0,0,0,4" ToolTip="Shows column for project git branch info"/>
+                        <CheckBox x:Name="chkShowMissingFolderProjects" Content="Show projects that don't exist on disk" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" Margin="0,0,0,4" ToolTip="List in recent projects, even if the project folder is missing"/>
+                        <CheckBox x:Name="chkAllowSingleInstanceOnly" Content="Allow single instance only" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkAllowSingleInstanceOnly_CheckedChanged" Unchecked="ChkAllowSingleInstanceOnly_CheckedChanged" Margin="0,0,0,4" ToolTip="Activates already running instance, instead of starting new exe (not working if app is minized to taskbar)"/>
+                        <CheckBox x:Name="chkEnableProjectRename" Content="Enable Project Rename F2 (Not recommended for beginners)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Can use F2 to rename project folders, Note that project will disappears from list on refresh, unless you open it (since its new path, not in unity recent projects registry)" Checked="ChkEnableProjectRename_Checked" Unchecked="ChkEnableProjectRename_Checked"/>
+                        <CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" Margin="0,0,0,4" ToolTip="If disabled, uses automatic quick project naming"/>
+                        <CheckBox x:Name="chkStreamerMode" Content="Streamer Mode (hide project names and folders)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Hide project names and folders in main view" Checked="ChkStreamerMode_Checked" Unchecked="ChkStreamerMode_Checked"/>
+                        <CheckBox x:Name="chkShowPlatform" Content="Show current target platform (if exists in .csproj)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Shows target platform column" Checked="ChkShowPlatform_Checked" Unchecked="ChkShowPlatform_Checked"/>
+                        <CheckBox x:Name="chkUseCustomTheme" Content="Use custom theme" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Loads theme.ini from application folder" Checked="ChkUseCustomTheme_Checked" Unchecked="ChkUseCustomTheme_Checked"/>
 
                         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBox x:Name="txtRootFolderForNewProjects" MinWidth="300" ToolTip="When you click &quot;Create Project&quot; in main page, new project is generated under this path+UnityVersion (eg. /2017a/)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
                             <Button x:Name="btnBrowseProjectRootFolder" Content="..." Margin="6,0,0,0" MinWidth="32" Click="BtnBrowseProjectRootFolder_Click" />
-                            <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ButtonForeground}" />
+                            <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ThemeButtonForeground}" />
                         </StackPanel>
                         <StackPanel Grid.Row="3" Orientation="Horizontal">
                             <TextBox x:Name="txtWebglRelativePath" MinWidth="200" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. Used for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
-                            <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ButtonForeground}" />
+                            <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ThemeButtonForeground}" />
                         </StackPanel>
                     </StackPanel>
 
@@ -729,7 +730,7 @@
         </TabControl>
 
         <Grid Grid.Row="2" UseLayoutRounding="False">
-            <StatusBar VerticalAlignment="Bottom" Margin="3,1,20,1" Background="{x:Null}" Foreground="{DynamicResource StatusText}">
+            <StatusBar VerticalAlignment="Bottom" Margin="3,1,20,1" Background="{x:Null}" Foreground="{DynamicResource ThemeStatusText}">
                 <TextBlock x:Name="txtStatus" Margin="6,1,3,0"  VerticalAlignment="Center" Text="Ready"/>
             </StatusBar>
         </Grid>

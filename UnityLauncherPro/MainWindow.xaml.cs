@@ -2,6 +2,7 @@
 // https://github.com/unitycoder/UnityLauncherPro
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -48,6 +49,8 @@ namespace UnityLauncherPro
         public static string preferredVersion = "none";
         Mutex myMutex;
 
+        Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -57,9 +60,6 @@ namespace UnityLauncherPro
         void Start()
         {
             LoadSettings();
-            
-            // TEST
-            //ApplySkin();
 
             // disable accesskeys without alt
             CoreCompatibilityPreferences.IsAltKeyRequiredInAccessKeyDefaultScope = true;
@@ -107,6 +107,14 @@ namespace UnityLauncherPro
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
+
+            // get original colors
+            foreach (DictionaryEntry item in Application.Current.Resources.MergedDictionaries[0])
+            {
+                origResourceColors[item.Key.ToString()] = (SolidColorBrush)item.Value;
+            }
+
+            ApplyTheme();
 
             isInitializing = false;
         }
@@ -259,6 +267,7 @@ namespace UnityLauncherPro
             chkEnableProjectRename.IsChecked = Properties.Settings.Default.enableProjectRename;
             chkStreamerMode.IsChecked = Properties.Settings.Default.streamerMode;
             chkShowPlatform.IsChecked = Properties.Settings.Default.showTargetPlatform;
+            chkUseCustomTheme.IsChecked = Properties.Settings.Default.useCustomTheme;
             txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
             txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
 
@@ -1719,9 +1728,10 @@ namespace UnityLauncherPro
             }
         }
 
-        void ApplySkin()
+        void ApplyTheme()
         {
-            // TODO dont load, if skinning is disabled in settings
+            if (chkUseCustomTheme.IsChecked == false) return;
+
             // TODO load current skin (or could save them into preferences from settings panel, so that it doesnt need to parse file everytime! and have reset colors button to reset them)
             // TODO set colors to resources
 
@@ -1742,10 +1752,36 @@ namespace UnityLauncherPro
                     // skip bad rows
                     if (row.Length != 2) continue;
                     // apply color
-                    Application.Current.Resources[row[0]] = (SolidColorBrush)(new BrushConverter().ConvertFrom(row[1]));
+                    Application.Current.Resources[row[0]] = (SolidColorBrush)(new BrushConverter().ConvertFrom(row[1].Trim()));
                 }
             }
-        } // loadskin()
+        }
+
+        void ResetTheme()
+        {
+            foreach (KeyValuePair<string, SolidColorBrush> item in origResourceColors)
+            {
+                Application.Current.Resources[item.Key] = item.Value;
+            }
+        }
+
+        private void ChkUseCustomTheme_Checked(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+            Properties.Settings.Default.useCustomTheme = isChecked;
+            Properties.Settings.Default.Save();
+
+            // reset colors now
+            if (isChecked == true)
+            {
+                ApplyTheme();
+            }
+            else
+            {
+                ResetTheme();
+            }
+        }
+
 
     } // class
 } //namespace
