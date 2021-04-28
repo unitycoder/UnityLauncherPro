@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="Upgrade Project Version" Height="533.165" Width="418.684" Background="{DynamicResource DarkestBackground}" MinWidth="319" MinHeight="555" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewKeyDown="Window_PreviewKeyDown" ShowInTaskbar="False">
+        Title="Upgrade Project Version" Height="533.165" Width="418.684" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="319" MinHeight="555" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewKeyDown="Window_PreviewKeyDown" ShowInTaskbar="False">
 	<Window.Resources>
 		<!-- custom buttons -->
 		<Style x:Key="CustomButton" TargetType="{x:Type Button}">
@@ -34,7 +34,7 @@
 
 		<!-- datagrid rows & row selection -->
 		<Style TargetType="DataGridRow">
-			<Setter Property="Background" Value="{StaticResource ButtonBackground}" />
+            <Setter Property="Background" Value="{StaticResource ThemeButtonBackground}" />
 			<Setter Property="BorderBrush" Value="{x:Null}" />
 			<Setter Property="BorderThickness" Value="0,0,0,0" />
 			<Style.Triggers>
@@ -42,7 +42,7 @@
 					<Setter Property="Background" Value="{StaticResource DataGridRowMouseOver}"/>
 				</Trigger>-->
 				<Trigger Property="IsSelected" Value="True">
-					<Setter Property="Background" Value="{StaticResource DataGridRowSelectedBackground}" />
+                    <Setter Property="Background" Value="{StaticResource ThemeDataGridRowSelectedBackground}" />
 				</Trigger>
 			</Style.Triggers>
 		</Style>
@@ -73,17 +73,17 @@
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type RepeatButton}">
 						<!-- button background -->
-						<Border Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="{DynamicResource ButtonBackground}" BorderBrush="{x:Null}">
+                        <Border Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="{DynamicResource ThemeButtonBackground}" BorderBrush="{x:Null}">
 							<!-- arrow sign -->
-							<Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ScrollArrowForeground}" Data="{Binding Path=Content,RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ThemeScrollArrowForeground}" Data="{Binding Path=Content,RelativeSource={RelativeSource TemplatedParent}}" />
 						</Border>
 						<ControlTemplate.Triggers>
 							<!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
 							<Trigger Property="IsMouseOver" Value="true">
-								<Setter TargetName="Border" Property="Background" Value="{StaticResource TextBoxBackground}" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeTextBoxBackground}" />
 							</Trigger>
 							<Trigger Property="IsPressed" Value="true">
-								<Setter TargetName="Border" Property="Background" Value="{StaticResource ScrollArrowPressed}" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollArrowPressed}" />
 							</Trigger>
 							<Trigger Property="IsEnabled" Value="false">
 								<Setter Property="Foreground" Value="Black"/>
@@ -120,7 +120,7 @@
 						<Border Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsMouseOver" Value="true">
-								<Setter TargetName="Border" Property="Background" Value="{StaticResource ScrollBarThumbFill}" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollBarThumbFill}" />
 							</Trigger>
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
@@ -173,23 +173,23 @@
 
 	</Window.Resources>
 	<Grid>
-		<Label x:Name="lblCurrentVersion" Content="Project Current Version" HorizontalAlignment="Left" Margin="9,11,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ButtonForeground}" Width="139"/>
-		<TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtCurrentVersion" Background="{DynamicResource DarkMenuBar}" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="173,16,37,0" UndoLimit="64" Text="Version" IsReadOnly="True" VerticalAlignment="Top" />
+        <Label x:Name="lblCurrentVersion" Content="Project Current Version" HorizontalAlignment="Left" Margin="9,11,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ThemeButtonForeground}" Width="139"/>
+        <TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtCurrentVersion" Background="{DynamicResource ThemeDarkMenuBar}" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="173,16,37,0" UndoLimit="64" Text="Version" IsReadOnly="True" VerticalAlignment="Top" />
 
-		<Label x:Name="lblAvailableVersions" Content="Available Unity Versions" HorizontalAlignment="Left" Margin="9,94,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ButtonForeground}"/>
-		<Button Style="{StaticResource CustomButton}" x:Name="btnDownload" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="0,47,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="35" Click="BtnDownload_Click" >
-			<Label Foreground="{DynamicResource ButtonForeground}" Content="_Download in Browser"/>
+        <Label x:Name="lblAvailableVersions" Content="Available Unity Versions" HorizontalAlignment="Left" Margin="9,94,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ThemeButtonForeground}"/>
+        <Button Style="{StaticResource CustomButton}" x:Name="btnDownload" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="0,47,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="35" Click="BtnDownload_Click" >
+            <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Download in Browser"/>
 		</Button>
-		<Button Style="{StaticResource CustomButton}" x:Name="btnOpenReleasePage" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="9,47,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="35" Click="BtnOpenReleasePage_Click" >
-			<Label Foreground="{DynamicResource ButtonForeground}" Content="_Open Release Page"/>
+        <Button Style="{StaticResource CustomButton}" x:Name="btnOpenReleasePage" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="9,47,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="35" Click="BtnOpenReleasePage_Click" >
+            <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Open Release Page"/>
 		</Button>
-		<Button Style="{StaticResource CustomButton}" x:Name="btnCancelUpgrade" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="9,434,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" Width="111" VerticalAlignment="Top" Height="51" Click="BtnCancelUpgrade_Click" >
-			<Label Foreground="{DynamicResource ButtonForeground}" Content="_Cancel"/>
+        <Button Style="{StaticResource CustomButton}" x:Name="btnCancelUpgrade" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="9,434,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" Width="111" VerticalAlignment="Top" Height="51" Click="BtnCancelUpgrade_Click" >
+            <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Cancel"/>
 		</Button>
-		<Button Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="0,434,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" Width="159" VerticalAlignment="Top" Height="51" Click="BtnUpgradeProject_Click" >
-			<Label Foreground="{DynamicResource ButtonForeground}" Content="_Upgrade Project"/>
+        <Button Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="0,434,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" Width="159" VerticalAlignment="Top" Height="51" Click="BtnUpgradeProject_Click" >
+            <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Upgrade Project"/>
 		</Button>
-		<DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" HorizontalAlignment="Left" Height="304" Margin="10,121,0,0" VerticalAlignment="Top" Width="393" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ButtonForeground}" Background="{DynamicResource MainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick">
+        <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" HorizontalAlignment="Left" Height="304" Margin="10,121,0,0" VerticalAlignment="Top" Width="393" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" />
 				<DataGridTextColumn Header="Value" Binding="{Binding Value}" IsReadOnly="True" />

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="Create New Project" Height="296" Width="300" Background="{DynamicResource DarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="Create New Project" Height="296" Width="300" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 	<Window.Resources>
 		<!-- custom buttons -->
 		<Style x:Key="CustomButton" TargetType="{x:Type Button}">
@@ -33,7 +33,7 @@
 		<!--TODO move to styles-->
 		<!-- datagrid rows & row selection -->
 		<Style TargetType="DataGridRow">
-			<Setter Property="Background" Value="{StaticResource ButtonBackground}" />
+            <Setter Property="Background" Value="{StaticResource ThemeButtonBackground}" />
 			<Setter Property="BorderBrush" Value="{x:Null}" />
 			<Setter Property="BorderThickness" Value="0,0,0,0" />
 			<Style.Triggers>
@@ -41,7 +41,7 @@
 					<Setter Property="Background" Value="{StaticResource DataGridRowMouseOver}"/>
 				</Trigger>-->
 				<Trigger Property="IsSelected" Value="True">
-					<Setter Property="Background" Value="{StaticResource DataGridRowSelectedBackground}" />
+                    <Setter Property="Background" Value="{StaticResource ThemeDataGridRowSelectedBackground}" />
 				</Trigger>
 			</Style.Triggers>
 		</Style>
@@ -78,10 +78,10 @@
 						<ControlTemplate.Triggers>
 							<!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
 							<Trigger Property="IsMouseOver" Value="true">
-								<Setter TargetName="Border" Property="Background" Value="{StaticResource TextBoxBackground}" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeTextBoxBackground}" />
 							</Trigger>
 							<Trigger Property="IsPressed" Value="true">
-								<Setter TargetName="Border" Property="Background" Value="{StaticResource ScrollArrowPressed}" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollArrowPressed}" />
 							</Trigger>
 							<Trigger Property="IsEnabled" Value="false">
 								<Setter Property="Foreground" Value="Black"/>
@@ -118,7 +118,7 @@
 						<Border Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsMouseOver" Value="true">
-								<Setter TargetName="Border" Property="Background" Value="{StaticResource ScrollBarThumbFill}" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollBarThumbFill}" />
 							</Trigger>
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
@@ -170,25 +170,25 @@
 
 	<Grid>
 		<StackPanel Margin="10,3">
-			<Label Content="Unity Version " Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
-			<DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" Height="120" Margin="3,0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ButtonForeground}" Background="{DynamicResource MainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="1" KeyboardNavigation.TabNavigation = "None" Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False">
+            <Label Content="Unity Version " Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
+            <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" Height="120" Margin="3,0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="1" KeyboardNavigation.TabNavigation = "None" Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False">
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" CanUserResize="False" MinWidth="300" />
 				</DataGrid.Columns>
 			</DataGrid>
-			<Label Content="Project Name:" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
+            <Label Content="Project Name:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
 			<TextBox x:Name="txtNewProjectName" VerticalAlignment="Center" Margin="3,0,3,3" IsUndoEnabled="True" TextChanged="TxtNewProjectName_TextChanged" PreviewKeyDown="TxtNewProjectName_PreviewKeyDown" TabIndex="0" />
-			<Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ButtonBackground}" Margin="0" FontSize="10" Padding="5,0,5,3" />
+            <Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ThemeButtonBackground}" Margin="0" FontSize="10" Padding="5,0,5,3" />
 			<Grid HorizontalAlignment="Stretch" Margin="0,8,0,0">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*"/>
 					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
-				<Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="3,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" IsTabStop="False" >
-					<Label Foreground="{DynamicResource ButtonForeground}" Content="Cancel"/>
+                <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="3,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" IsTabStop="False" >
+                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="Cancel"/>
 				</Button>
-				<Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Background="{DynamicResource ButtonBackground}" Foreground="#FFC1C1C1" Margin="3,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click" IsTabStop="False">
-					<Label Foreground="{DynamicResource ButtonForeground}" Content="_Create"/>
+                <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="3,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click" IsTabStop="False">
+                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Create"/>
 				</Button>
 			</Grid>
 		</StackPanel>
