@@ -50,6 +50,7 @@ namespace UnityLauncherPro
         Mutex myMutex;
 
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
+        string themefile = "theme.ini";
 
         public MainWindow()
         {
@@ -270,6 +271,8 @@ namespace UnityLauncherPro
             chkUseCustomTheme.IsChecked = Properties.Settings.Default.useCustomTheme;
             txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
             txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
+            themefile = Properties.Settings.Default.themeFile;
+            txtCustomThemeFile.Text = themefile;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -1732,11 +1735,7 @@ namespace UnityLauncherPro
         {
             if (chkUseCustomTheme.IsChecked == false) return;
 
-            // TODO load current skin (or could save them into preferences from settings panel, so that it doesnt need to parse file everytime! and have reset colors button to reset them)
-            // TODO set colors to resources
-
-            // TEST
-            var themefile = "theme.ini";
+            Console.WriteLine("Load theme: " + themefile);
 
             if (File.Exists(themefile))
             {
@@ -1751,8 +1750,19 @@ namespace UnityLauncherPro
                     var row = colors[i].Split('=');
                     // skip bad rows
                     if (row.Length != 2) continue;
-                    // apply color
-                    Application.Current.Resources[row[0]] = (SolidColorBrush)(new BrushConverter().ConvertFrom(row[1].Trim()));
+
+                    // parse color
+                    try
+                    {
+                        var col = new BrushConverter().ConvertFrom(row[1].Trim());
+                        // apply color
+                        Application.Current.Resources[row[0]] = (SolidColorBrush)col;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+
                 }
             }
         }
@@ -1771,6 +1781,8 @@ namespace UnityLauncherPro
             Properties.Settings.Default.useCustomTheme = isChecked;
             Properties.Settings.Default.Save();
 
+            btnReloadTheme.IsEnabled = isChecked;
+
             // reset colors now
             if (isChecked == true)
             {
@@ -1779,6 +1791,36 @@ namespace UnityLauncherPro
             else
             {
                 ResetTheme();
+            }
+        }
+
+        private void BtnReloadTheme_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyTheme();
+        }
+
+        private void TxtCustomThemeFile_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var s = (TextBox)sender;
+            themefile = s.Text;
+
+            Properties.Settings.Default.themeFile = themefile;
+            Properties.Settings.Default.Save();
+        }
+
+        private void TxtCustomThemeFile_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Return: // pressed enter in theme file text box
+                    Console.WriteLine(txtCustomThemeFile.Text);
+                    themefile = txtCustomThemeFile.Text;
+
+                    Properties.Settings.Default.themeFile = themefile;
+                    Properties.Settings.Default.Save();
+
+                    btnReloadTheme.Focus();
+                    break;
             }
         }
 

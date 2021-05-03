@@ -263,5 +263,17 @@ namespace UnityLauncherPro.Properties {
                 this["useCustomTheme"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("theme.ini")]
+        public string themeFile {
+            get {
+                return ((string)(this["themeFile"]));
+            }
+            set {
+                this["themeFile"] = value;
+            }
+        }
     }
 }
