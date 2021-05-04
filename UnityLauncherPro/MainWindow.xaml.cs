@@ -1735,7 +1735,7 @@ namespace UnityLauncherPro
         {
             if (chkUseCustomTheme.IsChecked == false) return;
 
-            Console.WriteLine("Load theme: " + themefile);
+            //Console.WriteLine("Load theme: " + themefile);
 
             if (File.Exists(themefile))
             {
@@ -1824,10 +1824,9 @@ namespace UnityLauncherPro
             }
         }
 
-
+        private void BtnExploreFolder_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.LaunchExplorer(System.AppDomain.CurrentDomain.BaseDirectory);
+        }
     } // class
 } //namespace
-
-
-
-
