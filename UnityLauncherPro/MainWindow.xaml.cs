@@ -1803,7 +1803,6 @@ namespace UnityLauncherPro
         {
             var s = (TextBox)sender;
             themefile = s.Text;
-
             Properties.Settings.Default.themeFile = themefile;
             Properties.Settings.Default.Save();
         }
@@ -1813,12 +1812,9 @@ namespace UnityLauncherPro
             switch (e.Key)
             {
                 case Key.Return: // pressed enter in theme file text box
-                    Console.WriteLine(txtCustomThemeFile.Text);
                     themefile = txtCustomThemeFile.Text;
-
                     Properties.Settings.Default.themeFile = themefile;
                     Properties.Settings.Default.Save();
-
                     btnReloadTheme.Focus();
                     break;
             }

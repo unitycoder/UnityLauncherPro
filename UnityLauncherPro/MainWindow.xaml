@@ -339,7 +339,7 @@
                             <!--TODO platform as dropdown?-->
                             <DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding TargetPlatform}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>
                             <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" SelectedItemBinding="{Binding TargetPlatform, NotifyOnSourceUpdated=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
-                            <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
+                            <DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>
                         </DataGrid.Columns>
 
                         <!-- right click context menu -->
@@ -357,7 +357,7 @@
                         </DataGrid.ContextMenu>
 
                         <!-- sample data for testing -->
-                        <local:Project GITBranch="" Modified="" Title="M dfgh dfghMO" Path="A:/temp" Version="2099.1.2.3"/>
+                        <local:Project TargetPlatform="C64" GITBranch="Best" Modified="" Title="M dfgh dfghMO" Path="A:/temp" Version="2099.1.2.3" />
                         <local:Project GITBranch="" Modified="" Title="asdgdfg" Path="A:/temp" Version="5.6.7f1"/>
                         <local:Project GITBranch="" Modified="" Title="Mghdfghdf dfghdfgMO" Path="A:/temp" Version="2018.3.13f1"/>
                         <local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>

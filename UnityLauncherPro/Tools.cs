@@ -328,11 +328,21 @@ namespace UnityLauncherPro
                 if (version.Contains("2017.1")) whatsnew = "whatsnew";
                 if (version.Contains("2018.2")) whatsnew = "whatsnew";
                 if (version.Contains("2018.3")) padding = "";
-                if (version.Contains("2018.1")) whatsnew = "whatsnew"; // doesnt work
-                if (version.Contains("2017.4.")) padding = ""; //  doesnt work for all versions
+                if (version.Contains("2018.1")) whatsnew = "whatsnew";
+                if (version.Contains("2017.4.")) padding = "";
                 if (version.Contains("2018.4.")) padding = "";
                 if (version.Contains("2019")) padding = "";
                 if (version.Contains("2020")) padding = "";
+                if (version.Contains("2021")) padding = "";
+                if (version.Contains("2022")) padding = "";
+                if (version.Contains("2023")) padding = "";
+                if (version.Contains("2024")) padding = "";
+                if (version.Contains("2025")) padding = "";
+                if (version.Contains("2026")) padding = "";
+                if (version.Contains("2027")) padding = "";
+                if (version.Contains("2028")) padding = "";
+                if (version.Contains("2029")) padding = "";
+                if (version.Contains("2030")) padding = "";
                 url = "https://unity3d.com/unity/" + whatsnew + "/" + padding + version;
             }
             else

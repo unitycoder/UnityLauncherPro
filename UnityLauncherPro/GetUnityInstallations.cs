@@ -50,7 +50,7 @@ namespace UnityLauncherPro
                     unity.Installed = installDate;
                     unity.IsPreferred = (version == MainWindow.preferredVersion);
 
-                    // TEST get platforms, NOTE if this is slow, do it later, or skip for commandline
+                    // get platforms, NOTE if this is slow, do it later, or skip for commandline
                     var platforms = GetPlatforms(dataFolder);
                     if (platforms != null) unity.Platforms = string.Join(", ", platforms);
 
