@@ -116,10 +116,12 @@ namespace UnityLauncherPro
                         }
 
                         // TODO add option to disable check
-                        string targetPlatform = "";
+                        //string targetPlatform = "";
+                        Platform targetPlatform = Platform.Unknown;
                         if (showTargetPlatform == true)
                         {
-                            targetPlatform = folderExists ? Tools.ParseTargetPlatform(projectPath) : null;
+                            //targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : null;
+                            targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : Platform.Unknown;
                         }
 
                         var p = new Project();
@@ -129,6 +131,7 @@ namespace UnityLauncherPro
                         p.Modified = lastUpdated;
                         p.Arguments = customArgs;
                         p.GITBranch = gitBranch;
+                        //p.TargetPlatform = targetPlatform;
                         p.TargetPlatform = targetPlatform;
                         p.folderExists = folderExists;
 

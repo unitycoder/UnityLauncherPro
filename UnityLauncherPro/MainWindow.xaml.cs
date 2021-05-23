@@ -476,7 +476,7 @@ namespace UnityLauncherPro
                 p.Title = Path.GetFileName(folder);
                 p.Version = Tools.GetProjectVersion(folder);
                 p.Arguments = Tools.ReadCustomLaunchArguments(folder, MainWindow.launcherArgumentsFile);
-                if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.ParseTargetPlatform(folder);
+                if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.GetTargetPlatform(folder);
                 if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
 
                 // add to list
@@ -1112,7 +1112,7 @@ namespace UnityLauncherPro
             Process.Start(githubURL);
         }
 
-        // finished editing project name cell or launcher argument cell
+        // finished editing project name cell or launcher argument cell or platform cells
         private void GridRecent_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             // avoid ending event running twice
@@ -1124,16 +1124,22 @@ namespace UnityLauncherPro
 
             // check that folder exists
             string path = proj.Path;
-            if (string.IsNullOrEmpty(path)) return;
+            Console.WriteLine(e.Column.DisplayIndex);
+            Console.WriteLine(path);
+            Console.WriteLine(string.IsNullOrEmpty(path));
+            if (string.IsNullOrEmpty(path))
+            {
 
-            // get current arguments, after editing
-            TextBox t = e.EditingElement as TextBox;
-            string newcellValue = t.Text.ToString();
-
+                //return;
+            }
 
             // check if we edited project name, or launcher arguments
             if (e.Column.DisplayIndex == 0)
             {
+                // get current arguments, after editing
+                TextBox t = e.EditingElement as TextBox;
+                string newcellValue = t.Text.ToString();
+
                 // restore read only
                 e.Column.IsReadOnly = true;
 
@@ -1191,8 +1197,11 @@ namespace UnityLauncherPro
                 }
 
             }
-            else // edit launcher arguments
+            else if (e.Column.DisplayIndex == 4) // edit launcher arguments
             {
+                // get current arguments, after editing
+                TextBox t = e.EditingElement as TextBox;
+                string newcellValue = t.Text.ToString();
 
                 string projSettingsFolder = "ProjectSettings";
 
@@ -1217,6 +1226,14 @@ namespace UnityLauncherPro
                     Console.WriteLine("Error saving launcher arguments: " + ex);
                 }
             }
+            else if (e.Column.DisplayIndex == 6) // platform dropdown
+            {
+                // get current arguments, after editing
+                var t = e.EditingElement as ComboBox;
+                string newcellValue = t.SelectedItem.ToString();
+
+                Console.WriteLine("Modified platform target: " + newcellValue);
+            }
 
             // TODO select the same row again
         }
@@ -1233,12 +1250,12 @@ namespace UnityLauncherPro
 
         private void GridRecent_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            // cancel if editing cell, because often try to double click to edit
+            // cancel if editing cell, because often try to double click to edit instead
             if (IsEditingCell(gridRecent)) return;
 
-            // cancel run if double click arguments editable field
+            // cancel run if double clicked Arguments or Platform editable field
             var currentColumnCell = gridRecent.CurrentCell.Column.DisplayIndex;
-            if (currentColumnCell == 4) return;
+            if (currentColumnCell == 4 || currentColumnCell == 6) return;
 
             var proj = GetSelectedProject();
             var proc = Tools.LaunchProject(proj);

@@ -734,9 +734,11 @@ namespace UnityLauncherPro
             return results;
         }
 
-        public static string ParseTargetPlatform(string projectPath)
+        public static Platform GetTargetPlatform(string projectPath)
+        //public static string GetTargetPlatform(string projectPath)
         {
-            string results = null;
+            //string results = null;
+            Platform results = Platform.Unknown;
 
             // get buildtarget from .csproj
             // <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
@@ -759,11 +761,11 @@ namespace UnityLauncherPro
                         // 2018: standalone, Win, Win64, OSXUniversal, Linux, Linux64, LinuxUniversal, iOS, Android, Web, WebStreamed, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, N3DS, tvOS
                         // 2019: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
                         // 2020: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
-                        results = csprojsplit[1].Substring(0, endrow);
+                        //results = csprojsplit[1].Substring(0, endrow);
+                        results = (Platform)Enum.Parse(typeof(Platform), csprojsplit[1].Substring(0, endrow));
                     }
                 }
             }
-
             return results;
         }
 

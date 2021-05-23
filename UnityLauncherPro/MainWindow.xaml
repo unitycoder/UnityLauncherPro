@@ -9,6 +9,13 @@
         Title="UnityLauncherPro" Height="650" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" Activated="Window_Activated">
     <Window.Resources>
 
+        <!-- platform dropdown menu -->
+        <ObjectDataProvider x:Key="platformEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="local:Platform"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
         <!-- colors for unity missing installatios -->
         <local:UnityInstallation x:Key="VersionInstalledConverter"/>
         <local:Project x:Key="ProjectExistsConverter"/>
@@ -337,9 +344,10 @@
                             <DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Arguments}" ClipboardContentBinding="{x:Null}" Header="Arguments" IsReadOnly="False" Width="100"/>
                             <DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding GITBranch}" ClipboardContentBinding="{x:Null}" Header="Branch" IsReadOnly="True" Width="100"/>
                             <!--TODO platform as dropdown?-->
-                            <DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding TargetPlatform}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>
+                            <!--<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding TargetPlatform}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
                             <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" SelectedItemBinding="{Binding TargetPlatform, NotifyOnSourceUpdated=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
-                            <DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>
+                            <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
+                            <DataGridComboBoxColumn Header="Platform" IsReadOnly="True"  SelectedItemBinding="{Binding TargetPlatform}" ItemsSource="{Binding Source={StaticResource platformEnum}}" />
                         </DataGrid.Columns>
 
                         <!-- right click context menu -->
@@ -357,7 +365,7 @@
                         </DataGrid.ContextMenu>
 
                         <!-- sample data for testing -->
-                        <local:Project TargetPlatform="C64" GITBranch="Best" Modified="" Title="M dfgh dfghMO" Path="A:/temp" Version="2099.1.2.3" />
+                        <local:Project TargetPlatform="win64" GITBranch="Best" Modified="" Title="M dfgh dfghMO" Path="A:/temp" Version="2099.1.2.3" />
                         <local:Project GITBranch="" Modified="" Title="asdgdfg" Path="A:/temp" Version="5.6.7f1"/>
                         <local:Project GITBranch="" Modified="" Title="Mghdfghdf dfghdfgMO" Path="A:/temp" Version="2018.3.13f1"/>
                         <local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>

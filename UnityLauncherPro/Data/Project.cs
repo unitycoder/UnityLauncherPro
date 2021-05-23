@@ -12,7 +12,8 @@ namespace UnityLauncherPro
         public DateTime? Modified { set; get; }
         public string Arguments { set; get; }
         public string GITBranch { set; get; }
-        public string TargetPlatform { set; get; }
+        //public string TargetPlatform { set; get; }
+        public Platform TargetPlatform { set; get; }
         public bool folderExists { set; get; }
         public Process Process; // launched unity exe
 
