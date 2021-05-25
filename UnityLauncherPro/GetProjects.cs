@@ -11,6 +11,9 @@ namespace UnityLauncherPro
         // which registries we want to scan for projects
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
+        static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Windows" }, { "StandaloneWindows", "Windows" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
+
+
         // TODO separate scan and folders
         public static List<Project> Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false)
         {
@@ -116,12 +119,12 @@ namespace UnityLauncherPro
                         }
 
                         // TODO add option to disable check
-                        //string targetPlatform = "";
-                        Platform targetPlatform = Platform.Unknown;
+                        string targetPlatform = "";
+                        //Platform targetPlatform = Platform.Unknown;
                         if (showTargetPlatform == true)
                         {
-                            //targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : null;
-                            targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : Platform.Unknown;
+                            targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : null;
+                            //targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : Platform.Unknown;
                         }
 
                         var p = new Project();
@@ -131,8 +134,21 @@ namespace UnityLauncherPro
                         p.Modified = lastUpdated;
                         p.Arguments = customArgs;
                         p.GITBranch = gitBranch;
+                        // TODO this one should pick best match from available platforms (since they look different: StandaloneWindows64 should be remapped as Windows)
                         //p.TargetPlatform = targetPlatform;
-                        p.TargetPlatform = targetPlatform;
+                        if (string.IsNullOrEmpty(targetPlatform) == false && remapPlatformNames.ContainsKey(targetPlatform))
+                        {
+                            p.TargetPlatform = remapPlatformNames[targetPlatform];
+                        }
+                        else
+                        {
+                                p.TargetPlatform = null;
+                        }
+
+                        // bubblegum(TM) solution, fill available platforms for this unity version, for this project
+                        p.TargetPlatforms = Tools.GetPlatformsForUnityVersion(projectVersion);
+
+
                         p.folderExists = folderExists;
 
                         // if want to hide project and folder path for screenshot

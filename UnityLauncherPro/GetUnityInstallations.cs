@@ -52,7 +52,10 @@ namespace UnityLauncherPro
 
                     // get platforms, NOTE if this is slow, do it later, or skip for commandline
                     var platforms = GetPlatforms(dataFolder);
-                    if (platforms != null) unity.Platforms = string.Join(", ", platforms);
+                    // this is for editor tab, show list of all platforms in cell
+                    if (platforms != null) unity.PlatformsCombined = string.Join(", ", platforms);
+                    // this is for keeping array of platforms for platform combobox
+                    if (platforms != null) unity.Platforms = platforms;
 
                     // add to list, if not there yet NOTE should notify that there are 2 same versions..? this might happen with preview builds..
                     if (results.Contains(unity) == true)
@@ -70,6 +73,7 @@ namespace UnityLauncherPro
             return results.ToArray();
         } // scan()
 
+        // scans unity installation folder for installed platforms
         static string[] GetPlatforms(string dataFolder)
         {
             // get all folders inside
@@ -92,6 +96,5 @@ namespace UnityLauncherPro
 
             return directories;
         }
-
     } // class
 } // namespace

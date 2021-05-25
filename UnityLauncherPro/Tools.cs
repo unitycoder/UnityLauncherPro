@@ -734,11 +734,11 @@ namespace UnityLauncherPro
             return results;
         }
 
-        public static Platform GetTargetPlatform(string projectPath)
-        //public static string GetTargetPlatform(string projectPath)
+        //public static Platform GetTargetPlatform(string projectPath)
+        public static string GetTargetPlatform(string projectPath)
         {
-            //string results = null;
-            Platform results = Platform.Unknown;
+            string results = null;
+            //Platform results = Platform.Unknown;
 
             // get buildtarget from .csproj
             // <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
@@ -761,8 +761,8 @@ namespace UnityLauncherPro
                         // 2018: standalone, Win, Win64, OSXUniversal, Linux, Linux64, LinuxUniversal, iOS, Android, Web, WebStreamed, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, N3DS, tvOS
                         // 2019: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
                         // 2020: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
-                        //results = csprojsplit[1].Substring(0, endrow);
-                        results = (Platform)Enum.Parse(typeof(Platform), csprojsplit[1].Substring(0, endrow));
+                        results = csprojsplit[1].Substring(0, endrow);
+                        //results = (Platform)Enum.Parse(typeof(Platform), csprojsplit[1].Substring(0, endrow));
                     }
                 }
             }
@@ -958,6 +958,20 @@ namespace UnityLauncherPro
         public static string GetEditorLogsFolder()
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Unity", "Editor");
+        }
+
+        public static string[] GetPlatformsForUnityVersion(string version)
+        {
+            // get platforms array for this unity version
+            // TODO use dictionary instead of looping versions
+            for (int i = 0; i < MainWindow.unityInstallationsSource.Length; i++)
+            {
+                if (MainWindow.unityInstallationsSource[i].Version == version)
+                {
+                    return MainWindow.unityInstallationsSource[i].Platforms;
+                }
+            }
+            return null;
         }
 
     } // class

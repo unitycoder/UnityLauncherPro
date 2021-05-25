@@ -38,7 +38,7 @@ namespace UnityLauncherPro
         // datagrid sources
         List<Project> projectsSource;
         Updates[] updatesSource;
-        UnityInstallation[] unityInstallationsSource;
+        public static UnityInstallation[] unityInstallationsSource;
 
         public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>(); // versionID and installation folder
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
@@ -1853,5 +1853,15 @@ namespace UnityLauncherPro
             chkEnablePlatformSelection.IsChecked = isChecked;
         }
 
+    
+        //private void CmbPlatformSelection_ManipulationInertiaStarting(object sender, ManipulationInertiaStartingEventArgs e)
+        //{
+        //    var comb = (ComboBox)sender;
+        //    Console.WriteLine(comb.Name);
+        //    comb.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+        //    comb.VerticalContentAlignment = VerticalAlignment.Center;
+        //    comb.HorizontalAlignment = HorizontalAlignment.Stretch;
+        //    comb.VerticalAlignment = VerticalAlignment.Center;
+        //}
     } // class
 } //namespace
