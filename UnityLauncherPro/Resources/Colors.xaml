@@ -47,5 +47,5 @@
 
 	<!--statusbar-->
 	<SolidColorBrush x:Key="ThemeStatusText" Color="#FF595959"/>
-
+    
 </ResourceDictionary>
