@@ -10,21 +10,11 @@
     <Window.Resources>
 
         <!--TODO cleanup unused styles for dropdown menu-->
-        <!--<Color x:Key="WindowColor">#FFE8EDF9</Color>-->
-        <!--<Color x:Key="ContentAreaColorLight">#FFC5CBF9</Color>-->
-        <!--<Color x:Key="ContentAreaColorDark">#FF7381F9</Color>-->
-        <Color x:Key="DisabledControlLightColor">#FFE8EDF9</Color>
-        <Color x:Key="DisabledControlDarkColor">#FFC5CBF9</Color>
-        <Color x:Key="DisabledForegroundColor">#FF888888</Color>
-        <Color x:Key="SelectedBackgroundColor">#FFC5CBF9</Color>
-        <Color x:Key="SelectedUnfocusedColor">#FFDDDDDD</Color>
-        <Color x:Key="ControlLightColor">White</Color>
+        <Color x:Key="ControlLightColor">Red</Color>
         <Color x:Key="ControlMediumColor">#FF7381F9</Color>
         <Color x:Key="ControlDarkColor">#FF211AA9</Color>
         <Color x:Key="ControlMouseOverColor">#FFFF0000</Color>
         <Color x:Key="ControlPressedColor">#FF211AA9</Color>
-        <!--<Color x:Key="GlyphColor">#FF444444</Color>-->
-        <!--<Color x:Key="GlyphMouseOver">sc#1, 0.004391443, 0.002428215, 0.242281124</Color>-->
         <!--Border colors-->
         <Color x:Key="BorderLightColor">#FFFF0000</Color>
         <Color x:Key="BorderMediumColor">#FF888888</Color>
@@ -40,83 +30,16 @@
         <Color x:Key="SliderTrackDarkColor">#FFC5CBF9</Color>
         <Color x:Key="NavButtonFrameColor">#FF3843C4</Color>
 
-        <LinearGradientBrush x:Key="MenuPopupBrush" EndPoint="0.5,1" StartPoint="0.5,0">
-            <GradientStop Color="{DynamicResource ControlLightColor}" Offset="0" />
-            <GradientStop Color="{DynamicResource ControlLightColor}" Offset="1" />
-        </LinearGradientBrush>
-
-        <LinearGradientBrush x:Key="ProgressBarIndicatorAnimatedFill" StartPoint="0,0" EndPoint="1,0">
-            <LinearGradientBrush.GradientStops>
-                <GradientStopCollection>
-                    <GradientStop Color="#000000FF"
-                    Offset="0" />
-                    <GradientStop Color="#600000FF"
-                    Offset="0.4" />
-                    <GradientStop Color="#600000FF"
-                    Offset="0.6" />
-                    <GradientStop Color="#000000FF"
-                    Offset="1" />
-                </GradientStopCollection>
-            </LinearGradientBrush.GradientStops>
-        </LinearGradientBrush>
-
         <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="16" />
                 </Grid.ColumnDefinitions>
-                <!--<VisualStateManager.VisualStateGroups>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
-                        <VisualState x:Name="MouseOver">
-                            <Storyboard>
-                                -->
-                <!--combobox main mouseover color effect-->
-                <!--
-                                <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)" Storyboard.TargetName="Border">
-                                    <EasingColorKeyFrame KeyTime="0" Value="{StaticResource ControlMouseOverColor}" />
-                                </ColorAnimationUsingKeyFrames>
-                            </Storyboard>
-                        </VisualState>
-                        <VisualState x:Name="Pressed" />
-                        <VisualState x:Name="Disabled">
-                            <Storyboard>
-                                <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)" Storyboard.TargetName="Border">
-                                    <EasingColorKeyFrame KeyTime="0" Value="{StaticResource DisabledControlDarkColor}" />
-                                </ColorAnimationUsingKeyFrames>
-                                <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="Arrow">
-                                    <EasingColorKeyFrame KeyTime="0" Value="{StaticResource DisabledForegroundColor}" />
-                                </ColorAnimationUsingKeyFrames>
-                                <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.BorderBrush).(GradientBrush.GradientStops)[1].(GradientStop.Color)" Storyboard.TargetName="Border">
-                                    <EasingColorKeyFrame KeyTime="0" Value="{StaticResource DisabledBorderDarkColor}" />
-                                </ColorAnimationUsingKeyFrames>
-                            </Storyboard>
-                        </VisualState>
-                    </VisualStateGroup>
-                    <VisualStateGroup x:Name="CheckStates">
-                        <VisualState x:Name="Checked">
-                            <Storyboard>
-                                <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)" Storyboard.TargetName="Border">
-                                    <EasingColorKeyFrame KeyTime="0" Value="{StaticResource ControlPressedColor}" />
-                                </ColorAnimationUsingKeyFrames>
-                            </Storyboard>
-                        </VisualState>
-                        <VisualState x:Name="Unchecked" />
-                        <VisualState x:Name="Indeterminate" />
-                    </VisualStateGroup>
-                </VisualStateManager.VisualStateGroups>-->
                 <!--combobox right edge rounding-->
                 <Border x:Name="Border" Grid.ColumnSpan="2" CornerRadius="0" BorderThickness="0" Background="{x:Null}">
-                    <!--<Border.BorderBrush>-->
-                    <!--<LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                            <GradientStop Color="{DynamicResource BorderLightColor}" Offset="0" />
-                            <GradientStop Color="{DynamicResource BorderDarkColor}" Offset="1" />
-                        </LinearGradientBrush>-->
-                    <!--</Border.BorderBrush>-->
-                    <!--dropdown style-->
                 </Border>
-                <!--combobox left edge corner rounding!-->
+                <!--combobox left edge corner rounding-->
                 <Border Grid.Column="0" CornerRadius="0" Margin="0" >
                     <Border.Background>
                         <!--main combo background-->
@@ -137,29 +60,20 @@
                     <Setter Property="Panel.Background" TargetName="Border" Value="{StaticResource ThemeDataGridRowMouseOver}" />
                 </Trigger>
             </ControlTemplate.Triggers>
-
         </ControlTemplate>
 
         <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
             <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
         </ControlTemplate>
 
-        <Style x:Key="{x:Type ComboBox}"
-       TargetType="{x:Type ComboBox}">
-            <Setter Property="SnapsToDevicePixels"
-          Value="true" />
-            <Setter Property="OverridesDefaultStyle"
-          Value="true" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
-          Value="Auto" />
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
-          Value="Auto" />
-            <Setter Property="ScrollViewer.CanContentScroll"
-          Value="true" />
-            <Setter Property="MinWidth"
-          Value="120" />
-            <Setter Property="MinHeight"
-          Value="20" />
+        <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
+            <Setter Property="MinWidth" Value="120" />
+            <Setter Property="MinHeight" Value="20" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ComboBox}">
@@ -168,14 +82,7 @@
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal" />
                                     <VisualState x:Name="MouseOver"/>
-                                    <VisualState x:Name="Disabled">
-                                        <Storyboard>
-                                            <ColorAnimationUsingKeyFrames Storyboard.TargetName="PART_EditableTextBox"
-                                                Storyboard.TargetProperty="(TextElement.Foreground).(SolidColorBrush.Color)">
-                                                <EasingColorKeyFrame KeyTime="0" Value="{StaticResource DisabledForegroundColor}" />
-                                            </ColorAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </VisualState>
+                                    <VisualState x:Name="Disabled"/>
                                 </VisualStateGroup>
                                 <VisualStateGroup x:Name="EditStates">
                                     <VisualState x:Name="Editable">
@@ -183,21 +90,15 @@
                                             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="PART_EditableTextBox">
                                                 <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
                                             </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)"
-                                                 Storyboard.TargetName="ContentSite">
-                                                <DiscreteObjectKeyFrame KeyTime="0"
-                                            Value="{x:Static Visibility.Hidden}" />
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ContentSite">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}" />
                                             </ObjectAnimationUsingKeyFrames>
                                         </Storyboard>
                                     </VisualState>
                                     <VisualState x:Name="Uneditable" />
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
-                            <ToggleButton x:Name="ToggleButton"
-                        Template="{StaticResource ComboBoxToggleButton}"
-                        Grid.Column="2"
-                        Focusable="false"
-                        ClickMode="Press"
+                            <ToggleButton x:Name="ToggleButton" Template="{StaticResource ComboBoxToggleButton}" Grid.Column="2" Focusable="false" ClickMode="Press"
                         IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
                             <ContentPresenter x:Name="ContentSite"
                             IsHitTestVisible="False"
@@ -208,16 +109,8 @@
                             VerticalAlignment="Stretch"
                             HorizontalAlignment="Left">
                             </ContentPresenter>
-                            <TextBox x:Name="PART_EditableTextBox"
-                   Style="{x:Null}"
-                   Template="{StaticResource ComboBoxTextBox}"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Bottom"
-                   Margin="3,3,23,3"
-                   Focusable="True"
-                   Background="Red"
-                   Visibility="Hidden"
-                   IsReadOnly="{TemplateBinding IsReadOnly}" />
+                            <TextBox x:Name="PART_EditableTextBox" Style="{x:Null}" Template="{StaticResource ComboBoxTextBox}" HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom" Margin="3,3,23,3" Focusable="True" Background="Red" Visibility="Hidden" IsReadOnly="{TemplateBinding IsReadOnly}" />
                             <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
                                 <Grid x:Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                     <Border x:Name="DropDownBorder" BorderThickness="1">
@@ -265,20 +158,24 @@
                                     <VisualState x:Name="Unselected" />
                                     <VisualState x:Name="Selected">
                                         <Storyboard>
-                                            --><!--combobox selected item color in dropdown --><!--
+                                            -->
+                            <!--combobox selected item color in dropdown -->
+                            <!--
                                             <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
                                                 <EasingColorKeyFrame KeyTime="0" Value="Black" />
                                             </ColorAnimationUsingKeyFrames>
                                         </Storyboard>
                                     </VisualState>
                                     <VisualState x:Name="SelectedUnfocused"/>
-                                    --><!--<VisualState x:Name="SelectedUnfocused">
+                                    -->
+                            <!--<VisualState x:Name="SelectedUnfocused">
                                         <Storyboard>
                                             <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
                                                 <EasingColorKeyFrame KeyTime="0" Value="Yellow" />
                                             </ColorAnimationUsingKeyFrames>
                                         </Storyboard>
-                                    </VisualState>--><!--
+                                    </VisualState>-->
+                            <!--
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>-->
                             <ContentPresenter />
@@ -288,7 +185,7 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="ComboBoxItem.IsMouseOver" Value="True">
                                 <Setter TargetName="Border"  Property="Background" Value="DarkBlue"></Setter>
-                                <Setter TargetName="Border"  Property="TextElement.Foreground" Value="White"></Setter>
+                                <!--<Setter TargetName="Border"  Property="TextElement.Foreground" Value="White"></Setter>-->
                             </Trigger>
                             <Trigger Property="ComboBoxItem.IsSelected" Value="True">
                                 <Setter TargetName="Border"  Property="Background" Value="{StaticResource ThemeDataGridRowSelectedBackground}"></Setter>
@@ -567,18 +464,6 @@
                         <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBox}" Height="24" />
                         <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" TextChanged="OnSearchTextChanged" PreviewKeyDown="TxtSearchBox_PreviewKeyDown" TabIndex="1" />
                         <Button x:Name="btnClearSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2"  BorderBrush="{x:Null}" Click="OnClearProjectSearchClick" IsTabStop="False">
-                            <!--<Button.Style>
-								<Style TargetType="{x:Type Button}">
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding Text, ElementName=txtSearchBox}" Value="">
-											<Setter Property="Visibility" Value="Hidden"/>
-										</DataTrigger>
-										<DataTrigger Binding="{Binding Text, ElementName=txtSearchBox}" Value="{x:Null}">
-											<Setter Property="Visibility" Value="Hidden"/>
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</Button.Style>-->
                             <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
@@ -641,22 +526,10 @@
                             <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
                             <!--<DataGridComboBoxColumn Header="Platform" IsReadOnly="False"  SelectedItemBinding="{Binding TargetPlatform}" ItemsSource="{Binding Source={StaticResource platformEnum}}" />-->
 
-                            <DataGridTemplateColumn>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <!--<ComboBox ItemsSource="{Binding Source={StaticResource platformEnum}}" DisplayMemberPath="TargetPlatform" SelectedValuePath="TargetPlatform" SelectedValue="{Binding TargetPlatform}" Height="18" />-->
-                                        <ComboBox ItemsSource="{Binding Source={StaticResource platformEnum}}" SelectedValue="{Binding TargetPlatform}" Height="18"  Foreground="{DynamicResource ThemeButtonWhiteText}">
-                                            <!--<ComboBox.ItemContainerStyle>
-                                                <Style TargetType="ComboBoxItem">
-                                                    <Setter Property="Background" Value="{StaticResource ThemeScrollBarBackground}"/>
-                                                    <Setter Property="BorderBrush" Value="{x:Null}"/>
-                                                </Style>
-                                            </ComboBox.ItemContainerStyle>-->
-                                            <!--<ComboBox.Resources>
-                                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Green"/>
-                                            </ComboBox.Resources>-->
-
-                                        </ComboBox>
+                            <DataGridTemplateColumn Header="Platform">
+                                <DataGridTemplateColumn.CellTemplate >
+                                    <DataTemplate >
+                                        <ComboBox x:Name="cmbPlatformSelection" IsEnabled="{Binding ElementName=chkEnablePlatformSelection, Path=IsChecked}" ItemsSource="{Binding Source={StaticResource platformEnum}}" SelectedValue="{Binding TargetPlatform}" Height="18"  Foreground="{DynamicResource ThemeButtonForeground}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -1015,34 +888,40 @@
                         </Button>
                     </StackPanel>
                     <!-- settings-->
-                    <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
-                        <CheckBox x:Name="chkMinimizeToTaskbar" Content="Minimize to tray" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged" Margin="0,0,0,4" ToolTip="When window is minimized, hides application into taskbar icon area" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" Margin="0,0,0,4" ToolTip="Install registry entry for Explorer context menu" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkQuitAfterOpen" Content="Close after opening project" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkQuitAfterOpen_CheckedChanged" Unchecked="ChkQuitAfterOpen_CheckedChanged" Margin="0,0,0,4" ToolTip="Closes launcher after running project (not really useful)" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkQuitAfterCommandline" Content="Close after launching from Explorer" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkQuitAfterCommandline_CheckedChanged" Checked="ChkQuitAfterCommandline_CheckedChanged" Margin="0,0,0,4" ToolTip="Close launcher after running from commandline or Explorer (recommended)" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkShowLauncherArgumentsColumn" Content="Show commandline arguments column" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" Margin="0,0,0,4" ToolTip="Shows column for custom project commandline params" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkShowGitBranchColumn" Content="Show git branch column" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged" Margin="0,0,0,4" ToolTip="Shows column for project git branch info" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkShowMissingFolderProjects" Content="Show projects that don't exist on disk" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" Margin="0,0,0,4" ToolTip="List in recent projects, even if the project folder is missing" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkAllowSingleInstanceOnly" Content="Allow single instance only" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkAllowSingleInstanceOnly_CheckedChanged" Unchecked="ChkAllowSingleInstanceOnly_CheckedChanged" Margin="0,0,0,4" ToolTip="Activates already running instance, instead of starting new exe (not working if app is minized to taskbar)" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkEnableProjectRename" Content="Enable Project Rename F2 (Not recommended for beginners)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Can use F2 to rename project folders, Note that project will disappears from list on refresh, unless you open it (since its new path, not in unity recent projects registry)" Checked="ChkEnableProjectRename_Checked" Unchecked="ChkEnableProjectRename_Checked" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" Margin="0,0,0,4" ToolTip="If disabled, uses automatic quick project naming" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkStreamerMode" Content="Streamer Mode (hide project names and folders)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Hide project names and folders in main view" Checked="ChkStreamerMode_Checked" Unchecked="ChkStreamerMode_Checked" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="chkShowPlatform" Content="Show current target platform (if exists in .csproj)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Shows target platform column" Checked="ChkShowPlatform_Checked" Unchecked="ChkShowPlatform_Checked" HorizontalAlignment="Left"/>
-                        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                            <CheckBox x:Name="chkUseCustomTheme" Content="Load custom theme" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Loads theme.ini from application folder" Checked="ChkUseCustomTheme_Checked" Unchecked="ChkUseCustomTheme_Checked" HorizontalAlignment="Left"/>
-                            <TextBox x:Name="txtCustomThemeFile" MinWidth="128" ToolTip="Default is theme.ini" Padding="0,3,0,0" Margin="5,0,0,0" Text="theme.ini" LostFocus="TxtCustomThemeFile_LostFocus" PreviewKeyDown="TxtCustomThemeFile_PreviewKeyDown" />
-                            <Button Style="{StaticResource CustomButton}" ToolTip="Reload theme" x:Name="btnReloadTheme" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnReloadTheme_Click" Margin="5,0,0,0"/>
-                            <Button Style="{StaticResource CustomButton}" ToolTip="Explore folder.." x:Name="btnExploreFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnExploreFolder_Click" Margin="5,0,0,0"/>
-                        </StackPanel>
+                    <StackPanel Grid.Row="3" Orientation="Horizontal">
+                        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
+                            <CheckBox x:Name="chkMinimizeToTaskbar" Content="Minimize to tray" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged" Margin="0,0,0,4" ToolTip="When window is minimized, hides application into taskbar icon area" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" Margin="0,0,0,4" ToolTip="Install registry entry for Explorer context menu" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkQuitAfterOpen" Content="Close after opening project" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkQuitAfterOpen_CheckedChanged" Unchecked="ChkQuitAfterOpen_CheckedChanged" Margin="0,0,0,4" ToolTip="Closes launcher after running project (not really useful)" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkQuitAfterCommandline" Content="Close after launching from Explorer" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkQuitAfterCommandline_CheckedChanged" Checked="ChkQuitAfterCommandline_CheckedChanged" Margin="0,0,0,4" ToolTip="Close launcher after running from commandline or Explorer (recommended)" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkShowLauncherArgumentsColumn" Content="Show commandline arguments column" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" Margin="0,0,0,4" ToolTip="Shows column for custom project commandline params" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkShowGitBranchColumn" Content="Show git branch column" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged" Margin="0,0,0,4" ToolTip="Shows column for project git branch info" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkShowMissingFolderProjects" Content="Show projects that don't exist on disk" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" Margin="0,0,0,4" ToolTip="List in recent projects, even if the project folder is missing" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkAllowSingleInstanceOnly" Content="Allow single instance only" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkAllowSingleInstanceOnly_CheckedChanged" Unchecked="ChkAllowSingleInstanceOnly_CheckedChanged" Margin="0,0,0,4" ToolTip="Activates already running instance, instead of starting new exe (not working if app is minized to taskbar)" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkEnableProjectRename" Content="Enable Project Rename F2 (Not recommended for beginners)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Can use F2 to rename project folders, Note that project will disappears from list on refresh, unless you open it (since its new path, not in unity recent projects registry)" Checked="ChkEnableProjectRename_Checked" Unchecked="ChkEnableProjectRename_Checked" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" Margin="0,0,0,4" ToolTip="If disabled, uses automatic quick project naming" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkStreamerMode" Content="Streamer Mode (hide project names and folders)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Hide project names and folders in main view" Checked="ChkStreamerMode_Checked" Unchecked="ChkStreamerMode_Checked" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkShowPlatform" Content="Show current target platform (if exists in .csproj)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Shows target platform column" Checked="ChkShowPlatform_Checked" Unchecked="ChkShowPlatform_Checked" HorizontalAlignment="Left"/>
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
+                                <CheckBox x:Name="chkUseCustomTheme" Content="Load custom theme" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Loads theme.ini from application folder" Checked="ChkUseCustomTheme_Checked" Unchecked="ChkUseCustomTheme_Checked" HorizontalAlignment="Left"/>
+                                <TextBox x:Name="txtCustomThemeFile" MinWidth="128" ToolTip="Default is theme.ini" Padding="0,3,0,0" Margin="5,0,0,0" Text="theme.ini" LostFocus="TxtCustomThemeFile_LostFocus" PreviewKeyDown="TxtCustomThemeFile_PreviewKeyDown" />
+                                <Button Style="{StaticResource CustomButton}" ToolTip="Reload theme" x:Name="btnReloadTheme" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnReloadTheme_Click" Margin="5,0,0,0"/>
+                                <Button Style="{StaticResource CustomButton}" ToolTip="Explore folder.." x:Name="btnExploreFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnExploreFolder_Click" Margin="5,0,0,0"/>
+                            </StackPanel>
 
-                        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                            <TextBox x:Name="txtRootFolderForNewProjects" MinWidth="300" ToolTip="When you click &quot;Create Project&quot; in main page, new project is generated under this path+UnityVersion (eg. /2017a/)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
-                            <Button x:Name="btnBrowseProjectRootFolder" Content="..." Margin="6,0,0,0" MinWidth="32" Click="BtnBrowseProjectRootFolder_Click" />
-                            <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ThemeButtonForeground}" />
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBox x:Name="txtRootFolderForNewProjects" MinWidth="300" ToolTip="When you click &quot;Create Project&quot; in main page, new project is generated under this path+UnityVersion (eg. /2017a/)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
+                                <Button x:Name="btnBrowseProjectRootFolder" Content="..." Margin="6,0,0,0" MinWidth="32" Click="BtnBrowseProjectRootFolder_Click" />
+                                <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ThemeButtonForeground}" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                                <TextBox x:Name="txtWebglRelativePath" MinWidth="200" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. Used for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
+                                <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ThemeButtonForeground}" />
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Grid.Row="3" Orientation="Horizontal">
-                            <TextBox x:Name="txtWebglRelativePath" MinWidth="200" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. Used for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
-                            <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ThemeButtonForeground}" />
+                        
+                        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
+                            <CheckBox x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Not working yet!)" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" Margin="0,0,0,4" ToolTip="" HorizontalAlignment="Left"/>
                         </StackPanel>
                     </StackPanel>
 

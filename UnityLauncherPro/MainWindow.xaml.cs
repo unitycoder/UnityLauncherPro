@@ -274,6 +274,8 @@ namespace UnityLauncherPro
             themefile = Properties.Settings.Default.themeFile;
             txtCustomThemeFile.Text = themefile;
 
+            chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
+
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
             gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -1230,6 +1232,7 @@ namespace UnityLauncherPro
             {
                 // get current arguments, after editing
                 var t = e.EditingElement as ComboBox;
+                if (t == null) return;
                 string newcellValue = t.SelectedItem.ToString();
 
                 Console.WriteLine("Modified platform target: " + newcellValue);
@@ -1841,5 +1844,14 @@ namespace UnityLauncherPro
         {
             Tools.LaunchExplorer(System.AppDomain.CurrentDomain.BaseDirectory);
         }
+
+        private void ChkEnablePlatformSelection_Checked(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+            Properties.Settings.Default.enablePlatformSelection = isChecked;
+            Properties.Settings.Default.Save();
+            chkEnablePlatformSelection.IsChecked = isChecked;
+        }
+
     } // class
 } //namespace

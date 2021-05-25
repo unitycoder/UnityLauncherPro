@@ -275,5 +275,17 @@ namespace UnityLauncherPro.Properties {
                 this["themeFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enablePlatformSelection {
+            get {
+                return ((bool)(this["enablePlatformSelection"]));
+            }
+            set {
+                this["enablePlatformSelection"] = value;
+            }
+        }
     }
 }
