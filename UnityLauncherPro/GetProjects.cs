@@ -143,7 +143,7 @@ namespace UnityLauncherPro
                         }
                         else
                         {
-                            Console.WriteLine("Missing buildTarget remap name for: "+ targetPlatform);
+                            if (string.IsNullOrEmpty(targetPlatform) == false) Console.WriteLine("Missing buildTarget remap name for: " + targetPlatform);
                             p.TargetPlatform = null;
                         }
 
