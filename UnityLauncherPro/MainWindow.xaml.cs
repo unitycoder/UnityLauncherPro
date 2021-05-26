@@ -1632,8 +1632,6 @@ namespace UnityLauncherPro
                 return;
             }
 
-            //Console.WriteLine("buildreport at " + startRow + " - " + endRow);
-
             var reportSource = new BuildReport[endRow - startRow];
 
             // get report rows
