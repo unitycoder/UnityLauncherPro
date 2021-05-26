@@ -191,6 +191,14 @@ namespace UnityLauncherPro
                     unitycommandlineparameters += " " + customArguments;
                 }
 
+                string projTargetPlatform = proj.TargetPlatform;
+                if (string.IsNullOrEmpty(projTargetPlatform) == false)
+                {
+                    unitycommandlineparameters += " -buildTarget " + projTargetPlatform;
+                }
+
+                Console.WriteLine("Start process: " + cmd + " " + unitycommandlineparameters);
+
                 newProcess.StartInfo.Arguments = unitycommandlineparameters;
                 newProcess.Start();
 
@@ -761,6 +769,7 @@ namespace UnityLauncherPro
                         // 2018: standalone, Win, Win64, OSXUniversal, Linux, Linux64, LinuxUniversal, iOS, Android, Web, WebStreamed, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, N3DS, tvOS
                         // 2019: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
                         // 2020: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
+                        // 2021: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
                         results = csprojsplit[1].Substring(0, endrow);
                         //results = (Platform)Enum.Parse(typeof(Platform), csprojsplit[1].Substring(0, endrow));
                     }

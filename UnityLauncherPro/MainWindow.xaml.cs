@@ -1853,7 +1853,17 @@ namespace UnityLauncherPro
             chkEnablePlatformSelection.IsChecked = isChecked;
         }
 
-    
+        private void CmbPlatformSelection_DropDownClosed(object sender, EventArgs e)
+        {
+            // TODO need to handle if user initially selects the null row
+            if (sender == null) return;
+            // get current platform, set it to selected project data
+            var cmb = (ComboBox)sender;
+            //Console.WriteLine(cmb.SelectedValue);
+            var p = GetSelectedProject();
+            p.TargetPlatform = cmb.SelectedValue.ToString();
+        }
+
         //private void CmbPlatformSelection_ManipulationInertiaStarting(object sender, ManipulationInertiaStartingEventArgs e)
         //{
         //    var comb = (ComboBox)sender;

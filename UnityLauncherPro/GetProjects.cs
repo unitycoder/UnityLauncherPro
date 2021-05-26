@@ -11,8 +11,8 @@ namespace UnityLauncherPro
         // which registries we want to scan for projects
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
-        static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Windows" }, { "StandaloneWindows", "Windows" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
-
+        // convert target platform name into valid buildtarget platform name, NOTE this depends on unity version, now only 2019 and later are supported
+        static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Standalone" }, { "StandaloneWindows", "Standalone" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
 
         // TODO separate scan and folders
         public static List<Project> Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false)
@@ -134,20 +134,21 @@ namespace UnityLauncherPro
                         p.Modified = lastUpdated;
                         p.Arguments = customArgs;
                         p.GITBranch = gitBranch;
-                        // TODO this one should pick best match from available platforms (since they look different: StandaloneWindows64 should be remapped as Windows)
                         //p.TargetPlatform = targetPlatform;
+                        //Console.WriteLine("targetPlatform="+ targetPlatform);
+                        // get matching buildtarget platform name from dictionary
                         if (string.IsNullOrEmpty(targetPlatform) == false && remapPlatformNames.ContainsKey(targetPlatform))
                         {
                             p.TargetPlatform = remapPlatformNames[targetPlatform];
                         }
                         else
                         {
-                                p.TargetPlatform = null;
+                            Console.WriteLine("Missing buildTarget remap name for: "+ targetPlatform);
+                            p.TargetPlatform = null;
                         }
 
                         // bubblegum(TM) solution, fill available platforms for this unity version, for this project
                         p.TargetPlatforms = Tools.GetPlatformsForUnityVersion(projectVersion);
-
 
                         p.folderExists = folderExists;
 
