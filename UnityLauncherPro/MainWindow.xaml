@@ -889,7 +889,7 @@
                         </StackPanel>
                         
                         <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
-                            <CheckBox x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Not working yet!)" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" Margin="0,0,0,4" ToolTip="" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Experimental!)" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" Margin="0,0,0,4" ToolTip="" HorizontalAlignment="Left"/>
                         </StackPanel>
                     </StackPanel>
 

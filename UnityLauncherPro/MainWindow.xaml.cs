@@ -1126,13 +1126,9 @@ namespace UnityLauncherPro
 
             // check that folder exists
             string path = proj.Path;
-            Console.WriteLine(e.Column.DisplayIndex);
-            Console.WriteLine(path);
-            Console.WriteLine(string.IsNullOrEmpty(path));
             if (string.IsNullOrEmpty(path))
             {
-
-                //return;
+                return;
             }
 
             // check if we edited project name, or launcher arguments
