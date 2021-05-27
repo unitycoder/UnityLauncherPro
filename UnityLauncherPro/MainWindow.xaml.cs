@@ -1849,13 +1849,19 @@ namespace UnityLauncherPro
 
         private void CmbPlatformSelection_DropDownClosed(object sender, EventArgs e)
         {
-            // TODO need to handle if user initially selects the null row
             if (sender == null) return;
-            // get current platform, set it to selected project data
-            var cmb = (ComboBox)sender;
-            //Console.WriteLine(cmb.SelectedValue);
-            var p = GetSelectedProject();
-            p.TargetPlatform = cmb.SelectedValue.ToString();
+            try
+            {
+                // get current platform, set it to selected project data
+                var cmb = (ComboBox)sender;
+                //Console.WriteLine(cmb.SelectedValue);
+                var p = GetSelectedProject();
+                if (p != null) p.TargetPlatform = cmb.SelectedValue.ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         //private void CmbPlatformSelection_ManipulationInertiaStarting(object sender, ManipulationInertiaStartingEventArgs e)
