@@ -19,11 +19,8 @@ Handle all your Unity versions and Projects easily!
 - Option to show missing projects in the list (if folder was removed)
 - 1-Click Start ADB Logcat with colors in command prompt
 - 1-Click browse editor log folder, crash logs folder, browse asset downloads folder, browse player logs folder
-- Easy Project version string copy (ctrl+c in selected project row or right click context menu)
-- Optional: Quick Project folder rename with F2
-- Quick Unity Editor Process Kill (alt+q in selected project row or right click context menu)
-- 1-Click start web server and launch WebGL build in browser
-- 1-Click browse project Application.persistentDataPath for selected project
+- Quick Unity Editor Process Kill (press ALT+Q in the selected project row or right click context menu)
+- 1-Click start web server and launch WebGL build in browser for selected project
 - Custom skin color themes
 - And more: https://github.com/unitycoder/UnityLauncherPro/wiki/Launcher-Comparison
 
