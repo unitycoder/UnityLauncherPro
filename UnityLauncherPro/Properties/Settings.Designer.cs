@@ -287,5 +287,17 @@ namespace UnityLauncherPro.Properties {
                 this["enablePlatformSelection"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool runAutomatically {
+            get {
+                return ((bool)(this["runAutomatically"]));
+            }
+            set {
+                this["runAutomatically"] = value;
+            }
+        }
     }
 }

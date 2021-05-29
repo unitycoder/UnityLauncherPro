@@ -24,7 +24,7 @@ namespace UnityLauncherPro
     public partial class MainWindow : Window
     {
         private System.Windows.Forms.NotifyIcon notifyIcon;
-        const string appName = "UnityLauncherPro";
+        public const string appName = "UnityLauncherPro";
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
         static extern IntPtr FindWindow(string cls, string win);
@@ -275,6 +275,7 @@ namespace UnityLauncherPro
             txtCustomThemeFile.Text = themefile;
 
             chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
+            chkRunAutomatically.IsChecked = Properties.Settings.Default.runAutomatically;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -1862,6 +1863,17 @@ namespace UnityLauncherPro
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private void ChkRunAutomatically_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+            Properties.Settings.Default.runAutomatically = isChecked;
+            Properties.Settings.Default.Save();
+            chkRunAutomatically.IsChecked = isChecked;
+            // set or unset registry, NOTE should not do this on debug build.. (otherwise 2 builds try to run?)
+            Tools.SetStartupRegistry(isChecked);
         }
 
         //private void CmbPlatformSelection_ManipulationInertiaStarting(object sender, ManipulationInertiaStartingEventArgs e)

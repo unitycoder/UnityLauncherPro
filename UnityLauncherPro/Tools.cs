@@ -983,5 +983,19 @@ namespace UnityLauncherPro
             return null;
         }
 
+        // https://stackoverflow.com/a/675347/5452781
+        public static void SetStartupRegistry(bool state)
+        {
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            if (state == true)
+            {
+                rk.SetValue(MainWindow.appName, "\"" + Process.GetCurrentProcess().MainModule.FileName + "\"");
+            }
+            else
+            {
+                rk.DeleteValue(MainWindow.appName, false);
+            }
+        }
+
     } // class
 } // namespace
