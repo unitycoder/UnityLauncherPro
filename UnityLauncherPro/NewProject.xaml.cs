@@ -67,6 +67,15 @@ namespace UnityLauncherPro
         {
             switch (e.Key)
             {
+                case Key.Tab:
+                    // manually tab into next component (automatic tabstops not really working here)
+                    TraversalRequest tRequest = new TraversalRequest(FocusNavigationDirection.Next);
+                    UIElement keyboardFocus = Keyboard.FocusedElement as UIElement;
+                    if (keyboardFocus != null)
+                    {
+                        keyboardFocus.MoveFocus(tRequest);
+                    }
+                    break;
                 case Key.Oem5:  // select next template §-key
                     cmbNewProjectTemplate.SelectedIndex = ++cmbNewProjectTemplate.SelectedIndex % cmbNewProjectTemplate.Items.Count;
                     e.Handled = true; // override writing to textbox
