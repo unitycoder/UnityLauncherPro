@@ -34,7 +34,7 @@ https://github.com/unitycoder/UnityLauncherPro/wiki
 ### Development
 See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro/tree/dev
 
-### Screenshots (older version)
+### Screenshots
 
 ![image](https://user-images.githubusercontent.com/5438317/71485879-184b3a00-281c-11ea-97db-73c5dfa9bb4e.png)
 
@@ -45,6 +45,12 @@ See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro
 ![image](https://user-images.githubusercontent.com/5438317/120828346-19ca7700-c565-11eb-9430-89420cf15caa.png)
 
 ![image](https://user-images.githubusercontent.com/5438317/120828355-1c2cd100-c565-11eb-9fee-bc77112b8d16.png)
+
+![image](https://user-images.githubusercontent.com/5438317/120828528-4da59c80-c565-11eb-8b11-9cf739cde306.png)
+
+![image](https://user-images.githubusercontent.com/5438317/120828565-58603180-c565-11eb-9cf3-0e3738a7dc95.png)
+
+![image](https://user-images.githubusercontent.com/5438317/120828587-5e561280-c565-11eb-876d-54b72aed88c9.png)
 
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
