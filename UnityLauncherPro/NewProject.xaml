@@ -33,7 +33,7 @@
         <!--TODO move to styles-->
         <!-- datagrid rows & row selection -->
         <Style TargetType="DataGridRow">
-            <Setter Property="Background" Value="{StaticResource ThemeButtonBackground}" />
+            <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}" />
             <Setter Property="BorderBrush" Value="{x:Null}" />
             <Setter Property="BorderThickness" Value="0,0,0,0" />
             <Style.Triggers>
@@ -41,7 +41,7 @@
 					<Setter Property="Background" Value="{StaticResource DataGridRowMouseOver}"/>
 				</Trigger>-->
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource ThemeDataGridRowSelectedBackground}" />
+                    <Setter Property="Background" Value="{DynamicResource ThemeDataGridRowSelectedBackground}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -78,10 +78,10 @@
                         <ControlTemplate.Triggers>
                             <!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeTextBoxBackground}" />
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeTextBoxBackground}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollArrowPressed}" />
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollArrowPressed}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="false">
                                 <Setter Property="Foreground" Value="Black"/>
@@ -118,7 +118,7 @@
                         <Border Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollBarThumbFill}" />
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollBarThumbFill}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

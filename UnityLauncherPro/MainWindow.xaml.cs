@@ -1752,7 +1752,7 @@ namespace UnityLauncherPro
 
             //Console.WriteLine("Load theme: " + themefile);
 
-            if (File.Exists(themefile))
+            if (File.Exists(themefile) == true)
             {
                 var colors = File.ReadAllLines(themefile);
 
@@ -1769,6 +1769,7 @@ namespace UnityLauncherPro
                     // parse color
                     try
                     {
+                        //Console.WriteLine(row[0] +"="+ row[1].Trim());
                         var col = new BrushConverter().ConvertFrom(row[1].Trim());
                         // apply color
                         Application.Current.Resources[row[0]] = (SolidColorBrush)col;
@@ -1792,6 +1793,8 @@ namespace UnityLauncherPro
 
         private void ChkUseCustomTheme_Checked(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             var isChecked = (bool)((CheckBox)sender).IsChecked;
             Properties.Settings.Default.useCustomTheme = isChecked;
             Properties.Settings.Default.Save();

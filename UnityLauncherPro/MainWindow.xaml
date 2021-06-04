@@ -36,7 +36,7 @@
             <!--mouseover combobox main-->
             <ControlTemplate.Triggers>
                 <Trigger Property="UIElement.IsMouseOver" Value="True">
-                    <Setter Property="Panel.Background" TargetName="Border" Value="{StaticResource ThemeDataGridRowMouseOver}" />
+                    <Setter Property="Panel.Background" TargetName="Border" Value="{DynamicResource ThemeDataGridRowMouseOver}" />
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -155,7 +155,7 @@
                                 <Setter TargetName="Border"  Property="Background" Value="DarkBlue"></Setter>
                             </Trigger>
                             <Trigger Property="ComboBoxItem.IsSelected" Value="True">
-                                <Setter TargetName="Border"  Property="Background" Value="{StaticResource ThemeDataGridRowSelectedBackground}"></Setter>
+                                <Setter TargetName="Border"  Property="Background" Value="{DynamicResource ThemeDataGridRowSelectedBackground}"></Setter>
                                 <Setter TargetName="Border"  Property="TextElement.Foreground" Value="White"></Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -187,15 +187,15 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="False">
-                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{StaticResource ThemeDeactiveTabForeground}"/>
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeDeactiveTabBackground}" />
+                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource ThemeDeactiveTabForeground}"/>
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeDeactiveTabBackground}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{StaticResource ThemeButtonWhiteText}"/>
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeMainBackgroundColor}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource ThemeButtonWhiteText}"/>
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeMainBackgroundColor}"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeMainBackgroundColor}"/>
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeMainBackgroundColor}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -205,9 +205,9 @@
 
         <!-- datagrid header -->
         <Style x:Key="HeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
-            <Setter Property="Background" Value="{StaticResource ThemeDatagridHeaderBackground}" />
-            <Setter Property="Foreground" Value="{StaticResource ThemeDatagridHeaderForeground}" />
-            <Setter Property="BorderBrush" Value="{StaticResource ThemeDatagridHeaderBorder}" />
+            <Setter Property="Background" Value="{DynamicResource ThemeDatagridHeaderBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource ThemeDatagridHeaderForeground}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeDatagridHeaderBorder}" />
             <Setter Property="BorderThickness" Value="0,0,1,1" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -215,22 +215,22 @@
             <Setter Property="Padding" Value="6,2,2,2" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource ThemeButtonBackground}"/>
+                    <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <!-- datagrid rows & row selection -->
         <Style TargetType="{x:Type DataGridRow}">
-            <Setter Property="Background" Value="{StaticResource ThemeButtonBackground}" />
+            <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}" />
             <Setter Property="BorderBrush" Value="{x:Null}" />
             <Setter Property="BorderThickness" Value="0,0,0,0" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource ThemeDataGridRowMouseOver}"/>
+                    <Setter Property="Background" Value="{DynamicResource ThemeDataGridRowMouseOver}"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource ThemeDataGridRowSelectedBackground}" />
+                    <Setter Property="Background" Value="{DynamicResource ThemeDataGridRowSelectedBackground}" />
                 </Trigger>
             </Style.Triggers>
             <Style.Resources>
@@ -271,15 +271,15 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="{StaticResource ThemeButtonForegroundDisabled}" />
+                                <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForegroundDisabled}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="Background" Value="{StaticResource ThemeButtonBackgroundMouseOver}" />
-                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{StaticResource ThemeButtonWhiteText}"/>
+                                <Setter TargetName="shortcutbutton" Property="Background" Value="{DynamicResource ThemeButtonBackgroundMouseOver}" />
+                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{DynamicResource ThemeButtonWhiteText}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="Background" Value="{StaticResource ThemeButtonBackgroundPressed}" />
-                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{StaticResource ThemeButtonWhiteText}"/>
+                                <Setter TargetName="shortcutbutton" Property="Background" Value="{DynamicResource ThemeButtonBackgroundPressed}" />
+                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{DynamicResource ThemeButtonWhiteText}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -303,13 +303,13 @@
                         <ControlTemplate.Triggers>
                             <!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeTextBoxBackground}" />
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeTextBoxBackground}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollArrowPressed}" />
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollArrowPressed}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Foreground" Value="{StaticResource ThemeScrollBarEnabledForeground}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource ThemeScrollBarEnabledForeground}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -343,7 +343,7 @@
                         <Border x:Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollBarThumbFill}" />
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollBarThumbFill}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -464,10 +464,10 @@
                             <DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" Width="72">
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
-                                        <Setter Property="Foreground" Value="{StaticResource ThemeGridRedText}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource ThemeGridRedText}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Version, Converter={StaticResource VersionInstalledConverter}}" Value="true">
-                                                <Setter Property="Foreground" Value="{StaticResource ThemeGridGreenText}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource ThemeGridGreenText}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -479,7 +479,7 @@
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding folderExists, Converter={StaticResource ProjectExistsConverter}}" Value="false">
-                                                <Setter Property="Foreground" Value="{StaticResource ThemeGridRedText}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource ThemeGridRedText}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -720,7 +720,7 @@
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Version, Converter={StaticResource VersionInstalledConverter}}" Value="true">
-                                                <Setter Property="Foreground" Value="{StaticResource ThemeGridGreenText}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource ThemeGridGreenText}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
