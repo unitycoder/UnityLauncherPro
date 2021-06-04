@@ -35,8 +35,7 @@ namespace UnityLauncherPro
                 gridAvailableVersions.ScrollIntoView(item);
             }
 
-            // scan available templates, TODO should cache this at least per session?
-            cmbNewProjectTemplate.ItemsSource = Tools.ScanTemplates(item.Value);
+            UpdateTemplatesDropDown(item.Value);
 
             // select projectname text so can overwrite if needed
             txtNewProjectName.Focus();
@@ -44,6 +43,13 @@ namespace UnityLauncherPro
             newProjectName = txtNewProjectName.Text;
         }
 
+        void UpdateTemplatesDropDown(string unityPath)
+        {
+            // scan available templates, TODO could cache this at least per session?
+            cmbNewProjectTemplate.ItemsSource = Tools.ScanTemplates(unityPath);
+            cmbNewProjectTemplate.SelectedIndex = 0;
+            lblTemplateTitleAndCount.Content = "Template: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
+        }
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
             templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
@@ -61,6 +67,10 @@ namespace UnityLauncherPro
         {
             switch (e.Key)
             {
+                case Key.Oem5:  // select next template §-key
+                    cmbNewProjectTemplate.SelectedIndex = ++cmbNewProjectTemplate.SelectedIndex % cmbNewProjectTemplate.Items.Count;
+                    e.Handled = true; // override writing to textbox
+                    break;
                 case Key.Enter: // enter accept
                     UpdateSelectedVersion();
                     DialogResult = true;
@@ -117,6 +127,8 @@ namespace UnityLauncherPro
             var k = gridAvailableVersions.SelectedItem as KeyValuePair<string, string>?;
             newVersion = k.Value.Key;
             GenerateNewName();
+            // update templates list for selected unity version
+            UpdateTemplatesDropDown(k.Value.Value);
         }
 
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
