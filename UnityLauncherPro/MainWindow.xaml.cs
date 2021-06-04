@@ -1396,7 +1396,7 @@ namespace UnityLauncherPro
                     Console.WriteLine("Create project " + NewProject.newVersion + " : " + projectPath);
                     if (string.IsNullOrEmpty(projectPath)) return;
 
-                    Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName);
+                    Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath);
                 }
                 else // false, cancel
                 {

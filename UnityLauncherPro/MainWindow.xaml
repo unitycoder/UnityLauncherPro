@@ -59,7 +59,7 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Center" />
-            
+
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ComboBox}">
@@ -141,7 +141,7 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Center" />-->
-            
+
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ComboBoxItem}">
@@ -887,7 +887,7 @@
                                 <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ThemeButtonForeground}" />
                             </StackPanel>
                         </StackPanel>
-                        
+
                         <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
                             <CheckBox x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Experimental!)" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" Margin="0,0,0,4" ToolTip="" HorizontalAlignment="Left"/>
                             <CheckBox x:Name="chkRunAutomatically" Content="Run this app automatically on startup" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="" HorizontalAlignment="Left" Checked="ChkRunAutomatically_Checked" Unchecked="ChkRunAutomatically_Checked"/>

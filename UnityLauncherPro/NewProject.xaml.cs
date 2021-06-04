@@ -11,6 +11,7 @@ namespace UnityLauncherPro
         public static string newProjectName = null;
         public static string newVersion = null;
         public static string newName = null;
+        public static string templateZipPath = null;
 
         public NewProject(string unityVersion, string suggestedName, string targetFolder)
         {
@@ -45,6 +46,7 @@ namespace UnityLauncherPro
 
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
+            templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
             UpdateSelectedVersion();
             DialogResult = true;
         }

@@ -877,7 +877,7 @@ namespace UnityLauncherPro
             return null;
         }
 
-        public static void FastCreateProject(string version, string baseFolder, string projectName = null)
+        public static void FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null)
         {
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
@@ -914,6 +914,12 @@ namespace UnityLauncherPro
 
             // create folder
             CreateEmptyProjectFolder(newPath, version);
+
+            // unzip template, if any
+            if (templateZipPath != null)
+            {
+                TarLib.Tar.ExtractTarGz(templateZipPath, newPath);
+            }
 
             // launch empty project
             var proj = new Project();
@@ -1010,7 +1016,7 @@ namespace UnityLauncherPro
             if (Directory.Exists(templateFolder) == false) return items;
 
             var fileEntries = Directory.GetFiles(templateFolder).ToList();
-            
+
             // process found files
             for (int i = fileEntries.Count - 1; i > -1; i--)
             {
@@ -1023,7 +1029,6 @@ namespace UnityLauncherPro
                 {
                     // cleanup name
                     var name = Path.GetFileName(fileEntries[i]).Replace("com.unity.template.", "").Replace(".tgz", "");
-
                     items.Add(name, fileEntries[i]);
                 }
             }

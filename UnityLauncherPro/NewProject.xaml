@@ -71,9 +71,9 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type RepeatButton}">
                         <!-- button background -->
-                        <Border Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="{DynamicResource ButtonBackground}" BorderBrush="{x:Null}">
+                        <Border Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="{DynamicResource ThemeButtonBackground}" BorderBrush="{x:Null}">
                             <!-- arrow sign -->
-                            <Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ScrollArrowForeground}" Data="{Binding Path=Content,RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ThemeScrollArrowForeground}" Data="{Binding Path=Content,RelativeSource={RelativeSource TemplatedParent}}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
@@ -134,7 +134,7 @@
                     <RowDefinition MaxHeight="18"/>
                 </Grid.RowDefinitions>
                 <!-- scrollbar background -->
-                <Border Grid.RowSpan="3" CornerRadius="0" Background="{DynamicResource ScrollBarBackground}" />
+                <Border Grid.RowSpan="3" CornerRadius="0" Background="{DynamicResource ThemeScrollBarBackground}" />
                 <!-- scrollbar top button -->
                 <RepeatButton Grid.Row="0" Style="{StaticResource ScrollBarLineButton}" Height="18" Command="ScrollBar.LineUpCommand"  Content="M 0 4 L 8 4 L 4 0 Z" />
                 <Track Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
@@ -143,7 +143,7 @@
                     </Track.DecreaseRepeatButton>
                     <Track.Thumb>
                         <!-- scrollbar foreground -->
-                        <Thumb Style="{StaticResource ScrollBarThumb}" Margin="1,0,1,0" Background="{DynamicResource ScrollBarFill}" BorderBrush="{x:Null}"/>
+                        <Thumb Style="{StaticResource ScrollBarThumb}" Margin="1,0,1,0" Background="{DynamicResource ThemeScrollBarFill}" BorderBrush="{x:Null}"/>
                     </Track.Thumb>
                     <Track.IncreaseRepeatButton>
                         <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageDownCommand" />
@@ -171,10 +171,18 @@
     <Grid>
         <StackPanel Margin="10,3">
             <Label Content="Unity Version " Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
-            <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" Height="120" Margin="3,0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="1" KeyboardNavigation.TabNavigation = "None" Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False">
+            <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" Height="120" Margin="3,0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="1" KeyboardNavigation.TabNavigation = "None" Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" CanUserResize="False" MinWidth="300" />
                 </DataGrid.Columns>
+                <!--<local:Project GITBranch="" Modified="" Title="dfgh" Path="A:/temp" Version="5.6.7f1"/>
+                <local:Project GITBranch="" Modified="" Title="dfgh" Path="A:/temp" Version="5.6.7f1"/>
+                <local:Project GITBranch="" Modified="" Title="dfgh" Path="A:/temp" Version="5.6.7f1"/>
+                <local:Project GITBranch="" Modified="" Title="dfgh" Path="A:/temp" Version="5.6.7f1"/>
+                <local:Project GITBranch="" Modified="" Title="dfgh" Path="A:/temp" Version="5.6.7f1"/>
+                <local:Project GITBranch="" Modified="" Title="dfgh" Path="A:/temp" Version="5.6.7f1"/>
+                <local:Project GITBranch="" Modified="" Title="dfgh" Path="A:/temp" Version="5.6.7f1"/>
+                <local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2018.3.13f1"/>-->
             </DataGrid>
 
 
@@ -187,7 +195,7 @@
                 <Label Grid.Column="0" Content="Project Name:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="5,5,5,0" />
                 <Label Grid.Column="2" Content="Template:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="5,5,5,0" />
             </Grid>
-            
+
             <Grid HorizontalAlignment="Stretch" Margin="0,3,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="60*"/>
