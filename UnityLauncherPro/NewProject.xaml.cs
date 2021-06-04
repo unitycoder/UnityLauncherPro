@@ -34,6 +34,9 @@ namespace UnityLauncherPro
                 gridAvailableVersions.ScrollIntoView(item);
             }
 
+            // scan available templates, TODO should cache this at least per session?
+            cmbNewProjectTemplate.ItemsSource = Tools.ScanTemplates(item.Value);
+
             // select projectname text so can overwrite if needed
             txtNewProjectName.Focus();
             txtNewProjectName.SelectAll();
