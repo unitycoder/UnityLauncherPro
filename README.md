@@ -22,6 +22,7 @@ Handle all your Unity versions and Projects easily!
 - Quick Unity Editor Process Kill (press ALT+Q in the selected project row or right click context menu)
 - 1-Click start web server and launch WebGL build in browser for selected project
 - Custom skin color themes
+- Select template for new project (template based on selected unity version)
 - And more: https://github.com/unitycoder/UnityLauncherPro/wiki/Launcher-Comparison
 
 ### Forum Thread
@@ -29,6 +30,9 @@ https://forum.unity.com/threads/unity-launcher-launch-correct-unity-versions-for
 
 ### Instructions
 https://github.com/unitycoder/UnityLauncherPro/wiki
+
+### Development
+See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro/tree/dev
 
 ### Screenshots (older version)
 
