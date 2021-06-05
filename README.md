@@ -46,12 +46,16 @@ See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro
 
 ![image](https://user-images.githubusercontent.com/5438317/120828355-1c2cd100-c565-11eb-9fee-bc77112b8d16.png)
 
+### Perform tasks on selected project
 ![image](https://user-images.githubusercontent.com/5438317/120828528-4da59c80-c565-11eb-8b11-9cf739cde306.png)
 
+### Quick New Project Creation (with Unity version and Templates selection)
 ![image](https://user-images.githubusercontent.com/5438317/120828565-58603180-c565-11eb-9cf3-0e3738a7dc95.png)
 
+### Upgrade Project Version (automatically suggests next higher version)
 ![image](https://user-images.githubusercontent.com/5438317/120828587-5e561280-c565-11eb-876d-54b72aed88c9.png)
 
+### Explorer integration (1-click opening projects with correct unity version)
 ![image](https://user-images.githubusercontent.com/5438317/120883135-34900080-c5e4-11eb-80a5-ae78fe89260a.png)
 
 <br>
