@@ -21,7 +21,7 @@ Handle all your Unity versions and Projects easily!
 - 1-Click browse editor log folder, crash logs folder, browse asset downloads folder, browse player logs folder
 - Quick Unity Editor Process Kill (press ALT+Q in the selected project row or right click context menu)
 - 1-Click start web server and launch WebGL build in browser for selected project
-- Custom skin color themes
+- Custom skin color themes https://github.com/unitycoder/UnityLauncherPro/wiki/Custom-themes
 - Select template for new project (template based on selected unity version)
 - And more: https://github.com/unitycoder/UnityLauncherPro/wiki/Launcher-Comparison
 
