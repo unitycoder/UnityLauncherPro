@@ -877,7 +877,7 @@ namespace UnityLauncherPro
             return null;
         }
 
-        public static void FastCreateProject(string version, string baseFolder, string projectName = null)
+        public static void FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null)
         {
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
@@ -914,6 +914,12 @@ namespace UnityLauncherPro
 
             // create folder
             CreateEmptyProjectFolder(newPath, version);
+
+            // unzip template, if any
+            if (templateZipPath != null)
+            {
+                TarLib.Tar.ExtractTarGz(templateZipPath, newPath);
+            }
 
             // launch empty project
             var proj = new Project();
@@ -995,6 +1001,39 @@ namespace UnityLauncherPro
             {
                 rk.DeleteValue(MainWindow.appName, false);
             }
+        }
+
+        public static Dictionary<string, string> ScanTemplates(string unityInstallPath)
+        {
+            var items = new Dictionary<string, string>();
+
+            // add none as default item
+            items.Add("None", null);
+
+            // get list of existing packages
+            var unityPath = Path.GetDirectoryName(unityInstallPath);
+            var templateFolder = Path.Combine(unityPath, "Data/Resources/PackageManager/ProjectTemplates/");
+            if (Directory.Exists(templateFolder) == false) return items;
+
+            var fileEntries = Directory.GetFiles(templateFolder).ToList();
+
+            // process found files
+            for (int i = fileEntries.Count - 1; i > -1; i--)
+            {
+                // check if its tgz
+                if (fileEntries[i].IndexOf(".tgz") == -1)
+                {
+                    fileEntries.RemoveAt(i);
+                }
+                else
+                {
+                    // cleanup name
+                    var name = Path.GetFileName(fileEntries[i]).Replace("com.unity.template.", "").Replace(".tgz", "");
+                    items.Add(name, fileEntries[i]);
+                }
+            }
+
+            return items;
         }
 
     } // class

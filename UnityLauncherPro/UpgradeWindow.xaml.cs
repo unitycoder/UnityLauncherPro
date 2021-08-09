@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace UnityLauncherPro
 {
@@ -126,7 +127,12 @@ namespace UnityLauncherPro
 
         private void GridAvailableVersions_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Upgrade();
+            var src = VisualTreeHelper.GetParent((DependencyObject)e.OriginalSource);
+            var srcType = src.GetType();
+            if (srcType == typeof(ContentPresenter))
+            {
+                Upgrade();
+            }
         }
 
         void Upgrade()

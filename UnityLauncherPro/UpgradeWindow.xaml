@@ -34,7 +34,7 @@
 
 		<!-- datagrid rows & row selection -->
 		<Style TargetType="DataGridRow">
-            <Setter Property="Background" Value="{StaticResource ThemeButtonBackground}" />
+            <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}" />
 			<Setter Property="BorderBrush" Value="{x:Null}" />
 			<Setter Property="BorderThickness" Value="0,0,0,0" />
 			<Style.Triggers>
@@ -42,7 +42,7 @@
 					<Setter Property="Background" Value="{StaticResource DataGridRowMouseOver}"/>
 				</Trigger>-->
 				<Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource ThemeDataGridRowSelectedBackground}" />
+                    <Setter Property="Background" Value="{DynamicResource ThemeDataGridRowSelectedBackground}" />
 				</Trigger>
 			</Style.Triggers>
 		</Style>
@@ -80,10 +80,10 @@
 						<ControlTemplate.Triggers>
 							<!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
 							<Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeTextBoxBackground}" />
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeTextBoxBackground}" />
 							</Trigger>
 							<Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollArrowPressed}" />
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollArrowPressed}" />
 							</Trigger>
 							<Trigger Property="IsEnabled" Value="false">
 								<Setter Property="Foreground" Value="Black"/>
@@ -120,7 +120,7 @@
 						<Border Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeScrollBarThumbFill}" />
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollBarThumbFill}" />
 							</Trigger>
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
@@ -136,7 +136,7 @@
 					<RowDefinition MaxHeight="18"/>
 				</Grid.RowDefinitions>
 				<!-- scrollbar background -->
-				<Border Grid.RowSpan="3" CornerRadius="0" Background="{DynamicResource ScrollBarBackground}" />
+                <Border Grid.RowSpan="3" CornerRadius="0" Background="{DynamicResource ThemeScrollBarBackground}" />
 				<!-- scrollbar top button -->
 				<RepeatButton Grid.Row="0" Style="{StaticResource ScrollBarLineButton}" Height="18" Command="ScrollBar.LineUpCommand"  Content="M 0 4 L 8 4 L 4 0 Z" />
 				<Track Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
@@ -145,7 +145,7 @@
 					</Track.DecreaseRepeatButton>
 					<Track.Thumb>
 						<!-- scrollbar foreground -->
-						<Thumb Style="{StaticResource ScrollBarThumb}" Margin="1,0,1,0" Background="{DynamicResource ScrollBarFill}" BorderBrush="{x:Null}"/>
+                        <Thumb Style="{StaticResource ScrollBarThumb}" Margin="1,0,1,0" Background="{DynamicResource ThemeScrollBarFill}" BorderBrush="{x:Null}"/>
 					</Track.Thumb>
 					<Track.IncreaseRepeatButton>
 						<RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageDownCommand" />
@@ -189,7 +189,7 @@
         <Button Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="0,434,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" Width="159" VerticalAlignment="Top" Height="51" Click="BtnUpgradeProject_Click" >
             <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Upgrade Project"/>
 		</Button>
-        <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" HorizontalAlignment="Left" Height="304" Margin="10,121,0,0" VerticalAlignment="Top" Width="393" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick">
+        <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" HorizontalAlignment="Left" Height="304" Margin="10,121,0,0" VerticalAlignment="Top" Width="393" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick" VerticalScrollBarVisibility="Visible">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" />
 				<DataGridTextColumn Header="Value" Binding="{Binding Value}" IsReadOnly="True" />
