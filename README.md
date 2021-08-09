@@ -21,7 +21,8 @@ Handle all your Unity versions and Projects easily!
 - 1-Click browse editor log folder, crash logs folder, browse asset downloads folder, browse player logs folder
 - Quick Unity Editor Process Kill (press ALT+Q in the selected project row or right click context menu)
 - 1-Click start web server and launch WebGL build in browser for selected project
-- Custom skin color themes
+- Custom skin color themes https://github.com/unitycoder/UnityLauncherPro/wiki/Custom-themes
+- Select template for new project (template based on selected unity version)
 - And more: https://github.com/unitycoder/UnityLauncherPro/wiki/Launcher-Comparison
 
 ### Forum Thread
@@ -30,17 +31,32 @@ https://forum.unity.com/threads/unity-launcher-launch-correct-unity-versions-for
 ### Instructions
 https://github.com/unitycoder/UnityLauncherPro/wiki
 
-### Screenshots (older version)
+### Development
+See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro/tree/dev
+
+### Screenshots
 
 ![image](https://user-images.githubusercontent.com/5438317/71485879-184b3a00-281c-11ea-97db-73c5dfa9bb4e.png)
 
-![image](https://user-images.githubusercontent.com/5438317/98661052-ace45b00-234e-11eb-84c0-089b3afd3814.png)
+![image](https://user-images.githubusercontent.com/5438317/120828332-146d2c80-c565-11eb-8a84-c3737c17025f.png)
 
-![image](https://user-images.githubusercontent.com/5438317/98661095-b968b380-234e-11eb-93bc-ea1b396c7205.png)
+![image](https://user-images.githubusercontent.com/5438317/120828338-17681d00-c565-11eb-972a-49055070427a.png)
 
-![image](https://user-images.githubusercontent.com/5438317/98661151-cc7b8380-234e-11eb-9874-103dae5fc2bf.png)
+![image](https://user-images.githubusercontent.com/5438317/120828346-19ca7700-c565-11eb-9430-89420cf15caa.png)
 
-![image](https://user-images.githubusercontent.com/5438317/98661193-d4d3be80-234e-11eb-9028-94a51d61b2d1.png)
+![image](https://user-images.githubusercontent.com/5438317/120828355-1c2cd100-c565-11eb-9fee-bc77112b8d16.png)
+
+### Perform tasks on selected project
+![image](https://user-images.githubusercontent.com/5438317/120828528-4da59c80-c565-11eb-8b11-9cf739cde306.png)
+
+### Quick New Project Creation (with Unity version and Templates selection)
+![image](https://user-images.githubusercontent.com/5438317/120828565-58603180-c565-11eb-9cf3-0e3738a7dc95.png)
+
+### Upgrade Project Version (automatically suggests next higher version)
+![image](https://user-images.githubusercontent.com/5438317/120828587-5e561280-c565-11eb-876d-54b72aed88c9.png)
+
+### Explorer integration (1-click opening projects with correct unity version)
+![image](https://user-images.githubusercontent.com/5438317/120883135-34900080-c5e4-11eb-80a5-ae78fe89260a.png)
 
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
