@@ -430,7 +430,7 @@ namespace UnityLauncherPro
 
         // parse Unity installer exe from release page
         // thanks to https://github.com/softfruit
-        static string ParseDownloadURLFromWebpage(string version)
+        public static string ParseDownloadURLFromWebpage(string version)
         {
             string url = "";
 

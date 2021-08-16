@@ -715,6 +715,16 @@ namespace UnityLauncherPro
             if (copy != null) Clipboard.SetText(copy);
         }
 
+        // get download url for selected update version
+        private void MenuItemCopyUpdateDownloadURL_Click(object sender, RoutedEventArgs e)
+        {
+            string copy = null;
+            var unity = GetSelectedUpdate();
+            copy = unity?.Version;https://unity3d.com/get-unity/download?thank-you=update&download_nid=65083&os=Win
+            string exeURL = Tools.ParseDownloadURLFromWebpage(copy);
+            if (exeURL != null) Clipboard.SetText(exeURL);
+        }
+
         private void BtnRefreshProjectList_Click(object sender, RoutedEventArgs e)
         {
             // we want to refresh unity installs also, to make sure version colors are correct
