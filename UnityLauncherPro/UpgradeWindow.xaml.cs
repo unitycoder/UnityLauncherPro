@@ -53,8 +53,29 @@ namespace UnityLauncherPro
                 btnOpenReleasePage.IsEnabled = false;
                 btnDownload.IsEnabled = false;
                 currentVersion = "None";
-                // just select first item then
-                if (gridAvailableVersions != null && gridAvailableVersions.Items.Count > 0) gridAvailableVersions.SelectedIndex = 0;
+
+                // if we have preferred version, and current is null
+                if (string.IsNullOrEmpty(MainWindow.preferredVersion) == false)
+                {
+                    // get correct row for preferred version
+                    var obj = Tools.GetEntry(MainWindow.unityInstalledVersions, MainWindow.preferredVersion);
+                    int index = gridAvailableVersions.Items.IndexOf(obj);
+                    if (index > -1)
+                    {
+                        gridAvailableVersions.SelectedIndex = index;
+                    }
+                    else
+                    {
+                        // just select first item then
+                        gridAvailableVersions.SelectedIndex = 0;
+                    }
+                }
+                else
+                {
+                    // just select first item then
+                    if (gridAvailableVersions != null && gridAvailableVersions.Items.Count > 0) gridAvailableVersions.SelectedIndex = 0;
+                }
+
             }
 
             gridAvailableVersions.Focus();
