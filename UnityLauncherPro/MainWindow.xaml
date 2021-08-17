@@ -732,6 +732,7 @@
                         <DataGrid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem x:Name="menuItemCopyUpdatesVersion" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
+                                <MenuItem x:Name="menuItemCopyUpdateDownloadURL" Header="Copy Download URL" Click="MenuItemCopyUpdateDownloadURL_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
                         <local:Updates ReleaseDate="2020-10-10" Version="5000.1.2.3"/>
