@@ -392,6 +392,11 @@ namespace UnityLauncherPro
             return version.Contains("a");
         }
 
+        public static bool VersionIsChinese(string version)
+        {
+            return version.Contains("c1");
+        }
+
         // open release notes page in browser
         public static bool OpenReleaseNotes(string version)
         {
@@ -547,6 +552,7 @@ namespace UnityLauncherPro
             // remove a,b,f,p
             cleanVersion = cleanVersion.Replace("a", ".");
             cleanVersion = cleanVersion.Replace("b", ".");
+            cleanVersion = cleanVersion.Replace("c1", "");
             cleanVersion = cleanVersion.Replace("f", ".");
             cleanVersion = cleanVersion.Replace("p", ".");
 
