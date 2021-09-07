@@ -1332,8 +1332,16 @@ namespace UnityLauncherPro
             if (tabControl.SelectedIndex == 0)
             {
                 var proj = GetSelectedProject();
-                // fix slashes so that it works in save dialogs
+                // fix slashes so that it works in save dialogs 
                 copy = proj?.Path.Replace('/', '\\');
+            }
+            else if (tabControl.SelectedIndex == 1)
+            {
+                var proj = GetSelectedUnity();
+                // fix slashes so that it works in save dialogs, and remove editor part
+                copy = proj?.Path.Replace('/', '\\').Replace("\\Editor", "");
+                // remove exe
+                copy = Path.GetDirectoryName(copy);
             }
             if (copy != null) Clipboard.SetText(copy);
         }
