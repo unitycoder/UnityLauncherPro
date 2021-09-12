@@ -58,5 +58,9 @@ See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro
 ### Explorer integration (1-click opening projects with correct unity version)
 ![image](https://user-images.githubusercontent.com/5438317/120883135-34900080-c5e4-11eb-80a5-ae78fe89260a.png)
 
+### View and Select current platform
+![unitylauncherpro_platform](https://user-images.githubusercontent.com/5438317/132997691-5ed50f1d-e285-4c83-b356-46c1e3f431e4.gif)
+
+
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
