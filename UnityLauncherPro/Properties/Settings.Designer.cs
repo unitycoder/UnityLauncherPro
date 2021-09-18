@@ -299,5 +299,41 @@ namespace UnityLauncherPro.Properties {
                 this["runAutomatically"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useCustomLastModified {
+            get {
+                return ((bool)(this["useCustomLastModified"]));
+            }
+            set {
+                this["useCustomLastModified"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("dd/MM/yyyy HH:mm:ss")]
+        public string customDateFormat {
+            get {
+                return ((string)(this["customDateFormat"]));
+            }
+            set {
+                this["customDateFormat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useHumandFriendlyLastModified {
+            get {
+                return ((bool)(this["useHumandFriendlyLastModified"]));
+            }
+            set {
+                this["useHumandFriendlyLastModified"] = value;
+            }
+        }
     }
 }

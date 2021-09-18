@@ -49,6 +49,10 @@ namespace UnityLauncherPro
         public static string preferredVersion = "none";
         Mutex myMutex;
 
+        string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
+        public static string currentDateFormat = null;
+        public static bool useHumanFriendlyDateFormat = false;
+
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
         string themefile = "theme.ini";
 
@@ -299,6 +303,29 @@ namespace UnityLauncherPro
 
             // other setting vars
             preferredVersion = Properties.Settings.Default.preferredVersion;
+
+            // get last modified date format
+            chkUseCustomLastModified.IsChecked = Properties.Settings.Default.useCustomLastModified;
+            txtCustomDateTimeFormat.Text = Properties.Settings.Default.customDateFormat;
+
+
+            if (Properties.Settings.Default.useCustomLastModified)
+            {
+                currentDateFormat = Properties.Settings.Default.customDateFormat;
+            }
+            else // use default
+            {
+                currentDateFormat = defaultDateFormat;
+            }
+
+            chkHumanFriendlyDateTime.IsChecked = Properties.Settings.Default.useHumandFriendlyLastModified;
+            // if both enabled, then disable custom
+            if (chkHumanFriendlyDateTime.IsChecked == true && chkUseCustomLastModified.IsChecked == true)
+            {
+                chkUseCustomLastModified.IsChecked = false;
+            }
+
+            useHumanFriendlyDateFormat = Properties.Settings.Default.useHumandFriendlyLastModified;
         } // LoadSettings()
 
         private void SaveSettingsOnExit()
@@ -720,7 +747,7 @@ namespace UnityLauncherPro
         {
             string copy = null;
             var unity = GetSelectedUpdate();
-            copy = unity?.Version;https://unity3d.com/get-unity/download?thank-you=update&download_nid=65083&os=Win
+            copy = unity?.Version; https://unity3d.com/get-unity/download?thank-you=update&download_nid=65083&os=Win
             string exeURL = Tools.ParseDownloadURLFromWebpage(copy);
             if (exeURL != null) Clipboard.SetText(exeURL);
         }
@@ -1895,6 +1922,76 @@ namespace UnityLauncherPro
             chkRunAutomatically.IsChecked = isChecked;
             // set or unset registry, NOTE should not do this on debug build.. (otherwise 2 builds try to run?)
             Tools.SetStartupRegistry(isChecked);
+        }
+
+        private void ChkUseCustomLastModified_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+            chkUseCustomLastModified.IsChecked = isChecked;
+            Properties.Settings.Default.useCustomLastModified = isChecked;
+            Properties.Settings.Default.Save();
+
+            if (isChecked)
+            {
+                ValidateCustomDateFormat(txtCustomDateTimeFormat.Text);
+            }
+            else
+            {
+                currentDateFormat = defaultDateFormat;
+            }
+        }
+
+        private void TxtCustomDateTimeFormat_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+            TextBox textBox = sender as TextBox;
+            ValidateCustomDateFormat(textBox.Text);
+        }
+
+        private void TxtCustomDateTimeFormat_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+            TextBox textBox = sender as TextBox;
+            ValidateCustomDateFormat(textBox.Text);
+        }
+
+        void ValidateCustomDateFormat(string format)
+        {
+            if (Tools.ValidateDateFormat(format))
+            {
+                currentDateFormat = format;
+                Properties.Settings.Default.customDateFormat = currentDateFormat;
+                Properties.Settings.Default.Save();
+                txtCustomDateTimeFormat.Foreground = System.Windows.Media.Brushes.Black;
+            }
+            else // invalid format
+            {
+                txtCustomDateTimeFormat.Foreground = System.Windows.Media.Brushes.Red;
+                currentDateFormat = defaultDateFormat;
+            }
+        }
+
+        private void ChkHumanFriendlyDateTime_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+
+            // cannot have both date formats
+            if (isChecked == true)
+            {
+                if (chkUseCustomLastModified.IsChecked == true) chkUseCustomLastModified.IsChecked = false;
+            }
+            else
+            {
+                currentDateFormat = defaultDateFormat;
+            }
+
+            useHumanFriendlyDateFormat = isChecked;
+
+            Properties.Settings.Default.useHumandFriendlyLastModified = isChecked;
+            Properties.Settings.Default.Save();
         }
 
         //private void CmbPlatformSelection_ManipulationInertiaStarting(object sender, ManipulationInertiaStartingEventArgs e)

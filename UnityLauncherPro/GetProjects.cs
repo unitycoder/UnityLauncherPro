@@ -94,9 +94,9 @@ namespace UnityLauncherPro
                             csprojFile = Path.Combine(projectPath, projectName + ".sln");
                         }
 
-                        // get last modified date
-                        DateTime? lastUpdated = folderExists ? Tools.GetLastModifiedTime(csprojFile) : null;
-
+                        // get last modified date from folder
+                        DateTime? lastUpdated = folderExists ? Tools.GetLastModifiedTime(projectPath) : null;
+                        
                         // get project version
                         string projectVersion = folderExists ? Tools.GetProjectVersion(projectPath) : null;
 

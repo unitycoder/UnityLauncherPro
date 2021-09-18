@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows.Data;
 
 namespace UnityLauncherPro
@@ -27,17 +28,16 @@ namespace UnityLauncherPro
         }
 
         // https://stackoverflow.com/a/5551986/5452781
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             bool b = (bool)value;
             return b;
             //return string.IsNullOrEmpty(str);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }
-
     }
 }

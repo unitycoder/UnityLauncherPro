@@ -74,5 +74,14 @@
     <Setting Name="runAutomatically" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="useCustomLastModified" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="customDateFormat" Type="System.String" Scope="User">
+      <Value Profile="(Default)">dd/MM/yyyy HH:mm:ss</Value>
+    </Setting>
+    <Setting Name="useHumandFriendlyLastModified" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

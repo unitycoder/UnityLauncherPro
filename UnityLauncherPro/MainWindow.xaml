@@ -4,10 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
-		xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="UnityLauncherPro.MainWindow"
+		xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:converters="clr-namespace:UnityLauncherPro.Converters" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
         Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" Activated="Window_Activated">
     <Window.Resources>
+
+        <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>
 
         <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
             <Grid>
@@ -485,7 +488,8 @@
                                     </Style>
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Modified, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True" Width="120"/>
+                            <!--<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Modified, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True" Width="120"/>-->
+                            <DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Modified, Converter={StaticResource lastModifiedConverter}}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True" Width="120"/>
                             <DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Arguments}" ClipboardContentBinding="{x:Null}" Header="Arguments" IsReadOnly="False" Width="100"/>
                             <DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding GITBranch}" ClipboardContentBinding="{x:Null}" Header="Branch" IsReadOnly="True" Width="60"/>
                             <!--TODO platform as dropdown?-->
@@ -891,8 +895,13 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
-                            <CheckBox x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Experimental!)" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" Margin="0,0,0,4" ToolTip="" HorizontalAlignment="Left"/>
-                            <CheckBox x:Name="chkRunAutomatically" Content="Run this app automatically on startup" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="" HorizontalAlignment="Left" Checked="ChkRunAutomatically_Checked" Unchecked="ChkRunAutomatically_Checked"/>
+                            <CheckBox x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Experimental!)" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" Margin="0,0,0,4" ToolTip="Select target platform" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkRunAutomatically" Content="Run this app automatically on startup" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Run automatically using startup registry key" HorizontalAlignment="Left" Checked="ChkRunAutomatically_Checked" Unchecked="ChkRunAutomatically_Checked"/>
+                            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                                <CheckBox x:Name="chkUseCustomLastModified" Content="Date format" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkUseCustomLastModified_Checked" Unchecked="ChkUseCustomLastModified_Checked"/>
+                                <TextBox x:Name="txtCustomDateTimeFormat" MinWidth="150" ToolTip="Default is dd/MM/yyyy HH:mm:ss" Padding="0,3,0,0" Margin="5,0,0,0" Text="dd/MM/yyyy HH:mm:ss" LostFocus="TxtCustomDateTimeFormat_LostFocus" TextChanged="TxtCustomDateTimeFormat_TextChanged" />
+                            </StackPanel>
+                            <CheckBox x:Name="chkHumanFriendlyDateTime" Content="Use human friendly last modified" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkHumanFriendlyDateTime_Checked" Unchecked="ChkHumanFriendlyDateTime_Checked"/>
                         </StackPanel>
                     </StackPanel>
 
