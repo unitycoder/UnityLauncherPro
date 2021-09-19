@@ -93,15 +93,7 @@
                    VerticalAlignment="Bottom" Margin="3,3,23,3" Focusable="True" Background="Red" Visibility="Hidden" IsReadOnly="{TemplateBinding IsReadOnly}" />
                             <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
                                 <Grid x:Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                    <Border x:Name="DropDownBorder" BorderThickness="1">
-                                        <Border.BorderBrush>
-                                            <SolidColorBrush Color="#FF171717" />
-                                        </Border.BorderBrush>
-                                        <Border.Background>
-                                            <!--combobox dropdown background here -->
-                                            <SolidColorBrush Color="#FF2E2E34" />
-                                        </Border.Background>
-                                    </Border>
+                                    <Border x:Name="DropDownBorder" BorderThickness="1" BorderBrush="{DynamicResource ThemeDropDownBorderBorderBrush}" Background="{DynamicResource ThemeDropDownBorderBackground}"/>
                                     <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
                                         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
                                     </ScrollViewer>
