@@ -21,19 +21,10 @@
                 <!--combobox right edge rounding-->
                 <Border x:Name="Border" Grid.ColumnSpan="2" CornerRadius="0" BorderThickness="0" Background="{x:Null}">
                 </Border>
-                <!--combobox left edge corner rounding-->
-                <Border Grid.Column="0" CornerRadius="0" Margin="0" >
-                    <Border.Background>
-                        <!--main combo background-->
-                        <SolidColorBrush Color="#FF3E3E44"/>
-                    </Border.Background>
-                </Border>
+                <!--combobox left edge corner rounding and background color-->
+                <Border Grid.Column="0" CornerRadius="0" Margin="0" Background="{DynamicResource ThemeButtonBackground}"/>
                 <!--combobox arrow-->
-                <Path x:Name="Arrow" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0 Z" >
-                    <Path.Fill>
-                        <SolidColorBrush Color="#FF000000"/>
-                    </Path.Fill>
-                </Path>
+                <Path x:Name="Arrow" Fill="{DynamicResource ThemeScrollBarEnabledForeground}" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0 Z" />
             </Grid>
 
             <!--mouseover combobox main-->
