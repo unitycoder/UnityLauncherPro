@@ -331,7 +331,8 @@ namespace UnityLauncherPro
             var order = Properties.Settings.Default.recentColumnsOrder;
 
             // if we dont have any values, get & set them now
-            if (order == null)
+            // also, if user has disabled optional columns, saved order must be reset to default
+            if (order == null || gridRecent.Columns.Count != Properties.Settings.Default.recentColumnsOrder.Length)
             {
                 Properties.Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
                 for (int i = 0; i < gridRecent.Columns.Count; i++)
@@ -344,7 +345,10 @@ namespace UnityLauncherPro
             {
                 for (int i = 0; i < gridRecent.Columns.Count; i++)
                 {
-                    gridRecent.Columns[i].DisplayIndex = Properties.Settings.Default.recentColumnsOrder[i];
+                    if (Properties.Settings.Default.recentColumnsOrder[i] > -1)
+                    {
+                        gridRecent.Columns[i].DisplayIndex = Properties.Settings.Default.recentColumnsOrder[i];
+                    }
                 }
             }
 
@@ -2018,6 +2022,9 @@ namespace UnityLauncherPro
 
         private void GridRecent_ColumnReordered(object sender, DataGridColumnEventArgs e)
         {
+            // if amount has changed, need to reset array
+            if (Properties.Settings.Default.recentColumnsOrder.Length != gridRecent.Columns.Count) Properties.Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
+
             // get new display indexes
             for (int i = 0; i < gridRecent.Columns.Count; i++)
             {
