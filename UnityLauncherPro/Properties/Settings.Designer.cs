@@ -335,5 +335,16 @@ namespace UnityLauncherPro.Properties {
                 this["useHumandFriendlyLastModified"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int[] recentColumnsOrder {
+            get {
+                return ((int[])(this["recentColumnsOrder"]));
+            }
+            set {
+                this["recentColumnsOrder"] = value;
+            }
+        }
     }
 }

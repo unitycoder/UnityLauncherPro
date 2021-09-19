@@ -326,6 +326,28 @@ namespace UnityLauncherPro
             }
 
             useHumanFriendlyDateFormat = Properties.Settings.Default.useHumandFriendlyLastModified;
+
+            // recent grid column display index order
+            var order = Properties.Settings.Default.recentColumnsOrder;
+
+            // if we dont have any values, get & set them now
+            if (order == null)
+            {
+                Properties.Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
+                for (int i = 0; i < gridRecent.Columns.Count; i++)
+                {
+                    Properties.Settings.Default.recentColumnsOrder[i] = gridRecent.Columns[i].DisplayIndex;
+                }
+                Properties.Settings.Default.Save();
+            }
+            else // load existing order
+            {
+                for (int i = 0; i < gridRecent.Columns.Count; i++)
+                {
+                    gridRecent.Columns[i].DisplayIndex = Properties.Settings.Default.recentColumnsOrder[i];
+                }
+            }
+
         } // LoadSettings()
 
         private void SaveSettingsOnExit()
@@ -1993,6 +2015,18 @@ namespace UnityLauncherPro
             Properties.Settings.Default.useHumandFriendlyLastModified = isChecked;
             Properties.Settings.Default.Save();
         }
+
+        private void GridRecent_ColumnReordered(object sender, DataGridColumnEventArgs e)
+        {
+            // get new display indexes
+            for (int i = 0; i < gridRecent.Columns.Count; i++)
+            {
+                Properties.Settings.Default.recentColumnsOrder[i] = gridRecent.Columns[i].DisplayIndex;
+            }
+            Properties.Settings.Default.Save();
+        }
+
+
 
         //private void CmbPlatformSelection_ManipulationInertiaStarting(object sender, ManipulationInertiaStartingEventArgs e)
         //{
