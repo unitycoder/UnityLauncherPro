@@ -40,6 +40,13 @@ namespace UnityLauncherPro
                 }
                 UpdateTemplatesDropDown(item.Value);
             }
+            else // we dont have requested unity version, get templates for the first item
+            {
+                var path = MainWindow.unityInstallationsSource[0].Path;
+                gridAvailableVersions.SelectedIndex = 0;
+                gridAvailableVersions.ScrollIntoView(gridAvailableVersions.Items[0]);
+                UpdateTemplatesDropDown(path);
+            }
 
             // select projectname text so can overwrite if needed
             txtNewProjectName.Focus();
@@ -133,6 +140,7 @@ namespace UnityLauncherPro
             txtNewProjectName.Text = newProj;
         }
 
+        // FIXME this gets called when list is updated?
         private void GridAvailableVersions_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (gridAvailableVersions.SelectedItem == null) return;
@@ -140,6 +148,7 @@ namespace UnityLauncherPro
             var k = gridAvailableVersions.SelectedItem as KeyValuePair<string, string>?;
             newVersion = k.Value.Key;
             GenerateNewName();
+
             // update templates list for selected unity version
             UpdateTemplatesDropDown(k.Value.Value);
         }
