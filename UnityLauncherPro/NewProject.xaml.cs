@@ -27,15 +27,19 @@ namespace UnityLauncherPro
             // fill available versions, TODO could show which modules are installed
             gridAvailableVersions.ItemsSource = MainWindow.unityInstalledVersions;
 
-            var item = Tools.GetEntry(MainWindow.unityInstalledVersions, unityVersion);
-            int index = gridAvailableVersions.Items.IndexOf(item);
-            if (index > -1)
+            // we dont have that version installed, TODO show info or pick closest?, for now picks the first item
+            if (MainWindow.unityInstalledVersions.ContainsKey(unityVersion) == true)
             {
-                gridAvailableVersions.SelectedIndex = index;
-                gridAvailableVersions.ScrollIntoView(item);
+                // autopick this unity version
+                var item = Tools.GetEntry(MainWindow.unityInstalledVersions, unityVersion);
+                int index = gridAvailableVersions.Items.IndexOf(item);
+                if (index > -1)
+                {
+                    gridAvailableVersions.SelectedIndex = index;
+                    gridAvailableVersions.ScrollIntoView(item);
+                }
+                UpdateTemplatesDropDown(item.Value);
             }
-
-            UpdateTemplatesDropDown(item.Value);
 
             // select projectname text so can overwrite if needed
             txtNewProjectName.Focus();
