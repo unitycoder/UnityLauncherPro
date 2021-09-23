@@ -36,7 +36,7 @@ namespace UnityLauncherPro
         static extern bool OpenIcon(IntPtr hWnd);
 
         // datagrid sources
-        List<Project> projectsSource;
+        public static List<Project> projectsSource;
         Updates[] updatesSource;
         public static UnityInstallation[] unityInstallationsSource;
 
@@ -78,7 +78,6 @@ namespace UnityLauncherPro
             // get unity installations
             dataGridUnitys.Items.Clear();
             UpdateUnityInstallationsList();
-
             HandleCommandLineLaunch();
 
             // check for duplicate instance, and activate that instead
@@ -92,10 +91,6 @@ namespace UnityLauncherPro
                     App.Current.Shutdown();
                 }
             }
-
-            // TEST platform combobox
-            // var test = new string[] { "1", "2", "3" };
-            // cmbPlatform.ItemsSource = test;
 
             // update projects list
             projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
@@ -393,11 +388,12 @@ namespace UnityLauncherPro
             unityInstallationsSource = GetUnityInstallations.Scan();
             dataGridUnitys.ItemsSource = unityInstallationsSource;
 
-            // make dictionary of installed unitys, to search faster
+            // also make dictionary of installed unitys, to search faster
             unityInstalledVersions.Clear();
             for (int i = 0, len = unityInstallationsSource.Length; i < len; i++)
             {
                 var version = unityInstallationsSource[i].Version;
+                // NOTE cannot have same version id in 2 places with this
                 if (string.IsNullOrEmpty(version) == false && unityInstalledVersions.ContainsKey(version) == false)
                 {
                     unityInstalledVersions.Add(version, unityInstallationsSource[i].Path);

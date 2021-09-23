@@ -51,6 +51,7 @@ namespace UnityLauncherPro
                     unity.Path = exePath;
                     unity.Installed = installDate;
                     unity.IsPreferred = (version == MainWindow.preferredVersion);
+                    unity.ProjectCount = GetProjectCountForUnityVersion(version);
 
                     // get platforms, NOTE if this is slow, do it later, or skip for commandline
                     var platforms = GetPlatforms(dataFolder);
@@ -98,5 +99,19 @@ namespace UnityLauncherPro
 
             return directories;
         }
+
+        static int GetProjectCountForUnityVersion(string version)
+        {
+            if (MainWindow.projectsSource == null) return 0;
+            //Console.WriteLine("xxx "+(MainWindow.projectsSource==null));
+            int count = 0;
+            // count projects using this exact version
+            for (int i = 0, len = MainWindow.projectsSource.Count; i < len; i++)
+            {
+                if (MainWindow.projectsSource[i].Version == version) count++;
+            }
+            return count;
+        }
+
     } // class
 } // namespace

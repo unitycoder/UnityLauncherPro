@@ -78,21 +78,21 @@ namespace UnityLauncherPro
                             projectName = projectPath;
                         }
 
-                        string csprojFile = Path.Combine(projectPath, projectName + ".csproj");
+                        //string csprojFile = Path.Combine(projectPath, projectName + ".csproj");
 
-                        // maybe 4.x or 2019 or later project
-                        if (folderExists == true && File.Exists(csprojFile) == false)
-                        {
-                            csprojFile = Path.Combine(projectPath, "Assembly-CSharp.csproj");
-                        }
-                        else if (folderExists == true && File.Exists(csprojFile) == false) // editor only project
-                        {
-                            csprojFile = Path.Combine(projectPath, projectName + ".Editor.csproj");
-                        }
-                        else if (folderExists == true && File.Exists(csprojFile) == false) // solution only
-                        {
-                            csprojFile = Path.Combine(projectPath, projectName + ".sln");
-                        }
+                        //// maybe 4.x or 2019 or later project
+                        //if (folderExists == true && File.Exists(csprojFile) == false)
+                        //{
+                        //    csprojFile = Path.Combine(projectPath, "Assembly-CSharp.csproj");
+                        //}
+                        //else if (folderExists == true && File.Exists(csprojFile) == false) // editor only project
+                        //{
+                        //    csprojFile = Path.Combine(projectPath, projectName + ".Editor.csproj");
+                        //}
+                        //else if (folderExists == true && File.Exists(csprojFile) == false) // solution only
+                        //{
+                        //    csprojFile = Path.Combine(projectPath, projectName + ".sln");
+                        //}
 
                         // get last modified date from folder
                         DateTime? lastUpdated = folderExists ? Tools.GetLastModifiedTime(projectPath) : null;

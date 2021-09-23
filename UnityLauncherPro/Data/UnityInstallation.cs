@@ -11,6 +11,7 @@ namespace UnityLauncherPro
 
         public string PlatformsCombined { set; get; }
         public string[] Platforms { set; get; }
+        public int ProjectCount { set; get; }
 
         public bool IsPreferred { set; get; }
 
