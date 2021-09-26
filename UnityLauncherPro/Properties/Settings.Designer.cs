@@ -346,5 +346,16 @@ namespace UnityLauncherPro.Properties {
                 this["recentColumnsOrder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int[] gridColumnWidthsBuildReport {
+            get {
+                return ((int[])(this["gridColumnWidthsBuildReport"]));
+            }
+            set {
+                this["gridColumnWidthsBuildReport"] = value;
+            }
+        }
     }
 }

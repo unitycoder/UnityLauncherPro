@@ -56,6 +56,9 @@ namespace UnityLauncherPro
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
         string themefile = "theme.ini";
 
+        string latestBuildReportProjectPath = null;
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -285,7 +288,7 @@ namespace UnityLauncherPro
             lstRootFolders.Items.Clear();
             lstRootFolders.ItemsSource = Properties.Settings.Default.rootFolders;
 
-            // restore datagrid column widths
+            // restore recent project datagrid column widths
             int[] gridColumnWidths = Properties.Settings.Default.gridColumnWidths;
             if (gridColumnWidths != null)
             {
@@ -293,6 +296,17 @@ namespace UnityLauncherPro
                 {
                     if (i >= gridRecent.Columns.Count) break; // too many columns were saved, probably some test columns
                     gridRecent.Columns[i].Width = gridColumnWidths[i];
+                }
+            }
+
+            // restore buildreport datagrid column widths
+            gridColumnWidths = Properties.Settings.Default.gridColumnWidthsBuildReport;
+            if (gridColumnWidths != null)
+            {
+                for (int i = 0; i < gridColumnWidths.Length; ++i)
+                {
+                    if (i >= gridBuildReport.Columns.Count) break; // too many columns were saved, probably some test columns
+                    gridBuildReport.Columns[i].Width = gridColumnWidths[i];
                 }
             }
 
@@ -322,6 +336,7 @@ namespace UnityLauncherPro
 
             useHumanFriendlyDateFormat = Properties.Settings.Default.useHumandFriendlyLastModified;
 
+
             // recent grid column display index order
             var order = Properties.Settings.Default.recentColumnsOrder;
 
@@ -349,10 +364,13 @@ namespace UnityLauncherPro
 
         } // LoadSettings()
 
+
         private void SaveSettingsOnExit()
         {
-            // save list column widths
+            // save recent project column widths
             List<int> gridWidths;
+
+            // if we dont have any settings yet
             if (Properties.Settings.Default.gridColumnWidths != null)
             {
                 gridWidths = new List<int>(Properties.Settings.Default.gridColumnWidths);
@@ -362,8 +380,8 @@ namespace UnityLauncherPro
                 gridWidths = new List<int>();
             }
 
-            // restore data grid view widths
-            var colum = gridRecent.Columns[0];
+            // get data grid view widths
+            var column = gridRecent.Columns[0];
             for (int i = 0; i < gridRecent.Columns.Count; ++i)
             {
                 if (Properties.Settings.Default.gridColumnWidths != null && Properties.Settings.Default.gridColumnWidths.Length > i)
@@ -376,6 +394,36 @@ namespace UnityLauncherPro
                 }
             }
             Properties.Settings.Default.gridColumnWidths = gridWidths.ToArray();
+            Properties.Settings.Default.Save();
+
+
+            // save buildrepot column widths
+            gridWidths.Clear();
+
+            // if we dont have any settings yet
+            if (Properties.Settings.Default.gridColumnWidthsBuildReport != null)
+            {
+                gridWidths = new List<int>(Properties.Settings.Default.gridColumnWidthsBuildReport);
+            }
+            else
+            {
+                gridWidths = new List<int>();
+            }
+
+            // get data grid view widths
+            column = gridBuildReport.Columns[0];
+            for (int i = 0; i < gridBuildReport.Columns.Count; ++i)
+            {
+                if (Properties.Settings.Default.gridColumnWidthsBuildReport != null && Properties.Settings.Default.gridColumnWidthsBuildReport.Length > i)
+                {
+                    gridWidths[i] = (int)gridBuildReport.Columns[i].Width.Value;
+                }
+                else
+                {
+                    gridWidths.Add((int)gridBuildReport.Columns[i].Width.Value);
+                }
+            }
+            Properties.Settings.Default.gridColumnWidthsBuildReport = gridWidths.ToArray();
             Properties.Settings.Default.Save();
 
         }
@@ -421,6 +469,11 @@ namespace UnityLauncherPro
         Updates GetSelectedUpdate()
         {
             return (Updates)dataGridUpdates.SelectedItem;
+        }
+
+        BuildReportItem GetSelectedBuildItem()
+        {
+            return (BuildReportItem)gridBuildReport.SelectedItem;
         }
 
         void AddUnityInstallationRootFolder()
@@ -1635,32 +1688,12 @@ namespace UnityLauncherPro
 
         private void BtnRefreshBuildReport_Click(object sender, RoutedEventArgs e)
         {
-            // TODO keep previous build report (total size?) so can compare to current one
-
             var logFile = Path.Combine(Tools.GetEditorLogsFolder(), "Editor.log");
-            //Console.WriteLine("read editor log: " + logFile);
 
-            List<string> rows = new List<string>();
+            if (File.Exists(logFile) == false) return;
 
-            try
-            {
-                using (var fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (var sr = new StreamReader(fs, Encoding.Default))
-                {
-                    while (sr.EndOfStream == false)
-                    {
-                        // TODO only start collecting when find build report start, and need to reset list if another build report later
-                        var r = sr.ReadLine();
-                        rows.Add(r);
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
+            // NOTE this can fail on a HUGE log file
+            string[] rows = File.ReadAllLines(logFile);
 
             if (rows == null)
             {
@@ -1668,21 +1701,29 @@ namespace UnityLauncherPro
                 return;
             }
 
-            // TODO parse project folder info also, so can browse to selected file
-
             int startRow = -1;
             int endRow = -1;
+
+            for (int i = 0, len = rows.Length; i < len; i++)
+            {
+                // get current project path from log file
+                if (rows[i] == "-projectPath")
+                {
+                    latestBuildReportProjectPath = rows[i + 1];
+                    break;
+                }
+            }
+            if (string.IsNullOrEmpty(latestBuildReportProjectPath)) Console.WriteLine("Failed to parse project path from logfile..");
+
             // loop backwards to find latest report
-            for (int i = rows.Count - 1; i >= 0; i--)
+            for (int i = rows.Length - 1; i >= 0; i--)
             {
                 // find start of build report
-                //if (rows[i].IndexOf("Build Report") == 0) // TODO take overview also
                 if (rows[i].IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
                 {
                     startRow = i + 1;
-
                     // find end of report
-                    for (int k = i; k < rows.Count; k++)
+                    for (int k = i; k < rows.Length; k++)
                     {
                         if (rows[k].IndexOf("-------------------------------------------------------------------------------") == 0)
                         {
@@ -1700,13 +1741,12 @@ namespace UnityLauncherPro
                 return;
             }
 
-            var reportSource = new BuildReport[endRow - startRow];
+            var reportSource = new BuildReportItem[endRow - startRow];
 
-            // get report rows
+            // parse actual report rows
             int index = 0;
             for (int i = startRow; i < endRow; i++)
             {
-                //Console.WriteLine(rows[i]);
                 var d = rows[i].Trim();
 
                 // get tab after kb
@@ -1720,10 +1760,11 @@ namespace UnityLauncherPro
                     continue;
                 }
 
-                var r = new BuildReport();
+                var r = new BuildReportItem();
                 r.Size = d.Substring(0, space1);
                 r.Percentage = d.Substring(space1 + 2, space2 - space1 - 1);
                 r.Path = d.Substring(space2 + 2, d.Length - space2 - 2);
+                r.Format = Path.GetExtension(r.Path);
                 reportSource[index++] = r;
             }
             gridBuildReport.ItemsSource = reportSource;
@@ -2029,16 +2070,26 @@ namespace UnityLauncherPro
             Properties.Settings.Default.Save();
         }
 
+        private void MenuItemExploreBuildItem_Click(object sender, RoutedEventArgs e)
+        {
+            OpenSelectedBuildReportFile();
+        }
 
+        private void GridBuildReport_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            OpenSelectedBuildReportFile();
+        }
 
-        //private void CmbPlatformSelection_ManipulationInertiaStarting(object sender, ManipulationInertiaStartingEventArgs e)
-        //{
-        //    var comb = (ComboBox)sender;
-        //    Console.WriteLine(comb.Name);
-        //    comb.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-        //    comb.VerticalContentAlignment = VerticalAlignment.Center;
-        //    comb.HorizontalAlignment = HorizontalAlignment.Stretch;
-        //    comb.VerticalAlignment = VerticalAlignment.Center;
-        //}
+        void OpenSelectedBuildReportFile()
+        {
+            var item = GetSelectedBuildItem();
+
+            if (item != null)
+            {
+                string filePath = Path.Combine(latestBuildReportProjectPath, item.Path);
+                Tools.LaunchExplorerSelectFile(filePath);
+            }
+        }
+
     } // class
 } //namespace

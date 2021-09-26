@@ -76,7 +76,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\LastModifiedConverter.cs" />
-    <Compile Include="Data\BuildReport.cs" />
+    <Compile Include="Data\BuildReportItem.cs" />
     <Compile Include="Data\Platform.cs" />
     <Compile Include="Data\Tabs.cs" />
     <Compile Include="GetProjects.cs" />

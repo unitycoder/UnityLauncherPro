@@ -86,5 +86,8 @@
     <Setting Name="recentColumnsOrder" Type="System.Int32[]" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="gridColumnWidthsBuildReport" Type="System.Int32[]" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

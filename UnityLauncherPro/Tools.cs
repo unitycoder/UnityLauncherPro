@@ -287,6 +287,32 @@ namespace UnityLauncherPro
             return false;
         }
 
+        public static bool LaunchExplorerSelectFile(string fileName)
+        {
+            if (File.Exists(fileName) == true)
+            {
+
+                fileName = Path.GetFullPath(fileName);
+                Process.Start("explorer.exe", string.Format("/select,\"{0}\"", fileName));
+                return true;
+            }
+            else // file is missing, try to find parent folder that we can go into
+            {
+                for (int i = fileName.Length - 1; i > -1; i--)
+                {
+                    if (fileName[i] == '/')
+                    {
+                        if (Directory.Exists(fileName.Substring(0, i)))
+                        {
+                            Process.Start(fileName.Substring(0, i) + "/");
+                            break;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         // run any exe
         public static bool LaunchExe(string path, string param = null)
         {
