@@ -119,6 +119,18 @@ namespace UnityLauncherPro
 
             ApplyTheme();
 
+            // for autostart with minimized
+            if (Properties.Settings.Default.runAutomatically == true && Properties.Settings.Default.runAutomaticallyMinimized == true)
+            {
+                // if application got started by the system, then hide, otherwise dont hide (user started it)
+                if (Directory.GetCurrentDirectory().ToLower() == @"c:\windows\system32")
+                {
+                    notifyIcon.Visible = true;
+                    this.Hide();
+                }
+
+            }
+
             isInitializing = false;
         }
 
@@ -278,6 +290,7 @@ namespace UnityLauncherPro
 
             chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
             chkRunAutomatically.IsChecked = Properties.Settings.Default.runAutomatically;
+            chkRunAutomaticallyMinimized.IsChecked = Properties.Settings.Default.runAutomaticallyMinimized;
 
             // update optional grid columns, hidden or visible
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -2091,5 +2104,13 @@ namespace UnityLauncherPro
             }
         }
 
+        private void ChkRunAutomaticallyMinimized_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+
+            Properties.Settings.Default.runAutomaticallyMinimized = isChecked;
+            Properties.Settings.Default.Save();
+        }
     } // class
 } //namespace

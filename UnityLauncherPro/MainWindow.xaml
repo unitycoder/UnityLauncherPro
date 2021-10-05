@@ -267,6 +267,10 @@
                                 <Setter TargetName="shortcutbutton" Property="Background" Value="{DynamicResource ThemeButtonBackgroundPressed}" />
                                 <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{DynamicResource ThemeButtonWhiteText}"/>
                             </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="{DynamicResource ThemeButtonFocusOutline}" />
+                                <Setter TargetName="shortcutbutton" Property="BorderThickness" Value="1" />
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -856,7 +860,7 @@
                     <!-- settings-->
                     <StackPanel Grid.Row="3" Orientation="Horizontal">
                         <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
-                            <CheckBox x:Name="chkMinimizeToTaskbar" Content="Minimize to tray" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged" Margin="0,0,0,4" ToolTip="When window is minimized, hides application into taskbar icon area" HorizontalAlignment="Left"/>
+                            <CheckBox x:Name="chkMinimizeToTaskbar" Content="Minimize to tray" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged" Margin="0,0,0,4" ToolTip="When minimized, hides application into taskbar icon area" HorizontalAlignment="Left"/>
                             <CheckBox x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" Margin="0,0,0,4" ToolTip="Install registry entry for Explorer context menu" HorizontalAlignment="Left"/>
                             <CheckBox x:Name="chkQuitAfterOpen" Content="Close after opening project" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkQuitAfterOpen_CheckedChanged" Unchecked="ChkQuitAfterOpen_CheckedChanged" Margin="0,0,0,4" ToolTip="Closes launcher after running project (not really useful)" HorizontalAlignment="Left"/>
                             <CheckBox x:Name="chkQuitAfterCommandline" Content="Close after launching from Explorer" Foreground="{DynamicResource ThemeButtonForeground}" Unchecked="ChkQuitAfterCommandline_CheckedChanged" Checked="ChkQuitAfterCommandline_CheckedChanged" Margin="0,0,0,4" ToolTip="Close launcher after running from commandline or Explorer (recommended)" HorizontalAlignment="Left"/>
@@ -888,7 +892,10 @@
 
                         <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
                             <CheckBox x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Experimental!)" Foreground="{DynamicResource ThemeButtonForeground}" Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" Margin="0,0,0,4" ToolTip="Select target platform" HorizontalAlignment="Left"/>
-                            <CheckBox x:Name="chkRunAutomatically" Content="Run this app automatically on startup" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Run automatically using startup registry key" HorizontalAlignment="Left" Checked="ChkRunAutomatically_Checked" Unchecked="ChkRunAutomatically_Checked"/>
+                            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                                <CheckBox x:Name="chkRunAutomatically" Content="Run automatically on startup  " Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Run automatically using startup registry key" HorizontalAlignment="Left" Checked="ChkRunAutomatically_Checked" Unchecked="ChkRunAutomatically_Checked"/>
+                                <CheckBox x:Name="chkRunAutomaticallyMinimized" Content="as minimized" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Minimize to tray when started automatically" HorizontalAlignment="Left" Checked="ChkRunAutomaticallyMinimized_Checked" Unchecked="ChkRunAutomaticallyMinimized_Checked"/>
+                            </StackPanel>
                             <StackPanel Grid.Row="3" Orientation="Horizontal">
                                 <CheckBox x:Name="chkUseCustomLastModified" Content="Date format" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkUseCustomLastModified_Checked" Unchecked="ChkUseCustomLastModified_Checked"/>
                                 <TextBox x:Name="txtCustomDateTimeFormat" MinWidth="150" ToolTip="Default is dd/MM/yyyy HH:mm:ss" Padding="0,3,0,0" Margin="5,0,0,0" Text="dd/MM/yyyy HH:mm:ss" LostFocus="TxtCustomDateTimeFormat_LostFocus" TextChanged="TxtCustomDateTimeFormat_TextChanged" />

@@ -24,6 +24,10 @@
                             <Trigger Property="IsPressed" Value="true">
                                 <Setter TargetName="shortcutbutton" Property="Background" Value="#FF0F0F0F" />
                             </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="{DynamicResource ThemeButtonFocusOutline}" />
+                                <Setter TargetName="shortcutbutton" Property="BorderThickness" Value="1" />
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -184,7 +188,7 @@
                     <ColumnDefinition Width="40*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Project Name:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="5,5,5,0" />
-                <Label x:Name="lblTemplateTitleAndCount" Grid.Column="2" Content="Template:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="5,5,5,0" />
+                <Label x:Name="lblTemplateTitleAndCount" Grid.Column="2" Content="Templates:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="5,5,5,0" />
             </Grid>
 
             <Grid HorizontalAlignment="Stretch" Margin="0,3,0,0">

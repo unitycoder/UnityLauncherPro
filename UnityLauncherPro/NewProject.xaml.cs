@@ -59,7 +59,7 @@ namespace UnityLauncherPro
             // scan available templates, TODO could cache this at least per session?
             cmbNewProjectTemplate.ItemsSource = Tools.ScanTemplates(unityPath);
             cmbNewProjectTemplate.SelectedIndex = 0;
-            lblTemplateTitleAndCount.Content = "Template: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
+            lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
         }
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {

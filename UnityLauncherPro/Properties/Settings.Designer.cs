@@ -357,5 +357,17 @@ namespace UnityLauncherPro.Properties {
                 this["gridColumnWidthsBuildReport"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool runAutomaticallyMinimized {
+            get {
+                return ((bool)(this["runAutomaticallyMinimized"]));
+            }
+            set {
+                this["runAutomaticallyMinimized"] = value;
+            }
+        }
     }
 }
