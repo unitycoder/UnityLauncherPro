@@ -244,6 +244,17 @@ namespace UnityLauncherPro
             }
         }
 
+        void FilterBuildReport()
+        {
+            _filterString = txtSearchBoxBuildReport.Text;
+            ICollectionView collection = CollectionViewSource.GetDefaultView(gridBuildReport.ItemsSource);
+            collection.Filter = BuildReportFilter;
+            //if (gridBuildReport.Items.Count > 0)
+            //{
+            //    gridBuildReport.SelectedIndex = 0;
+            //}
+        }
+
         private bool ProjectFilter(object item)
         {
             Project proj = item as Project;
@@ -260,6 +271,12 @@ namespace UnityLauncherPro
         {
             UnityInstallation unity = item as UnityInstallation;
             return (unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+        }
+
+        private bool BuildReportFilter(object item)
+        {
+            BuildReportItem reportItem = item as BuildReportItem;
+            return (reportItem.Path.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
         }
 
         void LoadSettings()
@@ -731,6 +748,18 @@ namespace UnityLauncherPro
                             break;
                         case Key.Escape: // clear project search
                             txtSearchBoxUpdates.Text = "";
+                            break;
+                        default: // any key
+                            break;
+                    }
+                    break;
+
+                case 3: // Tools
+
+                    switch (e.Key)
+                    {
+                        case Key.Escape: // clear search
+                            txtSearchBoxBuildReport.Text = "";
                             break;
                         default: // any key
                             break;
@@ -1706,7 +1735,14 @@ namespace UnityLauncherPro
             if (File.Exists(logFile) == false) return;
 
             // NOTE this can fail on a HUGE log file
-            string[] rows = File.ReadAllLines(logFile);
+            FileStream fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            StreamReader sr = new StreamReader(fs);
+            List<string> rows = new List<string>();
+            while (!sr.EndOfStream)
+            {
+                rows.Add(sr.ReadLine());
+            }
+
 
             if (rows == null)
             {
@@ -1717,7 +1753,7 @@ namespace UnityLauncherPro
             int startRow = -1;
             int endRow = -1;
 
-            for (int i = 0, len = rows.Length; i < len; i++)
+            for (int i = 0, len = rows.Count; i < len; i++)
             {
                 // get current project path from log file
                 if (rows[i] == "-projectPath")
@@ -1729,14 +1765,14 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(latestBuildReportProjectPath)) Console.WriteLine("Failed to parse project path from logfile..");
 
             // loop backwards to find latest report
-            for (int i = rows.Length - 1; i >= 0; i--)
+            for (int i = rows.Count - 1; i >= 0; i--)
             {
                 // find start of build report
                 if (rows[i].IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
                 {
                     startRow = i + 1;
                     // find end of report
-                    for (int k = i; k < rows.Length; k++)
+                    for (int k = i, len = rows.Count; k < len; k++)
                     {
                         if (rows[k].IndexOf("-------------------------------------------------------------------------------") == 0)
                         {
@@ -2111,6 +2147,45 @@ namespace UnityLauncherPro
 
             Properties.Settings.Default.runAutomaticallyMinimized = isChecked;
             Properties.Settings.Default.Save();
+        }
+
+        private void MenuItemEditPackages_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO read Editor\Data\Resources\PackageManager\Editor\manifest.json
+            // TODO read list of buildin packages *or no need, its com.unity.modules.*
+            // TODO show list of packages (with buildin packages hidden from the list)
+            // TODO user can enable/disable packages
+            // TODO save back to the JSON file (NOTE cannot write if not admin! need to run some batch command elevated to overwrite file?)
+            // TODO or, allow setting filter for packages (so can have custom "dont want"-packages list, and then remove those automatically! (from generated project, so original manifest can stay, but at which point..)
+        }
+
+        private void MenuItemUpdatesReleaseNotes_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            Tools.OpenReleaseNotes(unity?.Version);
+        }
+
+        private void BtnClearBuildReportSearch_Click(object sender, RoutedEventArgs e)
+        {
+            txtSearchBoxBuildReport.Text = "";
+        }
+
+        private void TxtSearchBoxBuildReport_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                    Tools.SetFocusToGrid(gridBuildReport);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void TxtSearchBoxBuildReport_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (gridBuildReport.ItemsSource != null) FilterBuildReport();
         }
     } // class
 } //namespace

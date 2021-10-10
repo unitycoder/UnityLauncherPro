@@ -634,6 +634,7 @@
                                 <MenuItem x:Name="menuItemCopyEditorPath" Header="Copy Editor Path" Click="MenuItemCopyPath_Click" />
                                 <MenuItem x:Name="menuItemShowUnityInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
                                 <MenuItem x:Name="menuItemSetPreferredUnityVersion" Header="Set as Preferred Version" Click="MenuItemSetPreferredUnityVersion_Click"/>
+                                <!--<MenuItem x:Name="menuItemEditPackages" Header="Edit Packages" Click="MenuItemEditPackages_Click"/>-->
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 
@@ -726,6 +727,7 @@
                             <ContextMenu>
                                 <MenuItem x:Name="menuItemCopyUpdatesVersion" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
                                 <MenuItem x:Name="menuItemCopyUpdateDownloadURL" Header="Copy Download URL" Click="MenuItemCopyUpdateDownloadURL_Click" />
+                                <MenuItem x:Name="menuItemUpdatesReleaseNotes" Header="Open Release Notes" Click="MenuItemUpdatesReleaseNotes_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
                         <local:Updates ReleaseDate="2020-10-10" Version="5000.1.2.3"/>
@@ -800,6 +802,30 @@
                             <Button x:Name="btnClearBuildReport" Style="{StaticResource CustomButton}" ToolTip="Clear report" Content="🗑" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"  Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnClearBuildReport_Click" />
                             <Button x:Name="btnRefreshBuildReport" Style="{StaticResource CustomButton}" ToolTip="Get latest Build Report from Editor.log" Content="⟳" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshBuildReport_Click"/>
                             <!--<CheckBox x:Name="chkAutoUpdateBuildReport" Content="AutoUpdate" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" HorizontalAlignment="Right" VerticalAlignment="Top" Height="26" VerticalContentAlignment="Center" IsEnabled="False"/>-->
+
+                            <!-- search box -->
+                            <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
+                                <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxBuildReport}" Height="24" />
+                                <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxBuildReport" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxBuildReport_PreviewKeyDown" TextChanged="TxtSearchBoxBuildReport_TextChanged" />
+                                <Button x:Name="btnClearBuildReportSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="BtnClearBuildReportSearch_Click">
+                                    <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchCaret}" Padding="5,3,4,4" HorizontalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxBuildReport}" Value="">
+                                                        <Setter Property="Visibility" Value="Hidden"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxBuildReport}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Hidden"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Button>
+                            </Grid>
+
+
                         </StackPanel>
                         <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick">
                             <DataGrid.Columns>
