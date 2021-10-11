@@ -1735,16 +1735,22 @@ namespace UnityLauncherPro
             if (File.Exists(logFile) == false) return;
 
             // NOTE this can fail on a HUGE log file
-            FileStream fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            StreamReader sr = new StreamReader(fs);
             List<string> rows = new List<string>();
-            while (!sr.EndOfStream)
+            try
             {
-                rows.Add(sr.ReadLine());
+                using (FileStream fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    using (StreamReader sr = new StreamReader(fs))
+                    {
+                        // now we collect all lines, but could collect only those needed below
+                        while (!sr.EndOfStream)
+                        {
+                            rows.Add(sr.ReadLine());
+                        }
+                    }
+                }
             }
-
-
-            if (rows == null)
+            catch (Exception)
             {
                 Console.WriteLine("Failed to open editor log: " + logFile);
                 return;
@@ -1786,7 +1792,7 @@ namespace UnityLauncherPro
 
             if (startRow == -1 || endRow == -1)
             {
-                Console.WriteLine("Failed to parse Build Report, start= " + startRow + " end= " + endRow);
+                Console.WriteLine("Failed to parse Editor.Log (probably no build report there), start= " + startRow + " end= " + endRow);
                 return;
             }
 
