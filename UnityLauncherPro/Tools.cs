@@ -144,7 +144,7 @@ namespace UnityLauncherPro
         }
 
         // NOTE holding alt key (when using alt+o) brings up unity project selector
-        public static Process LaunchProject(Project proj)
+        public static Process LaunchProject(Project proj, DataGrid dataGridRef = null)
         {
             // validate
             if (proj == null) return null;
@@ -200,6 +200,7 @@ namespace UnityLauncherPro
                 Console.WriteLine("Start process: " + cmd + " " + unitycommandlineparameters);
 
                 newProcess.StartInfo.Arguments = unitycommandlineparameters;
+                newProcess.EnableRaisingEvents = true;
                 newProcess.Start();
 
                 if (Properties.Settings.Default.closeAfterProject)
@@ -212,12 +213,10 @@ namespace UnityLauncherPro
                 Console.WriteLine(e);
             }
 
-            // move as first, since its opened, disabled for now, more used to it staying in place..
-            // MainWindow wnd = (MainWindow)Application.Current.MainWindow;
-            // wnd.MoveRecentGridItem(0);
-
+            // NOTE move project as first, since its opened, disabled for now, since its too jumpy..
+            //MainWindow wnd = (MainWindow)Application.Current.MainWindow;
+            //wnd.MoveRecentGridItem(0);
             return newProcess;
-
         }
 
         static bool CheckCrashBackupScene(string projectPath)
@@ -775,7 +774,7 @@ namespace UnityLauncherPro
         }
 
         //public static Platform GetTargetPlatform(string projectPath)
-        public static string GetTargetPlatform(string projectPath)
+        static string GetTargetPlatformRaw(string projectPath)
         {
             string results = null;
             //Platform results = Platform.Unknown;
@@ -807,7 +806,27 @@ namespace UnityLauncherPro
                     }
                 }
             }
+            else
+            {
+                Console.WriteLine("Missing csproj, cannot parse target platform: "+ projectPath);
+            }
+
             return results;
+        }
+
+        public static string GetTargetPlatform(string projectPath)
+        {
+            var rawPlatformName = GetTargetPlatformRaw(projectPath);
+
+            if (string.IsNullOrEmpty(rawPlatformName) == false && GetProjects.remapPlatformNames.ContainsKey(rawPlatformName))
+            {
+                return GetProjects.remapPlatformNames[rawPlatformName];
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(rawPlatformName) == false) Console.WriteLine("Missing buildTarget remap name for: " + rawPlatformName);
+                return null;
+            }
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ namespace UnityLauncherPro
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
         // convert target platform name into valid buildtarget platform name, NOTE this depends on unity version, now only 2019 and later are supported
-        static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Standalone" }, { "StandaloneWindows", "Standalone" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
+        public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Standalone" }, { "StandaloneWindows", "Standalone" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
 
         // TODO separate scan and folders
         public static List<Project> Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false)
@@ -78,22 +78,6 @@ namespace UnityLauncherPro
                             projectName = projectPath;
                         }
 
-                        //string csprojFile = Path.Combine(projectPath, projectName + ".csproj");
-
-                        //// maybe 4.x or 2019 or later project
-                        //if (folderExists == true && File.Exists(csprojFile) == false)
-                        //{
-                        //    csprojFile = Path.Combine(projectPath, "Assembly-CSharp.csproj");
-                        //}
-                        //else if (folderExists == true && File.Exists(csprojFile) == false) // editor only project
-                        //{
-                        //    csprojFile = Path.Combine(projectPath, projectName + ".Editor.csproj");
-                        //}
-                        //else if (folderExists == true && File.Exists(csprojFile) == false) // solution only
-                        //{
-                        //    csprojFile = Path.Combine(projectPath, projectName + ".sln");
-                        //}
-
                         // get last modified date from folder
                         DateTime? lastUpdated = folderExists ? Tools.GetLastModifiedTime(projectPath) : null;
                         
@@ -114,13 +98,10 @@ namespace UnityLauncherPro
                             gitBranch = folderExists ? Tools.ReadGitBranchInfo(projectPath) : null;
                         }
 
-                        // TODO add option to disable check
                         string targetPlatform = "";
-                        //Platform targetPlatform = Platform.Unknown;
                         if (showTargetPlatform == true)
                         {
                             targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : null;
-                            //targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : Platform.Unknown;
                         }
 
                         var p = new Project();
@@ -130,18 +111,7 @@ namespace UnityLauncherPro
                         p.Modified = lastUpdated;
                         p.Arguments = customArgs;
                         p.GITBranch = gitBranch;
-                        //p.TargetPlatform = targetPlatform;
-                        //Console.WriteLine("targetPlatform="+ targetPlatform);
-                        // get matching buildtarget platform name from dictionary
-                        if (string.IsNullOrEmpty(targetPlatform) == false && remapPlatformNames.ContainsKey(targetPlatform))
-                        {
-                            p.TargetPlatform = remapPlatformNames[targetPlatform];
-                        }
-                        else
-                        {
-                            if (string.IsNullOrEmpty(targetPlatform) == false) Console.WriteLine("Missing buildTarget remap name for: " + targetPlatform);
-                            p.TargetPlatform = null;
-                        }
+                        p.TargetPlatform = targetPlatform;
 
                         // bubblegum(TM) solution, fill available platforms for this unity version, for this project
                         p.TargetPlatforms = Tools.GetPlatformsForUnityVersion(projectVersion);

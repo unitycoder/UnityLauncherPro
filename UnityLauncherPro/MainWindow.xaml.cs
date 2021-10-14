@@ -561,7 +561,7 @@ namespace UnityLauncherPro
             }
         }
 
-        void RefreshRecentProjects()
+        public void RefreshRecentProjects()
         {
             // clear search
             txtSearchBox.Text = "";
@@ -824,8 +824,32 @@ namespace UnityLauncherPro
         private void BtnLaunchProject_Click(object sender, RoutedEventArgs e)
         {
             var proj = GetSelectedProject();
-            var proc = Tools.LaunchProject(proj);
+            var proc = Tools.LaunchProject(proj, gridRecent);
             proj.Process = proc;
+
+            // subscribe to process exit, so that can update proj details row (if it was changed in Unity)
+            proj.Process.Exited += (object o, EventArgs ea) =>
+            {
+                Console.WriteLine("Unity closed, update this project: " + proj);
+
+                // call update on main thread, TODO move this to Tools?
+                this.Dispatcher.Invoke(() =>
+                {
+                    //Console.WriteLine("got project "+gridRecent.Items.Contains(proj));
+                    var index = projectsSource.IndexOf(proj);
+                    var tempProj = projectsSource[index];
+                    tempProj.Modified = Tools.GetLastModifiedTime(proj.Path);
+                    tempProj.Version = Tools.GetProjectVersion(proj.Path);
+                    tempProj.GITBranch = Tools.ReadGitBranchInfo(proj.Path);
+                    tempProj.TargetPlatform = Tools.GetTargetPlatform(proj.Path);
+                    projectsSource[index] = tempProj;
+
+                    // TODO no need to update every item though..
+                    gridRecent.Items.Refresh();
+
+                });
+            };
+
             Tools.SetFocusToGrid(gridRecent);
         }
 
