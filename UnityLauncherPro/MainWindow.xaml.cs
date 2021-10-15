@@ -52,6 +52,8 @@ namespace UnityLauncherPro
         string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
         public static string currentDateFormat = null;
         public static bool useHumanFriendlyDateFormat = false;
+        const string defaultAdbLogCatArgs = "-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
+        string adbLogCatArgs = defaultAdbLogCatArgs;
 
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
         string themefile = "theme.ini";
@@ -347,7 +349,6 @@ namespace UnityLauncherPro
             chkUseCustomLastModified.IsChecked = Properties.Settings.Default.useCustomLastModified;
             txtCustomDateTimeFormat.Text = Properties.Settings.Default.customDateFormat;
 
-
             if (Properties.Settings.Default.useCustomLastModified)
             {
                 currentDateFormat = Properties.Settings.Default.customDateFormat;
@@ -391,6 +392,9 @@ namespace UnityLauncherPro
                     }
                 }
             }
+
+            adbLogCatArgs = Properties.Settings.Default.adbLogCatArgs;
+            txtLogCatArgs.Text = adbLogCatArgs;
 
         } // LoadSettings()
 
@@ -1124,13 +1128,14 @@ namespace UnityLauncherPro
 
         private void BtnOpenADBLogCat_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(adbLogCatArgs)) return;
+
             try
             {
                 Process myProcess = new Process();
                 var cmd = "cmd.exe";
                 myProcess.StartInfo.FileName = cmd;
-                // NOTE windows10 cmd line supports ansi colors, otherwise remove -v color
-                var pars = " /c adb logcat -s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
+                var pars = " /c adb logcat " + adbLogCatArgs;
                 myProcess.StartInfo.Arguments = pars;
                 myProcess.Start();
             }
@@ -2216,6 +2221,22 @@ namespace UnityLauncherPro
         private void TxtSearchBoxBuildReport_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (gridBuildReport.ItemsSource != null) FilterBuildReport();
+        }
+
+        private void TxtLogCatArgs_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+            Properties.Settings.Default.adbLogCatArgs = txtLogCatArgs.Text;
+            Properties.Settings.Default.Save();
+            adbLogCatArgs = txtLogCatArgs.Text;
+        }
+
+        private void BtnResetLogCatArgs_Click(object sender, RoutedEventArgs e)
+        {
+            adbLogCatArgs = defaultAdbLogCatArgs;
+            Properties.Settings.Default.adbLogCatArgs = defaultAdbLogCatArgs;
+            Properties.Settings.Default.Save();
+            txtLogCatArgs.Text = defaultAdbLogCatArgs;
         }
     } // class
 } //namespace

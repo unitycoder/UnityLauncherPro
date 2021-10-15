@@ -808,7 +808,7 @@ namespace UnityLauncherPro
             }
             else
             {
-                Console.WriteLine("Missing csproj, cannot parse target platform: "+ projectPath);
+                //Console.WriteLine("Missing csproj, cannot parse target platform: "+ projectPath);
             }
 
             return results;
