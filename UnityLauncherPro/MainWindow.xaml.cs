@@ -23,8 +23,33 @@ namespace UnityLauncherPro
 {
     public partial class MainWindow : Window
     {
-        private System.Windows.Forms.NotifyIcon notifyIcon;
         public const string appName = "UnityLauncherPro";
+        public static string currentDateFormat = null;
+        public static bool useHumanFriendlyDateFormat = false;
+        public static List<Project> projectsSource;
+        public static UnityInstallation[] unityInstallationsSource;
+        public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>(); // versionID and installation folder
+        public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
+        public static string preferredVersion = "none";
+
+        const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
+        const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
+        const string resourcesURL = "https://github.com/unitycoder/UnityResources";
+        const string defaultAdbLogCatArgs = "-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
+        System.Windows.Forms.NotifyIcon notifyIcon;
+
+        Updates[] updatesSource;
+
+        string _filterString = null;
+        int lastSelectedProjectIndex = 0;
+        Mutex myMutex;
+
+        string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
+        string adbLogCatArgs = defaultAdbLogCatArgs;
+
+        Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
+        string themefile = "theme.ini";
+        string latestBuildReportProjectPath = null;
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
         static extern IntPtr FindWindow(string cls, string win);
@@ -34,32 +59,6 @@ namespace UnityLauncherPro
         static extern bool IsIconic(IntPtr hWnd);
         [DllImport("user32")]
         static extern bool OpenIcon(IntPtr hWnd);
-
-        // datagrid sources
-        public static List<Project> projectsSource;
-        Updates[] updatesSource;
-        public static UnityInstallation[] unityInstallationsSource;
-
-        public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>(); // versionID and installation folder
-        const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
-        public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
-        string _filterString = null;
-        const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
-        int lastSelectedProjectIndex = 0;
-        public static string preferredVersion = "none";
-        Mutex myMutex;
-
-        string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
-        public static string currentDateFormat = null;
-        public static bool useHumanFriendlyDateFormat = false;
-        const string defaultAdbLogCatArgs = "-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
-        string adbLogCatArgs = defaultAdbLogCatArgs;
-
-        Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
-        string themefile = "theme.ini";
-
-        string latestBuildReportProjectPath = null;
-
 
         public MainWindow()
         {
@@ -2237,6 +2236,11 @@ namespace UnityLauncherPro
             Properties.Settings.Default.adbLogCatArgs = defaultAdbLogCatArgs;
             Properties.Settings.Default.Save();
             txtLogCatArgs.Text = defaultAdbLogCatArgs;
+        }
+
+        private void BtnResources_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.OpenURL(resourcesURL);
         }
     } // class
 } //namespace

@@ -752,7 +752,6 @@
                         </Button>
                     </Grid>
                 </Grid>
-
             </TabItem>
 
             <!-- Tab: Tools -->
@@ -765,8 +764,10 @@
                     <!-- 1st part -->
                     <Grid Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left">
                         <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top">
-                            <Border VerticalAlignment="Top" Height="50" HorizontalAlignment="Left">
-                                <StackPanel Orientation="Horizontal" Margin="0,10,10,10" VerticalAlignment="Top" Width="560">
+                            <!--border to avoid next row moving when button is selected-->
+                            <Border VerticalAlignment="Top" Height="40" HorizontalAlignment="Left" Margin="0,0,0,2">
+                                <!-- folders -->
+                                <StackPanel Orientation="Horizontal" Margin="0,4,10,4" VerticalAlignment="Top" Width="560">
                                     <Label Content="Folders" Foreground="{DynamicResource ThemeButtonForeground}" />
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Browse Editor logs folder">
                                         <Label Content="_Editor Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
@@ -782,26 +783,29 @@
                                     </Button>
                                 </StackPanel>
                             </Border>
-                            <!--adb args textbox-->
-                            <!--<Border VerticalAlignment="Top" Height="40">-->
-                            <StackPanel Orientation="Horizontal" Margin="2" VerticalAlignment="Top">
-                                <Label Content="Tools" Foreground="{DynamicResource ThemeButtonForeground}" />
-                                <Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click" ToolTip="Start ADB logcat commandline">
-                                    <Label Content="_ADB logcat" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-                                </Button>
-                                <!--<StackPanel Orientation="Horizontal">-->
-                                <Label Content="Args:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="0,1,0,-4" />
-                                <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,5,0,0" Height="20"  >
-                                    <TextBox Width="420" Text="-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color"  CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtLogCatArgs" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="32" TextChanged="TxtLogCatArgs_TextChanged" />
-                                </Grid>
-                                <!--</StackPanel>-->
-                                <Button Style="{StaticResource CustomButton}" x:Name="btnResetLogCatArgs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Reset to default logcat args" Click="BtnResetLogCatArgs_Click">
-                                    <Label Content="Reset" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                            <!-- tools -->
+                            <Border VerticalAlignment="Top" Height="37" HorizontalAlignment="Left" Margin="0">
+                                <StackPanel Orientation="Horizontal" Margin="2,0" VerticalAlignment="Top">
+                                    <Label Content="Tools" Foreground="{DynamicResource ThemeButtonForeground}" />
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click" ToolTip="Start ADB logcat commandline">
+                                        <Label Content="_ADB logcat" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    </Button>
+                                    <Label Content="Args:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="0,1,0,-4" />
+                                    <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,5,0,0" Height="20"  >
+                                        <TextBox Width="420" Text="-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color"  CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtLogCatArgs" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="32" TextChanged="TxtLogCatArgs_TextChanged" />
+                                    </Grid>
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnResetLogCatArgs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Reset to default logcat args" Click="BtnResetLogCatArgs_Click">
+                                        <Label Content="Reset" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                            <!-- links -->
+                            <StackPanel Orientation="Horizontal" Margin="2,0" VerticalAlignment="Top">
+                                <Label Content="Links" Foreground="{DynamicResource ThemeButtonForeground}" />
+                                <Button Style="{StaticResource CustomButton}" x:Name="btnResources" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnResources_Click" ToolTip="List of resources, cheatsheets, sdk downloads in github page">
+                                    <Label Content="Resources 🔗" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                 </Button>
                             </StackPanel>
-
-                            <!--</Border>-->
-
                         </StackPanel>
                     </Grid>
                     <!-- 2nd part -->
