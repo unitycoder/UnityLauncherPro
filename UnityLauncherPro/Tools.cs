@@ -5,16 +5,31 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using UnityLauncherPro.Helpers;
 
 namespace UnityLauncherPro
 {
     public static class Tools
     {
+        const int SW_RESTORE = 9;
+
+        [DllImport("user32", CharSet = CharSet.Unicode)]
+        static extern IntPtr FindWindow(string cls, string win);
+        [DllImport("user32")]
+        static extern IntPtr SetForegroundWindow(IntPtr hWnd);
+        [DllImport("user32")]
+        static extern bool IsIconic(IntPtr hWnd);
+        [DllImport("user32")]
+        static extern bool OpenIcon(IntPtr hWnd);
+        [DllImport("user32")]
+        private static extern bool ShowWindow(IntPtr handle, int nCmdShow);
+
         // returns last modified date for file (or null if cannot get it)
         public static DateTime? GetLastModifiedTime(string path)
         {
@@ -150,7 +165,20 @@ namespace UnityLauncherPro
             if (proj == null) return null;
             if (Directory.Exists(proj.Path) == false) return null;
 
-            Console.WriteLine("launch project " + proj.Title + " " + proj.Version);
+            Console.WriteLine("Launching project " + proj.Title + " at " + proj.Path);
+
+            // check if this project path has unity already running? (from lock file or process) 
+            // NOTE this check only works if previous unity instance was started while we were running
+            if (ProcessHandler.IsRunning(proj.Path))
+            {
+                Console.WriteLine("Project is already running, lets not launch unity.. because it opens Hub");
+                BringProcessToFront(ProcessHandler.Get(proj.Path));
+                return null;
+            }
+            else
+            {
+                // TODO check lock file?
+            }
 
             // there is no assets path, probably we want to create new project then
             var assetsFolder = Path.Combine(proj.Path, "Assets");
@@ -216,6 +244,8 @@ namespace UnityLauncherPro
             // NOTE move project as first, since its opened, disabled for now, since its too jumpy..
             //MainWindow wnd = (MainWindow)Application.Current.MainWindow;
             //wnd.MoveRecentGridItem(0);
+
+            ProcessHandler.Add(proj, newProcess);
             return newProcess;
         }
 
@@ -679,7 +709,6 @@ namespace UnityLauncherPro
                 // inject new version for this item
                 proj.Version = upgradeToVersion;
                 var proc = LaunchProject(proj);
-                proj.Process = proc;
             }
             else
             {
@@ -977,7 +1006,7 @@ namespace UnityLauncherPro
             proj.Path = Path.Combine(baseFolder, newPath);
             proj.Version = version;
             var proc = LaunchProject(proj);
-            proj.Process = proc;
+            ProcessHandler.Add(proj, proc);
         } // FastCreateProject
 
 
@@ -1140,6 +1169,18 @@ namespace UnityLauncherPro
                 //Console.WriteLine("Invalid custom datetime format: " + format);
                 return false;
             }
+        }
+
+        // https://stackoverflow.com/a/37724335/5452781
+        public static void BringProcessToFront(Process process)
+        {
+            IntPtr handle = process.MainWindowHandle;
+            if (IsIconic(handle))
+            {
+                ShowWindow(handle, SW_RESTORE);
+            }
+
+            SetForegroundWindow(handle);
         }
 
     } // class

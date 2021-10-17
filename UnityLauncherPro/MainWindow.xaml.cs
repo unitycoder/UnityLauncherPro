@@ -18,6 +18,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
+using UnityLauncherPro.Helpers;
 
 namespace UnityLauncherPro
 {
@@ -91,6 +92,7 @@ namespace UnityLauncherPro
                 myMutex = new Mutex(true, appName, out aIsNewInstance);
                 if (!aIsNewInstance)
                 {
+                    // NOTE doesnt work if its minized to tray
                     ActivateOtherWindow();
                     App.Current.Shutdown();
                 }
@@ -142,8 +144,7 @@ namespace UnityLauncherPro
             if (other != IntPtr.Zero)
             {
                 SetForegroundWindow(other);
-                if (IsIconic(other))
-                    OpenIcon(other);
+                if (IsIconic(other)) OpenIcon(other);
             }
         }
 
@@ -192,7 +193,8 @@ namespace UnityLauncherPro
                     {
                         // try launching it
                         var proc = Tools.LaunchProject(proj);
-                        proj.Process = proc;
+                        //proj.Process = proc;
+                        //ProcessHandler.Add(proj, proc);
                     }
 
                     // quit after launch if enabled in settings
@@ -828,30 +830,8 @@ namespace UnityLauncherPro
         {
             var proj = GetSelectedProject();
             var proc = Tools.LaunchProject(proj, gridRecent);
-            proj.Process = proc;
 
-            // subscribe to process exit, so that can update proj details row (if it was changed in Unity)
-            proj.Process.Exited += (object o, EventArgs ea) =>
-            {
-                Console.WriteLine("Unity closed, update this project: " + proj);
-
-                // call update on main thread, TODO move this to Tools?
-                this.Dispatcher.Invoke(() =>
-                {
-                    //Console.WriteLine("got project "+gridRecent.Items.Contains(proj));
-                    var index = projectsSource.IndexOf(proj);
-                    var tempProj = projectsSource[index];
-                    tempProj.Modified = Tools.GetLastModifiedTime(proj.Path);
-                    tempProj.Version = Tools.GetProjectVersion(proj.Path);
-                    tempProj.GITBranch = Tools.ReadGitBranchInfo(proj.Path);
-                    tempProj.TargetPlatform = Tools.GetTargetPlatform(proj.Path);
-                    projectsSource[index] = tempProj;
-
-                    // TODO no need to update every item though..
-                    gridRecent.Items.Refresh();
-
-                });
-            };
+            //ProcessHandler.Add(proj, proc);
 
             Tools.SetFocusToGrid(gridRecent);
         }
@@ -963,7 +943,7 @@ namespace UnityLauncherPro
                 case Key.Return: // open selected project
                     var proj = GetSelectedProject();
                     var proc = Tools.LaunchProject(proj);
-                    proj.Process = proc;
+                    //ProcessHandler.Add(proj, proc);
                     break;
                 case Key.Tab:
                 case Key.Up:
@@ -1055,7 +1035,7 @@ namespace UnityLauncherPro
                     e.Handled = true;
                     var proj = GetSelectedProject();
                     var proc = Tools.LaunchProject(proj);
-                    proj.Process = proc;
+                    //ProcessHandler.Add(proj, proc);
                     break;
                 default:
                     break;
@@ -1441,7 +1421,7 @@ namespace UnityLauncherPro
 
             var proj = GetSelectedProject();
             var proc = Tools.LaunchProject(proj);
-            proj.Process = proc;
+            //ProcessHandler.Add(proj, proc);
         }
 
         private void DataGridUnitys_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -1727,16 +1707,18 @@ namespace UnityLauncherPro
         void KillSelectedProcess(object sender, ExecutedRoutedEventArgs e)
         {
             var proj = GetSelectedProject();
-            if (proj.Process != null)
+            var proc = ProcessHandler.Get(proj.Path);
+            if (proj != null && proc != null)
             {
                 try
                 {
-                    proj.Process.Kill();
+                    proc.Kill();
                 }
                 catch (Exception)
                 {
                 }
-                proj.Process = null;
+                //proc.Dispose(); // NOTE cannot dispose, otherwise process.Exited event is not called
+                proj = null;
             }
         }
 
@@ -1745,7 +1727,8 @@ namespace UnityLauncherPro
             if (tabControl.SelectedIndex == 0)
             {
                 var proj = GetSelectedProject();
-                menuItemKillProcess.IsEnabled = proj.Process != null;
+                var proc = ProcessHandler.Get(proj.Path);
+                menuItemKillProcess.IsEnabled = proc != null;
             }
         }
 
@@ -1892,7 +1875,8 @@ namespace UnityLauncherPro
             int port = rnd.Next(50000, 61000);
 
             // take process id from unity, if have it (then webserver closes automatically when unity is closed)
-            int pid = proj.Process == null ? -1 : proj.Process.Id;
+            var proc = ProcessHandler.Get(proj.Path);
+            int pid = proc == null ? -1 : proc.Id;
             var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
 
             // then open browser
@@ -2241,6 +2225,28 @@ namespace UnityLauncherPro
         private void BtnResources_Click(object sender, RoutedEventArgs e)
         {
             Tools.OpenURL(resourcesURL);
+        }
+
+        public void ProcessExitedCallBack(Project proj)
+        {
+            Console.WriteLine("Process Exited: " + proj.Path);
+            //var index = projectsSource.IndexOf(proj); // this fails since proj has changed after refresh (timestamp or other data)
+
+            // FIXME nobody likes extra loops.. but only 40 items to find correct project?
+            for (int i = 0, len = projectsSource.Count; i < len; i++)
+            {
+                if (projectsSource[i].Path == proj.Path)
+                {
+                    var tempProj = projectsSource[i];
+                    tempProj.Modified = Tools.GetLastModifiedTime(proj.Path);
+                    tempProj.Version = Tools.GetProjectVersion(proj.Path);
+                    tempProj.GITBranch = Tools.ReadGitBranchInfo(proj.Path);
+                    tempProj.TargetPlatform = Tools.GetTargetPlatform(proj.Path);
+                    projectsSource[i] = tempProj;
+                    gridRecent.Items.Refresh();
+                    break;
+                }
+            }
         }
     } // class
 } //namespace
