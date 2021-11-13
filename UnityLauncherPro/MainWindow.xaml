@@ -485,10 +485,10 @@
                             <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
                             <!--<DataGridComboBoxColumn Header="Platform" IsReadOnly="False"  SelectedItemBinding="{Binding TargetPlatform}" ItemsSource="{Binding Source={StaticResource platformEnum}}" />-->
 
-                            <DataGridTemplateColumn Header="Platform">
+                            <DataGridTemplateColumn Header="Platform" Width="90">
                                 <DataGridTemplateColumn.CellTemplate >
                                     <DataTemplate >
-                                        <ComboBox x:Name="cmbPlatformSelection" OverridesDefaultStyle="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" IsEnabled="{Binding ElementName=chkEnablePlatformSelection, Path=IsChecked}" ItemsSource="{Binding TargetPlatforms}" SelectedValue="{Binding TargetPlatform}" Height="18"  Foreground="{DynamicResource ThemeButtonForeground}" DropDownClosed="CmbPlatformSelection_DropDownClosed"/>
+                                        <ComboBox x:Name="cmbPlatformSelection" OverridesDefaultStyle="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" IsEnabled="{Binding ElementName=chkEnablePlatformSelection, Path=IsChecked}" ItemsSource="{Binding TargetPlatforms}" SelectedValue="{Binding TargetPlatform}" Height="18"  Foreground="{DynamicResource ThemeButtonForeground}" DropDownClosed="CmbPlatformSelection_DropDownClosed" MinWidth="80"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

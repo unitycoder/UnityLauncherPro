@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,7 +28,7 @@ namespace UnityLauncherPro
         public static bool useHumanFriendlyDateFormat = false;
         public static List<Project> projectsSource;
         public static UnityInstallation[] unityInstallationsSource;
-        public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>(); // versionID and installation folder
+        public static ObservableDictionary<string, string> unityInstalledVersions = new ObservableDictionary<string, string>(); // versionID and installation folder
         public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
         public static string preferredVersion = "none";
 
@@ -473,6 +472,7 @@ namespace UnityLauncherPro
 
             // also make dictionary of installed unitys, to search faster
             unityInstalledVersions.Clear();
+
             for (int i = 0, len = unityInstallationsSource.Length; i < len; i++)
             {
                 var version = unityInstallationsSource[i].Version;
