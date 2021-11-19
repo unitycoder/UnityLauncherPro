@@ -957,27 +957,27 @@ namespace UnityLauncherPro
             return null;
         }
 
-        public static void FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null)
+        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null)
         {
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
             {
                 Console.WriteLine("Missing baseFolder value");
-                return;
+                return null;
             }
 
             // check if base folder exists
             if (Directory.Exists(baseFolder) == false)
             {
                 Console.WriteLine("Missing baseFolder: " + baseFolder);
-                return;
+                return null;
             }
 
             // check selected unity version
             if (string.IsNullOrEmpty(version) == true)
             {
                 Console.WriteLine("Missing unity version");
-                return;
+                return null;
             }
 
             string newPath = null;
@@ -988,7 +988,7 @@ namespace UnityLauncherPro
                 Console.WriteLine(baseFolder);
                 projectName = GetSuggestedProjectName(version, baseFolder);
                 // failed getting new path a-z
-                if (projectName == null) return;
+                if (projectName == null) return null;
             }
             newPath = Path.Combine(baseFolder, projectName);
 
@@ -1003,10 +1003,12 @@ namespace UnityLauncherPro
 
             // launch empty project
             var proj = new Project();
+            proj.Title = projectName;
             proj.Path = Path.Combine(baseFolder, newPath);
             proj.Version = version;
             var proc = LaunchProject(proj);
             ProcessHandler.Add(proj, proc);
+            return proj;
         } // FastCreateProject
 
 

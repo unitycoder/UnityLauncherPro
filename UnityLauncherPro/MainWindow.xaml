@@ -919,7 +919,7 @@
                             </StackPanel>
 
                             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBox x:Name="txtRootFolderForNewProjects" MinWidth="300" ToolTip="When you click &quot;Create Project&quot; in main page, new project is generated under this path+UnityVersion (eg. /2017a/)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
+                                <TextBox x:Name="txtRootFolderForNewProjects" MinWidth="300" ToolTip="Root folder for quick New Projects (so that you dont have to pick project folder every time)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
                                 <Button x:Name="btnBrowseProjectRootFolder" Content="..." Margin="6,0,0,0" MinWidth="32" Click="BtnBrowseProjectRootFolder_Click" />
                                 <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ThemeButtonForeground}" />
                             </StackPanel>

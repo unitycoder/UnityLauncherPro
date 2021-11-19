@@ -610,22 +610,29 @@ namespace UnityLauncherPro
             var folder = Tools.BrowseForOutputFolder("Select Project Folder to Add it Into Projects List");
             if (string.IsNullOrEmpty(folder) == false)
             {
-                // create new project item
-                var p = new Project();
-                p.Path = folder;
-                p.Title = Path.GetFileName(folder);
-                p.Version = Tools.GetProjectVersion(folder);
-                p.Arguments = Tools.ReadCustomLaunchArguments(folder, MainWindow.launcherArgumentsFile);
-                if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.GetTargetPlatform(folder);
-                if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
-
-                // add to list
-                projectsSource.Insert(0, p);
-                gridRecent.Items.Refresh();
-                Tools.SetFocusToGrid(gridRecent); // force focus
-                gridRecent.SelectedIndex = 0;
-
+                var proj = GetNewProjectData(folder);
+                AddNewProjectToList(proj);
             }
+        }
+
+        Project GetNewProjectData(string folder)
+        {
+            var p = new Project();
+            p.Path = folder;
+            p.Title = Path.GetFileName(folder);
+            p.Version = Tools.GetProjectVersion(folder);
+            p.Arguments = Tools.ReadCustomLaunchArguments(folder, MainWindow.launcherArgumentsFile);
+            if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.GetTargetPlatform(folder);
+            if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
+            return p;
+        }
+
+        void AddNewProjectToList(Project proj)
+        {
+            projectsSource.Insert(0, proj);
+            gridRecent.Items.Refresh();
+            Tools.SetFocusToGrid(gridRecent); // force focus
+            gridRecent.SelectedIndex = 0;
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
@@ -1530,6 +1537,15 @@ namespace UnityLauncherPro
 
         void CreateNewEmptyProject()
         {
+            // first check if quick project path is assigned, if not, need to set it
+            if (Directory.Exists(txtRootFolderForNewProjects.Text) == false)
+            {
+                tabControl.SelectedIndex = 4;
+                this.UpdateLayout();
+                txtRootFolderForNewProjects.Focus();
+                return;
+            }
+
             if (chkAskNameForQuickProject.IsChecked == true)
             {
                 // ask name
@@ -1538,7 +1554,7 @@ namespace UnityLauncherPro
                 // if in maintab
                 if (tabControl.SelectedIndex == 0)
                 {
-                    newVersion = GetSelectedProject().Version == null ? preferredVersion : GetSelectedProject().Version;
+                    newVersion = GetSelectedProject()?.Version == null ? preferredVersion : GetSelectedProject().Version;
                 }
                 else // unity tab
                 {
@@ -1566,7 +1582,10 @@ namespace UnityLauncherPro
                     Console.WriteLine("Create project " + NewProject.newVersion + " : " + projectPath);
                     if (string.IsNullOrEmpty(projectPath)) return;
 
-                    Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath);
+                    var p = Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath);
+
+                    // add to list (just in case new project fails to start, then folder is already generated..)
+                    if (p != null) AddNewProjectToList(p);
                 }
                 else // false, cancel
                 {
@@ -1586,7 +1605,8 @@ namespace UnityLauncherPro
                 {
                     newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
                 }
-                Tools.FastCreateProject(newVersion, txtRootFolderForNewProjects.Text);
+                var p = Tools.FastCreateProject(newVersion, txtRootFolderForNewProjects.Text);
+                if (p != null) AddNewProjectToList(p);
             }
 
         }
