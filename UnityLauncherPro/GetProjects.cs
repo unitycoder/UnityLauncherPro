@@ -12,7 +12,7 @@ namespace UnityLauncherPro
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
         // convert target platform name into valid buildtarget platform name, NOTE this depends on unity version, now only 2019 and later are supported
-        public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Standalone" }, { "StandaloneWindows", "Standalone" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
+        public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Win64" }, { "StandaloneWindows", "Win" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
 
         // TODO separate scan and folders
         public static List<Project> Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false)
@@ -80,7 +80,7 @@ namespace UnityLauncherPro
 
                         // get last modified date from folder
                         DateTime? lastUpdated = folderExists ? Tools.GetLastModifiedTime(projectPath) : null;
-                        
+
                         // get project version
                         string projectVersion = folderExists ? Tools.GetProjectVersion(projectPath) : null;
 
@@ -111,6 +111,7 @@ namespace UnityLauncherPro
                         p.Modified = lastUpdated;
                         p.Arguments = customArgs;
                         p.GITBranch = gitBranch;
+                        //Console.WriteLine("targetPlatform " + targetPlatform + " projectPath:" + projectPath);
                         p.TargetPlatform = targetPlatform;
 
                         // bubblegum(TM) solution, fill available platforms for this unity version, for this project

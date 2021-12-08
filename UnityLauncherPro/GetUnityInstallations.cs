@@ -9,7 +9,7 @@ namespace UnityLauncherPro
     /// </summary>
     public static class GetUnityInstallations
     {
-        static Dictionary<string, string> platformNames = new Dictionary<string, string> { { "androidplayer", "Android" }, { "windowsstandalonesupport", "Standalone" }, { "linuxstandalonesupport", "Standalone" }, { "LinuxStandalone", "Standalone" }, { "OSXStandalone", "Standalone" }, { "webglsupport", "WebGL" }, { "metrosupport", "UWP" } };
+        static Dictionary<string, string> platformNames = new Dictionary<string, string> { { "androidplayer", "Android" }, { "windowsstandalonesupport", "Win" }, { "linuxstandalonesupport", "Linux" }, { "LinuxStandalone", "Linux" }, { "OSXStandalone", "OSX" }, { "webglsupport", "WebGL" }, { "metrosupport", "UWP" }, { "iossupport", "iOS" } };
 
 
         // returns unity installations
@@ -93,22 +93,31 @@ namespace UnityLauncherPro
             // get all folders inside
             var platformFolder = Path.Combine(dataFolder, "PlaybackEngines");
             if (Directory.Exists(platformFolder) == false) return null;
-            var directories = Directory.GetDirectories(platformFolder);
-            for (int i = 0; i < directories.Length; i++)
+
+            //var directories = Directory.GetDirectories(platformFolder);
+            var directories = new List<string>(Directory.GetDirectories(platformFolder));
+            //for (int i = 0; i < directories.Length; i++)
+            var count = directories.Count;
+            for (int i = 0; i < count; i++)
             {
                 var foldername = Path.GetFileName(directories[i]).ToLower();
+                //Console.WriteLine("PlaybackEngines: " + foldername);
                 // check if have better name in dictionary
                 if (platformNames.ContainsKey(foldername))
                 {
                     directories[i] = platformNames[foldername];
+
+                    // add also 64bit desktop versions for that platform, NOTE dont add android, ios or webgl
+                    if (foldername.IndexOf("alone") > -1) directories.Add(platformNames[foldername] + "64");
                 }
-                else
+                else // use raw
                 {
                     directories[i] = foldername;
                 }
+                //Console.WriteLine(i + " : " + foldername + " > " + directories[i]);
             }
 
-            return directories;
+            return directories.ToArray();
         }
 
         static int GetProjectCountForUnityVersion(string version)

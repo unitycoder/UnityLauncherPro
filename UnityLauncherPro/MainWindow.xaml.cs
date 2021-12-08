@@ -2252,7 +2252,7 @@ namespace UnityLauncherPro
             Console.WriteLine("Process Exited: " + proj.Path);
             //var index = projectsSource.IndexOf(proj); // this fails since proj has changed after refresh (timestamp or other data)
 
-            // FIXME nobody likes extra loops.. but only 40 items to find correct project?
+            // FIXME nobody likes extra loops.. but only 40 items to find correct project? but still..
             for (int i = 0, len = projectsSource.Count; i < len; i++)
             {
                 if (projectsSource[i].Path == proj.Path)
