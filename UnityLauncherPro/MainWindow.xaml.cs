@@ -2249,7 +2249,7 @@ namespace UnityLauncherPro
 
         public void ProcessExitedCallBack(Project proj)
         {
-            Console.WriteLine("Process Exited: " + proj.Path);
+            //Console.WriteLine("Process Exited: " + proj.Path);
             //var index = projectsSource.IndexOf(proj); // this fails since proj has changed after refresh (timestamp or other data)
 
             // FIXME nobody likes extra loops.. but only 40 items to find correct project? but still..
@@ -2267,6 +2267,13 @@ namespace UnityLauncherPro
                     break;
                 }
             }
+        }
+
+        private void MenuItemDownloadInBrowser_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            string exeURL = Tools.ParseDownloadURLFromWebpage(unity?.Version);
+            Tools.DownloadInBrowser(exeURL, unity?.Version);
         }
     } // class
 } //namespace

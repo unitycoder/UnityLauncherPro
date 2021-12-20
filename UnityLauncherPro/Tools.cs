@@ -475,6 +475,8 @@ namespace UnityLauncherPro
         {
             string exeURL = ParseDownloadURLFromWebpage(version);
 
+            Console.WriteLine("exeURL=" + exeURL);
+
             if (string.IsNullOrEmpty(exeURL) == false)
             {
                 //SetStatus("Download installer in browser: " + exeURL);
@@ -542,11 +544,12 @@ namespace UnityLauncherPro
                         // find line where full installer is (from archive page)
                         if (lines[i].Contains("UnitySetup64-" + version))
                         {
-                            // take previous line, which contains download assistant url
-                            string line = lines[i - 1];
+                            // take full exe installer line, to have changeset hash, then replace with download assistant filepath
+                            string line = lines[i];
                             int start = line.IndexOf('"') + 1;
                             int end = line.IndexOf('"', start);
-                            url = @"https://unity3d.com" + line.Substring(start, end - start);
+                            url = line.Substring(start, end - start);
+                            url = url.Replace("Windows64EditorInstaller/UnitySetup64-", "UnityDownloadAssistant-");
                             break;
                         }
                     }

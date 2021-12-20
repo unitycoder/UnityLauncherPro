@@ -726,6 +726,7 @@
                         <DataGrid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem x:Name="menuItemCopyUpdatesVersion" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
+                                <MenuItem x:Name="menuItemDownloadInBrowser" Header="Download in Browser" Click="MenuItemDownloadInBrowser_Click" />
                                 <MenuItem x:Name="menuItemCopyUpdateDownloadURL" Header="Copy Download URL" Click="MenuItemCopyUpdateDownloadURL_Click" />
                                 <MenuItem x:Name="menuItemUpdatesReleaseNotes" Header="Open Release Notes" Click="MenuItemUpdatesReleaseNotes_Click" />
                             </ContextMenu>
