@@ -2275,5 +2275,36 @@ namespace UnityLauncherPro
             string exeURL = Tools.ParseDownloadURLFromWebpage(unity?.Version);
             Tools.DownloadInBrowser(exeURL, unity?.Version);
         }
+
+        private void MenuItemDownloadLinuxModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            var editorFolder = Path.GetDirectoryName(unity.Path);
+
+            // TODO move to Tools as DownloadModule(version, exepath..)
+            var changeSetFile = Path.Combine(editorFolder, @"Data\PlaybackEngines\windowsstandalonesupport\Source\WindowsPlayer\WindowsPlayer\UnityConfigureRevision.gen.h");
+            if (File.Exists(changeSetFile) == true)
+            {
+                var allText = File.ReadAllText(changeSetFile);
+                var hashRaw = allText.Split(new string[] { "#define UNITY_VERSION_HASH \"" }, StringSplitOptions.None);
+                if (hashRaw.Length > 1)
+                {
+                    var hash = hashRaw[1].Replace("\"", "");
+
+                    // NOTE downloads now both, mono and il2cpp
+                    var moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-IL2CPP-Support-for-Editor-" + unity.Version + ".exe";
+                    Tools.OpenURL(moduleURL);
+                    moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-Mono-Support-for-Editor-" + unity.Version + ".exe";
+                    Tools.OpenURL(moduleURL);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Changeset hash file not found: " + changeSetFile);
+            }
+
+
+        }
     } // class
 } //namespace
