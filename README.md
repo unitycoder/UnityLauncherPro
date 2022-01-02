@@ -65,3 +65,4 @@ See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro
 
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
+
