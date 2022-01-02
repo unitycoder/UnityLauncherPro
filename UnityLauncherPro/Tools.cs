@@ -1188,5 +1188,49 @@ namespace UnityLauncherPro
             SetForegroundWindow(handle);
         }
 
+        public static void DownloadLinuxModules(string UnityExePath, string unityVersion)
+        {
+            var editorFolder = Path.GetDirectoryName(UnityExePath);
+
+            string hash = null;
+
+            // get from unity exe (only for 2018.4 and later?)
+            var versionInfo = FileVersionInfo.GetVersionInfo(UnityExePath);
+            var versionRaw = versionInfo.ProductVersion.Split('_');
+            if (versionRaw.Length == 2)
+            {
+                hash = versionRaw[1];
+            }
+            else // try other files
+            {
+                var changeSetFile = Path.Combine(editorFolder, @"Data\PlaybackEngines\windowsstandalonesupport\Source\WindowsPlayer\WindowsPlayer\UnityConfigureRevision.gen.h");
+                if (File.Exists(changeSetFile) == true)
+                {
+                    var allText = File.ReadAllText(changeSetFile);
+                    var hashRaw = allText.Split(new string[] { "#define UNITY_VERSION_HASH \"" }, StringSplitOptions.None);
+                    if (hashRaw.Length > 1)
+                    {
+                        hash = hashRaw[1].Replace("\"", "");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to parse UNITY_VERSION_HASH from " + changeSetFile);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Changeset hash file not found: " + changeSetFile);
+                }
+            }
+
+            if (hash == null) return;
+
+            // NOTE downloads now both, mono and il2cpp
+            var moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-IL2CPP-Support-for-Editor-" + unityVersion + ".exe";
+            OpenURL(moduleURL);
+            moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-Mono-Support-for-Editor-" + unityVersion + ".exe";
+            OpenURL(moduleURL);
+        }
+
     } // class
 } // namespace

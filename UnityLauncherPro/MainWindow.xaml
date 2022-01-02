@@ -635,6 +635,7 @@
                                 <MenuItem x:Name="menuItemShowUnityInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
                                 <MenuItem x:Name="menuItemSetPreferredUnityVersion" Header="Set as Preferred Version" Click="MenuItemSetPreferredUnityVersion_Click"/>
                                 <!--<MenuItem x:Name="menuItemEditPackages" Header="Edit Packages" Click="MenuItemEditPackages_Click"/>-->
+                                <Separator></Separator>
                                 <MenuItem x:Name="menuItemDownloadLinuxModule" Header="Download Linux modules" Click="MenuItemDownloadLinuxModule_Click"/>
                             </ContextMenu>
                         </DataGrid.ContextMenu>
