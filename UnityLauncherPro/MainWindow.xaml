@@ -485,10 +485,10 @@
                             <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
                             <!--<DataGridComboBoxColumn Header="Platform" IsReadOnly="False"  SelectedItemBinding="{Binding TargetPlatform}" ItemsSource="{Binding Source={StaticResource platformEnum}}" />-->
 
-                            <DataGridTemplateColumn Header="Platform">
+                            <DataGridTemplateColumn Header="Platform" Width="90">
                                 <DataGridTemplateColumn.CellTemplate >
                                     <DataTemplate >
-                                        <ComboBox x:Name="cmbPlatformSelection" OverridesDefaultStyle="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" IsEnabled="{Binding ElementName=chkEnablePlatformSelection, Path=IsChecked}" ItemsSource="{Binding TargetPlatforms}" SelectedValue="{Binding TargetPlatform}" Height="18"  Foreground="{DynamicResource ThemeButtonForeground}" DropDownClosed="CmbPlatformSelection_DropDownClosed"/>
+                                        <ComboBox x:Name="cmbPlatformSelection" OverridesDefaultStyle="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" IsEnabled="{Binding ElementName=chkEnablePlatformSelection, Path=IsChecked}" ItemsSource="{Binding TargetPlatforms}" SelectedValue="{Binding TargetPlatform}" Height="18"  Foreground="{DynamicResource ThemeButtonForeground}" DropDownClosed="CmbPlatformSelection_DropDownClosed" MinWidth="80"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -634,6 +634,9 @@
                                 <MenuItem x:Name="menuItemCopyEditorPath" Header="Copy Editor Path" Click="MenuItemCopyPath_Click" />
                                 <MenuItem x:Name="menuItemShowUnityInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
                                 <MenuItem x:Name="menuItemSetPreferredUnityVersion" Header="Set as Preferred Version" Click="MenuItemSetPreferredUnityVersion_Click"/>
+                                <!--<MenuItem x:Name="menuItemEditPackages" Header="Edit Packages" Click="MenuItemEditPackages_Click"/>-->
+                                <Separator></Separator>
+                                <MenuItem x:Name="menuItemDownloadLinuxModule" Header="Download Linux modules" Click="MenuItemDownloadLinuxModule_Click"/>
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 
@@ -725,7 +728,9 @@
                         <DataGrid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem x:Name="menuItemCopyUpdatesVersion" Header="Copy Unity Version" Click="MenuItemCopyVersion_Click" />
+                                <MenuItem x:Name="menuItemDownloadInBrowser" Header="Download in Browser" Click="MenuItemDownloadInBrowser_Click" />
                                 <MenuItem x:Name="menuItemCopyUpdateDownloadURL" Header="Copy Download URL" Click="MenuItemCopyUpdateDownloadURL_Click" />
+                                <MenuItem x:Name="menuItemUpdatesReleaseNotes" Header="Open Release Notes" Click="MenuItemUpdatesReleaseNotes_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
                         <local:Updates ReleaseDate="2020-10-10" Version="5000.1.2.3"/>
@@ -750,21 +755,22 @@
                         </Button>
                     </Grid>
                 </Grid>
-
             </TabItem>
 
             <!-- Tab: Tools -->
             <TabItem Header="Tools" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="15*" />
+                        <RowDefinition Height="124" />
                         <RowDefinition Height="50*" />
                     </Grid.RowDefinitions>
                     <!-- 1st part -->
                     <Grid Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left">
-                        <StackPanel Orientation="Vertical" Margin="10">
-                            <Border HorizontalAlignment="Left" VerticalAlignment="Top">
-                                <StackPanel Orientation="Horizontal" Margin="10">
+                        <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top">
+                            <!--border to avoid next row moving when button is selected-->
+                            <Border VerticalAlignment="Top" Height="40" HorizontalAlignment="Left" Margin="0,0,0,2">
+                                <!-- folders -->
+                                <StackPanel Orientation="Horizontal" Margin="0,4,10,4" VerticalAlignment="Top" Width="560">
                                     <Label Content="Folders" Foreground="{DynamicResource ThemeButtonForeground}" />
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Browse Editor logs folder">
                                         <Label Content="_Editor Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
@@ -780,17 +786,29 @@
                                     </Button>
                                 </StackPanel>
                             </Border>
-                            <Border HorizontalAlignment="Left" VerticalAlignment="Top">
-                                <StackPanel Orientation="Horizontal" Margin="10">
+                            <!-- tools -->
+                            <Border VerticalAlignment="Top" Height="37" HorizontalAlignment="Left" Margin="0">
+                                <StackPanel Orientation="Horizontal" Margin="2,0" VerticalAlignment="Top">
                                     <Label Content="Tools" Foreground="{DynamicResource ThemeButtonForeground}" />
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click" ToolTip="Start ADB logcat commandline">
                                         <Label Content="_ADB logcat" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
-                                    <Button Style="{StaticResource CustomButton}" x:Name="btnAdbBindWifi" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnAdbBindWifi_Click" IsEnabled="False" ToolTip="Bind Android device to wireless ADB">
-                                        <Label Content="_Bind Wifi" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    <Label Content="Args:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="0,1,0,-4" />
+                                    <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,5,0,0" Height="20"  >
+                                        <TextBox Width="420" Text="-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color"  CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtLogCatArgs" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="32" TextChanged="TxtLogCatArgs_TextChanged" />
+                                    </Grid>
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnResetLogCatArgs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Reset to default logcat args" Click="BtnResetLogCatArgs_Click">
+                                        <Label Content="Reset" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
                                 </StackPanel>
                             </Border>
+                            <!-- links -->
+                            <StackPanel Orientation="Horizontal" Margin="2,0" VerticalAlignment="Top">
+                                <Label Content="Links" Foreground="{DynamicResource ThemeButtonForeground}" />
+                                <Button Style="{StaticResource CustomButton}" x:Name="btnResources" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnResources_Click" ToolTip="List of resources, cheatsheets, sdk downloads in github page">
+                                    <Label Content="Resources 🔗" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                </Button>
+                            </StackPanel>
                         </StackPanel>
                     </Grid>
                     <!-- 2nd part -->
@@ -800,6 +818,30 @@
                             <Button x:Name="btnClearBuildReport" Style="{StaticResource CustomButton}" ToolTip="Clear report" Content="🗑" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"  Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnClearBuildReport_Click" />
                             <Button x:Name="btnRefreshBuildReport" Style="{StaticResource CustomButton}" ToolTip="Get latest Build Report from Editor.log" Content="⟳" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshBuildReport_Click"/>
                             <!--<CheckBox x:Name="chkAutoUpdateBuildReport" Content="AutoUpdate" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" HorizontalAlignment="Right" VerticalAlignment="Top" Height="26" VerticalContentAlignment="Center" IsEnabled="False"/>-->
+
+                            <!-- search box -->
+                            <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
+                                <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxBuildReport}" Height="24" />
+                                <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxBuildReport" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxBuildReport_PreviewKeyDown" TextChanged="TxtSearchBoxBuildReport_TextChanged" />
+                                <Button x:Name="btnClearBuildReportSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="BtnClearBuildReportSearch_Click">
+                                    <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchCaret}" Padding="5,3,4,4" HorizontalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxBuildReport}" Value="">
+                                                        <Setter Property="Visibility" Value="Hidden"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxBuildReport}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Hidden"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Button>
+                            </Grid>
+
+
                         </StackPanel>
                         <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick">
                             <DataGrid.Columns>
@@ -880,7 +922,7 @@
                             </StackPanel>
 
                             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBox x:Name="txtRootFolderForNewProjects" MinWidth="300" ToolTip="When you click &quot;Create Project&quot; in main page, new project is generated under this path+UnityVersion (eg. /2017a/)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
+                                <TextBox x:Name="txtRootFolderForNewProjects" MinWidth="300" ToolTip="Root folder for quick New Projects (so that you dont have to pick project folder every time)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
                                 <Button x:Name="btnBrowseProjectRootFolder" Content="..." Margin="6,0,0,0" MinWidth="32" Click="BtnBrowseProjectRootFolder_Click" />
                                 <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ThemeButtonForeground}" />
                             </StackPanel>

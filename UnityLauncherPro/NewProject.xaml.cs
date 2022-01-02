@@ -25,7 +25,7 @@ namespace UnityLauncherPro
             lblNewProjectFolder.Content = targetFolder;
 
             // fill available versions, TODO could show which modules are installed
-            gridAvailableVersions.ItemsSource = MainWindow.unityInstalledVersions;
+            if (gridAvailableVersions.ItemsSource == null) gridAvailableVersions.ItemsSource = MainWindow.unityInstalledVersions;
 
             // we dont have that version installed, TODO show info or pick closest?, for now picks the first item
             if (MainWindow.unityInstalledVersions.ContainsKey(unityVersion) == true)
@@ -157,6 +157,8 @@ namespace UnityLauncherPro
         {
             // set initial default row color
             DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
+            // if now unitys available
+            if (row == null) return;
             //row.Background = Brushes.Green;
             row.Foreground = Brushes.White;
             row.FontWeight = FontWeights.Bold;

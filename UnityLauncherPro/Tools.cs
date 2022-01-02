@@ -5,16 +5,31 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using UnityLauncherPro.Helpers;
 
 namespace UnityLauncherPro
 {
     public static class Tools
     {
+        const int SW_RESTORE = 9;
+
+        [DllImport("user32", CharSet = CharSet.Unicode)]
+        static extern IntPtr FindWindow(string cls, string win);
+        [DllImport("user32")]
+        static extern IntPtr SetForegroundWindow(IntPtr hWnd);
+        [DllImport("user32")]
+        static extern bool IsIconic(IntPtr hWnd);
+        [DllImport("user32")]
+        static extern bool OpenIcon(IntPtr hWnd);
+        [DllImport("user32")]
+        private static extern bool ShowWindow(IntPtr handle, int nCmdShow);
+
         // returns last modified date for file (or null if cannot get it)
         public static DateTime? GetLastModifiedTime(string path)
         {
@@ -144,13 +159,26 @@ namespace UnityLauncherPro
         }
 
         // NOTE holding alt key (when using alt+o) brings up unity project selector
-        public static Process LaunchProject(Project proj)
+        public static Process LaunchProject(Project proj, DataGrid dataGridRef = null)
         {
             // validate
             if (proj == null) return null;
             if (Directory.Exists(proj.Path) == false) return null;
 
-            Console.WriteLine("launch project " + proj.Title + " " + proj.Version);
+            Console.WriteLine("Launching project " + proj.Title + " at " + proj.Path);
+
+            // check if this project path has unity already running? (from lock file or process) 
+            // NOTE this check only works if previous unity instance was started while we were running
+            if (ProcessHandler.IsRunning(proj.Path))
+            {
+                Console.WriteLine("Project is already running, lets not launch unity.. because it opens Hub");
+                BringProcessToFront(ProcessHandler.Get(proj.Path));
+                return null;
+            }
+            else
+            {
+                // TODO check lock file?
+            }
 
             // there is no assets path, probably we want to create new project then
             var assetsFolder = Path.Combine(proj.Path, "Assets");
@@ -200,6 +228,7 @@ namespace UnityLauncherPro
                 Console.WriteLine("Start process: " + cmd + " " + unitycommandlineparameters);
 
                 newProcess.StartInfo.Arguments = unitycommandlineparameters;
+                newProcess.EnableRaisingEvents = true;
                 newProcess.Start();
 
                 if (Properties.Settings.Default.closeAfterProject)
@@ -212,12 +241,12 @@ namespace UnityLauncherPro
                 Console.WriteLine(e);
             }
 
-            // move as first, since its opened, disabled for now, more used to it staying in place..
-            // MainWindow wnd = (MainWindow)Application.Current.MainWindow;
-            // wnd.MoveRecentGridItem(0);
+            // NOTE move project as first, since its opened, disabled for now, since its too jumpy..
+            //MainWindow wnd = (MainWindow)Application.Current.MainWindow;
+            //wnd.MoveRecentGridItem(0);
 
+            ProcessHandler.Add(proj, newProcess);
             return newProcess;
-
         }
 
         static bool CheckCrashBackupScene(string projectPath)
@@ -446,6 +475,8 @@ namespace UnityLauncherPro
         {
             string exeURL = ParseDownloadURLFromWebpage(version);
 
+            Console.WriteLine("exeURL=" + exeURL);
+
             if (string.IsNullOrEmpty(exeURL) == false)
             {
                 //SetStatus("Download installer in browser: " + exeURL);
@@ -513,11 +544,12 @@ namespace UnityLauncherPro
                         // find line where full installer is (from archive page)
                         if (lines[i].Contains("UnitySetup64-" + version))
                         {
-                            // take previous line, which contains download assistant url
-                            string line = lines[i - 1];
+                            // take full exe installer line, to have changeset hash, then replace with download assistant filepath
+                            string line = lines[i];
                             int start = line.IndexOf('"') + 1;
                             int end = line.IndexOf('"', start);
-                            url = @"https://unity3d.com" + line.Substring(start, end - start);
+                            url = line.Substring(start, end - start);
+                            url = url.Replace("Windows64EditorInstaller/UnitySetup64-", "UnityDownloadAssistant-");
                             break;
                         }
                     }
@@ -680,7 +712,6 @@ namespace UnityLauncherPro
                 // inject new version for this item
                 proj.Version = upgradeToVersion;
                 var proc = LaunchProject(proj);
-                proj.Process = proc;
             }
             else
             {
@@ -775,7 +806,7 @@ namespace UnityLauncherPro
         }
 
         //public static Platform GetTargetPlatform(string projectPath)
-        public static string GetTargetPlatform(string projectPath)
+        static string GetTargetPlatformRaw(string projectPath)
         {
             string results = null;
             //Platform results = Platform.Unknown;
@@ -807,7 +838,27 @@ namespace UnityLauncherPro
                     }
                 }
             }
+            else
+            {
+                //Console.WriteLine("Missing csproj, cannot parse target platform: "+ projectPath);
+            }
+
             return results;
+        }
+
+        public static string GetTargetPlatform(string projectPath)
+        {
+            var rawPlatformName = GetTargetPlatformRaw(projectPath);
+
+            if (string.IsNullOrEmpty(rawPlatformName) == false && GetProjects.remapPlatformNames.ContainsKey(rawPlatformName))
+            {
+                return GetProjects.remapPlatformNames[rawPlatformName];
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(rawPlatformName) == false) Console.WriteLine("Missing buildTarget remap name for: " + rawPlatformName);
+                return null;
+            }
         }
 
         /// <summary>
@@ -909,27 +960,27 @@ namespace UnityLauncherPro
             return null;
         }
 
-        public static void FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null)
+        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null)
         {
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
             {
                 Console.WriteLine("Missing baseFolder value");
-                return;
+                return null;
             }
 
             // check if base folder exists
             if (Directory.Exists(baseFolder) == false)
             {
                 Console.WriteLine("Missing baseFolder: " + baseFolder);
-                return;
+                return null;
             }
 
             // check selected unity version
             if (string.IsNullOrEmpty(version) == true)
             {
                 Console.WriteLine("Missing unity version");
-                return;
+                return null;
             }
 
             string newPath = null;
@@ -940,7 +991,7 @@ namespace UnityLauncherPro
                 Console.WriteLine(baseFolder);
                 projectName = GetSuggestedProjectName(version, baseFolder);
                 // failed getting new path a-z
-                if (projectName == null) return;
+                if (projectName == null) return null;
             }
             newPath = Path.Combine(baseFolder, projectName);
 
@@ -955,10 +1006,12 @@ namespace UnityLauncherPro
 
             // launch empty project
             var proj = new Project();
+            proj.Title = projectName;
             proj.Path = Path.Combine(baseFolder, newPath);
             proj.Version = version;
             var proc = LaunchProject(proj);
-            proj.Process = proc;
+            ProcessHandler.Add(proj, proc);
+            return proj;
         } // FastCreateProject
 
 
@@ -1121,6 +1174,62 @@ namespace UnityLauncherPro
                 //Console.WriteLine("Invalid custom datetime format: " + format);
                 return false;
             }
+        }
+
+        // https://stackoverflow.com/a/37724335/5452781
+        public static void BringProcessToFront(Process process)
+        {
+            IntPtr handle = process.MainWindowHandle;
+            if (IsIconic(handle))
+            {
+                ShowWindow(handle, SW_RESTORE);
+            }
+
+            SetForegroundWindow(handle);
+        }
+
+        public static void DownloadLinuxModules(string UnityExePath, string unityVersion)
+        {
+            var editorFolder = Path.GetDirectoryName(UnityExePath);
+
+            string hash = null;
+
+            // get from unity exe (only for 2018.4 and later?)
+            var versionInfo = FileVersionInfo.GetVersionInfo(UnityExePath);
+            var versionRaw = versionInfo.ProductVersion.Split('_');
+            if (versionRaw.Length == 2)
+            {
+                hash = versionRaw[1];
+            }
+            else // try other files
+            {
+                var changeSetFile = Path.Combine(editorFolder, @"Data\PlaybackEngines\windowsstandalonesupport\Source\WindowsPlayer\WindowsPlayer\UnityConfigureRevision.gen.h");
+                if (File.Exists(changeSetFile) == true)
+                {
+                    var allText = File.ReadAllText(changeSetFile);
+                    var hashRaw = allText.Split(new string[] { "#define UNITY_VERSION_HASH \"" }, StringSplitOptions.None);
+                    if (hashRaw.Length > 1)
+                    {
+                        hash = hashRaw[1].Replace("\"", "");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to parse UNITY_VERSION_HASH from " + changeSetFile);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Changeset hash file not found: " + changeSetFile);
+                }
+            }
+
+            if (hash == null) return;
+
+            // NOTE downloads now both, mono and il2cpp
+            var moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-IL2CPP-Support-for-Editor-" + unityVersion + ".exe";
+            OpenURL(moduleURL);
+            moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-Mono-Support-for-Editor-" + unityVersion + ".exe";
+            OpenURL(moduleURL);
         }
 
     } // class

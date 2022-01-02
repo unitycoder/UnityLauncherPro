@@ -369,5 +369,17 @@ namespace UnityLauncherPro.Properties {
                 this["runAutomaticallyMinimized"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color")]
+        public string adbLogCatArgs {
+            get {
+                return ((string)(this["adbLogCatArgs"]));
+            }
+            set {
+                this["adbLogCatArgs"] = value;
+            }
+        }
     }
 }

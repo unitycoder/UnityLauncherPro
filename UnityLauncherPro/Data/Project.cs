@@ -15,24 +15,19 @@ namespace UnityLauncherPro
         public string GITBranch { set; get; }
         //public string TargetPlatform { set; get; }
         public string TargetPlatform { set; get; }
-
         public string[] TargetPlatforms { set; get; }
-
-
         public bool folderExists { set; get; }
-        public Process Process; // launched unity exe
 
         public override string ToString()
         {
             return $"{Title} {Version} {Path} {Modified} {Arguments} {GITBranch} {TargetPlatform}";
         }
 
-        // https://stackoverflow.com/a/5551986/5452781
+        // change datagrid colors based on value using converter https://stackoverflow.com/a/5551986/5452781
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             bool b = (bool)value;
             return b;
-            //return string.IsNullOrEmpty(str);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

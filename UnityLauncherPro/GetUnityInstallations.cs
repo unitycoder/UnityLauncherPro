@@ -9,8 +9,7 @@ namespace UnityLauncherPro
     /// </summary>
     public static class GetUnityInstallations
     {
-        //static Dictionary<string, string> platformNames = new Dictionary<string, string> { { "androidplayer", "Android" }, { "windowsstandalonesupport", "Windows" }, { "linuxstandalonesupport", "Linux" }, { "LinuxStandalone", "Linux" }, { "OSXStandalone", "Mac" }, { "webglsupport", "WebGL" }, { "metrosupport", "UWP" } };
-        static Dictionary<string, string> platformNames = new Dictionary<string, string> { { "androidplayer", "Android" }, { "windowsstandalonesupport", "Standalone" }, { "linuxstandalonesupport", "Standalone" }, { "LinuxStandalone", "Standalone" }, { "OSXStandalone", "Standalone" }, { "webglsupport", "WebGL" }, { "metrosupport", "UWP" } };
+        static Dictionary<string, string> platformNames = new Dictionary<string, string> { { "androidplayer", "Android" }, { "windowsstandalonesupport", "Win" }, { "linuxstandalonesupport", "Linux" }, { "LinuxStandalone", "Linux" }, { "OSXStandalone", "OSX" }, { "webglsupport", "WebGL" }, { "metrosupport", "UWP" }, { "iossupport", "iOS" } };
 
 
         // returns unity installations
@@ -33,18 +32,30 @@ namespace UnityLauncherPro
                 // parse all folders under root, and search for unity editor files
                 for (int i = 0, length = directories.Length; i < length; i++)
                 {
-                    // check if uninstaller is there, sure sign for unity
-                    var uninstallExe = Path.Combine(directories[i], "Editor", "Uninstall.exe");
+                    var editorFolder = Path.Combine(directories[i], "Editor");
+                    if (Directory.Exists(editorFolder) == false)
+                    {
+                        // OPTIONAL scan for source code build output
+                        editorFolder = Path.Combine(directories[i], "build/WindowsEditor/x64/Release");
+                        if (Directory.Exists(editorFolder) == false)
+                        {
+                            // no unity editor root folder found, skip this folder
+                            continue;
+                        }
+                    }
+
+                    // check if uninstaller is there, sure sign of unity
+                    var uninstallExe = Path.Combine(editorFolder, "Uninstall.exe");
                     var haveUninstaller = File.Exists(uninstallExe);
 
-                    var exePath = Path.Combine(directories[i], "Editor", "Unity.exe");
+                    var exePath = Path.Combine(editorFolder, "Unity.exe");
                     if (File.Exists(exePath) == false) continue;
 
                     // get full version number from uninstaller (or try exe, if no uninstaller)
                     var version = Tools.GetFileVersionData(haveUninstaller ? uninstallExe : exePath);
 
                     // we got new version to add
-                    var dataFolder = Path.Combine(directories[i], "Editor", "Data");
+                    var dataFolder = Path.Combine(editorFolder, "Data");
                     DateTime? installDate = Tools.GetLastModifiedTime(dataFolder);
                     UnityInstallation unity = new UnityInstallation();
                     unity.Version = version;
@@ -82,22 +93,31 @@ namespace UnityLauncherPro
             // get all folders inside
             var platformFolder = Path.Combine(dataFolder, "PlaybackEngines");
             if (Directory.Exists(platformFolder) == false) return null;
-            var directories = Directory.GetDirectories(platformFolder);
-            for (int i = 0; i < directories.Length; i++)
+
+            //var directories = Directory.GetDirectories(platformFolder);
+            var directories = new List<string>(Directory.GetDirectories(platformFolder));
+            //for (int i = 0; i < directories.Length; i++)
+            var count = directories.Count;
+            for (int i = 0; i < count; i++)
             {
                 var foldername = Path.GetFileName(directories[i]).ToLower();
+                //Console.WriteLine("PlaybackEngines: " + foldername);
                 // check if have better name in dictionary
                 if (platformNames.ContainsKey(foldername))
                 {
                     directories[i] = platformNames[foldername];
+
+                    // add also 64bit desktop versions for that platform, NOTE dont add android, ios or webgl
+                    if (foldername.IndexOf("alone") > -1) directories.Add(platformNames[foldername] + "64");
                 }
-                else
+                else // use raw
                 {
                     directories[i] = foldername;
                 }
+                //Console.WriteLine(i + " : " + foldername + " > " + directories[i]);
             }
 
-            return directories;
+            return directories.ToArray();
         }
 
         static int GetProjectCountForUnityVersion(string version)

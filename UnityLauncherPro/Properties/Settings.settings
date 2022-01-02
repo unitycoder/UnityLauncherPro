@@ -92,5 +92,8 @@
     <Setting Name="runAutomaticallyMinimized" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="adbLogCatArgs" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

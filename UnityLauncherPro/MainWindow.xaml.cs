@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,13 +17,39 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
+using UnityLauncherPro.Helpers;
 
 namespace UnityLauncherPro
 {
     public partial class MainWindow : Window
     {
-        private System.Windows.Forms.NotifyIcon notifyIcon;
         public const string appName = "UnityLauncherPro";
+        public static string currentDateFormat = null;
+        public static bool useHumanFriendlyDateFormat = false;
+        public static List<Project> projectsSource;
+        public static UnityInstallation[] unityInstallationsSource;
+        public static ObservableDictionary<string, string> unityInstalledVersions = new ObservableDictionary<string, string>(); // versionID and installation folder
+        public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
+        public static string preferredVersion = "none";
+
+        const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
+        const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
+        const string resourcesURL = "https://github.com/unitycoder/UnityResources";
+        const string defaultAdbLogCatArgs = "-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
+        System.Windows.Forms.NotifyIcon notifyIcon;
+
+        Updates[] updatesSource;
+
+        string _filterString = null;
+        int lastSelectedProjectIndex = 0;
+        Mutex myMutex;
+
+        string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
+        string adbLogCatArgs = defaultAdbLogCatArgs;
+
+        Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
+        string themefile = "theme.ini";
+        string latestBuildReportProjectPath = null;
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
         static extern IntPtr FindWindow(string cls, string win);
@@ -34,30 +59,6 @@ namespace UnityLauncherPro
         static extern bool IsIconic(IntPtr hWnd);
         [DllImport("user32")]
         static extern bool OpenIcon(IntPtr hWnd);
-
-        // datagrid sources
-        public static List<Project> projectsSource;
-        Updates[] updatesSource;
-        public static UnityInstallation[] unityInstallationsSource;
-
-        public static Dictionary<string, string> unityInstalledVersions = new Dictionary<string, string>(); // versionID and installation folder
-        const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
-        public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
-        string _filterString = null;
-        const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
-        int lastSelectedProjectIndex = 0;
-        public static string preferredVersion = "none";
-        Mutex myMutex;
-
-        string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
-        public static string currentDateFormat = null;
-        public static bool useHumanFriendlyDateFormat = false;
-
-        Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
-        string themefile = "theme.ini";
-
-        string latestBuildReportProjectPath = null;
-
 
         public MainWindow()
         {
@@ -90,6 +91,7 @@ namespace UnityLauncherPro
                 myMutex = new Mutex(true, appName, out aIsNewInstance);
                 if (!aIsNewInstance)
                 {
+                    // NOTE doesnt work if its minized to tray
                     ActivateOtherWindow();
                     App.Current.Shutdown();
                 }
@@ -141,8 +143,7 @@ namespace UnityLauncherPro
             if (other != IntPtr.Zero)
             {
                 SetForegroundWindow(other);
-                if (IsIconic(other))
-                    OpenIcon(other);
+                if (IsIconic(other)) OpenIcon(other);
             }
         }
 
@@ -191,7 +192,8 @@ namespace UnityLauncherPro
                     {
                         // try launching it
                         var proc = Tools.LaunchProject(proj);
-                        proj.Process = proc;
+                        //proj.Process = proc;
+                        //ProcessHandler.Add(proj, proc);
                     }
 
                     // quit after launch if enabled in settings
@@ -244,6 +246,17 @@ namespace UnityLauncherPro
             }
         }
 
+        void FilterBuildReport()
+        {
+            _filterString = txtSearchBoxBuildReport.Text;
+            ICollectionView collection = CollectionViewSource.GetDefaultView(gridBuildReport.ItemsSource);
+            collection.Filter = BuildReportFilter;
+            //if (gridBuildReport.Items.Count > 0)
+            //{
+            //    gridBuildReport.SelectedIndex = 0;
+            //}
+        }
+
         private bool ProjectFilter(object item)
         {
             Project proj = item as Project;
@@ -260,6 +273,12 @@ namespace UnityLauncherPro
         {
             UnityInstallation unity = item as UnityInstallation;
             return (unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+        }
+
+        private bool BuildReportFilter(object item)
+        {
+            BuildReportItem reportItem = item as BuildReportItem;
+            return (reportItem.Path.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
         }
 
         void LoadSettings()
@@ -330,7 +349,6 @@ namespace UnityLauncherPro
             chkUseCustomLastModified.IsChecked = Properties.Settings.Default.useCustomLastModified;
             txtCustomDateTimeFormat.Text = Properties.Settings.Default.customDateFormat;
 
-
             if (Properties.Settings.Default.useCustomLastModified)
             {
                 currentDateFormat = Properties.Settings.Default.customDateFormat;
@@ -374,6 +392,9 @@ namespace UnityLauncherPro
                     }
                 }
             }
+
+            adbLogCatArgs = Properties.Settings.Default.adbLogCatArgs;
+            txtLogCatArgs.Text = adbLogCatArgs;
 
         } // LoadSettings()
 
@@ -451,6 +472,7 @@ namespace UnityLauncherPro
 
             // also make dictionary of installed unitys, to search faster
             unityInstalledVersions.Clear();
+
             for (int i = 0, len = unityInstallationsSource.Length; i < len; i++)
             {
                 var version = unityInstallationsSource[i].Version;
@@ -544,7 +566,7 @@ namespace UnityLauncherPro
             }
         }
 
-        void RefreshRecentProjects()
+        public void RefreshRecentProjects()
         {
             // clear search
             txtSearchBox.Text = "";
@@ -588,22 +610,29 @@ namespace UnityLauncherPro
             var folder = Tools.BrowseForOutputFolder("Select Project Folder to Add it Into Projects List");
             if (string.IsNullOrEmpty(folder) == false)
             {
-                // create new project item
-                var p = new Project();
-                p.Path = folder;
-                p.Title = Path.GetFileName(folder);
-                p.Version = Tools.GetProjectVersion(folder);
-                p.Arguments = Tools.ReadCustomLaunchArguments(folder, MainWindow.launcherArgumentsFile);
-                if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.GetTargetPlatform(folder);
-                if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
-
-                // add to list
-                projectsSource.Insert(0, p);
-                gridRecent.Items.Refresh();
-                Tools.SetFocusToGrid(gridRecent); // force focus
-                gridRecent.SelectedIndex = 0;
-
+                var proj = GetNewProjectData(folder);
+                AddNewProjectToList(proj);
             }
+        }
+
+        Project GetNewProjectData(string folder)
+        {
+            var p = new Project();
+            p.Path = folder;
+            p.Title = Path.GetFileName(folder);
+            p.Version = Tools.GetProjectVersion(folder);
+            p.Arguments = Tools.ReadCustomLaunchArguments(folder, MainWindow.launcherArgumentsFile);
+            if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.GetTargetPlatform(folder);
+            if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
+            return p;
+        }
+
+        void AddNewProjectToList(Project proj)
+        {
+            projectsSource.Insert(0, proj);
+            gridRecent.Items.Refresh();
+            Tools.SetFocusToGrid(gridRecent); // force focus
+            gridRecent.SelectedIndex = 0;
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
@@ -736,6 +765,18 @@ namespace UnityLauncherPro
                             break;
                     }
                     break;
+
+                case 3: // Tools
+
+                    switch (e.Key)
+                    {
+                        case Key.Escape: // clear search
+                            txtSearchBoxBuildReport.Text = "";
+                            break;
+                        default: // any key
+                            break;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -795,8 +836,10 @@ namespace UnityLauncherPro
         private void BtnLaunchProject_Click(object sender, RoutedEventArgs e)
         {
             var proj = GetSelectedProject();
-            var proc = Tools.LaunchProject(proj);
-            proj.Process = proc;
+            var proc = Tools.LaunchProject(proj, gridRecent);
+
+            //ProcessHandler.Add(proj, proc);
+
             Tools.SetFocusToGrid(gridRecent);
         }
 
@@ -907,7 +950,7 @@ namespace UnityLauncherPro
                 case Key.Return: // open selected project
                     var proj = GetSelectedProject();
                     var proc = Tools.LaunchProject(proj);
-                    proj.Process = proc;
+                    //ProcessHandler.Add(proj, proc);
                     break;
                 case Key.Tab:
                 case Key.Up:
@@ -999,7 +1042,7 @@ namespace UnityLauncherPro
                     e.Handled = true;
                     var proj = GetSelectedProject();
                     var proc = Tools.LaunchProject(proj);
-                    proj.Process = proc;
+                    //ProcessHandler.Add(proj, proc);
                     break;
                 default:
                     break;
@@ -1071,13 +1114,14 @@ namespace UnityLauncherPro
 
         private void BtnOpenADBLogCat_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(adbLogCatArgs)) return;
+
             try
             {
                 Process myProcess = new Process();
                 var cmd = "cmd.exe";
                 myProcess.StartInfo.FileName = cmd;
-                // NOTE windows10 cmd line supports ansi colors, otherwise remove -v color
-                var pars = " /c adb logcat -s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
+                var pars = " /c adb logcat " + adbLogCatArgs;
                 myProcess.StartInfo.Arguments = pars;
                 myProcess.Start();
             }
@@ -1384,7 +1428,7 @@ namespace UnityLauncherPro
 
             var proj = GetSelectedProject();
             var proc = Tools.LaunchProject(proj);
-            proj.Process = proc;
+            //ProcessHandler.Add(proj, proc);
         }
 
         private void DataGridUnitys_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -1493,6 +1537,15 @@ namespace UnityLauncherPro
 
         void CreateNewEmptyProject()
         {
+            // first check if quick project path is assigned, if not, need to set it
+            if (Directory.Exists(txtRootFolderForNewProjects.Text) == false)
+            {
+                tabControl.SelectedIndex = 4;
+                this.UpdateLayout();
+                txtRootFolderForNewProjects.Focus();
+                return;
+            }
+
             if (chkAskNameForQuickProject.IsChecked == true)
             {
                 // ask name
@@ -1501,7 +1554,7 @@ namespace UnityLauncherPro
                 // if in maintab
                 if (tabControl.SelectedIndex == 0)
                 {
-                    newVersion = GetSelectedProject().Version == null ? preferredVersion : GetSelectedProject().Version;
+                    newVersion = GetSelectedProject()?.Version == null ? preferredVersion : GetSelectedProject().Version;
                 }
                 else // unity tab
                 {
@@ -1529,7 +1582,10 @@ namespace UnityLauncherPro
                     Console.WriteLine("Create project " + NewProject.newVersion + " : " + projectPath);
                     if (string.IsNullOrEmpty(projectPath)) return;
 
-                    Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath);
+                    var p = Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath);
+
+                    // add to list (just in case new project fails to start, then folder is already generated..)
+                    if (p != null) AddNewProjectToList(p);
                 }
                 else // false, cancel
                 {
@@ -1549,7 +1605,8 @@ namespace UnityLauncherPro
                 {
                     newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
                 }
-                Tools.FastCreateProject(newVersion, txtRootFolderForNewProjects.Text);
+                var p = Tools.FastCreateProject(newVersion, txtRootFolderForNewProjects.Text);
+                if (p != null) AddNewProjectToList(p);
             }
 
         }
@@ -1670,16 +1727,18 @@ namespace UnityLauncherPro
         void KillSelectedProcess(object sender, ExecutedRoutedEventArgs e)
         {
             var proj = GetSelectedProject();
-            if (proj.Process != null)
+            var proc = ProcessHandler.Get(proj.Path);
+            if (proj != null && proc != null)
             {
                 try
                 {
-                    proj.Process.Kill();
+                    proc.Kill();
                 }
                 catch (Exception)
                 {
                 }
-                proj.Process = null;
+                //proc.Dispose(); // NOTE cannot dispose, otherwise process.Exited event is not called
+                proj = null;
             }
         }
 
@@ -1688,7 +1747,8 @@ namespace UnityLauncherPro
             if (tabControl.SelectedIndex == 0)
             {
                 var proj = GetSelectedProject();
-                menuItemKillProcess.IsEnabled = proj.Process != null;
+                var proc = ProcessHandler.Get(proj.Path);
+                menuItemKillProcess.IsEnabled = proc != null;
             }
         }
 
@@ -1706,9 +1766,22 @@ namespace UnityLauncherPro
             if (File.Exists(logFile) == false) return;
 
             // NOTE this can fail on a HUGE log file
-            string[] rows = File.ReadAllLines(logFile);
-
-            if (rows == null)
+            List<string> rows = new List<string>();
+            try
+            {
+                using (FileStream fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    using (StreamReader sr = new StreamReader(fs))
+                    {
+                        // now we collect all lines, but could collect only those needed below
+                        while (!sr.EndOfStream)
+                        {
+                            rows.Add(sr.ReadLine());
+                        }
+                    }
+                }
+            }
+            catch (Exception)
             {
                 Console.WriteLine("Failed to open editor log: " + logFile);
                 return;
@@ -1717,7 +1790,7 @@ namespace UnityLauncherPro
             int startRow = -1;
             int endRow = -1;
 
-            for (int i = 0, len = rows.Length; i < len; i++)
+            for (int i = 0, len = rows.Count; i < len; i++)
             {
                 // get current project path from log file
                 if (rows[i] == "-projectPath")
@@ -1729,14 +1802,14 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(latestBuildReportProjectPath)) Console.WriteLine("Failed to parse project path from logfile..");
 
             // loop backwards to find latest report
-            for (int i = rows.Length - 1; i >= 0; i--)
+            for (int i = rows.Count - 1; i >= 0; i--)
             {
                 // find start of build report
                 if (rows[i].IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
                 {
                     startRow = i + 1;
                     // find end of report
-                    for (int k = i; k < rows.Length; k++)
+                    for (int k = i, len = rows.Count; k < len; k++)
                     {
                         if (rows[k].IndexOf("-------------------------------------------------------------------------------") == 0)
                         {
@@ -1750,7 +1823,7 @@ namespace UnityLauncherPro
 
             if (startRow == -1 || endRow == -1)
             {
-                Console.WriteLine("Failed to parse Build Report, start= " + startRow + " end= " + endRow);
+                Console.WriteLine("Failed to parse Editor.Log (probably no build report there), start= " + startRow + " end= " + endRow);
                 return;
             }
 
@@ -1822,7 +1895,8 @@ namespace UnityLauncherPro
             int port = rnd.Next(50000, 61000);
 
             // take process id from unity, if have it (then webserver closes automatically when unity is closed)
-            int pid = proj.Process == null ? -1 : proj.Process.Id;
+            var proc = ProcessHandler.Get(proj.Path);
+            int pid = proc == null ? -1 : proc.Id;
             var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
 
             // then open browser
@@ -2111,6 +2185,102 @@ namespace UnityLauncherPro
 
             Properties.Settings.Default.runAutomaticallyMinimized = isChecked;
             Properties.Settings.Default.Save();
+        }
+
+        private void MenuItemEditPackages_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO read Editor\Data\Resources\PackageManager\Editor\manifest.json
+            // TODO read list of buildin packages *or no need, its com.unity.modules.*
+            // TODO show list of packages (with buildin packages hidden from the list)
+            // TODO user can enable/disable packages
+            // TODO save back to the JSON file (NOTE cannot write if not admin! need to run some batch command elevated to overwrite file?)
+            // TODO or, allow setting filter for packages (so can have custom "dont want"-packages list, and then remove those automatically! (from generated project, so original manifest can stay, but at which point..)
+        }
+
+        private void MenuItemUpdatesReleaseNotes_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            Tools.OpenReleaseNotes(unity?.Version);
+        }
+
+        private void BtnClearBuildReportSearch_Click(object sender, RoutedEventArgs e)
+        {
+            txtSearchBoxBuildReport.Text = "";
+        }
+
+        private void TxtSearchBoxBuildReport_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                    Tools.SetFocusToGrid(gridBuildReport);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void TxtSearchBoxBuildReport_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (gridBuildReport.ItemsSource != null) FilterBuildReport();
+        }
+
+        private void TxtLogCatArgs_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+            Properties.Settings.Default.adbLogCatArgs = txtLogCatArgs.Text;
+            Properties.Settings.Default.Save();
+            adbLogCatArgs = txtLogCatArgs.Text;
+        }
+
+        private void BtnResetLogCatArgs_Click(object sender, RoutedEventArgs e)
+        {
+            adbLogCatArgs = defaultAdbLogCatArgs;
+            Properties.Settings.Default.adbLogCatArgs = defaultAdbLogCatArgs;
+            Properties.Settings.Default.Save();
+            txtLogCatArgs.Text = defaultAdbLogCatArgs;
+        }
+
+        private void BtnResources_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.OpenURL(resourcesURL);
+        }
+
+        public void ProcessExitedCallBack(Project proj)
+        {
+            //Console.WriteLine("Process Exited: " + proj.Path);
+            //var index = projectsSource.IndexOf(proj); // this fails since proj has changed after refresh (timestamp or other data)
+
+            // FIXME nobody likes extra loops.. but only 40 items to find correct project? but still..
+            for (int i = 0, len = projectsSource.Count; i < len; i++)
+            {
+                if (projectsSource[i].Path == proj.Path)
+                {
+                    var tempProj = projectsSource[i];
+                    tempProj.Modified = Tools.GetLastModifiedTime(proj.Path);
+                    tempProj.Version = Tools.GetProjectVersion(proj.Path);
+                    tempProj.GITBranch = Tools.ReadGitBranchInfo(proj.Path);
+                    tempProj.TargetPlatform = Tools.GetTargetPlatform(proj.Path);
+                    projectsSource[i] = tempProj;
+                    gridRecent.Items.Refresh();
+                    break;
+                }
+            }
+        }
+
+        private void MenuItemDownloadInBrowser_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            string exeURL = Tools.ParseDownloadURLFromWebpage(unity?.Version);
+            Tools.DownloadInBrowser(exeURL, unity?.Version);
+        }
+
+        private void MenuItemDownloadLinuxModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.DownloadLinuxModules(unity.Path, unity.Version);
         }
     } // class
 } //namespace
