@@ -1404,6 +1404,12 @@ namespace UnityLauncherPro
                 Console.WriteLine("Modified platform target: " + newcellValue);
             }
 
+            gridRecent.CommitEdit();
+            gridRecent.CommitEdit();
+
+            // TODO add esc to cancel edit
+            //gridRecent.CancelEdit();
+
             // TODO select the same row again
         }
 
