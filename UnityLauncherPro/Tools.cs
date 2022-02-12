@@ -67,7 +67,7 @@ namespace UnityLauncherPro
                     if (data != null && data.Length > 0)
                     {
                         var dd = data[0];
-                        // check first line
+                        // check string
                         if (dd.Contains("m_EditorVersion"))
                         {
                             var t = dd.Split(new string[] { "m_EditorVersion: " }, StringSplitOptions.None);
@@ -134,6 +134,38 @@ namespace UnityLauncherPro
             }
 
             return version;
+        }
+
+        internal static string ReadProjectName(string projectPath)
+        {
+            string results = null;
+            var versionPath = Path.Combine(projectPath, "ProjectSettings", "ProjectSettings.asset");
+            if (File.Exists(versionPath) == true) // 5.x and later
+            {
+                var data = File.ReadAllLines(versionPath);
+
+                if (data != null && data.Length > 0)
+                {
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        // check row
+                        if (data[i].IndexOf("productName: ") > -1)
+                        {
+                            var t = data[i].Split(new string[] { "productName: " }, StringSplitOptions.None);
+                            if (t != null && t.Length > 0)
+                            {
+                                results = t[1].Trim();
+                                break;
+                            }
+                            else
+                            {
+                                throw new InvalidDataException("invalid productName data:" + data);
+                            }
+                        }
+                    }
+                }
+            }
+            return results;
         }
 
         // returns unity version number string from file
@@ -884,21 +916,45 @@ namespace UnityLauncherPro
             return dirInfo;
         }
 
-        /// <summary>
-        /// reads LauncherArguments.txt file from ProjectSettings-folder
-        /// </summary>
-        /// <param name="projectPath">full project root path</param>
-        /// <param name="launcherArgumentsFile">default filename is "LauncherArguments.txt"</param>
-        /// <returns></returns>
-        public static string ReadCustomLaunchArguments(string projectPath, string launcherArgumentsFile)
+        public static string ReadCustomProjectData(string projectPath, string customFile)
         {
             string results = null;
-            string argumentsFile = Path.Combine(projectPath, "ProjectSettings", launcherArgumentsFile);
-            if (File.Exists(argumentsFile) == true)
+            customFile = Path.Combine(projectPath, "ProjectSettings", customFile);
+            if (File.Exists(customFile) == true)
             {
-                results = string.Join(" ", File.ReadAllLines(argumentsFile));
+                results = string.Join(" ", File.ReadAllLines(customFile));
             }
             return results;
+        }
+
+        public static bool SaveCustomProjectData(string projectPath, string customFile, string data)
+        {
+            customFile = Path.Combine(projectPath, "ProjectSettings", customFile);
+
+            try
+            {
+                File.WriteAllText(customFile, data);
+                return true;
+            }
+            catch (Exception)
+            {
+            }
+
+            return false;
+        }
+
+        public static bool HasFocus(DependencyObject obj, Control control, bool checkChildren)
+        {
+            var oFocused = System.Windows.Input.FocusManager.GetFocusedElement(obj) as DependencyObject;
+            if (!checkChildren)
+                return oFocused == control;
+            while (oFocused != null)
+            {
+                if (oFocused == control)
+                    return true;
+                oFocused = System.Windows.Media.VisualTreeHelper.GetParent(oFocused);
+            }
+            return false;
         }
 
         public static void SetFocusToGrid(DataGrid targetGrid, int index = -1)

@@ -88,7 +88,7 @@ namespace UnityLauncherPro
                         string customArgs = "";
                         if (getArguments == true)
                         {
-                            customArgs = folderExists ? Tools.ReadCustomLaunchArguments(projectPath, MainWindow.launcherArgumentsFile) : null;
+                            customArgs = folderExists ? Tools.ReadCustomProjectData(projectPath, MainWindow.launcherArgumentsFile) : null;
                         }
 
                         // get git branchinfo, only if column in enabled
@@ -105,7 +105,23 @@ namespace UnityLauncherPro
                         }
 
                         var p = new Project();
-                        p.Title = projectName;
+
+                        switch (MainWindow.projectNameSetting)
+                        {
+                            case 0:
+                                p.Title = Tools.ReadCustomProjectData(projectPath, MainWindow.projectNameFile);
+                                break;
+                            case 1:
+                                p.Title = Tools.ReadProjectName(projectPath);
+                                break;
+                            default:
+                                p.Title = projectName;
+                                break;
+                        }
+
+                        // if no custom data or no product name found
+                        if (string.IsNullOrEmpty(p.Title)) p.Title = projectName;
+
                         p.Version = projectVersion;
                         p.Path = projectPath;
                         p.Modified = lastUpdated;

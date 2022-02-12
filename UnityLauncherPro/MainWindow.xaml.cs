@@ -30,7 +30,9 @@ namespace UnityLauncherPro
         public static UnityInstallation[] unityInstallationsSource;
         public static ObservableDictionary<string, string> unityInstalledVersions = new ObservableDictionary<string, string>(); // versionID and installation folder
         public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
+        public static readonly string projectNameFile = "ProjectName.txt";
         public static string preferredVersion = "none";
+        public static int projectNameSetting = 0; // 0 = folder or ProjectName.txt if exists, 1=ProductName
 
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
@@ -396,6 +398,20 @@ namespace UnityLauncherPro
             adbLogCatArgs = Properties.Settings.Default.adbLogCatArgs;
             txtLogCatArgs.Text = adbLogCatArgs;
 
+            projectNameSetting = Properties.Settings.Default.projectName;
+            switch (projectNameSetting)
+            {
+                case 0:
+                    radioProjNameFolder.IsChecked = true;
+                    break;
+                case 1:
+                    radioProjNameProductName.IsChecked = true;
+                    break;
+                default:
+                    radioProjNameFolder.IsChecked = true;
+                    break;
+            }
+
         } // LoadSettings()
 
 
@@ -458,6 +474,9 @@ namespace UnityLauncherPro
                 }
             }
             Properties.Settings.Default.gridColumnWidthsBuildReport = gridWidths.ToArray();
+
+            Properties.Settings.Default.projectName = projectNameSetting;
+
             Properties.Settings.Default.Save();
 
         }
@@ -621,7 +640,7 @@ namespace UnityLauncherPro
             p.Path = folder;
             p.Title = Path.GetFileName(folder);
             p.Version = Tools.GetProjectVersion(folder);
-            p.Arguments = Tools.ReadCustomLaunchArguments(folder, MainWindow.launcherArgumentsFile);
+            p.Arguments = Tools.ReadCustomProjectData(folder, MainWindow.launcherArgumentsFile);
             if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.GetTargetPlatform(folder);
             if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
             return p;
@@ -708,8 +727,12 @@ namespace UnityLauncherPro
                             break;
                         case Key.F2: // edit arguments or project name
                             if (chkEnableProjectRename.IsChecked == false) return; //if rename not enabled
-                            // if in first cell (or no cell)
+
+                            // if not inside datagrid, cancel
+                            if (Tools.HasFocus(this, gridRecent, true) == false) return;
+
                             var cell = gridRecent.CurrentCell;
+                            // if in first cell (or no cell)
                             if (cell.Column.DisplayIndex == 0)
                             {
                                 // enable cell edit
@@ -1295,8 +1318,8 @@ namespace UnityLauncherPro
             var proj = GetSelectedProject();
 
             // check that folder exists
-            string path = proj.Path;
-            if (string.IsNullOrEmpty(path))
+            string projectPath = proj.Path;
+            if (string.IsNullOrEmpty(projectPath))
             {
                 return;
             }
@@ -1304,65 +1327,78 @@ namespace UnityLauncherPro
             // check if we edited project name, or launcher arguments
             if (e.Column.DisplayIndex == 0)
             {
+                // NOTE cannot rename folder anymore, too dangerous, rename creates custom ProjectName.txt to keep track of projectname
+
                 // get current arguments, after editing
                 TextBox t = e.EditingElement as TextBox;
-                string newcellValue = t.Text.ToString();
+                string newProjectNameString = t.Text.ToString();
 
                 // restore read only
                 e.Column.IsReadOnly = true;
 
-                if (string.IsNullOrEmpty(newcellValue))
+                if (string.IsNullOrEmpty(newProjectNameString))
                 {
-                    Console.WriteLine("Project name is null: " + newcellValue);
+                    Console.WriteLine("Project name is null: " + newProjectNameString);
                     return;
                 }
 
-                // cannot allow / or \ or . as last character (otherwise might have issues going parent folder?)
-                if (newcellValue.EndsWith("\\") || newcellValue.EndsWith("/") || newcellValue.EndsWith("."))
+                //// cannot allow / or \ or . as last character (otherwise might have issues going parent folder?)
+                //if (newProjectNameString.EndsWith("\\") || newProjectNameString.EndsWith("/") || newProjectNameString.EndsWith("."))
+                //{
+                //    Console.WriteLine("Project name cannot end with / or \\ or . ");
+                //    return;
+                //}
+
+                //// get new path
+                //var newPath = Path.Combine(Directory.GetParent(path).ToString(), newProjectNameString);
+
+                //// check if has invalid characters for full path
+                //if (newPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+                //{
+                //    Console.WriteLine("Invalid project path: " + newPath);
+                //    return;
+                //}
+
+                //// check if same as before (need to replace mismatch slashes)
+                //if (path.Replace('/', '\\') == newPath.Replace('/', '\\'))
+                //{
+                //    Console.WriteLine("Rename cancelled..");
+                //    return;
+                //}
+
+                //// check if new folder already exists
+                //if (Directory.Exists(newPath))
+                //{
+                //    Console.WriteLine("Directory already exists: " + newPath);
+                //    return;
+                //}
+
+                //// try rename project folder by moving directory to new name
+                //Directory.Move(path, newPath);
+
+                //// check if move was success
+                //if (Directory.Exists(newPath))
+                //{
+                //    // force ending edit (otherwise only ends on enter or esc)
+                //    gridRecent.CommitEdit(DataGridEditingUnit.Row, true);
+
+                //    // TODO save to registry (otherwise not listed in recent projects, unless opened)
+                //}
+                //else
+                //{
+                //    Console.WriteLine("Failed to rename directory..");
+                //}
+
+                var write = Tools.SaveCustomProjectData(projectPath, projectNameFile, newProjectNameString);
+                // write success, otherwise keep old name
+                if (write == true)
                 {
-                    Console.WriteLine("Project name cannot end with / or \\ or . ");
-                    return;
-                }
-
-                // get new path
-                var newPath = Path.Combine(Directory.GetParent(path).ToString(), newcellValue);
-
-                // check if has invalid characters for full path
-                if (newPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
-                {
-                    Console.WriteLine("Invalid project path: " + newPath);
-                    return;
-                }
-
-                // check if same as before (need to replace mismatch slashes)
-                if (path.Replace('/', '\\') == newPath.Replace('/', '\\'))
-                {
-                    Console.WriteLine("Rename cancelled..");
-                    return;
-                }
-
-                // check if new folder already exists
-                if (Directory.Exists(newPath))
-                {
-                    Console.WriteLine("Directory already exists: " + newPath);
-                    return;
-                }
-
-                // try rename project folder by moving directory to new name
-                Directory.Move(path, newPath);
-
-                // check if move was success
-                if (Directory.Exists(newPath))
-                {
-                    // force ending edit (otherwise only ends on enter or esc)
                     gridRecent.CommitEdit(DataGridEditingUnit.Row, true);
+                    proj.Title = newProjectNameString;
+                    Console.WriteLine("Project title renamed to: " + newProjectNameString);
+                    gridRecent.Items.Refresh();
+                }
 
-                    // TODO save to registry (otherwise not listed in recent projects, unless opened)
-                }
-                else
-                {
-                    Console.WriteLine("Failed to rename directory..");
-                }
 
             }
             else if (e.Column.DisplayIndex == 4) // edit launcher arguments
@@ -1374,14 +1410,14 @@ namespace UnityLauncherPro
                 string projSettingsFolder = "ProjectSettings";
 
                 // check if projectsettings folder exists, if not then add
-                string outputFolder = Path.Combine(path, projSettingsFolder);
+                string outputFolder = Path.Combine(projectPath, projSettingsFolder);
                 if (Directory.Exists(outputFolder) == false)
                 {
                     Directory.CreateDirectory(outputFolder);
                 }
 
                 // save arguments to projectsettings folder
-                string outputFile = Path.Combine(path, projSettingsFolder, launcherArgumentsFile);
+                string outputFile = Path.Combine(projectPath, projSettingsFolder, launcherArgumentsFile);
 
                 try
                 {
@@ -2287,6 +2323,20 @@ namespace UnityLauncherPro
             var unity = GetSelectedUnity();
             if (unity == null) return;
             Tools.DownloadLinuxModules(unity.Path, unity.Version);
+        }
+
+        private void RadioProjNameFolder_Checked(object sender, RoutedEventArgs e)
+        {
+            projectNameSetting = 0; // default, folder
+            if (this.IsActive == false) return; // dont run code on window init
+            RefreshRecentProjects();
+        }
+
+        private void RadioProjNameProductName_Checked(object sender, RoutedEventArgs e)
+        {
+            projectNameSetting = 1; // player settings, product name
+            if (this.IsActive == false) return; // dont run code on window init
+            RefreshRecentProjects();
         }
     } // class
 } //namespace
