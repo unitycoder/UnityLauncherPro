@@ -174,11 +174,42 @@
     </Window.Resources>
 
     <Grid>
-        <DataGrid x:Name="gridThemeColors" KeyboardNavigation.TabNavigation="None" SelectionMode="Single" Height="120" Margin="3,0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" IsTabStop="True" TabIndex="1" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" SelectionChanged="GridThemeColors_SelectionChanged">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <DataGrid Grid.Row="0" x:Name="gridThemeColors" KeyboardNavigation.TabNavigation="None" SelectionMode="Single" Margin="3,0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" IsTabStop="True" TabIndex="1" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" SelectionChanged="GridThemeColors_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" CanUserResize="False"/>
                 <DataGridTextColumn Header="Value" Binding="{Binding Value}" IsReadOnly="True" CanUserResize="False"/>
             </DataGrid.Columns>
         </DataGrid>
+        <!--tools-->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
+            <Rectangle  x:Name="rectSelectedColor" Fill="#FF000000" HorizontalAlignment="Left" Height="64"  Stroke="Black" VerticalAlignment="Center" Width="64" ToolTip="Current color"/>
+            <!--<TextBox x:Name="txtSelectedColorHex" VerticalAlignment="Center" IsUndoEnabled="True" TabIndex="0" Width="189" Height="24" Margin="10,0,0,0" />-->
+            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Width="40">Red</Label>
+                    <Slider x:Name="sliderRed" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderRed_ValueChanged"/>
+                    <TextBox x:Name="txtRed" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Width="40">Green</Label>
+                    <Slider x:Name="sliderGreen"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderGreen_ValueChanged"/>
+                    <TextBox x:Name="txtGreen" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Width="40">Blue</Label>
+                    <Slider x:Name="sliderBlue"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderBlue_ValueChanged"/>
+                    <TextBox x:Name="txtBlue" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
+                </StackPanel>
+            </StackPanel>
+            
+            <Button Style="{StaticResource CustomButton}" x:Name="btnSaveTheme" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" VerticalAlignment="Center" Height="35" Click="BtnSaveTheme_Click" TabIndex="3" Width="157" Margin="16,0,0,0">
+                <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="Save Theme"/>
+            </Button>
+        </StackPanel>
+
     </Grid>
 </Window>
