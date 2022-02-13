@@ -88,6 +88,9 @@
     <Compile Include="NewProject.xaml.cs">
       <DependentUpon>NewProject.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ThemeEditor.xaml.cs">
+      <DependentUpon>ThemeEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools.cs" />
     <Compile Include="Data\UnityInstallation.cs" />
     <Compile Include="Data\Updates.cs" />
@@ -114,6 +117,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ThemeEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UpgradeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

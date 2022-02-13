@@ -95,5 +95,8 @@
     <Setting Name="adbLogCatArgs" Type="System.String" Scope="User">
       <Value Profile="(Default)">-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color</Value>
     </Setting>
+    <Setting Name="projectName" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -381,5 +381,17 @@ namespace UnityLauncherPro.Properties {
                 this["adbLogCatArgs"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int projectName {
+            get {
+                return ((int)(this["projectName"]));
+            }
+            set {
+                this["projectName"] = value;
+            }
+        }
     }
 }
