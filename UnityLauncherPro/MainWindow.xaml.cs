@@ -136,6 +136,10 @@ namespace UnityLauncherPro
 
             }
 
+            // TEST
+            themeEditorWindow = new ThemeEditor();
+            themeEditorWindow.Show();
+
             isInitializing = false;
         }
 

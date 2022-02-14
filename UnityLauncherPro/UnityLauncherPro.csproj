@@ -79,6 +79,7 @@
     <Compile Include="Data\BuildReportItem.cs" />
     <Compile Include="Data\Platform.cs" />
     <Compile Include="Data\Tabs.cs" />
+    <Compile Include="Data\ThemeColor.cs" />
     <Compile Include="GetProjects.cs" />
     <Compile Include="GetUnityInstallations.cs" />
     <Compile Include="GetUnityUpdates.cs" />
