@@ -43,9 +43,9 @@ See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro
 
 ![image](https://user-images.githubusercontent.com/5438317/120828338-17681d00-c565-11eb-972a-49055070427a.png)
 
-![image](https://user-images.githubusercontent.com/5438317/120828346-19ca7700-c565-11eb-9430-89420cf15caa.png)
+![image](https://user-images.githubusercontent.com/5438317/154346224-8aa8d547-8495-47cf-baca-4cb31639344b.png)
 
-![image](https://user-images.githubusercontent.com/5438317/120828355-1c2cd100-c565-11eb-9fee-bc77112b8d16.png)
+![image](https://user-images.githubusercontent.com/5438317/154346049-4426f504-a437-4119-8d1c-f3d4d3fa434c.png)
 
 ### Perform tasks on selected project
 ![image](https://user-images.githubusercontent.com/5438317/120828528-4da59c80-c565-11eb-8b11-9cf739cde306.png)
