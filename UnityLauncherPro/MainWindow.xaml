@@ -506,6 +506,8 @@
                                 <MenuItem x:Name="menuItemKillProcess" Header="Kill Process" Click="MenuItemKillProcess_Click" />
                                 <Separator/>
                                 <MenuItem x:Name="menuStartWebGLServer" Header="Start WebGL server" Click="MenuStartWebGLServer_Click" />
+                                <Separator/>
+                                <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 

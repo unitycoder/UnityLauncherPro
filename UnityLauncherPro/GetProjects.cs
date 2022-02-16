@@ -146,6 +146,57 @@ namespace UnityLauncherPro
 
             return projectsFound;
         } // Scan()
+
+        public static bool RemoveRecentProject(string projectPathToRemove)
+        {
+            var hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
+
+            // check each version path
+            for (int i = 0, len = registryPathsToCheck.Length; i < len; i++)
+            {
+                RegistryKey key = hklm.OpenSubKey(registryPathsToCheck[i], true);
+
+                if (key == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    //Console.WriteLine("Null registry key at " + registryPathsToCheck[i]);
+                }
+
+                // parse recent project paths
+                foreach (var valueName in key.GetValueNames())
+                {
+                    if (valueName.IndexOf("RecentlyUsedProjectPaths-") == 0)
+                    {
+                        string projectPath = "";
+                        // check if binary or not
+                        var valueKind = key.GetValueKind(valueName);
+                        if (valueKind == RegistryValueKind.Binary)
+                        {
+                            byte[] projectPathBytes = (byte[])key.GetValue(valueName);
+                            projectPath = Encoding.UTF8.GetString(projectPathBytes, 0, projectPathBytes.Length - 1);
+                        }
+                        else // should be string then
+                        {
+                            projectPath = (string)key.GetValue(valueName);
+                        }
+
+                        // if our project folder, remove registry item
+                        if (projectPath == projectPathToRemove)
+                        {
+                            Console.WriteLine("Deleted registery item: " + valueName + " projectPath=" + projectPath);
+                            key.DeleteValue(valueName);
+                            return true;
+                        }
+
+                    } // valid key
+                } // each key
+            } // for each registry root
+            return false;
+        } // RemoveRecentProject()
+
     } // class
 } // namespace
 

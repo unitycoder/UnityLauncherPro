@@ -137,8 +137,8 @@ namespace UnityLauncherPro
             }
 
             // TEST
-            themeEditorWindow = new ThemeEditor();
-            themeEditorWindow.Show();
+            //themeEditorWindow = new ThemeEditor();
+            //themeEditorWindow.Show();
 
             isInitializing = false;
         }
@@ -2361,6 +2361,16 @@ namespace UnityLauncherPro
         {
             themeEditorWindow = new ThemeEditor();
             themeEditorWindow.Show();
+        }
+
+        private void MenuRemoveProject_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            if (proj == null) return;
+            if (GetProjects.RemoveRecentProject(proj.Path))
+            {
+                RefreshRecentProjects();
+            }
         }
     } // class
 } //namespace
