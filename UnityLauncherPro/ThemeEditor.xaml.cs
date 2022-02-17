@@ -14,7 +14,7 @@ namespace UnityLauncherPro
         // TODO take from mainwindow?
         //Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
         //public static List<ThemeColor> themeColors;
-        public static ObservableCollection<ThemeColor> themeColors  = new ObservableCollection<ThemeColor>();
+        public static ObservableCollection<ThemeColor> themeColors = new ObservableCollection<ThemeColor>();
 
         public ThemeEditor()
         {
@@ -105,11 +105,13 @@ namespace UnityLauncherPro
 
             //themeColors[gridThemeColors.SelectedIndex].Key = "asdf";
             themeColors[gridThemeColors.SelectedIndex].Brush = newColorBrush;
-            
+
             // NOTE slow but works..
             gridThemeColors.Items.Refresh();
 
-            // TODO apply color changes to mainwindow
+            // apply color changes to mainwindow
+            var item = gridThemeColors.SelectedItem as ThemeColor;
+            Application.Current.Resources[item.Key] = newColorBrush;
         }
 
         private void SliderRed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -154,6 +156,6 @@ namespace UnityLauncherPro
             Console.WriteLine("TODO save theme to file..");
         }
 
-     
+
     }
 }

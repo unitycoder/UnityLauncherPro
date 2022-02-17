@@ -948,7 +948,7 @@
                             <CheckBox x:Name="chkHumanFriendlyDateTime" Content="Use human friendly last modified" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkHumanFriendlyDateTime_Checked" Unchecked="ChkHumanFriendlyDateTime_Checked"/>
                             <Label Foreground="{DynamicResource ThemeButtonForeground}">Project name:</Label>
                             <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioProjNameFolder" Content="Folder or ProjectName.txt" Foreground="{DynamicResource ThemeButtonForeground}" Margin="4,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>
+                                <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder" Foreground="{DynamicResource ThemeButtonForeground}" Margin="4,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>
                                 <RadioButton x:Name="radioProjNameProductName" Content="Settings ProductName" Foreground="{DynamicResource ThemeButtonForeground}" Margin="5,0,0,0" GroupName="toggleGroupProjectName" Checked="RadioProjNameProductName_Checked" ToolTip="Take project name from player settings ProductName field"/>
                             </StackPanel>
                         </StackPanel>
