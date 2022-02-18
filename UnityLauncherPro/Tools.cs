@@ -1244,7 +1244,7 @@ namespace UnityLauncherPro
             SetForegroundWindow(handle);
         }
 
-        public static void DownloadLinuxModules(string UnityExePath, string unityVersion)
+        public static void DownloadAdditionalModules(string UnityExePath, string unityVersion, string moduleName)
         {
             var editorFolder = Path.GetDirectoryName(UnityExePath);
 
@@ -1281,10 +1281,7 @@ namespace UnityLauncherPro
 
             if (hash == null) return;
 
-            // NOTE downloads now both, mono and il2cpp
-            var moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-IL2CPP-Support-for-Editor-" + unityVersion + ".exe";
-            OpenURL(moduleURL);
-            moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-Mono-Support-for-Editor-" + unityVersion + ".exe";
+            var moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-" + moduleName + "-Support-for-Editor-" + unityVersion + ".exe";
             OpenURL(moduleURL);
         }
 

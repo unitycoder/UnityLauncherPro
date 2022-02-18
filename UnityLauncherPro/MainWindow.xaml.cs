@@ -2340,7 +2340,8 @@ namespace UnityLauncherPro
         {
             var unity = GetSelectedUnity();
             if (unity == null) return;
-            Tools.DownloadLinuxModules(unity.Path, unity.Version);
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Linux-IL2CPP");
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Linux-Mono");
         }
 
         private void RadioProjNameFolder_Checked(object sender, RoutedEventArgs e)
@@ -2371,6 +2372,27 @@ namespace UnityLauncherPro
             {
                 RefreshRecentProjects();
             }
+        }
+
+        private void MenuItemDownloadAndroidModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Android");
+        }
+
+        private void MenuItemDownloadIOSModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "iOS");
+        }
+
+        private void MenuItemDownloadWebGLModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "WebGL");
         }
     } // class
 } //namespace

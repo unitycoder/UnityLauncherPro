@@ -638,6 +638,9 @@
                                 <MenuItem x:Name="menuItemSetPreferredUnityVersion" Header="Set as Preferred Version" Click="MenuItemSetPreferredUnityVersion_Click"/>
                                 <!--<MenuItem x:Name="menuItemEditPackages" Header="Edit Packages" Click="MenuItemEditPackages_Click"/>-->
                                 <Separator></Separator>
+                                <MenuItem x:Name="menuItemDownloadAndroidModule" Header="Download Android module" Click="MenuItemDownloadAndroidModule_Click"/>
+                                <MenuItem x:Name="menuItemDownloadIOSModule" Header="Download IOS module" Click="MenuItemDownloadIOSModule_Click"/>
+                                <MenuItem x:Name="menuItemDownloadWebGLModule" Header="Download WebGL module" Click="MenuItemDownloadWebGLModule_Click" />
                                 <MenuItem x:Name="menuItemDownloadLinuxModule" Header="Download Linux modules" Click="MenuItemDownloadLinuxModule_Click"/>
                             </ContextMenu>
                         </DataGrid.ContextMenu>
