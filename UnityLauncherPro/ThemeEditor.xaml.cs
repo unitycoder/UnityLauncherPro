@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,10 +13,11 @@ namespace UnityLauncherPro
 {
     public partial class ThemeEditor : Window
     {
-        // TODO take from mainwindow?
-        //Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
-        //public static List<ThemeColor> themeColors;
         public static ObservableCollection<ThemeColor> themeColors = new ObservableCollection<ThemeColor>();
+        static ObservableCollection<ThemeColor> themeColorsOrig = new ObservableCollection<ThemeColor>();
+
+        // hack for adjusting slider, without triggering onchange..
+        bool forceValue = false;
 
         public ThemeEditor()
         {
@@ -25,31 +28,25 @@ namespace UnityLauncherPro
         {
             themeColors.Clear();
 
-            // get original colors
+            // get original colors to collection
             foreach (DictionaryEntry item in Application.Current.Resources.MergedDictionaries[0])
             {
-                // take original colors, so can reset them
-                //origResourceColors[item.Key.ToString()] = (SolidColorBrush)item.Value;
-                //var col = (SolidColorBrush)item.Value;
-                //Console.WriteLine(item.Key.ToString() + "=" + col);
                 var themeColorPair = new ThemeColor();
                 themeColorPair.Key = item.Key.ToString();
                 themeColorPair.Brush = (SolidColorBrush)item.Value;
                 themeColors.Add(themeColorPair);
-                //var col = new BrushConverter().ConvertFrom(row[1].Trim());
-                // apply color
-                //Application.Current.Resources[row[0]] = (SolidColorBrush)col;
+
+                // take backup copy
+                var themeColorPair2 = new ThemeColor();
+                themeColorPair2.Key = item.Key.ToString();
+                themeColorPair2.Brush = (SolidColorBrush)item.Value;
+                themeColorsOrig.Add(themeColorPair2);
             }
 
             // display current theme keys and values
-            //gridThemeColors.ItemsSource = origResourceColors;
             gridThemeColors.ItemsSource = themeColors;
-            //gridThemeColors.DataContext = themeColors;
-
         }
 
-        int selectedRow = -1;
-        bool forceValue = false;
 
         private void GridThemeColors_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
@@ -153,9 +150,52 @@ namespace UnityLauncherPro
 
         private void BtnSaveTheme_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("TODO save theme to file..");
+            // NOTE for now its application root folder, would be nicer to have fixed themes/ folder
+            var rootFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+            List<string> iniRows = new List<string>();
+            iniRows.Add("# Created with UnityLauncherPro built-in theme editor " + DateTime.Now.ToString("dd/MM/YYYY"));
+            for (int i = 0; i < themeColors.Count; i++)
+            {
+                iniRows.Add(themeColors[i].Key + "=" + themeColors[i].Brush.ToString());
+            }
+            // TODO ask for output filename
+            var themePath = Path.Combine(rootFolder, "custom.ini");
+            File.WriteAllLines(themePath, iniRows);
+            Console.WriteLine("Saved theme: " + themePath);
         }
 
+        private void BtnResetTheme_Click(object sender, RoutedEventArgs e)
+        {
+            for (int i = 0; i < themeColorsOrig.Count; i++)
+            {
+                // reset collection colors
+                // FIXME fails if exit theme editor, then come back to reset
+                themeColors[i].Brush = themeColorsOrig[i].Brush;
 
+                // reset application colors
+                Application.Current.Resources[themeColors[i].Key] = themeColorsOrig[i].Brush;
+            }
+
+            // reset current button
+            if (gridThemeColors.SelectedItem != null)
+            {
+                var item = gridThemeColors.SelectedItem as ThemeColor;
+                forceValue = true;
+                sliderRed.Value = item.Brush.Color.R;
+                txtRed.Text = sliderRed.Value.ToString();
+                forceValue = true;
+                sliderGreen.Value = item.Brush.Color.G;
+                txtGreen.Text = sliderGreen.Value.ToString();
+                forceValue = true;
+                sliderBlue.Value = item.Brush.Color.B;
+                txtBlue.Text = sliderBlue.Value.ToString();
+                forceValue = true;
+                sliderAlpha.Value = item.Brush.Color.A;
+                txtAlpha.Text = sliderAlpha.Value.ToString();
+                forceValue = false;
+            }
+
+            gridThemeColors.Items.Refresh();
+        }
     }
 }

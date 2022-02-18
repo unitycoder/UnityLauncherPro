@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="ThemeEditor" Height="450" Width="500" WindowStyle="ToolWindow" Loaded="Window_Loaded" Background="{DynamicResource ThemeDarkestBackground}">
+        Title="ThemeEditor" Height="450" Width="500" WindowStyle="ToolWindow" Loaded="Window_Loaded" Background="#FF121212">
     <!--TODO take from mainwindow?-->
     <Window.Resources>
         <!-- custom buttons -->
@@ -26,7 +26,7 @@
                                 <Setter TargetName="shortcutbutton" Property="Background" Value="#FF0F0F0F" />
                             </Trigger>
                             <Trigger Property="IsFocused" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="{DynamicResource ThemeButtonFocusOutline}" />
+                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="#FF003D61" />
                                 <Setter TargetName="shortcutbutton" Property="BorderThickness" Value="1" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -38,7 +38,7 @@
         <!--TODO move to styles-->
         <!-- datagrid rows & row selection -->
         <Style TargetType="DataGridRow">
-            <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}" />
+            <Setter Property="Background" Value="#FF3F3F46" />
             <Setter Property="BorderBrush" Value="{x:Null}" />
             <Setter Property="BorderThickness" Value="0,0,0,0" />
             <Style.Triggers>
@@ -46,7 +46,7 @@
 					<Setter Property="Background" Value="{StaticResource DataGridRowMouseOver}"/>
 				</Trigger>-->
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource ThemeDataGridRowSelectedBackground}" />
+                    <Setter Property="Background" Value="#FF007ACC" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -76,17 +76,17 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type RepeatButton}">
                         <!-- button background -->
-                        <Border Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="{DynamicResource ThemeButtonBackground}" BorderBrush="{x:Null}">
+                        <Border Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="#FF3F3F46" BorderBrush="{x:Null}">
                             <!-- arrow sign -->
-                            <Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ThemeScrollArrowForeground}" Data="{Binding Path=Content,RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#FF5E5E64" Data="{Binding Path=Content,RelativeSource={RelativeSource TemplatedParent}}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeTextBoxBackground}" />
+                                <Setter TargetName="Border" Property="Background" Value="#FF333337" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollArrowPressed}" />
+                                <Setter TargetName="Border" Property="Background" Value="#FF838383" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="false">
                                 <Setter Property="Foreground" Value="Black"/>
@@ -123,7 +123,7 @@
                         <Border Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollBarThumbFill}" />
+                                <Setter TargetName="Border" Property="Background" Value="#FF6A6969" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -139,7 +139,7 @@
                     <RowDefinition MaxHeight="18"/>
                 </Grid.RowDefinitions>
                 <!-- scrollbar background -->
-                <Border Grid.RowSpan="3" CornerRadius="0" Background="{DynamicResource ThemeScrollBarBackground}" />
+                <Border Grid.RowSpan="3" CornerRadius="0" Background="#FF151515" />
                 <!-- scrollbar top button -->
                 <RepeatButton Grid.Row="0" Style="{StaticResource ScrollBarLineButton}" Height="18" Command="ScrollBar.LineUpCommand"  Content="M 0 4 L 8 4 L 4 0 Z" />
                 <Track Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
@@ -148,7 +148,7 @@
                     </Track.DecreaseRepeatButton>
                     <Track.Thumb>
                         <!-- scrollbar foreground -->
-                        <Thumb Style="{StaticResource ScrollBarThumb}" Margin="1,0,1,0" Background="{DynamicResource ThemeScrollBarFill}" BorderBrush="{x:Null}"/>
+                        <Thumb Style="{StaticResource ScrollBarThumb}" Margin="1,0,1,0" Background="#FF47474B" BorderBrush="{x:Null}"/>
                     </Track.Thumb>
                     <Track.IncreaseRepeatButton>
                         <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageDownCommand" />
@@ -181,7 +181,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <!--<DataGrid Grid.Row="0" x:Name="gridThemeColors" KeyboardNavigation.TabNavigation="None" SelectionMode="Single" Margin="3,0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" IsTabStop="True" TabIndex="1" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" SelectionChanged="GridThemeColors_SelectionChanged">-->
-        <DataGrid Grid.Row="0" x:Name="gridThemeColors" KeyboardNavigation.TabNavigation="None" SelectionMode="Single" Margin="3,0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" IsTabStop="True" TabIndex="1" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" SelectionChanged="GridThemeColors_SelectionChanged">
+        <DataGrid Grid.Row="0" x:Name="gridThemeColors" KeyboardNavigation.TabNavigation="None" SelectionMode="Single" Margin="3,0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="#FFC1C1C1" Background="#FF262626" IsTabStop="True" TabIndex="1" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" SelectionChanged="GridThemeColors_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" CanUserResize="False"/>
                 <DataGridTextColumn Header="Value" Binding="{Binding Brush}" IsReadOnly="True" CanUserResize="False">
@@ -192,7 +192,7 @@
                             <Setter Property="Background" Value="{Binding Brush, Converter={StaticResource SolidColorBrushConverter}}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Brush, Converter={StaticResource SolidColorBrushConverter}}" Value="true">
-                                    <Setter Property="Foreground" Value="{DynamicResource ThemeGridGreenText}" />
+                                    <Setter Property="Foreground" Value="White" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -206,30 +206,34 @@
             <!--<TextBox x:Name="txtSelectedColorHex" VerticalAlignment="Center" IsUndoEnabled="True" TabIndex="0" Width="189" Height="24" Margin="10,0,0,0" />-->
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
                 <StackPanel Orientation="Horizontal">
-                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Width="40">Red</Label>
+                    <Label Foreground="#FFC1C1C1" Width="44">Red</Label>
                     <Slider x:Name="sliderRed" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderRed_ValueChanged"/>
                     <TextBox x:Name="txtRed" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Width="40">Green</Label>
+                    <Label Foreground="#FFC1C1C1" Width="44">Green</Label>
                     <Slider x:Name="sliderGreen"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderGreen_ValueChanged"/>
                     <TextBox x:Name="txtGreen" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Width="40">Blue</Label>
+                    <Label Foreground="#FFC1C1C1" Width="44">Blue</Label>
                     <Slider x:Name="sliderBlue"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderBlue_ValueChanged"/>
                     <TextBox x:Name="txtBlue" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Width="40">Alpha</Label>
+                    <Label Foreground="#FFC1C1C1" Width="44">Alpha</Label>
                     <Slider x:Name="sliderAlpha"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderAlpha_ValueChanged"/>
                     <TextBox x:Name="txtAlpha" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
             </StackPanel>
-            
-            <Button Style="{StaticResource CustomButton}" x:Name="btnSaveTheme" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" VerticalAlignment="Center" Height="35" Click="BtnSaveTheme_Click" TabIndex="3" Width="157" Margin="16,0,0,0">
-                <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="Save Theme"/>
-            </Button>
+            <StackPanel Orientation="Vertical" Margin="25,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Button  x:Name="btnResetTheme" Style="{StaticResource CustomButton}" Background="#FF3F3F46" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" VerticalAlignment="Center" Height="36" Click="BtnResetTheme_Click" TabIndex="3" Width="78.5" Margin="0,0,0,20">
+                    <Label Foreground="#FFC1C1C1" Content="Reset Theme"/>
+                </Button>
+                <Button  x:Name="btnSaveTheme" Style="{StaticResource CustomButton}" Background="#FF3F3F46" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" VerticalAlignment="Center" Height="36" TabIndex="3" Width="157" Margin="0" Click="BtnSaveTheme_Click">
+                    <Label Foreground="#FFC1C1C1" Content="Save Theme"/>
+                </Button>
+            </StackPanel>
         </StackPanel>
 
     </Grid>
