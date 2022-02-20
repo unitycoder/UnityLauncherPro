@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,18 +29,27 @@ namespace UnityLauncherPro
         {
             themeColors.Clear();
 
+            //foreach (KeyValuePair<string, SolidColorBrush> item in origResourceColors)
+            //{
+            //    Application.Current.Resources[item.Key] = item.Value;
+            //}
+
             // get original colors to collection
             foreach (DictionaryEntry item in Application.Current.Resources.MergedDictionaries[0])
+            //foreach (DictionaryEntry item in Application.Current.Resources[themeColors[i].Key])
             {
+                // take currently used colors
+                var currentColor = Application.Current.Resources[item.Key];
+
                 var themeColorPair = new ThemeColor();
                 themeColorPair.Key = item.Key.ToString();
-                themeColorPair.Brush = (SolidColorBrush)item.Value;
+                themeColorPair.Brush = (SolidColorBrush)currentColor;// (SolidColorBrush)item.Value;
                 themeColors.Add(themeColorPair);
 
                 // take backup copy
                 var themeColorPair2 = new ThemeColor();
                 themeColorPair2.Key = item.Key.ToString();
-                themeColorPair2.Brush = (SolidColorBrush)item.Value;
+                themeColorPair2.Brush = (SolidColorBrush)currentColor; // item.Value;
                 themeColorsOrig.Add(themeColorPair2);
             }
 
@@ -53,6 +63,8 @@ namespace UnityLauncherPro
             if (gridThemeColors.SelectedItem == null) return;
             //Console.WriteLine(gridThemeColors.SelectedItem);
             var item = gridThemeColors.SelectedItem as ThemeColor;
+
+            if (item == null) return;
 
             //selectedRow = gridThemeColors.SelectedIndex;
 
@@ -69,12 +81,16 @@ namespace UnityLauncherPro
 
             forceValue = true;
             sliderRed.Value = item.Brush.Color.R;
+            txtRed.Text = sliderRed.Value.ToString();
             forceValue = true;
             sliderGreen.Value = item.Brush.Color.G;
+            txtGreen.Text = sliderGreen.Value.ToString();
             forceValue = true;
             sliderBlue.Value = item.Brush.Color.B;
+            txtBlue.Text = sliderBlue.Value.ToString();
             forceValue = true;
             sliderAlpha.Value = item.Brush.Color.A;
+            txtAlpha.Text = sliderAlpha.Value.ToString();
             forceValue = false;
         }
 
@@ -150,18 +166,32 @@ namespace UnityLauncherPro
 
         private void BtnSaveTheme_Click(object sender, RoutedEventArgs e)
         {
-            // NOTE for now its application root folder, would be nicer to have fixed themes/ folder
-            var rootFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-            List<string> iniRows = new List<string>();
-            iniRows.Add("# Created with UnityLauncherPro built-in theme editor " + DateTime.Now.ToString("dd/MM/YYYY"));
-            for (int i = 0; i < themeColors.Count; i++)
+            var themeFolder = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "Themes");
+
+            if (Directory.Exists(themeFolder) == false) Directory.CreateDirectory(themeFolder);
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.FileName = "custom";
+            saveFileDialog.DefaultExt = ".ini";
+            saveFileDialog.Filter = "Theme files (.ini)|*.ini";
+            saveFileDialog.InitialDirectory = themeFolder;
+            saveFileDialog.RestoreDirectory = true;
+
+            if (saveFileDialog.ShowDialog() == true)
             {
-                iniRows.Add(themeColors[i].Key + "=" + themeColors[i].Brush.ToString());
+                List<string> iniRows = new List<string>();
+                iniRows.Add("# Created with UnityLauncherPro built-in theme editor " + DateTime.Now.ToString("dd/MM/YYYY"));
+                for (int i = 0; i < themeColors.Count; i++)
+                {
+                    iniRows.Add(themeColors[i].Key + "=" + themeColors[i].Brush.ToString());
+                }
+
+                var themePath = saveFileDialog.FileName;
+                File.WriteAllLines(themePath, iniRows);
+                Console.WriteLine("Saved theme: " + themePath);
+
+                // TODO close theme editor window?
             }
-            // TODO ask for output filename
-            var themePath = Path.Combine(rootFolder, "custom.ini");
-            File.WriteAllLines(themePath, iniRows);
-            Console.WriteLine("Saved theme: " + themePath);
         }
 
         private void BtnResetTheme_Click(object sender, RoutedEventArgs e)
