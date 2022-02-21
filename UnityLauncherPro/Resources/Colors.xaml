@@ -27,7 +27,7 @@
     <SolidColorBrush x:Key="ThemeButtonBackgroundPressed" Color="#FF0F0F0F"/>
     <SolidColorBrush x:Key="ThemeMainTitle" Color="#FFB8B8B8"/>
     <SolidColorBrush x:Key="ThemeScrollBarEnabledForeground" Color="#FF000000"/>
-    
+
     <!--search-->
     <SolidColorBrush x:Key="ThemeSearchPlaceholder" Color="#7F919191"/>
     <SolidColorBrush x:Key="ThemeSearchClose" Color="#A3C1C1C1"/>
@@ -38,7 +38,7 @@
     <!--window-->
     <SolidColorBrush x:Key="ThemeWindowMinClose" Color="#FFC3C3C3"/>
 
-    <!--grids-->
+    <!--datagrids-->
     <SolidColorBrush x:Key="ThemeGridForeground" Color="#FFD8D8D8"/>
     <SolidColorBrush x:Key="ThemeGridHorizontalGridLines" Color="#4C000000"/>
     <SolidColorBrush x:Key="ThemeGridVerticalGridLines" Color="#19000000"/>
@@ -51,9 +51,8 @@
     <!--platform selection combobox-->
     <SolidColorBrush x:Key="ThemeDropDownBorderBorderBrush" Color="#FF171717"/>
     <SolidColorBrush x:Key="ThemeDropDownBorderBackground" Color="#FF2E2E34"/>
-    
+
     <!--focused button outline-->
     <SolidColorBrush x:Key="ThemeButtonFocusOutline" Color="#FF003D61"/>
-
 
 </ResourceDictionary>

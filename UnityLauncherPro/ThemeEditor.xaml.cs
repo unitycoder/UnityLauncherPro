@@ -28,6 +28,7 @@ namespace UnityLauncherPro
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             themeColors.Clear();
+            themeColorsOrig.Clear();
 
             //foreach (KeyValuePair<string, SolidColorBrush> item in origResourceColors)
             //{
@@ -36,14 +37,13 @@ namespace UnityLauncherPro
 
             // get original colors to collection
             foreach (DictionaryEntry item in Application.Current.Resources.MergedDictionaries[0])
-            //foreach (DictionaryEntry item in Application.Current.Resources[themeColors[i].Key])
             {
                 // take currently used colors
                 var currentColor = Application.Current.Resources[item.Key];
 
                 var themeColorPair = new ThemeColor();
                 themeColorPair.Key = item.Key.ToString();
-                themeColorPair.Brush = (SolidColorBrush)currentColor;// (SolidColorBrush)item.Value;
+                themeColorPair.Brush = (SolidColorBrush)currentColor;
                 themeColors.Add(themeColorPair);
 
                 // take backup copy
@@ -166,7 +166,7 @@ namespace UnityLauncherPro
 
         private void BtnSaveTheme_Click(object sender, RoutedEventArgs e)
         {
-            var themeFolder = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "Themes");
+            var themeFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes");
 
             if (Directory.Exists(themeFolder) == false) Directory.CreateDirectory(themeFolder);
 
@@ -196,10 +196,11 @@ namespace UnityLauncherPro
 
         private void BtnResetTheme_Click(object sender, RoutedEventArgs e)
         {
+            Console.WriteLine(themeColorsOrig.Count);
+            Console.WriteLine(themeColors.Count);
             for (int i = 0; i < themeColorsOrig.Count; i++)
             {
                 // reset collection colors
-                // FIXME fails if exit theme editor, then come back to reset
                 themeColors[i].Brush = themeColorsOrig[i].Brush;
 
                 // reset application colors

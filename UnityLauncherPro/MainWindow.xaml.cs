@@ -51,7 +51,7 @@ namespace UnityLauncherPro
         string adbLogCatArgs = defaultAdbLogCatArgs;
 
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
-        string themefile = "theme.ini";
+
         string latestBuildReportProjectPath = null;
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
@@ -66,13 +66,11 @@ namespace UnityLauncherPro
         public MainWindow()
         {
             InitializeComponent();
-            Start();
+            Init();
         }
 
-        void Start()
+        void Init()
         {
-            LoadSettings();
-
             // disable accesskeys without alt
             CoreCompatibilityPreferences.IsAltKeyRequiredInAccessKeyDefaultScope = true;
 
@@ -81,6 +79,11 @@ namespace UnityLauncherPro
             Resizable_BorderLess_Chrome.CornerRadius = new CornerRadius(0);
             Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
             WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
+        }
+
+        void Start()
+        {
+            LoadSettings();
 
             // get unity installations
             dataGridUnitys.Items.Clear();
@@ -122,7 +125,7 @@ namespace UnityLauncherPro
                 origResourceColors[item.Key.ToString()] = (SolidColorBrush)item.Value;
             }
 
-            ApplyTheme();
+            ApplyTheme(txtCustomThemeFile.Text);
 
             // for autostart with minimized
             if (Properties.Settings.Default.runAutomatically == true && Properties.Settings.Default.runAutomaticallyMinimized == true)
@@ -311,8 +314,7 @@ namespace UnityLauncherPro
             chkUseCustomTheme.IsChecked = Properties.Settings.Default.useCustomTheme;
             txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
             txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
-            themefile = Properties.Settings.Default.themeFile;
-            txtCustomThemeFile.Text = themefile;
+            txtCustomThemeFile.Text = Properties.Settings.Default.themeFile;
 
             chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
             chkRunAutomatically.IsChecked = Properties.Settings.Default.runAutomatically;
@@ -1997,15 +1999,17 @@ namespace UnityLauncherPro
             }
         }
 
-        void ApplyTheme()
+        void ApplyTheme(string themeFile)
         {
             if (chkUseCustomTheme.IsChecked == false) return;
 
             //Console.WriteLine("Load theme: " + themefile);
 
-            if (File.Exists(themefile) == true)
+            themeFile = "Themes/" + themeFile;
+
+            if (File.Exists(themeFile) == true)
             {
-                var colors = File.ReadAllLines(themefile);
+                var colors = File.ReadAllLines(themeFile);
 
                 // parse lines
                 for (int i = 0, length = colors.Length; i < length; i++)
@@ -2034,7 +2038,7 @@ namespace UnityLauncherPro
             }
             else
             {
-                Console.WriteLine("Theme file not found: " + themefile);
+                Console.WriteLine("Theme file not found: " + themeFile);
             }
         }
 
@@ -2059,7 +2063,7 @@ namespace UnityLauncherPro
             // reset colors now
             if (isChecked == true)
             {
-                ApplyTheme();
+                ApplyTheme(txtCustomThemeFile.Text);
             }
             else
             {
@@ -2069,14 +2073,13 @@ namespace UnityLauncherPro
 
         private void BtnReloadTheme_Click(object sender, RoutedEventArgs e)
         {
-            ApplyTheme();
+            ApplyTheme(txtCustomThemeFile.Text);
         }
 
         private void TxtCustomThemeFile_LostFocus(object sender, RoutedEventArgs e)
         {
             var s = (TextBox)sender;
-            themefile = s.Text;
-            Properties.Settings.Default.themeFile = themefile;
+            Properties.Settings.Default.themeFile = s.Text;
             Properties.Settings.Default.Save();
         }
 
@@ -2085,8 +2088,7 @@ namespace UnityLauncherPro
             switch (e.Key)
             {
                 case Key.Return: // pressed enter in theme file text box
-                    themefile = txtCustomThemeFile.Text;
-                    Properties.Settings.Default.themeFile = themefile;
+                    Properties.Settings.Default.themeFile = txtCustomThemeFile.Text;
                     Properties.Settings.Default.Save();
                     btnReloadTheme.Focus();
                     break;
@@ -2095,7 +2097,7 @@ namespace UnityLauncherPro
 
         private void BtnExploreFolder_Click(object sender, RoutedEventArgs e)
         {
-            Tools.LaunchExplorer(System.AppDomain.CurrentDomain.BaseDirectory);
+            Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes"));
         }
 
         private void ChkEnablePlatformSelection_Checked(object sender, RoutedEventArgs e)
@@ -2393,6 +2395,12 @@ namespace UnityLauncherPro
             var unity = GetSelectedUnity();
             if (unity == null) return;
             Tools.DownloadAdditionalModules(unity.Path, unity.Version, "WebGL");
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Start();
+
         }
     } // class
 } //namespace

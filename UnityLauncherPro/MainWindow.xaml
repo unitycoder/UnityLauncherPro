@@ -7,7 +7,7 @@
 		xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:converters="clr-namespace:UnityLauncherPro.Converters" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" Activated="Window_Activated">
+        Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" Activated="Window_Activated" Loaded="Window_Loaded">
     <Window.Resources>
 
         <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>
@@ -220,7 +220,17 @@
                 </Trigger>
             </Style.Triggers>
             <Style.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
+                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>-->
+
+                <!--<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource ThemeGridRowHighlight}"/>-->
+                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource ThemeGridRowHighlight}"/>-->
+
+                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource ThemeGridRowHighlight.Color}"/>-->
+                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{Binding DynamicResource ThemeGridRowHighlight, Converter={StaticResource solidColorBrushToColorConverter}, ElementName=SolidColorBrush}"/>-->
+                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource Color1}"/>-->
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">Transparent</SolidColorBrush>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}">Transparent</SolidColorBrush>
+                <!--<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">Red</SolidColorBrush>-->
             </Style.Resources>
         </Style>
 
@@ -923,7 +933,7 @@
                                 <CheckBox x:Name="chkUseCustomTheme" Content="Load custom theme" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,4" ToolTip="Loads theme.ini from application folder" Checked="ChkUseCustomTheme_Checked" Unchecked="ChkUseCustomTheme_Checked" HorizontalAlignment="Left"/>
                                 <TextBox x:Name="txtCustomThemeFile" MinWidth="128" ToolTip="Default is theme.ini" Padding="0,3,0,0" Margin="5,0,0,0" Text="theme.ini" LostFocus="TxtCustomThemeFile_LostFocus" PreviewKeyDown="TxtCustomThemeFile_PreviewKeyDown" />
                                 <Button Style="{StaticResource CustomButton}" ToolTip="Reload theme" x:Name="btnReloadTheme" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnReloadTheme_Click" Margin="5,0,0,0"/>
-                                <Button Style="{StaticResource CustomButton}" ToolTip="Explore Themes folder (application root)" x:Name="btnExploreFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnExploreFolder_Click" Margin="5,0,0,0"/>
+                                <Button Style="{StaticResource CustomButton}" ToolTip="Explore Themes folder" x:Name="btnExploreFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnExploreFolder_Click" Margin="5,0,0,0"/>
                                 <Button Style="{StaticResource CustomButton}" ToolTip="Open theme editor" x:Name="btnThemeEditor" Content="✎" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnThemeEditor_Click" Margin="5,0,0,0"/>
                             </StackPanel>
 
