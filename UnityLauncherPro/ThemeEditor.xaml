@@ -6,6 +6,18 @@
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
         Title="ThemeEditor" Height="450" Width="500" WindowStyle="ToolWindow" Loaded="Window_Loaded" Background="#FF121212">
+
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Undo" Executed="Executed_Undo" CanExecute="CanExecute_Undo"/>
+        <!--<CommandBinding Command="ApplicationCommands.Paste" Executed="Executed_Paste" CanExecute="CanExecute_Paste"/>-->
+        <CommandBinding Command="ApplicationCommands.Save" Executed="Executed_Save" CanExecute="CanExecute_Save"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="ApplicationCommands.Undo" Gesture="Ctrl+Z"/>
+        <!--<KeyBinding Command="ApplicationCommands.Paste" Gesture="Ctrl+V"/>-->
+        <KeyBinding Command="ApplicationCommands.Save" Gesture="Ctrl+S"/>
+    </Window.InputBindings>
+
     <!--TODO take from mainwindow?-->
     <Window.Resources>
         <!-- custom buttons -->
@@ -202,27 +214,27 @@
         </DataGrid>
         <!--tools-->
         <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
-            <Rectangle  x:Name="rectSelectedColor" Fill="#FF000000" HorizontalAlignment="Left" Height="64"  Stroke="Black" VerticalAlignment="Center" Width="64" ToolTip="Current color"/>
+            <Rectangle  x:Name="rectSelectedColor" Fill="#FF000000" HorizontalAlignment="Left" Height="64"  Stroke="Black" VerticalAlignment="Center" Width="32" ToolTip="Current color" Margin="5,0,0,0"/>
             <!--<TextBox x:Name="txtSelectedColorHex" VerticalAlignment="Center" IsUndoEnabled="True" TabIndex="0" Width="189" Height="24" Margin="10,0,0,0" />-->
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Red</Label>
-                    <Slider x:Name="sliderRed" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderRed_ValueChanged"/>
+                    <Slider x:Name="sliderRed" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderRed_ValueChanged" PreviewMouseLeftButtonDown="SliderRed_PreviewMouseLeftButtonDown"/>
                     <TextBox x:Name="txtRed" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Green</Label>
-                    <Slider x:Name="sliderGreen"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderGreen_ValueChanged"/>
+                    <Slider x:Name="sliderGreen"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderGreen_ValueChanged" PreviewMouseLeftButtonDown="SliderGreen_PreviewMouseLeftButtonDown"/>
                     <TextBox x:Name="txtGreen" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Blue</Label>
-                    <Slider x:Name="sliderBlue"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderBlue_ValueChanged"/>
+                    <Slider x:Name="sliderBlue"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderBlue_ValueChanged" PreviewMouseLeftButtonDown="SliderBlue_PreviewMouseLeftButtonDown"/>
                     <TextBox x:Name="txtBlue" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Alpha</Label>
-                    <Slider x:Name="sliderAlpha"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="128" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderAlpha_ValueChanged"/>
+                    <Slider x:Name="sliderAlpha"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderAlpha_ValueChanged" PreviewMouseLeftButtonDown="SliderAlpha_PreviewMouseLeftButtonDown"/>
                     <TextBox x:Name="txtAlpha" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
             </StackPanel>
@@ -230,7 +242,7 @@
                 <Button  x:Name="btnResetTheme" Style="{StaticResource CustomButton}" Background="#FF3F3F46" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" VerticalAlignment="Center" Height="36" Click="BtnResetTheme_Click" TabIndex="3" Width="78.5" Margin="0,0,0,20">
                     <Label Foreground="#FFC1C1C1" Content="Reset Theme"/>
                 </Button>
-                <Button  x:Name="btnSaveTheme" Style="{StaticResource CustomButton}" Background="#FF3F3F46" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" VerticalAlignment="Center" Height="36" TabIndex="3" Width="157" Margin="0" Click="BtnSaveTheme_Click">
+                <Button  x:Name="btnSaveTheme" Style="{StaticResource CustomButton}" Background="#FF3F3F46" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" VerticalAlignment="Center" Height="36" TabIndex="3" Width="128" Margin="0" Click="BtnSaveTheme_Click">
                     <Label Foreground="#FFC1C1C1" Content="Save Theme"/>
                 </Button>
             </StackPanel>

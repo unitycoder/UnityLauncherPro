@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace UnityLauncherPro
@@ -19,6 +20,12 @@ namespace UnityLauncherPro
 
         // hack for adjusting slider, without triggering onchange..
         bool forceValue = false;
+
+        // for single undo
+        Slider previousSlider;
+        TextBox previousTextBox;
+        int previousValue;
+
 
         public ThemeEditor()
         {
@@ -39,17 +46,17 @@ namespace UnityLauncherPro
             foreach (DictionaryEntry item in Application.Current.Resources.MergedDictionaries[0])
             {
                 // take currently used colors
-                var currentColor = Application.Current.Resources[item.Key];
+                var currentColor = (SolidColorBrush)Application.Current.Resources[item.Key];
 
                 var themeColorPair = new ThemeColor();
                 themeColorPair.Key = item.Key.ToString();
-                themeColorPair.Brush = (SolidColorBrush)currentColor;
+                themeColorPair.Brush = currentColor;
                 themeColors.Add(themeColorPair);
 
                 // take backup copy
                 var themeColorPair2 = new ThemeColor();
                 themeColorPair2.Key = item.Key.ToString();
-                themeColorPair2.Brush = (SolidColorBrush)currentColor; // item.Value;
+                themeColorPair2.Brush = currentColor;
                 themeColorsOrig.Add(themeColorPair2);
             }
 
@@ -130,11 +137,13 @@ namespace UnityLauncherPro
         private void SliderRed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (forceValue == true) return;
-            // onchanged is called before other components are ready..wpf :D
+            // onchanged is called before other components are ready..thanks wpf :D
+
             if (txtRed == null) return;
             txtRed.Text = ((int)((Slider)sender).Value).ToString();
             UpdateColorPreview();
             forceValue = false;
+
         }
 
         private void SliderGreen_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -164,6 +173,8 @@ namespace UnityLauncherPro
             forceValue = false;
         }
 
+        string saveFileName = null;
+
         private void BtnSaveTheme_Click(object sender, RoutedEventArgs e)
         {
             var themeFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes");
@@ -171,7 +182,14 @@ namespace UnityLauncherPro
             if (Directory.Exists(themeFolder) == false) Directory.CreateDirectory(themeFolder);
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.FileName = "custom";
+            if (string.IsNullOrEmpty(saveFileName))
+            {
+                saveFileDialog.FileName = "custom";
+            }
+            else
+            {
+                saveFileDialog.FileName = saveFileName;
+            }
             saveFileDialog.DefaultExt = ".ini";
             saveFileDialog.Filter = "Theme files (.ini)|*.ini";
             saveFileDialog.InitialDirectory = themeFolder;
@@ -187,6 +205,7 @@ namespace UnityLauncherPro
                 }
 
                 var themePath = saveFileDialog.FileName;
+                saveFileName = Path.GetFileNameWithoutExtension(themePath);
                 File.WriteAllLines(themePath, iniRows);
                 Console.WriteLine("Saved theme: " + themePath);
 
@@ -228,5 +247,70 @@ namespace UnityLauncherPro
 
             gridThemeColors.Items.Refresh();
         }
-    }
-}
+
+
+
+        public void Executed_Undo(object sender, ExecutedRoutedEventArgs e)
+        {
+            // restore previous color
+            forceValue = true;
+            previousSlider.Value = previousValue;
+            previousTextBox.Text = previousValue.ToString();
+            forceValue = false;
+            UpdateColorPreview();
+        }
+
+        public void CanExecute_Undo(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        //public void Executed_Paste(object sender, ExecutedRoutedEventArgs e)
+        //{
+        //    //OnPasteImageFromClipboard();
+        //}
+
+        //public void CanExecute_Paste(object sender, CanExecuteRoutedEventArgs e)
+        //{
+        //    e.CanExecute = true;
+        //}
+
+        public void Executed_Save(object sender, ExecutedRoutedEventArgs e)
+        {
+            BtnSaveTheme_Click(null, null);
+        }
+
+        public void CanExecute_Save(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void SliderRed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            previousSlider = (Slider)sender;
+            previousTextBox = txtRed;
+            previousValue = int.Parse(previousTextBox.Text);
+        }
+
+        private void SliderGreen_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            previousSlider = (Slider)sender;
+            previousTextBox = txtGreen;
+            previousValue = int.Parse(previousTextBox.Text);
+        }
+
+        private void SliderBlue_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            previousSlider = (Slider)sender;
+            previousTextBox = txtBlue;
+            previousValue = int.Parse(previousTextBox.Text);
+        }
+
+        private void SliderAlpha_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            previousSlider = (Slider)sender;
+            previousTextBox = txtAlpha;
+            previousValue = int.Parse(previousTextBox.Text);
+        }
+    } // class
+} // namespace

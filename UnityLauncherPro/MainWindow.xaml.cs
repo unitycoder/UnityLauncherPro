@@ -79,12 +79,13 @@ namespace UnityLauncherPro
             Resizable_BorderLess_Chrome.CornerRadius = new CornerRadius(0);
             Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
             WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
+
+            // need to load here to get correct window size early
+            LoadSettings();
         }
 
         void Start()
         {
-            LoadSettings();
-
             // get unity installations
             dataGridUnitys.Items.Clear();
             UpdateUnityInstallationsList();
