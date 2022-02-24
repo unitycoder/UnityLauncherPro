@@ -2177,11 +2177,12 @@ namespace UnityLauncherPro
                 currentDateFormat = format;
                 Properties.Settings.Default.customDateFormat = currentDateFormat;
                 Properties.Settings.Default.Save();
-                txtCustomDateTimeFormat.Foreground = System.Windows.Media.Brushes.Black;
+                txtCustomDateTimeFormat.BorderBrush = System.Windows.Media.Brushes.Transparent;
             }
             else // invalid format
             {
-                txtCustomDateTimeFormat.Foreground = System.Windows.Media.Brushes.Red;
+                //txtCustomDateTimeFormat.Foreground = System.Windows.Media.Brushes.Red;
+                txtCustomDateTimeFormat.BorderBrush = System.Windows.Media.Brushes.Red;
                 currentDateFormat = defaultDateFormat;
             }
         }

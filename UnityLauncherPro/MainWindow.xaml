@@ -407,7 +407,7 @@
                     <ControlTemplate TargetType="{x:Type CheckBox}">
                         <BulletDecorator Background="Transparent">
                             <BulletDecorator.Bullet>
-                                <Border x:Name="Border" Margin="0 1 0 0" Width="14" Height="13" CornerRadius="0" Background="#ffffff" BorderThickness="1" BorderBrush="#404040">
+                                <Border x:Name="Border" Margin="0 1 0 0" Width="14" Height="13" CornerRadius="0" Background="{DynamicResource ThemeRadioCheckBoxBackground}" BorderThickness="1" BorderBrush="#404040">
                                     <Path Width="8" Height="8" x:Name="CheckMark" SnapsToDevicePixels="False" Stroke="#000000" StrokeThickness="1.75" Data="M 0 3 L 3 6 L 7 0" Margin="1,1,0,0" />
                                 </Border>
                             </BulletDecorator.Bullet>
@@ -442,10 +442,10 @@
                     <ControlTemplate TargetType="{x:Type RadioButton}">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
                             <Grid>
-                                <Ellipse x:Name="TargetEllipse" Width="12" Height="12" Fill="{DynamicResource ThemeButtonForeground}" Stroke="Transparent" />
+                                <Ellipse x:Name="TargetEllipse" Width="12" Height="12" Fill="{DynamicResource ThemeRadioCheckBoxBackground}" Stroke="Transparent" />
                                 <Ellipse x:Name="CheckedEllipse" Width="6" Height="6" Fill="{DynamicResource ThemeRadioButtonSelected}" Visibility="Collapsed"/>
                             </Grid>
-                            <Label Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" Background="{TemplateBinding Background}"/>
+                            <Label Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"/>
                         </StackPanel>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
@@ -1000,19 +1000,19 @@
                             <CheckBox  x:Name="chkShowPlatform" Content="Show current target platform (if exists in .csproj)"  ToolTip="Shows target platform column" Checked="ChkShowPlatform_Checked" Unchecked="ChkShowPlatform_Checked" HorizontalAlignment="Left"/>
                             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
                                 <CheckBox  x:Name="chkUseCustomTheme" Content="Load custom theme" ToolTip="Loads theme.ini from application folder" Checked="ChkUseCustomTheme_Checked" Unchecked="ChkUseCustomTheme_Checked" HorizontalAlignment="Left"/>
-                                <TextBox x:Name="txtCustomThemeFile" MinWidth="128" ToolTip="Default is theme.ini" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="theme.ini" LostFocus="TxtCustomThemeFile_LostFocus" PreviewKeyDown="TxtCustomThemeFile_PreviewKeyDown" />
+                                <TextBox x:Name="txtCustomThemeFile" BorderBrush="Transparent" MinWidth="128" ToolTip="Default is theme.ini" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="theme.ini" LostFocus="TxtCustomThemeFile_LostFocus" PreviewKeyDown="TxtCustomThemeFile_PreviewKeyDown" />
                                 <Button Style="{StaticResource CustomButton}" ToolTip="Reload theme" x:Name="btnReloadTheme" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnReloadTheme_Click" Margin="5,0,0,0"/>
                                 <Button Style="{StaticResource CustomButton}" ToolTip="Explore Themes folder" x:Name="btnExploreFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnExploreFolder_Click" Margin="5,0,0,0"/>
                                 <Button Style="{StaticResource CustomButton}" ToolTip="Open theme editor" x:Name="btnThemeEditor" Content="✎" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnThemeEditor_Click" Margin="5,0,0,0"/>
                             </StackPanel>
 
                             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBox x:Name="txtRootFolderForNewProjects" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="300" ToolTip="Root folder for quick New Projects (so that you dont have to pick project folder every time)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
+                                <TextBox x:Name="txtRootFolderForNewProjects" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="300" ToolTip="Root folder for quick New Projects (so that you dont have to pick project folder every time)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
                                 <Button Style="{StaticResource CustomButton}" x:Name="btnBrowseProjectRootFolder" Content="..." Margin="6,0,0,0" MinWidth="22" Click="BtnBrowseProjectRootFolder_Click" MinHeight="22" FontSize="16" ToolTip="Browse for new projects root folder.." />
                                 <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ThemeButtonForeground}" />
                             </StackPanel>
                             <StackPanel Grid.Row="3" Orientation="Horizontal">
-                                <TextBox x:Name="txtWebglRelativePath" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="200" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. Used for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
+                                <TextBox x:Name="txtWebglRelativePath" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="200" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. Used for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
                                 <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ThemeButtonForeground}" />
                             </StackPanel>
                         </StackPanel>
@@ -1025,13 +1025,13 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox  x:Name="chkUseCustomLastModified" Content="Date format" ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkUseCustomLastModified_Checked" Unchecked="ChkUseCustomLastModified_Checked"/>
-                                <TextBox x:Name="txtCustomDateTimeFormat" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="150" ToolTip="Default is dd/MM/yyyy HH:mm:ss" Padding="0,3,0,0" Margin="5,0,0,0" Text="dd/MM/yyyy HH:mm:ss" LostFocus="TxtCustomDateTimeFormat_LostFocus" TextChanged="TxtCustomDateTimeFormat_TextChanged" />
-
+                                <TextBox x:Name="txtCustomDateTimeFormat" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="150" ToolTip="Default is dd/MM/yyyy HH:mm:ss" Padding="0,3,0,0" Margin="5,0,0,0" Text="dd/MM/yyyy HH:mm:ss" LostFocus="TxtCustomDateTimeFormat_LostFocus" TextChanged="TxtCustomDateTimeFormat_TextChanged">
+                                </TextBox>
                             </StackPanel>
                             <CheckBox  x:Name="chkHumanFriendlyDateTime" Content="Use human friendly last modified"  ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkHumanFriendlyDateTime_Checked" Unchecked="ChkHumanFriendlyDateTime_Checked"/>
-                            <Label Foreground="{DynamicResource ThemeButtonForeground}">Project name:</Label>
+                            <Label Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,5,5,0">Project name:</Label>
                             <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder"  Margin="4,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>
+                                <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder"  Margin="3,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>
                                 <RadioButton x:Name="radioProjNameProductName" Content="Settings ProductName"  Margin="5,0,0,0" GroupName="toggleGroupProjectName" Checked="RadioProjNameProductName_Checked" ToolTip="Take project name from player settings ProductName field"/>
                             </StackPanel>
                         </StackPanel>

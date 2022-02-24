@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="ThemeEditor" Height="450" Width="500" WindowStyle="ToolWindow" Loaded="Window_Loaded" Background="#FF121212">
+        Title="ThemeEditor" Height="500" Width="500" WindowStyle="ToolWindow" Loaded="Window_Loaded" Background="#FF121212">
 
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Undo" Executed="Executed_Undo" CanExecute="CanExecute_Undo"/>
@@ -20,6 +20,24 @@
 
     <!--TODO take from mainwindow?-->
     <Window.Resources>
+
+        <!-- datagrid header -->
+        <Style x:Key="HeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Background" Value="#4C3F3F46" />
+            <Setter Property="Foreground" Value="#FFB6B6B6" />
+            <Setter Property="BorderBrush" Value="#4C000000" />
+            <Setter Property="BorderThickness" Value="0,0,1,1" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="6,2,2,2" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF3F3F46"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- custom buttons -->
         <Style x:Key="CustomButton" TargetType="{x:Type Button}">
             <Setter Property="SnapsToDevicePixels" Value="true"/>
@@ -189,17 +207,17 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="300"/>
+            <RowDefinition Height="350"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <!--<DataGrid Grid.Row="0" x:Name="gridThemeColors" KeyboardNavigation.TabNavigation="None" SelectionMode="Single" Margin="3,0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" IsTabStop="True" TabIndex="1" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" SelectionChanged="GridThemeColors_SelectionChanged">-->
-        <DataGrid Grid.Row="0" x:Name="gridThemeColors" KeyboardNavigation.TabNavigation="None" SelectionMode="Single" Margin="3,0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="#FFC1C1C1" Background="#FF262626" IsTabStop="True" TabIndex="1" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" SelectionChanged="GridThemeColors_SelectionChanged">
+        <DataGrid Grid.Row="0" CanUserAddRows="False" x:Name="gridThemeColors" ColumnHeaderStyle="{StaticResource HeaderStyle}" KeyboardNavigation.TabNavigation="None" SelectionMode="Single" Margin="3,0" HeadersVisibility="Column" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="#FFC1C1C1" Background="#FF262626" IsTabStop="True" TabIndex="1" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" SelectionChanged="GridThemeColors_SelectionChanged">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" CanUserResize="False"/>
-                <DataGridTextColumn Header="Value" Binding="{Binding Brush}" IsReadOnly="True" CanUserResize="False">
+                <DataGridTextColumn CanUserSort="False" CanUserReorder="False" Header="Key" Binding="{Binding Key}" IsReadOnly="True" CanUserResize="False"/>
+                <DataGridTextColumn CanUserSort="False" CanUserReorder="False" Header="Value" Binding="{Binding Brush}" IsReadOnly="True" CanUserResize="False">
                     <DataGridTextColumn.CellStyle>
                         <Style TargetType="{x:Type DataGridCell}">
-                            <!--TODO make this color opposise of background-->
+                            <!--TODO could make this color opposite of background-->
                             <Setter Property="Foreground" Value="White" />
                             <Setter Property="Background" Value="{Binding Brush, Converter={StaticResource SolidColorBrushConverter}}" />
                             <Style.Triggers>
@@ -214,28 +232,28 @@
         </DataGrid>
         <!--tools-->
         <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
-            <Rectangle  x:Name="rectSelectedColor" Fill="#FF000000" HorizontalAlignment="Left" Height="64"  Stroke="Black" VerticalAlignment="Center" Width="32" ToolTip="Current color" Margin="5,0,0,0"/>
+            <Rectangle  x:Name="rectSelectedColor" Fill="#FF000000" HorizontalAlignment="Left"  Stroke="Black" Width="32" ToolTip="Current color" Margin="5,0,0,0"/>
             <!--<TextBox x:Name="txtSelectedColorHex" VerticalAlignment="Center" IsUndoEnabled="True" TabIndex="0" Width="189" Height="24" Margin="10,0,0,0" />-->
-            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
+            <StackPanel Orientation="Vertical" Margin="0,0,0,0">
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Red</Label>
-                    <Slider x:Name="sliderRed" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderRed_ValueChanged" PreviewMouseLeftButtonDown="SliderRed_PreviewMouseLeftButtonDown"/>
-                    <TextBox x:Name="txtRed" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
+                    <Slider x:Name="sliderRed" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderRed_ValueChanged" PreviewMouseLeftButtonDown="SliderRed_PreviewMouseLeftButtonDown" IsSnapToTickEnabled="True"/>
+                    <TextBox x:Name="txtRed" Text="{Binding ElementName=sliderRed,Path=Value}" Background="#FFAAAAAA" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Green</Label>
-                    <Slider x:Name="sliderGreen"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderGreen_ValueChanged" PreviewMouseLeftButtonDown="SliderGreen_PreviewMouseLeftButtonDown"/>
-                    <TextBox x:Name="txtGreen" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
+                    <Slider x:Name="sliderGreen"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderGreen_ValueChanged" PreviewMouseLeftButtonDown="SliderGreen_PreviewMouseLeftButtonDown" IsSnapToTickEnabled="True"/>
+                    <TextBox x:Name="txtGreen" Text="{Binding ElementName=sliderGreen,Path=Value}" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Background="#FFAAAAAA" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Blue</Label>
-                    <Slider x:Name="sliderBlue"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderBlue_ValueChanged" PreviewMouseLeftButtonDown="SliderBlue_PreviewMouseLeftButtonDown"/>
-                    <TextBox x:Name="txtBlue" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
+                    <Slider x:Name="sliderBlue"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderBlue_ValueChanged" PreviewMouseLeftButtonDown="SliderBlue_PreviewMouseLeftButtonDown" IsSnapToTickEnabled="True"/>
+                    <TextBox x:Name="txtBlue" Text="{Binding ElementName=sliderBlue,Path=Value}" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Background="#FFAAAAAA" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Alpha</Label>
-                    <Slider x:Name="sliderAlpha"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderAlpha_ValueChanged" PreviewMouseLeftButtonDown="SliderAlpha_PreviewMouseLeftButtonDown"/>
-                    <TextBox x:Name="txtAlpha" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
+                    <Slider x:Name="sliderAlpha"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderAlpha_ValueChanged" PreviewMouseLeftButtonDown="SliderAlpha_PreviewMouseLeftButtonDown" IsSnapToTickEnabled="True"/>
+                    <TextBox x:Name="txtAlpha" Text="{Binding ElementName=sliderAlpha,Path=Value}" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Background="#FFAAAAAA" Margin="5,0,0,8" IsReadOnly="True" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Vertical" Margin="25,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">

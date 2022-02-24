@@ -3,8 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,32 +14,49 @@ namespace UnityLauncherPro
 {
     public partial class ThemeEditor : Window
     {
-        public static ObservableCollection<ThemeColor> themeColors = new ObservableCollection<ThemeColor>();
+        static ObservableCollection<ThemeColor> themeColors = new ObservableCollection<ThemeColor>();
         static ObservableCollection<ThemeColor> themeColorsOrig = new ObservableCollection<ThemeColor>();
+
+        string previousSaveFileName = null;
 
         // hack for adjusting slider, without triggering onchange..
         bool forceValue = false;
 
         // for single undo
         Slider previousSlider;
-        TextBox previousTextBox;
-        int previousValue;
-
+        int previousValue = -1;
 
         public ThemeEditor()
         {
             InitializeComponent();
         }
 
+        void UpdateColorPreview()
+        {
+            var newColor = new Color();
+            newColor.R = (byte)sliderRed.Value;
+            newColor.G = (byte)sliderGreen.Value;
+            newColor.B = (byte)sliderBlue.Value;
+            newColor.A = (byte)sliderAlpha.Value;
+            var newColorBrush = new SolidColorBrush(newColor);
+            rectSelectedColor.Fill = newColorBrush;
+
+            // set new color into our collection values
+            themeColors[themeColors.IndexOf((ThemeColor)gridThemeColors.SelectedItem)].Brush = newColorBrush;
+
+            // NOTE slow but works..
+            gridThemeColors.Items.Refresh();
+
+            // apply color changes to mainwindow
+            var item = gridThemeColors.SelectedItem as ThemeColor;
+            Application.Current.Resources[item.Key] = newColorBrush;
+            forceValue = false;
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             themeColors.Clear();
             themeColorsOrig.Clear();
-
-            //foreach (KeyValuePair<string, SolidColorBrush> item in origResourceColors)
-            //{
-            //    Application.Current.Resources[item.Key] = item.Value;
-            //}
 
             // get original colors to collection
             foreach (DictionaryEntry item in Application.Current.Resources.MergedDictionaries[0])
@@ -59,121 +75,36 @@ namespace UnityLauncherPro
                 themeColorPair2.Brush = currentColor;
                 themeColorsOrig.Add(themeColorPair2);
             }
-
             // display current theme keys and values
             gridThemeColors.ItemsSource = themeColors;
+
+            // sort by key sa default
+            gridThemeColors.Items.SortDescriptions.Add(new SortDescription("Key", ListSortDirection.Ascending));
+
+            gridThemeColors.SelectedIndex = 0;
         }
 
-
-        private void GridThemeColors_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void GridThemeColors_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (gridThemeColors.SelectedItem == null) return;
-            //Console.WriteLine(gridThemeColors.SelectedItem);
-            var item = gridThemeColors.SelectedItem as ThemeColor;
+            if (gridThemeColors.SelectedIndex == -1) return;
 
+            var item = gridThemeColors.SelectedItem as ThemeColor;
             if (item == null) return;
 
-            //selectedRow = gridThemeColors.SelectedIndex;
-
-            //selectedKey = k.Value.Key;
-            //Console.WriteLine("Selected: " +selectedKey + "=" + origResourceColors[selectedKey].ToString());
-
-            // show color
-            // TODO show current color AND modified color next to each other
-            //rectSelectedColor.Fill = origResourceColors[selectedKey];
-            //var item = (string, SolidColorBrush)gridThemeColors.SelectedItem;
+            // update preview box
             rectSelectedColor.Fill = item.Brush;
 
-            //txtSelectedColorHex.Text = origResourceColors[selectedKey].ToString();
-
+            // update RGBA sliders
             forceValue = true;
             sliderRed.Value = item.Brush.Color.R;
-            txtRed.Text = sliderRed.Value.ToString();
             forceValue = true;
             sliderGreen.Value = item.Brush.Color.G;
-            txtGreen.Text = sliderGreen.Value.ToString();
             forceValue = true;
             sliderBlue.Value = item.Brush.Color.B;
-            txtBlue.Text = sliderBlue.Value.ToString();
             forceValue = true;
             sliderAlpha.Value = item.Brush.Color.A;
-            txtAlpha.Text = sliderAlpha.Value.ToString();
             forceValue = false;
         }
-
-        void UpdateColorPreview()
-        {
-            var newColor = new Color();
-            newColor.R = byte.Parse(((int)sliderRed.Value).ToString());
-            newColor.G = byte.Parse(((int)sliderGreen.Value).ToString());
-            newColor.B = byte.Parse(((int)sliderBlue.Value).ToString());
-            newColor.A = byte.Parse(((int)sliderAlpha.Value).ToString());
-            var newColorBrush = new SolidColorBrush(newColor);
-            rectSelectedColor.Fill = newColorBrush;
-
-            // TODO apply color to datagrid or dictionary
-            //if (selectedKey == null) return;
-            //origResourceColors[selectedKey] = newColorBrush;
-            //gridThemeColors.Items.Refresh();
-
-            //DataRowView rowView = gridThemeColors.Items[ as DataRowView;
-            //rowView.BeginEdit();
-            //rowView[1] = "Change cell here";
-            //rowView.EndEdit();
-            //gridThemeColors.Items.Refresh();
-            //Console.WriteLine(1234);
-
-            //themeColors[gridThemeColors.SelectedIndex].Key = "asdf";
-            themeColors[gridThemeColors.SelectedIndex].Brush = newColorBrush;
-
-            // NOTE slow but works..
-            gridThemeColors.Items.Refresh();
-
-            // apply color changes to mainwindow
-            var item = gridThemeColors.SelectedItem as ThemeColor;
-            Application.Current.Resources[item.Key] = newColorBrush;
-        }
-
-        private void SliderRed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (forceValue == true) return;
-            // onchanged is called before other components are ready..thanks wpf :D
-
-            if (txtRed == null) return;
-            txtRed.Text = ((int)((Slider)sender).Value).ToString();
-            UpdateColorPreview();
-            forceValue = false;
-
-        }
-
-        private void SliderGreen_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (forceValue == true) return;
-            if (txtGreen == null) return;
-            txtGreen.Text = ((int)((Slider)sender).Value).ToString();
-            UpdateColorPreview();
-            forceValue = false;
-        }
-
-        private void SliderBlue_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (forceValue == true) return;
-            if (txtBlue == null) return;
-            txtBlue.Text = ((int)((Slider)sender).Value).ToString();
-            UpdateColorPreview();
-            forceValue = false;
-        }
-
-        private void SliderAlpha_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (forceValue == true) return;
-            if (txtAlpha == null) return;
-            txtAlpha.Text = ((int)((Slider)sender).Value).ToString();
-            UpdateColorPreview();
-            forceValue = false;
-        }
-
-        string saveFileName = null;
 
         private void BtnSaveTheme_Click(object sender, RoutedEventArgs e)
         {
@@ -182,13 +113,13 @@ namespace UnityLauncherPro
             if (Directory.Exists(themeFolder) == false) Directory.CreateDirectory(themeFolder);
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            if (string.IsNullOrEmpty(saveFileName))
+            if (string.IsNullOrEmpty(previousSaveFileName))
             {
                 saveFileDialog.FileName = "custom";
             }
             else
             {
-                saveFileDialog.FileName = saveFileName;
+                saveFileDialog.FileName = previousSaveFileName;
             }
             saveFileDialog.DefaultExt = ".ini";
             saveFileDialog.Filter = "Theme files (.ini)|*.ini";
@@ -205,18 +136,15 @@ namespace UnityLauncherPro
                 }
 
                 var themePath = saveFileDialog.FileName;
-                saveFileName = Path.GetFileNameWithoutExtension(themePath);
+                previousSaveFileName = Path.GetFileNameWithoutExtension(themePath);
                 File.WriteAllLines(themePath, iniRows);
                 Console.WriteLine("Saved theme: " + themePath);
-
                 // TODO close theme editor window?
             }
         }
 
         private void BtnResetTheme_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine(themeColorsOrig.Count);
-            Console.WriteLine(themeColors.Count);
             for (int i = 0; i < themeColorsOrig.Count; i++)
             {
                 // reset collection colors
@@ -226,45 +154,62 @@ namespace UnityLauncherPro
                 Application.Current.Resources[themeColors[i].Key] = themeColorsOrig[i].Brush;
             }
 
-            // reset current button
+            // reset current color
             if (gridThemeColors.SelectedItem != null)
             {
                 var item = gridThemeColors.SelectedItem as ThemeColor;
                 forceValue = true;
                 sliderRed.Value = item.Brush.Color.R;
-                txtRed.Text = sliderRed.Value.ToString();
                 forceValue = true;
                 sliderGreen.Value = item.Brush.Color.G;
-                txtGreen.Text = sliderGreen.Value.ToString();
                 forceValue = true;
                 sliderBlue.Value = item.Brush.Color.B;
-                txtBlue.Text = sliderBlue.Value.ToString();
                 forceValue = true;
                 sliderAlpha.Value = item.Brush.Color.A;
-                txtAlpha.Text = sliderAlpha.Value.ToString();
                 forceValue = false;
             }
+
+            UpdateColorPreview();
 
             gridThemeColors.Items.Refresh();
         }
 
+        private void SliderRed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (forceValue == true) return;
+            if (txtRed == null) return; // onchanged is called before other components are ready..thanks wpf :D
+            UpdateColorPreview();
+        }
 
+        private void SliderGreen_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (forceValue == true) return;
+            if (txtGreen == null) return;
+            UpdateColorPreview();
+        }
+
+        private void SliderBlue_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (forceValue == true) return;
+            if (txtBlue == null) return;
+            UpdateColorPreview();
+        }
 
         public void Executed_Undo(object sender, ExecutedRoutedEventArgs e)
         {
             // restore previous color
             forceValue = true;
             previousSlider.Value = previousValue;
-            previousTextBox.Text = previousValue.ToString();
             forceValue = false;
             UpdateColorPreview();
         }
 
         public void CanExecute_Undo(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            e.CanExecute = previousValue > -1;
         }
 
+        // TODO could add paste HTML code from clipboard
         //public void Executed_Paste(object sender, ExecutedRoutedEventArgs e)
         //{
         //    //OnPasteImageFromClipboard();
@@ -274,6 +219,13 @@ namespace UnityLauncherPro
         //{
         //    e.CanExecute = true;
         //}
+
+        private void SliderAlpha_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (forceValue == true) return;
+            if (txtAlpha == null) return;
+            UpdateColorPreview();
+        }
 
         public void Executed_Save(object sender, ExecutedRoutedEventArgs e)
         {
@@ -287,30 +239,28 @@ namespace UnityLauncherPro
 
         private void SliderRed_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            previousSlider = (Slider)sender;
-            previousTextBox = txtRed;
-            previousValue = int.Parse(previousTextBox.Text);
+            SetUndoValues(sender, txtRed);
         }
 
         private void SliderGreen_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            previousSlider = (Slider)sender;
-            previousTextBox = txtGreen;
-            previousValue = int.Parse(previousTextBox.Text);
+            SetUndoValues(sender, txtGreen);
         }
 
         private void SliderBlue_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            previousSlider = (Slider)sender;
-            previousTextBox = txtBlue;
-            previousValue = int.Parse(previousTextBox.Text);
+            SetUndoValues(sender, txtBlue);
         }
 
         private void SliderAlpha_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            SetUndoValues(sender, txtAlpha);
+        }
+
+        void SetUndoValues(Object sender, TextBox textBox)
+        {
             previousSlider = (Slider)sender;
-            previousTextBox = txtAlpha;
-            previousValue = int.Parse(previousTextBox.Text);
+            previousValue = (int)previousSlider.Value;
         }
     } // class
 } // namespace
