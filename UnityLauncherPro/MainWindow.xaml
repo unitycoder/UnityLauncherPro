@@ -394,30 +394,25 @@
         <BooleanToVisibilityConverter x:Key="MyBoolToVisibilityConverter" />
 
 
-        <!--checkbox-->
+        <!--checkboxes-->
         <Style x:Key="{x:Type CheckBox}" TargetType="{x:Type CheckBox}">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForeground}"/>
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            
+
             <Setter Property="Margin" Value="1 0 0 3"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <!--<StackPanel Orientation="Horizontal">-->
-                            <BulletDecorator Background="Transparent">
-                                <BulletDecorator.Bullet>
-                                    <Border x:Name="Border" Margin="0 1 0 0" Width="14" Height="13" CornerRadius="0" Background="#ffffff" BorderThickness="1" BorderBrush="#404040">
-                                        <Path Width="8" Height="8" x:Name="CheckMark" SnapsToDevicePixels="False" Stroke="#000000" StrokeThickness="1.75" Data="M 0 3 L 3 6 L 7 0" Margin="1,1,0,0" />
-                                    </Border>
-                                </BulletDecorator.Bullet>
-                                <ContentPresenter Margin="3,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" RecognizesAccessKey="True"/>
-                            </BulletDecorator>
-                            <!--<TextBlock Foreground="Red">asdf</TextBlock>-->
-                            <!--<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="8" Foreground="White" Text="{TemplateBinding Content}"/>-->
-                            <!--</ContentPresenter/>-->                           
-                        <!--</StackPanel>-->
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Border x:Name="Border" Margin="0 1 0 0" Width="14" Height="13" CornerRadius="0" Background="#ffffff" BorderThickness="1" BorderBrush="#404040">
+                                    <Path Width="8" Height="8" x:Name="CheckMark" SnapsToDevicePixels="False" Stroke="#000000" StrokeThickness="1.75" Data="M 0 3 L 3 6 L 7 0" Margin="1,1,0,0" />
+                                </Border>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter Margin="3,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" RecognizesAccessKey="True"/>
+                        </BulletDecorator>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="false">
                                 <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed"/>
@@ -437,6 +432,33 @@
             </Setter>
         </Style>
 
+        <!--radiobuttons-->
+        <Style x:Key="{x:Type RadioButton}" TargetType="{x:Type RadioButton}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForeground}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
+                            <Grid>
+                                <Ellipse x:Name="TargetEllipse" Width="12" Height="12" Fill="{DynamicResource ThemeButtonForeground}" Stroke="Transparent" />
+                                <Ellipse x:Name="CheckedEllipse" Width="6" Height="6" Fill="{DynamicResource ThemeRadioButtonSelected}" Visibility="Collapsed"/>
+                            </Grid>
+                            <Label Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" Background="{TemplateBinding Background}"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckedEllipse" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="TargetEllipse" Property="Stroke" Value="{DynamicResource ThemeSystemHighlight}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
 
 
@@ -1009,8 +1031,8 @@
                             <CheckBox  x:Name="chkHumanFriendlyDateTime" Content="Use human friendly last modified"  ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkHumanFriendlyDateTime_Checked" Unchecked="ChkHumanFriendlyDateTime_Checked"/>
                             <Label Foreground="{DynamicResource ThemeButtonForeground}">Project name:</Label>
                             <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder" Foreground="{DynamicResource ThemeButtonForeground}" Margin="4,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>
-                                <RadioButton x:Name="radioProjNameProductName" Content="Settings ProductName" Foreground="{DynamicResource ThemeButtonForeground}" Margin="5,0,0,0" GroupName="toggleGroupProjectName" Checked="RadioProjNameProductName_Checked" ToolTip="Take project name from player settings ProductName field"/>
+                                <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder"  Margin="4,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>
+                                <RadioButton x:Name="radioProjNameProductName" Content="Settings ProductName"  Margin="5,0,0,0" GroupName="toggleGroupProjectName" Checked="RadioProjNameProductName_Checked" ToolTip="Take project name from player settings ProductName field"/>
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
