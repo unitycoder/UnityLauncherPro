@@ -129,7 +129,7 @@ namespace UnityLauncherPro
             if (saveFileDialog.ShowDialog() == true)
             {
                 List<string> iniRows = new List<string>();
-                iniRows.Add("# Created with UnityLauncherPro built-in theme editor " + DateTime.Now.ToString("dd/MM/YYYY"));
+                iniRows.Add("# Created with UnityLauncherPro built-in theme editor " + DateTime.Now.ToString("dd/MM/yyyy"));
                 for (int i = 0; i < themeColors.Count; i++)
                 {
                     iniRows.Add(themeColors[i].Key + "=" + themeColors[i].Brush.ToString());

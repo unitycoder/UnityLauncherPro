@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="ThemeEditor" Height="500" Width="500" WindowStyle="ToolWindow" Loaded="Window_Loaded" Background="#FF121212">
+        Title="ThemeEditor" Height="500" Width="500" WindowStyle="ToolWindow" Loaded="Window_Loaded" Background="#FF121212" ResizeMode="NoResize">
 
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Undo" Executed="Executed_Undo" CanExecute="CanExecute_Undo"/>
