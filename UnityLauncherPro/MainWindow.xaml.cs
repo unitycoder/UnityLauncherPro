@@ -2364,6 +2364,11 @@ namespace UnityLauncherPro
 
         private void BtnThemeEditor_Click(object sender, RoutedEventArgs e)
         {
+            if (themeEditorWindow != null && themeEditorWindow.IsVisible == true)
+            {
+                themeEditorWindow.Activate();
+                return;
+            }
             themeEditorWindow = new ThemeEditor();
             themeEditorWindow.Show();
         }

@@ -13,11 +13,12 @@
     <!--datagrid-->
     <SolidColorBrush x:Key="ThemeDatagridHeaderBackground" Color="#4C3F3F46"/>
     <SolidColorBrush x:Key="ThemeDatagridHeaderForeground" Color="#FFB6B6B6"/>
-    <SolidColorBrush x:Key="ThemeDatagridHeaderBorder" Color="#4C000000"/>
+    <SolidColorBrush x:Key="ThemeDatagridLines" Color="#4C000000"/>
+    <!--<SolidColorBrush x:Key="ThemeDatagridHeaderBorder" Color="#4C000000"/>-->
+    <!--<SolidColorBrush x:Key="ThemeGridHorizontalGridLines" Color="#4C000000"/>-->
     <SolidColorBrush x:Key="ThemeDataGridRowMouseOver" Color="#7F007ACC"/>
     <SolidColorBrush x:Key="ThemeDataGridRowSelectedBackground" Color="#FF007ACC"/>
     <SolidColorBrush x:Key="ThemeGridForeground" Color="#FFD8D8D8"/>
-    <SolidColorBrush x:Key="ThemeGridHorizontalGridLines" Color="#4C000000"/>
     <SolidColorBrush x:Key="ThemeGridVerticalGridLines" Color="#19000000"/>
     <SolidColorBrush x:Key="ThemeGridGreenText" Color="#FF00C500"/>
     <SolidColorBrush x:Key="ThemeGridRedText" Color="#FFF54F4F"/>
@@ -33,7 +34,6 @@
     <!--buttons-->
     <SolidColorBrush x:Key="ThemeButtonForegroundDisabled" Color="#FF707070"/>
     <SolidColorBrush x:Key="ThemeButtonBackgroundMouseOver" Color="#FF494949"/>
-    <SolidColorBrush x:Key="ThemeButtonWhiteText" Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="ThemeButtonBackgroundPressed" Color="#FF0F0F0F"/>
     <SolidColorBrush x:Key="ThemeButtonBackground" Color="#FF3F3F46"/>
     <SolidColorBrush x:Key="ThemeButtonForeground" Color="#FFC1C1C1"/>
@@ -57,11 +57,13 @@
 
     <!--radio and checkboxes-->
     <SolidColorBrush x:Key="ThemeRadioButtonSelected" Color="#FF1E1E1E"/>
-    <SolidColorBrush x:Key="ThemeRadioButtonOutline" Color="#FF1E1E1E"/>
+    <!--<SolidColorBrush x:Key="ThemeRadioButtonOutline" Color="#FF1E1E1E"/>-->
     <SolidColorBrush x:Key="ThemeRadioCheckBoxBackground" Color="#FFFFFFFF"/>
 
     <!--common-->
-    <SolidColorBrush x:Key="ThemeButtonFocusOutline" Color="#FF003D61"/>
+    <!--<SolidColorBrush x:Key="ThemeButtonFocusOutline" Color="#FF003D61"/>-->
     <SolidColorBrush x:Key="ThemeSystemHighlight" Color="#FF0078D7"/>
+    <!--<SolidColorBrush x:Key="ThemeButtonWhiteText" Color="#FFFFFFFF"/>-->
+    <SolidColorBrush x:Key="ThemeBrightText" Color="#FFFFFFFF"/>
 
 </ResourceDictionary>

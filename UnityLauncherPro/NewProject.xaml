@@ -25,7 +25,7 @@
                                 <Setter TargetName="shortcutbutton" Property="Background" Value="#FF0F0F0F" />
                             </Trigger>
                             <Trigger Property="IsFocused" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="{DynamicResource ThemeButtonFocusOutline}" />
+                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="{DynamicResource ThemeSystemHighlight}" />
                                 <Setter TargetName="shortcutbutton" Property="BorderThickness" Value="1" />
                             </Trigger>
                         </ControlTemplate.Triggers>

@@ -177,7 +177,7 @@
                                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeDeactiveTabBackground}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource ThemeButtonWhiteText}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource ThemeBrightText}"/>
                                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeMainBackgroundColor}"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -193,7 +193,7 @@
         <Style x:Key="HeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Background" Value="{DynamicResource ThemeDatagridHeaderBackground}" />
             <Setter Property="Foreground" Value="{DynamicResource ThemeDatagridHeaderForeground}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ThemeDatagridHeaderBorder}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeDatagridLines}" />
             <Setter Property="BorderThickness" Value="0,0,1,1" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -271,14 +271,14 @@
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
                                 <Setter TargetName="shortcutbutton" Property="Background" Value="{DynamicResource ThemeButtonBackgroundMouseOver}" />
-                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{DynamicResource ThemeButtonWhiteText}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{DynamicResource ThemeBrightText}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
                                 <Setter TargetName="shortcutbutton" Property="Background" Value="{DynamicResource ThemeButtonBackgroundPressed}" />
-                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{DynamicResource ThemeButtonWhiteText}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{DynamicResource ThemeBrightText}"/>
                             </Trigger>
                             <Trigger Property="IsFocused" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="{DynamicResource ThemeButtonFocusOutline}" />
+                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="{DynamicResource ThemeSystemHighlight}" />
                                 <Setter TargetName="shortcutbutton" Property="BorderThickness" Value="1" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -520,7 +520,7 @@
                     <Button Style="{StaticResource CustomButton}" ToolTip="Add existing project" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="0,4,34,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" TabIndex="10" />
                     <Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshProjectList_Click" TabIndex="11"/>
 
-                    <DataGrid x:Name="gridRecent" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" ContextMenuOpening="GridRecent_ContextMenuOpening" BeginningEdit="GridRecent_BeginningEdit" RowHeight="21" ColumnReordered="GridRecent_ColumnReordered" >
+                    <DataGrid x:Name="gridRecent" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" ContextMenuOpening="GridRecent_ContextMenuOpening" BeginningEdit="GridRecent_BeginningEdit" RowHeight="21" ColumnReordered="GridRecent_ColumnReordered" >
 
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
@@ -683,7 +683,7 @@
 
                     <Button Style="{StaticResource CustomButton}" ToolTip="Refresh installations (F5)" x:Name="btnRefreshUnityList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshUnityList_Click"/>
 
-                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick">
+                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick">
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                         </DataGrid.CommandBindings>
@@ -789,7 +789,7 @@
                     </Grid>
 
                     <Button Style="{StaticResource CustomButton}" ToolTip="Fetch released versions" x:Name="btnRefreshUpdatesList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="OnGetUnityUpdatesClick"/>
-                    <DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUpdates_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUpdates_PreviewMouseDoubleClick">
+                    <DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUpdates_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUpdates_PreviewMouseDoubleClick">
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                         </DataGrid.CommandBindings>
@@ -927,7 +927,7 @@
 
 
                         </StackPanel>
-                        <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeGridHorizontalGridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick">
+                        <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Size}" ClipboardContentBinding="{x:Null}" Header="Size" IsReadOnly="True" Width="75"/>
                                 <DataGridTextColumn Binding="{Binding Percentage}" ClipboardContentBinding="{x:Null}" Header="%" IsReadOnly="True" Width="55" />
