@@ -393,5 +393,17 @@ namespace UnityLauncherPro.Properties {
                 this["projectName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string templatePackagesFolder {
+            get {
+                return ((string)(this["templatePackagesFolder"]));
+            }
+            set {
+                this["templatePackagesFolder"] = value;
+            }
+        }
     }
 }

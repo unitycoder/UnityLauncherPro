@@ -1034,6 +1034,11 @@
                                 <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder"  Margin="3,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>
                                 <RadioButton x:Name="radioProjNameProductName" Content="Settings ProductName"  Margin="5,0,0,0" GroupName="toggleGroupProjectName" Checked="RadioProjNameProductName_Checked" ToolTip="Take project name from player settings ProductName field"/>
                             </StackPanel>
+                            <!--<StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBox x:Name="txtTemplatePackagesFolder" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" ToolTip="Folder for your custom unitypackage templates (for new project)" Padding="0,3,0,0" Width="110" TextChanged="TxtTemplatePackagesFolder_TextChanged" />
+                                <Button Style="{StaticResource CustomButton}" x:Name="btnBrowseTemplateUnityPackagesFolder" Content="..." Margin="6,0,0,0" MinWidth="22" MinHeight="22" FontSize="16" ToolTip="Browse for new projects root folder.." Click="BtnBrowseTemplateUnityPackagesFolder_Click" />
+                                <Label Content="UnityPackage Templates Folder" Foreground="{DynamicResource ThemeButtonForeground}" />
+                            </StackPanel>-->
                         </StackPanel>
                     </StackPanel>
 

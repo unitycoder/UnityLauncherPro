@@ -638,6 +638,8 @@ namespace UnityLauncherPro
             {
                 var proj = GetNewProjectData(folder);
                 AddNewProjectToList(proj);
+                // clear search, so can see added project
+                txtSearchBox.Text = "";
             }
         }
 
@@ -719,7 +721,7 @@ namespace UnityLauncherPro
                             {
                                 // its already clear
                             }
-                            else // we have text in searchbox
+                            else // we have text in searchbox, clear it
                             {
                                 txtSearchBox.Text = "";
                             }
@@ -1579,7 +1581,6 @@ namespace UnityLauncherPro
                 Properties.Settings.Default.newProjectsRoot = folder;
                 Properties.Settings.Default.Save();
             }
-            // save to prefs when? onchange
         }
 
         private void TxtRootFolderForNewProjects_TextChanged(object sender, TextChangedEventArgs e)
@@ -2407,8 +2408,25 @@ namespace UnityLauncherPro
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Start();
-
         }
+
+        //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var folder = Tools.BrowseForOutputFolder("Select unitypackage Templates folder");
+        //    if (string.IsNullOrEmpty(folder) == false)
+        //    {
+        //        txtTemplatePackagesFolder.Text = folder;
+        //        Properties.Settings.Default.templatePackagesFolder = folder;
+        //        Properties.Settings.Default.Save();
+        //    }
+        //}
+
+        //private void TxtTemplatePackagesFolder_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    Properties.Settings.Default.templatePackagesFolder = txtTemplatePackagesFolder.Text;
+        //    Properties.Settings.Default.Save();
+        //}
+
     } // class
 } //namespace
 
