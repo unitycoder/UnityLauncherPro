@@ -13,8 +13,13 @@ namespace UnityLauncherPro
         public static string newName = null;
         public static string templateZipPath = null;
 
+        bool isInitializing = true; // to keep OnChangeEvent from firing too early
+        int previousSelectedTemplateIndex = -1;
+        int previousSelectedModuleIndex = -1;
+
         public NewProject(string unityVersion, string suggestedName, string targetFolder)
         {
+            isInitializing = true;
             InitializeComponent();
 
             // get version
@@ -25,22 +30,26 @@ namespace UnityLauncherPro
             lblNewProjectFolder.Content = targetFolder;
 
             // fill available versions, TODO could show which modules are installed
-            if (gridAvailableVersions.ItemsSource == null) gridAvailableVersions.ItemsSource = MainWindow.unityInstalledVersions;
+            if (gridAvailableVersions.ItemsSource == null) gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
 
-            // we dont have that version installed, TODO show info or pick closest?, for now picks the first item
+            // we have that version installed
             if (MainWindow.unityInstalledVersions.ContainsKey(unityVersion) == true)
             {
-                // autopick this unity version
-                var item = Tools.GetEntry(MainWindow.unityInstalledVersions, unityVersion);
-                int index = gridAvailableVersions.Items.IndexOf(item);
-                if (index > -1)
+                // find this unity version, TODO theres probably easier way than looping all
+                for (int i = 0; i < MainWindow.unityInstallationsSource.Length; i++)
                 {
-                    gridAvailableVersions.SelectedIndex = index;
-                    gridAvailableVersions.ScrollIntoView(item);
+                    if (MainWindow.unityInstallationsSource[i].Version == newVersion)
+                    {
+                        gridAvailableVersions.SelectedIndex = i;
+                        gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
+                        break;
+                    }
                 }
-                UpdateTemplatesDropDown(item.Value);
+
+                UpdateTemplatesDropDown((gridAvailableVersions.SelectedItem as UnityInstallation).Path);
+                UpdateModulesDropdown(newVersion);
             }
-            else // we dont have requested unity version, get templates for the first item
+            else // we dont have requested unity version, select first item then
             {
                 var path = MainWindow.unityInstallationsSource[0].Path;
                 gridAvailableVersions.SelectedIndex = 0;
@@ -52,7 +61,9 @@ namespace UnityLauncherPro
             txtNewProjectName.Focus();
             txtNewProjectName.SelectAll();
             newProjectName = txtNewProjectName.Text;
-        }
+
+            isInitializing = false;
+        }  // NewProject
 
         void UpdateTemplatesDropDown(string unityPath)
         {
@@ -61,6 +72,21 @@ namespace UnityLauncherPro
             cmbNewProjectTemplate.SelectedIndex = 0;
             lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
         }
+
+
+        void UpdateModulesDropdown(string version)
+        {
+            // get modules and stick into combobox
+            cmbNewProjectPlatform.ItemsSource = Tools.GetPlatformsForUnityVersion(version);
+            System.Console.WriteLine(Tools.GetPlatformsForUnityVersion(version).Length);
+
+            // TODO remember this selection next time
+            cmbNewProjectPlatform.SelectedIndex = 0;
+            //lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
+        }
+
+
+
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
             templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
@@ -97,6 +123,21 @@ namespace UnityLauncherPro
                     e.Handled = true;
                     break;
                 case Key.Escape: // esc cancel
+                    // if pressed esc while combobox is open, close that one instead of closing window
+                    if (cmbNewProjectTemplate.IsDropDownOpen)
+                    {
+                        cmbNewProjectTemplate.IsDropDownOpen = false;
+                        if (previousSelectedTemplateIndex > -1) cmbNewProjectTemplate.SelectedIndex = previousSelectedTemplateIndex;
+                        return;
+                    }
+
+                    if (cmbNewProjectPlatform.IsDropDownOpen)
+                    {
+                        cmbNewProjectPlatform.IsDropDownOpen = false;
+                        if (previousSelectedModuleIndex > -1) cmbNewProjectPlatform.SelectedIndex = previousSelectedModuleIndex;
+                        return;
+                    }
+
                     DialogResult = false;
                     e.Handled = true;
                     break;
@@ -107,10 +148,10 @@ namespace UnityLauncherPro
 
         void UpdateSelectedVersion()
         {
-            var k = gridAvailableVersions.SelectedItem as KeyValuePair<string, string>?;
-            if (k != null && k.Value.Key != newVersion)
+            var k = gridAvailableVersions.SelectedItem as UnityInstallation;
+            if (k != null && k.Version != newVersion)
             {
-                newVersion = k.Value.Key;
+                newVersion = k.Version;
             }
         }
 
@@ -143,14 +184,15 @@ namespace UnityLauncherPro
         // FIXME this gets called when list is updated?
         private void GridAvailableVersions_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (gridAvailableVersions.SelectedItem == null) return;
+            if (gridAvailableVersions.SelectedItem == null || isInitializing == true) return;
             // new row selected, generate new project name for this version
-            var k = gridAvailableVersions.SelectedItem as KeyValuePair<string, string>?;
-            newVersion = k.Value.Key;
+            var k = gridAvailableVersions.SelectedItem as UnityInstallation;
+            newVersion = k.Version;
             GenerateNewName();
 
             // update templates list for selected unity version
-            UpdateTemplatesDropDown(k.Value.Value);
+            UpdateTemplatesDropDown(k.Path);
+            UpdateModulesDropdown(k.Version);
         }
 
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
@@ -162,6 +204,17 @@ namespace UnityLauncherPro
             //row.Background = Brushes.Green;
             row.Foreground = Brushes.White;
             row.FontWeight = FontWeights.Bold;
+        }
+
+        private void CmbNewProjectTemplate_DropDownOpened(object sender, System.EventArgs e)
+        {
+            // on open, take current selection, so can undo later
+            previousSelectedTemplateIndex = cmbNewProjectTemplate.SelectedIndex;
+        }
+
+        private void CmbNewProjectPlatform_DropDownOpened(object sender, System.EventArgs e)
+        {
+            previousSelectedModuleIndex = cmbNewProjectPlatform.SelectedIndex;
         }
     }
 }

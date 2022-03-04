@@ -1081,7 +1081,8 @@ namespace UnityLauncherPro
             }
 
             // find next free folder checking all "unityversion_a-z" characters
-            var unityBaseVersion = version.Substring(0, version.IndexOf('.'));
+            var unityBaseVersion = version.Substring(0, version.LastIndexOf('.'));
+            unityBaseVersion = unityBaseVersion.Replace(".", "_");
             for (int i = 97; i < 122; i++)
             {
                 var newProject = unityBaseVersion + "_" + ((char)i);
@@ -1096,7 +1097,8 @@ namespace UnityLauncherPro
                     return newProject;
                 }
             }
-            return null;
+            // couldnt find free letter to use, lets add timestamp then
+            return unityBaseVersion + "_" + DateTime.Now.ToString("ddMMyyyy_HHmmss");
         }
 
         static void CreateEmptyProjectFolder(string path, string version)
