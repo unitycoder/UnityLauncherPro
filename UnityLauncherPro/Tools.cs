@@ -383,7 +383,7 @@ namespace UnityLauncherPro
             {
                 if (string.IsNullOrEmpty(param) == true)
                 {
-                    Console.WriteLine(path);
+                    Console.WriteLine("LaunchExe=" + path);
                     Process.Start(path);
                 }
                 else
@@ -1016,7 +1016,7 @@ namespace UnityLauncherPro
             return null;
         }
 
-        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null)
+        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null, string platform = null)
         {
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
@@ -1035,7 +1035,7 @@ namespace UnityLauncherPro
             // check selected unity version
             if (string.IsNullOrEmpty(version) == true)
             {
-                Console.WriteLine("Missing unity version");
+                Console.WriteLine("Missing unity version string");
                 return null;
             }
 
@@ -1043,8 +1043,8 @@ namespace UnityLauncherPro
             // if we didnt have name yet
             if (string.IsNullOrEmpty(projectName) == true)
             {
-                Console.WriteLine(version);
-                Console.WriteLine(baseFolder);
+                //Console.WriteLine("version=" + version);
+                //Console.WriteLine("baseFolder=" + baseFolder);
                 projectName = GetSuggestedProjectName(version, baseFolder);
                 // failed getting new path a-z
                 if (projectName == null) return null;
@@ -1065,6 +1065,7 @@ namespace UnityLauncherPro
             proj.Title = projectName;
             proj.Path = Path.Combine(baseFolder, newPath);
             proj.Version = version;
+            proj.TargetPlatform = platform;
             var proc = LaunchProject(proj);
             ProcessHandler.Add(proj, proc);
             return proj;

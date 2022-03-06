@@ -405,5 +405,17 @@ namespace UnityLauncherPro.Properties {
                 this["templatePackagesFolder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string newProjectPlatform {
+            get {
+                return ((string)(this["newProjectPlatform"]));
+            }
+            set {
+                this["newProjectPlatform"] = value;
+            }
+        }
     }
 }

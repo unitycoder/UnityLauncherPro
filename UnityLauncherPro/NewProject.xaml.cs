@@ -12,6 +12,7 @@ namespace UnityLauncherPro
         public static string newVersion = null;
         public static string newName = null;
         public static string templateZipPath = null;
+        public static string selectedPlatform = null;
 
         bool isInitializing = true; // to keep OnChangeEvent from firing too early
         int previousSelectedTemplateIndex = -1;
@@ -77,11 +78,22 @@ namespace UnityLauncherPro
         void UpdateModulesDropdown(string version)
         {
             // get modules and stick into combobox
-            cmbNewProjectPlatform.ItemsSource = Tools.GetPlatformsForUnityVersion(version);
-            System.Console.WriteLine(Tools.GetPlatformsForUnityVersion(version).Length);
+            var platformsForThisUnity = Tools.GetPlatformsForUnityVersion(version);
+            cmbNewProjectPlatform.ItemsSource = platformsForThisUnity;
+            //System.Console.WriteLine(Tools.GetPlatformsForUnityVersion(version).Length);
 
-            // TODO remember this selection next time
-            cmbNewProjectPlatform.SelectedIndex = 0;
+            var lastUsedPlatform = Properties.Settings.Default.newProjectPlatform;
+
+            for (int i = 0; i < platformsForThisUnity.Length; i++)
+            {
+                // set default platform (now win64) if never used this before
+                if (platformsForThisUnity[i].ToLower() == "win64" || platformsForThisUnity[i] == lastUsedPlatform)
+                {
+                    cmbNewProjectPlatform.SelectedIndex = i;
+                    break;
+                }
+            }
+
             //lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
         }
 
@@ -90,7 +102,13 @@ namespace UnityLauncherPro
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
             templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
+            selectedPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
             UpdateSelectedVersion();
+
+            // save last used value for platform
+            Properties.Settings.Default.newProjectPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
+            Properties.Settings.Default.Save();
+
             DialogResult = true;
         }
 
@@ -123,7 +141,7 @@ namespace UnityLauncherPro
                     e.Handled = true;
                     break;
                 case Key.Escape: // esc cancel
-                    // if pressed esc while combobox is open, close that one instead of closing window
+                                 // if pressed esc while combobox is open, close that one instead of closing window
                     if (cmbNewProjectTemplate.IsDropDownOpen)
                     {
                         cmbNewProjectTemplate.IsDropDownOpen = false;

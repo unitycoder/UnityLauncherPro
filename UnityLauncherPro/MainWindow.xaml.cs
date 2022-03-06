@@ -559,7 +559,7 @@ namespace UnityLauncherPro
             dataGridUpdates.ItemsSource = null;
             var task = GetUnityUpdates.Scan();
             var items = await task;
-            Console.WriteLine(items == null);
+            Console.WriteLine("CallGetUnityUpdates=" + items == null);
             if (items == null) return;
             updatesSource = GetUnityUpdates.Parse(items);
             if (updatesSource == null) return;
@@ -1642,7 +1642,7 @@ namespace UnityLauncherPro
                     Console.WriteLine("Create project " + NewProject.newVersion + " : " + projectPath);
                     if (string.IsNullOrEmpty(projectPath)) return;
 
-                    var p = Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath);
+                    var p = Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath, NewProject.selectedPlatform);
 
                     // add to list (just in case new project fails to start, then folder is already generated..)
                     if (p != null) AddNewProjectToList(p);
@@ -1732,7 +1732,7 @@ namespace UnityLauncherPro
             {
                 path = GetSelectedUpdate()?.Version; // TODO copy url instead
             }
-            Console.WriteLine(path);
+            Console.WriteLine("CopyRowFolderToClipBoard=" + path);
 
             if (string.IsNullOrEmpty(path) == false) Clipboard.SetText(path);
         }
