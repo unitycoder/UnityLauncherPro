@@ -7,7 +7,7 @@
 		xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:converters="clr-namespace:UnityLauncherPro.Converters" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" Activated="Window_Activated" Loaded="Window_Loaded">
+        Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized">
     <Window.Resources>
 
         <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>

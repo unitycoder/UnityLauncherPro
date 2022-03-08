@@ -1540,12 +1540,6 @@ namespace UnityLauncherPro
 
         }
 
-        private void Window_Activated(object sender, EventArgs e)
-        {
-            //Console.WriteLine("gridRecent.IsFocused=" + gridRecent.IsFocused);
-            //Console.WriteLine("gridRecent.IsFocused=" + gridRecent.IsKeyboardFocused);
-        }
-
         private void MenuItemCopyPath_Click(object sender, RoutedEventArgs e)
         {
             string copy = null;
@@ -2405,8 +2399,9 @@ namespace UnityLauncherPro
             Tools.DownloadAdditionalModules(unity.Path, unity.Version, "WebGL");
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_SourceInitialized(object sender, EventArgs e)
         {
+            // need to run here, so that main window gets hidden if start from commandline as new/upgrade project
             Start();
         }
 
