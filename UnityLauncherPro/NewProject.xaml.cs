@@ -131,6 +131,14 @@ namespace UnityLauncherPro
                         keyboardFocus.MoveFocus(tRequest);
                     }
                     break;
+                case Key.F2: // select project name field
+                    txtNewProjectName.Focus();
+                    txtNewProjectName.SelectAll();
+                    break;
+                case Key.F3: // next platform
+                    cmbNewProjectPlatform.SelectedIndex = ++cmbNewProjectPlatform.SelectedIndex % cmbNewProjectPlatform.Items.Count;
+                    break;
+                case Key.F4: // next template
                 case Key.Oem5:  // select next template §-key
                     cmbNewProjectTemplate.SelectedIndex = ++cmbNewProjectTemplate.SelectedIndex % cmbNewProjectTemplate.Items.Count;
                     e.Handled = true; // override writing to textbox

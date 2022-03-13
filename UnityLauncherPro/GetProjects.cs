@@ -78,6 +78,8 @@ namespace UnityLauncherPro
                             projectName = projectPath;
                         }
 
+                        //Console.WriteLine("valueName="+ valueName+"  , projectName =" + projectName);
+
                         // get last modified date from folder
                         DateTime? lastUpdated = folderExists ? Tools.GetLastModifiedTime(projectPath) : null;
 
@@ -143,6 +145,8 @@ namespace UnityLauncherPro
                     } // valid key
                 } // each key
             } // for each registry root
+
+            // NOTE sometimes projects are in wrong order, seems to be related to messing up your unity registry, the keys are received in created order (so if you had removed/modified them manually, it might return wrong order instead of 0 - 40)
 
             return projectsFound;
         } // Scan()

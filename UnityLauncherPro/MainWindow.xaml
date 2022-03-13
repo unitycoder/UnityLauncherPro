@@ -877,13 +877,6 @@
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click" ToolTip="Start ADB logcat commandline">
                                         <Label Content="_ADB logcat" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
-                                    <Label Content="Args:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="0,1,0,-4" />
-                                    <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,5,0,0" Height="20"  >
-                                        <TextBox Width="420" Text="-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color"  CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtLogCatArgs" Background="{DynamicResource ThemeTextBoxBackground}" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="32" TextChanged="TxtLogCatArgs_TextChanged" />
-                                    </Grid>
-                                    <Button Style="{StaticResource CustomButton}" x:Name="btnResetLogCatArgs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Reset to default logcat args" Click="BtnResetLogCatArgs_Click">
-                                        <Label Content="Reset" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-                                    </Button>
                                 </StackPanel>
                             </Border>
                             <!-- links -->
@@ -1039,6 +1032,15 @@
                                 <Button Style="{StaticResource CustomButton}" x:Name="btnBrowseTemplateUnityPackagesFolder" Content="..." Margin="6,0,0,0" MinWidth="22" MinHeight="22" FontSize="16" ToolTip="Browse for new projects root folder.." Click="BtnBrowseTemplateUnityPackagesFolder_Click" />
                                 <Label Content="UnityPackage Templates Folder" Foreground="{DynamicResource ThemeButtonForeground}" />
                             </StackPanel>-->
+
+                            <Label Content="ADB args:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="0,1,0,-4" />
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBox x:Name="txtLogCatArgs" BorderBrush="Transparent" Text="-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="312" ToolTip="ADB commandline arguments" Padding="0,3,0,0" TextChanged="TxtLogCatArgs_TextChanged" Width="312" />
+                                <Button Style="{StaticResource CustomButton}" x:Name="btnResetLogCatArgs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Reset to default logcat args" Click="BtnResetLogCatArgs_Click">
+                                    <Label Content="Reset" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                </Button>
+                            </StackPanel>
+
                         </StackPanel>
                     </StackPanel>
 
