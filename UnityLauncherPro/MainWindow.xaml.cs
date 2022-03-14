@@ -573,22 +573,15 @@ namespace UnityLauncherPro
 
             var unity = GetSelectedUnity();
             if (unity == null) return;
-            // NOTE for now, just select the same version.. then user can see what has been released after this
+
+
             // NOTE if updates are not loaded, should wait for that
             if (dataGridUpdates.ItemsSource != null)
             {
                 tabControl.SelectedIndex = 2;
-                // find matching version
-                for (int i = 0; i < dataGridUpdates.Items.Count; i++)
-                {
-                    Updates row = (Updates)dataGridUpdates.Items[i];
-                    if (row.Version == unity.Version)
-                    {
-                        dataGridUpdates.SelectedIndex = i;
-                        dataGridUpdates.ScrollIntoView(row);
-                        break;
-                    }
-                }
+
+                // NOTE for now, just set filter to current version, minus patch version "2021.1.7f1" > "2021.1"
+                txtSearchBoxUpdates.Text = unity.Version.Substring(0, unity.Version.LastIndexOf('.'));
             }
         }
 
