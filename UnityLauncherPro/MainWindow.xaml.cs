@@ -26,6 +26,7 @@ namespace UnityLauncherPro
         public const string appName = "UnityLauncherPro";
         public static string currentDateFormat = null;
         public static bool useHumanFriendlyDateFormat = false;
+        public static bool searchProjectPathAlso = false;
         public static List<Project> projectsSource;
         public static UnityInstallation[] unityInstallationsSource;
         public static ObservableDictionary<string, string> unityInstalledVersions = new ObservableDictionary<string, string>(); // versionID and installation folder
@@ -271,7 +272,7 @@ namespace UnityLauncherPro
         private bool ProjectFilter(object item)
         {
             Project proj = item as Project;
-            return (proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+            return (proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1) || (searchProjectPathAlso && (proj.Path.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1));
         }
 
         private bool UpdatesFilter(object item)
@@ -376,7 +377,7 @@ namespace UnityLauncherPro
             }
 
             useHumanFriendlyDateFormat = Properties.Settings.Default.useHumandFriendlyLastModified;
-
+            searchProjectPathAlso = Properties.Settings.Default.searchProjectPathAlso;
 
             // recent grid column display index order
             var order = Properties.Settings.Default.recentColumnsOrder;
@@ -2396,6 +2397,16 @@ namespace UnityLauncherPro
         {
             // need to run here, so that main window gets hidden if start from commandline as new/upgrade project
             Start();
+        }
+
+        private void ChkSearchProjectPath_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+
+            searchProjectPathAlso = isChecked;
+            Properties.Settings.Default.searchProjectPathAlso = isChecked;
+            Properties.Settings.Default.Save();
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)

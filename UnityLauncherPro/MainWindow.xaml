@@ -1025,6 +1025,7 @@
                                 </TextBox>
                             </StackPanel>
                             <CheckBox  x:Name="chkHumanFriendlyDateTime" Content="Use human friendly last modified"  ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkHumanFriendlyDateTime_Checked" Unchecked="ChkHumanFriendlyDateTime_Checked"/>
+                            <CheckBox  x:Name="chkSearchProjectPath" Content="Search project path also"  ToolTip="Searches from project folder path and project name" HorizontalAlignment="Left" Checked="ChkSearchProjectPath_Checked" Unchecked="ChkSearchProjectPath_Checked"/>
                             <Label Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,5,5,0">Project name:</Label>
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder"  Margin="3,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>

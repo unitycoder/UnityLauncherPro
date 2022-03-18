@@ -417,5 +417,17 @@ namespace UnityLauncherPro.Properties {
                 this["newProjectPlatform"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool searchProjectPathAlso {
+            get {
+                return ((bool)(this["searchProjectPathAlso"]));
+            }
+            set {
+                this["searchProjectPathAlso"] = value;
+            }
+        }
     }
 }
