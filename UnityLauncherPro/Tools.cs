@@ -1016,7 +1016,7 @@ namespace UnityLauncherPro
             return null;
         }
 
-        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null, string platform = null)
+        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null, string[] platformsForThisUnity = null, string platform = null)
         {
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
@@ -1065,7 +1065,9 @@ namespace UnityLauncherPro
             proj.Title = projectName;
             proj.Path = Path.Combine(baseFolder, newPath);
             proj.Version = version;
+            proj.TargetPlatforms = platformsForThisUnity;
             proj.TargetPlatform = platform;
+            proj.Modified = DateTime.Now;
             var proc = LaunchProject(proj);
             ProcessHandler.Add(proj, proc);
             return proj;

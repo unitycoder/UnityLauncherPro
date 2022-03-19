@@ -13,6 +13,7 @@ namespace UnityLauncherPro
         public static string newName = null;
         public static string templateZipPath = null;
         public static string selectedPlatform = null;
+        public static string[] platformsForThisUnity = null;
 
         bool isInitializing = true; // to keep OnChangeEvent from firing too early
         int previousSelectedTemplateIndex = -1;
@@ -77,8 +78,8 @@ namespace UnityLauncherPro
 
         void UpdateModulesDropdown(string version)
         {
-            // get modules and stick into combobox
-            var platformsForThisUnity = Tools.GetPlatformsForUnityVersion(version);
+            // get modules and stick into combobox, NOTE we already have this info from GetProjects.Scan, so could access it
+            platformsForThisUnity = Tools.GetPlatformsForUnityVersion(version);
             cmbNewProjectPlatform.ItemsSource = platformsForThisUnity;
             //System.Console.WriteLine(Tools.GetPlatformsForUnityVersion(version).Length);
 
@@ -86,8 +87,8 @@ namespace UnityLauncherPro
 
             for (int i = 0; i < platformsForThisUnity.Length; i++)
             {
-                // set default platform (now win64) if never used this before
-                if (platformsForThisUnity[i].ToLower() == "win64" || platformsForThisUnity[i] == lastUsedPlatform)
+                // set default platform (win64) if never used this setting before
+                if ((lastUsedPlatform == null && platformsForThisUnity[i].ToLower() == "win64") || platformsForThisUnity[i] == lastUsedPlatform)
                 {
                     cmbNewProjectPlatform.SelectedIndex = i;
                     break;
@@ -143,9 +144,8 @@ namespace UnityLauncherPro
                     cmbNewProjectTemplate.SelectedIndex = ++cmbNewProjectTemplate.SelectedIndex % cmbNewProjectTemplate.Items.Count;
                     e.Handled = true; // override writing to textbox
                     break;
-                case Key.Enter: // enter accept
-                    UpdateSelectedVersion();
-                    DialogResult = true;
+                case Key.Enter: // enter, create proj
+                    BtnCreateNewProject_Click(null, null);
                     e.Handled = true;
                     break;
                 case Key.Escape: // esc cancel
