@@ -378,6 +378,7 @@ namespace UnityLauncherPro
 
             useHumanFriendlyDateFormat = Properties.Settings.Default.useHumandFriendlyLastModified;
             searchProjectPathAlso = Properties.Settings.Default.searchProjectPathAlso;
+            chkSearchProjectPath.IsChecked = searchProjectPathAlso;
 
             // recent grid column display index order
             var order = Properties.Settings.Default.recentColumnsOrder;
