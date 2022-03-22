@@ -26,6 +26,7 @@ namespace UnityLauncherPro
         public const string appName = "UnityLauncherPro";
         public static string currentDateFormat = null;
         public static bool useHumanFriendlyDateFormat = false;
+        public static bool searchProjectPathAlso = false;
         public static List<Project> projectsSource;
         public static UnityInstallation[] unityInstallationsSource;
         public static ObservableDictionary<string, string> unityInstalledVersions = new ObservableDictionary<string, string>(); // versionID and installation folder
@@ -45,12 +46,13 @@ namespace UnityLauncherPro
         string _filterString = null;
         int lastSelectedProjectIndex = 0;
         Mutex myMutex;
+        ThemeEditor themeEditorWindow;
 
         string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
         string adbLogCatArgs = defaultAdbLogCatArgs;
 
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
-        string themefile = "theme.ini";
+
         string latestBuildReportProjectPath = null;
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
@@ -65,13 +67,11 @@ namespace UnityLauncherPro
         public MainWindow()
         {
             InitializeComponent();
-            Start();
+            Init();
         }
 
-        void Start()
+        void Init()
         {
-            LoadSettings();
-
             // disable accesskeys without alt
             CoreCompatibilityPreferences.IsAltKeyRequiredInAccessKeyDefaultScope = true;
 
@@ -81,6 +81,12 @@ namespace UnityLauncherPro
             Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
             WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
 
+            // need to load here to get correct window size early
+            LoadSettings();
+        }
+
+        void Start()
+        {
             // get unity installations
             dataGridUnitys.Items.Clear();
             UpdateUnityInstallationsList();
@@ -121,7 +127,7 @@ namespace UnityLauncherPro
                 origResourceColors[item.Key.ToString()] = (SolidColorBrush)item.Value;
             }
 
-            ApplyTheme();
+            ApplyTheme(txtCustomThemeFile.Text);
 
             // for autostart with minimized
             if (Properties.Settings.Default.runAutomatically == true && Properties.Settings.Default.runAutomaticallyMinimized == true)
@@ -134,6 +140,10 @@ namespace UnityLauncherPro
                 }
 
             }
+
+            // TEST
+            //themeEditorWindow = new ThemeEditor();
+            //themeEditorWindow.Show();
 
             isInitializing = false;
         }
@@ -262,7 +272,7 @@ namespace UnityLauncherPro
         private bool ProjectFilter(object item)
         {
             Project proj = item as Project;
-            return (proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+            return (proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1) || (searchProjectPathAlso && (proj.Path.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1));
         }
 
         private bool UpdatesFilter(object item)
@@ -306,8 +316,7 @@ namespace UnityLauncherPro
             chkUseCustomTheme.IsChecked = Properties.Settings.Default.useCustomTheme;
             txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
             txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
-            themefile = Properties.Settings.Default.themeFile;
-            txtCustomThemeFile.Text = themefile;
+            txtCustomThemeFile.Text = Properties.Settings.Default.themeFile;
 
             chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
             chkRunAutomatically.IsChecked = Properties.Settings.Default.runAutomatically;
@@ -368,7 +377,8 @@ namespace UnityLauncherPro
             }
 
             useHumanFriendlyDateFormat = Properties.Settings.Default.useHumandFriendlyLastModified;
-
+            searchProjectPathAlso = Properties.Settings.Default.searchProjectPathAlso;
+            chkSearchProjectPath.IsChecked = searchProjectPathAlso;
 
             // recent grid column display index order
             var order = Properties.Settings.Default.recentColumnsOrder;
@@ -478,7 +488,6 @@ namespace UnityLauncherPro
             Properties.Settings.Default.projectName = projectNameSetting;
 
             Properties.Settings.Default.Save();
-
         }
 
         void UpdateUnityInstallationsList()
@@ -552,7 +561,7 @@ namespace UnityLauncherPro
             dataGridUpdates.ItemsSource = null;
             var task = GetUnityUpdates.Scan();
             var items = await task;
-            Console.WriteLine(items == null);
+            Console.WriteLine("CallGetUnityUpdates=" + items == null);
             if (items == null) return;
             updatesSource = GetUnityUpdates.Parse(items);
             if (updatesSource == null) return;
@@ -566,22 +575,15 @@ namespace UnityLauncherPro
 
             var unity = GetSelectedUnity();
             if (unity == null) return;
-            // NOTE for now, just select the same version.. then user can see what has been released after this
+
+
             // NOTE if updates are not loaded, should wait for that
             if (dataGridUpdates.ItemsSource != null)
             {
                 tabControl.SelectedIndex = 2;
-                // find matching version
-                for (int i = 0; i < dataGridUpdates.Items.Count; i++)
-                {
-                    Updates row = (Updates)dataGridUpdates.Items[i];
-                    if (row.Version == unity.Version)
-                    {
-                        dataGridUpdates.SelectedIndex = i;
-                        dataGridUpdates.ScrollIntoView(row);
-                        break;
-                    }
-                }
+
+                // NOTE for now, just set filter to current version, minus patch version "2021.1.7f1" > "2021.1"
+                txtSearchBoxUpdates.Text = unity.Version.Substring(0, unity.Version.LastIndexOf('.'));
             }
         }
 
@@ -631,6 +633,8 @@ namespace UnityLauncherPro
             {
                 var proj = GetNewProjectData(folder);
                 AddNewProjectToList(proj);
+                // clear search, so can see added project
+                txtSearchBox.Text = "";
             }
         }
 
@@ -661,6 +665,8 @@ namespace UnityLauncherPro
 
         private void BtnMinimize_Click(object sender, RoutedEventArgs e)
         {
+            CloseThemeEditor();
+
             // remove focus from minimize button
             gridRecent.Focus();
             if (chkMinimizeToTaskbar.IsChecked == true)
@@ -710,7 +716,7 @@ namespace UnityLauncherPro
                             {
                                 // its already clear
                             }
-                            else // we have text in searchbox
+                            else // we have text in searchbox, clear it
                             {
                                 txtSearchBox.Text = "";
                             }
@@ -843,7 +849,15 @@ namespace UnityLauncherPro
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            // (TODO force) close theme editor, if still open, TODO NEED to cancel all changes
+            CloseThemeEditor();
+
             SaveSettingsOnExit();
+        }
+
+        private void CloseThemeEditor()
+        {
+            if (themeEditorWindow != null) themeEditorWindow.Close();
         }
 
 
@@ -901,7 +915,7 @@ namespace UnityLauncherPro
         {
             string copy = null;
             var unity = GetSelectedUpdate();
-            copy = unity?.Version; https://unity3d.com/get-unity/download?thank-you=update&download_nid=65083&os=Win
+            copy = unity?.Version; //https://unity3d.com/get-unity/download?thank-you=update&download_nid=65083&os=Win
             string exeURL = Tools.ParseDownloadURLFromWebpage(copy);
             if (exeURL != null) Clipboard.SetText(exeURL);
         }
@@ -1521,12 +1535,6 @@ namespace UnityLauncherPro
 
         }
 
-        private void Window_Activated(object sender, EventArgs e)
-        {
-            //Console.WriteLine("gridRecent.IsFocused=" + gridRecent.IsFocused);
-            //Console.WriteLine("gridRecent.IsFocused=" + gridRecent.IsKeyboardFocused);
-        }
-
         private void MenuItemCopyPath_Click(object sender, RoutedEventArgs e)
         {
             string copy = null;
@@ -1562,7 +1570,6 @@ namespace UnityLauncherPro
                 Properties.Settings.Default.newProjectsRoot = folder;
                 Properties.Settings.Default.Save();
             }
-            // save to prefs when? onchange
         }
 
         private void TxtRootFolderForNewProjects_TextChanged(object sender, TextChangedEventArgs e)
@@ -1624,7 +1631,7 @@ namespace UnityLauncherPro
                     Console.WriteLine("Create project " + NewProject.newVersion + " : " + projectPath);
                     if (string.IsNullOrEmpty(projectPath)) return;
 
-                    var p = Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath);
+                    var p = Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath, NewProject.platformsForThisUnity, NewProject.selectedPlatform);
 
                     // add to list (just in case new project fails to start, then folder is already generated..)
                     if (p != null) AddNewProjectToList(p);
@@ -1714,7 +1721,7 @@ namespace UnityLauncherPro
             {
                 path = GetSelectedUpdate()?.Version; // TODO copy url instead
             }
-            Console.WriteLine(path);
+            Console.WriteLine("CopyRowFolderToClipBoard=" + path);
 
             if (string.IsNullOrEmpty(path) == false) Clipboard.SetText(path);
         }
@@ -1983,15 +1990,17 @@ namespace UnityLauncherPro
             }
         }
 
-        void ApplyTheme()
+        void ApplyTheme(string themeFile)
         {
             if (chkUseCustomTheme.IsChecked == false) return;
 
             //Console.WriteLine("Load theme: " + themefile);
 
-            if (File.Exists(themefile) == true)
+            themeFile = "Themes/" + themeFile;
+
+            if (File.Exists(themeFile) == true)
             {
-                var colors = File.ReadAllLines(themefile);
+                var colors = File.ReadAllLines(themeFile);
 
                 // parse lines
                 for (int i = 0, length = colors.Length; i < length; i++)
@@ -2018,6 +2027,10 @@ namespace UnityLauncherPro
 
                 }
             }
+            else
+            {
+                Console.WriteLine("Theme file not found: " + themeFile);
+            }
         }
 
         void ResetTheme()
@@ -2041,7 +2054,7 @@ namespace UnityLauncherPro
             // reset colors now
             if (isChecked == true)
             {
-                ApplyTheme();
+                ApplyTheme(txtCustomThemeFile.Text);
             }
             else
             {
@@ -2051,14 +2064,13 @@ namespace UnityLauncherPro
 
         private void BtnReloadTheme_Click(object sender, RoutedEventArgs e)
         {
-            ApplyTheme();
+            ApplyTheme(txtCustomThemeFile.Text);
         }
 
         private void TxtCustomThemeFile_LostFocus(object sender, RoutedEventArgs e)
         {
             var s = (TextBox)sender;
-            themefile = s.Text;
-            Properties.Settings.Default.themeFile = themefile;
+            Properties.Settings.Default.themeFile = s.Text;
             Properties.Settings.Default.Save();
         }
 
@@ -2067,8 +2079,7 @@ namespace UnityLauncherPro
             switch (e.Key)
             {
                 case Key.Return: // pressed enter in theme file text box
-                    themefile = txtCustomThemeFile.Text;
-                    Properties.Settings.Default.themeFile = themefile;
+                    Properties.Settings.Default.themeFile = txtCustomThemeFile.Text;
                     Properties.Settings.Default.Save();
                     btnReloadTheme.Focus();
                     break;
@@ -2077,7 +2088,7 @@ namespace UnityLauncherPro
 
         private void BtnExploreFolder_Click(object sender, RoutedEventArgs e)
         {
-            Tools.LaunchExplorer(System.AppDomain.CurrentDomain.BaseDirectory);
+            Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes"));
         }
 
         private void ChkEnablePlatformSelection_Checked(object sender, RoutedEventArgs e)
@@ -2156,11 +2167,12 @@ namespace UnityLauncherPro
                 currentDateFormat = format;
                 Properties.Settings.Default.customDateFormat = currentDateFormat;
                 Properties.Settings.Default.Save();
-                txtCustomDateTimeFormat.Foreground = System.Windows.Media.Brushes.Black;
+                txtCustomDateTimeFormat.BorderBrush = System.Windows.Media.Brushes.Transparent;
             }
             else // invalid format
             {
-                txtCustomDateTimeFormat.Foreground = System.Windows.Media.Brushes.Red;
+                //txtCustomDateTimeFormat.Foreground = System.Windows.Media.Brushes.Red;
+                txtCustomDateTimeFormat.BorderBrush = System.Windows.Media.Brushes.Red;
                 currentDateFormat = defaultDateFormat;
             }
         }
@@ -2322,7 +2334,8 @@ namespace UnityLauncherPro
         {
             var unity = GetSelectedUnity();
             if (unity == null) return;
-            Tools.DownloadLinuxModules(unity.Path, unity.Version);
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Linux-IL2CPP");
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Linux-Mono");
         }
 
         private void RadioProjNameFolder_Checked(object sender, RoutedEventArgs e)
@@ -2338,5 +2351,82 @@ namespace UnityLauncherPro
             if (this.IsActive == false) return; // dont run code on window init
             RefreshRecentProjects();
         }
+
+        private void BtnThemeEditor_Click(object sender, RoutedEventArgs e)
+        {
+            if (themeEditorWindow != null && themeEditorWindow.IsVisible == true)
+            {
+                themeEditorWindow.Activate();
+                return;
+            }
+            themeEditorWindow = new ThemeEditor();
+            themeEditorWindow.Show();
+        }
+
+        private void MenuRemoveProject_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            if (proj == null) return;
+            if (GetProjects.RemoveRecentProject(proj.Path))
+            {
+                RefreshRecentProjects();
+            }
+        }
+
+        private void MenuItemDownloadAndroidModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Android");
+        }
+
+        private void MenuItemDownloadIOSModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "iOS");
+        }
+
+        private void MenuItemDownloadWebGLModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "WebGL");
+        }
+
+        private void Window_SourceInitialized(object sender, EventArgs e)
+        {
+            // need to run here, so that main window gets hidden if start from commandline as new/upgrade project
+            Start();
+        }
+
+        private void ChkSearchProjectPath_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+
+            searchProjectPathAlso = isChecked;
+            Properties.Settings.Default.searchProjectPathAlso = isChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var folder = Tools.BrowseForOutputFolder("Select unitypackage Templates folder");
+        //    if (string.IsNullOrEmpty(folder) == false)
+        //    {
+        //        txtTemplatePackagesFolder.Text = folder;
+        //        Properties.Settings.Default.templatePackagesFolder = folder;
+        //        Properties.Settings.Default.Save();
+        //    }
+        //}
+
+        //private void TxtTemplatePackagesFolder_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    Properties.Settings.Default.templatePackagesFolder = txtTemplatePackagesFolder.Text;
+        //    Properties.Settings.Default.Save();
+        //}
+
     } // class
 } //namespace
+

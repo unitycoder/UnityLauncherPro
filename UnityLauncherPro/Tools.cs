@@ -383,7 +383,7 @@ namespace UnityLauncherPro
             {
                 if (string.IsNullOrEmpty(param) == true)
                 {
-                    Console.WriteLine(path);
+                    Console.WriteLine("LaunchExe=" + path);
                     Process.Start(path);
                 }
                 else
@@ -1016,7 +1016,7 @@ namespace UnityLauncherPro
             return null;
         }
 
-        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null)
+        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null, string[] platformsForThisUnity = null, string platform = null)
         {
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
@@ -1035,7 +1035,7 @@ namespace UnityLauncherPro
             // check selected unity version
             if (string.IsNullOrEmpty(version) == true)
             {
-                Console.WriteLine("Missing unity version");
+                Console.WriteLine("Missing unity version string");
                 return null;
             }
 
@@ -1043,8 +1043,8 @@ namespace UnityLauncherPro
             // if we didnt have name yet
             if (string.IsNullOrEmpty(projectName) == true)
             {
-                Console.WriteLine(version);
-                Console.WriteLine(baseFolder);
+                //Console.WriteLine("version=" + version);
+                //Console.WriteLine("baseFolder=" + baseFolder);
                 projectName = GetSuggestedProjectName(version, baseFolder);
                 // failed getting new path a-z
                 if (projectName == null) return null;
@@ -1065,6 +1065,9 @@ namespace UnityLauncherPro
             proj.Title = projectName;
             proj.Path = Path.Combine(baseFolder, newPath);
             proj.Version = version;
+            proj.TargetPlatforms = platformsForThisUnity;
+            proj.TargetPlatform = platform;
+            proj.Modified = DateTime.Now;
             var proc = LaunchProject(proj);
             ProcessHandler.Add(proj, proc);
             return proj;
@@ -1081,7 +1084,8 @@ namespace UnityLauncherPro
             }
 
             // find next free folder checking all "unityversion_a-z" characters
-            var unityBaseVersion = version.Substring(0, version.IndexOf('.'));
+            var unityBaseVersion = version.Substring(0, version.LastIndexOf('.'));
+            unityBaseVersion = unityBaseVersion.Replace(".", "_");
             for (int i = 97; i < 122; i++)
             {
                 var newProject = unityBaseVersion + "_" + ((char)i);
@@ -1096,7 +1100,8 @@ namespace UnityLauncherPro
                     return newProject;
                 }
             }
-            return null;
+            // couldnt find free letter to use, lets add timestamp then
+            return unityBaseVersion + "_" + DateTime.Now.ToString("ddMMyyyy_HHmmss");
         }
 
         static void CreateEmptyProjectFolder(string path, string version)
@@ -1244,7 +1249,7 @@ namespace UnityLauncherPro
             SetForegroundWindow(handle);
         }
 
-        public static void DownloadLinuxModules(string UnityExePath, string unityVersion)
+        public static void DownloadAdditionalModules(string UnityExePath, string unityVersion, string moduleName)
         {
             var editorFolder = Path.GetDirectoryName(UnityExePath);
 
@@ -1281,12 +1286,10 @@ namespace UnityLauncherPro
 
             if (hash == null) return;
 
-            // NOTE downloads now both, mono and il2cpp
-            var moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-IL2CPP-Support-for-Editor-" + unityVersion + ".exe";
-            OpenURL(moduleURL);
-            moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-Linux-Mono-Support-for-Editor-" + unityVersion + ".exe";
+            var moduleURL = "https://download.unity3d.com/download_unity/" + hash + "/TargetSupportInstaller/UnitySetup-" + moduleName + "-Support-for-Editor-" + unityVersion + ".exe";
             OpenURL(moduleURL);
         }
 
     } // class
 } // namespace
+

@@ -79,6 +79,7 @@
     <Compile Include="Data\BuildReportItem.cs" />
     <Compile Include="Data\Platform.cs" />
     <Compile Include="Data\Tabs.cs" />
+    <Compile Include="Data\ThemeColor.cs" />
     <Compile Include="GetProjects.cs" />
     <Compile Include="GetUnityInstallations.cs" />
     <Compile Include="GetUnityUpdates.cs" />
@@ -87,6 +88,9 @@
     <Compile Include="Libraries\ExtractTarGz.cs" />
     <Compile Include="NewProject.xaml.cs">
       <DependentUpon>NewProject.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ThemeEditor.xaml.cs">
+      <DependentUpon>ThemeEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools.cs" />
     <Compile Include="Data\UnityInstallation.cs" />
@@ -114,6 +118,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ThemeEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UpgradeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

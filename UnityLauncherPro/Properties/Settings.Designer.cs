@@ -393,5 +393,41 @@ namespace UnityLauncherPro.Properties {
                 this["projectName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string templatePackagesFolder {
+            get {
+                return ((string)(this["templatePackagesFolder"]));
+            }
+            set {
+                this["templatePackagesFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string newProjectPlatform {
+            get {
+                return ((string)(this["newProjectPlatform"]));
+            }
+            set {
+                this["newProjectPlatform"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool searchProjectPathAlso {
+            get {
+                return ((bool)(this["searchProjectPathAlso"]));
+            }
+            set {
+                this["searchProjectPathAlso"] = value;
+            }
+        }
     }
 }

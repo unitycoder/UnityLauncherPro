@@ -1,33 +1,46 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:UnityLauncherPro">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--window-->
+    <SolidColorBrush x:Key="ThemeMainTitle" Color="#FFB8B8B8"/>
     <SolidColorBrush x:Key="ThemeDarkestBackground" Color="#FF121212"/>
     <SolidColorBrush x:Key="ThemeDarkMenuBar" Color="#FF0C0C0C"/>
     <SolidColorBrush x:Key="ThemeMainBackgroundColor" Color="#FF262626"/>
-    <SolidColorBrush x:Key="ThemeTextBoxBackground" Color="#FF333337"/>
-    <SolidColorBrush x:Key="ThemeButtonBackground" Color="#FF3F3F46"/>
-    <SolidColorBrush x:Key="ThemeButtonForeground" Color="#FFC1C1C1"/>
     <SolidColorBrush x:Key="ThemeDeactiveTabForeground" Color="#FFC1C1C1"/>
     <SolidColorBrush x:Key="ThemeDeactiveTabBackground" Color="#FF1D1D1D"/>
+    <SolidColorBrush x:Key="ThemeWindowMinClose" Color="#FFC3C3C3"/>
+
+    <!--datagrid-->
     <SolidColorBrush x:Key="ThemeDatagridHeaderBackground" Color="#4C3F3F46"/>
     <SolidColorBrush x:Key="ThemeDatagridHeaderForeground" Color="#FFB6B6B6"/>
-    <SolidColorBrush x:Key="ThemeDatagridHeaderBorder" Color="#4C000000"/>
+    <SolidColorBrush x:Key="ThemeDatagridLines" Color="#4C000000"/>
+    <!--<SolidColorBrush x:Key="ThemeDatagridHeaderBorder" Color="#4C000000"/>-->
+    <!--<SolidColorBrush x:Key="ThemeGridHorizontalGridLines" Color="#4C000000"/>-->
     <SolidColorBrush x:Key="ThemeDataGridRowMouseOver" Color="#7F007ACC"/>
     <SolidColorBrush x:Key="ThemeDataGridRowSelectedBackground" Color="#FF007ACC"/>
+    <SolidColorBrush x:Key="ThemeGridForeground" Color="#FFD8D8D8"/>
+    <SolidColorBrush x:Key="ThemeGridVerticalGridLines" Color="#19000000"/>
+    <SolidColorBrush x:Key="ThemeGridGreenText" Color="#FF00C500"/>
+    <SolidColorBrush x:Key="ThemeGridRedText" Color="#FFF54F4F"/>
+
+    <!--scrollbar-->
     <SolidColorBrush x:Key="ThemeScrollArrowPressed" Color="#FF838383"/>
     <SolidColorBrush x:Key="ThemeScrollArrowForeground" Color="#FF5E5E64"/>
     <SolidColorBrush x:Key="ThemeScrollBarThumbFill" Color="#FF6A6969"/>
     <SolidColorBrush x:Key="ThemeScrollBarBackground" Color="#FF151515"/>
     <SolidColorBrush x:Key="ThemeScrollBarFill" Color="#FF47474B"/>
+    <SolidColorBrush x:Key="ThemeScrollBarEnabledForeground" Color="#FF000000"/>
 
-    <!--custom components-->
+    <!--buttons-->
     <SolidColorBrush x:Key="ThemeButtonForegroundDisabled" Color="#FF707070"/>
     <SolidColorBrush x:Key="ThemeButtonBackgroundMouseOver" Color="#FF494949"/>
-    <SolidColorBrush x:Key="ThemeButtonWhiteText" Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="ThemeButtonBackgroundPressed" Color="#FF0F0F0F"/>
-    <SolidColorBrush x:Key="ThemeMainTitle" Color="#FFB8B8B8"/>
-    <SolidColorBrush x:Key="ThemeScrollBarEnabledForeground" Color="#FF000000"/>
-    
+    <SolidColorBrush x:Key="ThemeButtonBackground" Color="#FF3F3F46"/>
+    <SolidColorBrush x:Key="ThemeButtonForeground" Color="#FFC1C1C1"/>
+
+    <!--textbox-->
+    <SolidColorBrush x:Key="ThemeTextBoxBackground" Color="#FF333337"/>
+
     <!--search-->
     <SolidColorBrush x:Key="ThemeSearchPlaceholder" Color="#7F919191"/>
     <SolidColorBrush x:Key="ThemeSearchClose" Color="#A3C1C1C1"/>
@@ -35,25 +48,22 @@
     <SolidColorBrush x:Key="ThemeSearchForeground" Color="#FFC7C7C7"/>
     <SolidColorBrush x:Key="ThemeSearchSelection" Color="#FF003966"/>
 
-    <!--window-->
-    <SolidColorBrush x:Key="ThemeWindowMinClose" Color="#FFC3C3C3"/>
-
-    <!--grids-->
-    <SolidColorBrush x:Key="ThemeGridForeground" Color="#FFD8D8D8"/>
-    <SolidColorBrush x:Key="ThemeGridHorizontalGridLines" Color="#4C000000"/>
-    <SolidColorBrush x:Key="ThemeGridVerticalGridLines" Color="#19000000"/>
-    <SolidColorBrush x:Key="ThemeGridGreenText" Color="#FF00C500"/>
-    <SolidColorBrush x:Key="ThemeGridRedText" Color="#FFF54F4F"/>
-
     <!--statusbar-->
     <SolidColorBrush x:Key="ThemeStatusText" Color="#FF595959"/>
 
-    <!--platform selection combobox-->
+    <!--combobox-->
     <SolidColorBrush x:Key="ThemeDropDownBorderBorderBrush" Color="#FF171717"/>
     <SolidColorBrush x:Key="ThemeDropDownBorderBackground" Color="#FF2E2E34"/>
-    
-    <!--focused button outline-->
-    <SolidColorBrush x:Key="ThemeButtonFocusOutline" Color="#FF003D61"/>
 
+    <!--radio and checkboxes-->
+    <SolidColorBrush x:Key="ThemeRadioButtonSelected" Color="#FF1E1E1E"/>
+    <!--<SolidColorBrush x:Key="ThemeRadioButtonOutline" Color="#FF1E1E1E"/>-->
+    <SolidColorBrush x:Key="ThemeRadioCheckBoxBackground" Color="#FFFFFFFF"/>
+
+    <!--common-->
+    <!--<SolidColorBrush x:Key="ThemeButtonFocusOutline" Color="#FF003D61"/>-->
+    <SolidColorBrush x:Key="ThemeSystemHighlight" Color="#FF0078D7"/>
+    <!--<SolidColorBrush x:Key="ThemeButtonWhiteText" Color="#FFFFFFFF"/>-->
+    <SolidColorBrush x:Key="ThemeBrightText" Color="#FFFFFFFF"/>
 
 </ResourceDictionary>

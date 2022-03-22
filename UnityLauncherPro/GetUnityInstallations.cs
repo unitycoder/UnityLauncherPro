@@ -82,6 +82,7 @@ namespace UnityLauncherPro
                 } // got folders
             } // all root folders
 
+            // sort by version
             results.Sort((s1, s2) => Tools.VersionAsInt(s2.Version).CompareTo(Tools.VersionAsInt(s1.Version)));
 
             return results.ToArray();

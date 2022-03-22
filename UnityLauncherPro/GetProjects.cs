@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -78,6 +78,8 @@ namespace UnityLauncherPro
                             projectName = projectPath;
                         }
 
+                        //Console.WriteLine("valueName="+ valueName+"  , projectName =" + projectName);
+
                         // get last modified date from folder
                         DateTime? lastUpdated = folderExists ? Tools.GetLastModifiedTime(projectPath) : null;
 
@@ -136,15 +138,69 @@ namespace UnityLauncherPro
                         p.folderExists = folderExists;
 
                         // if want to hide project and folder path for screenshot
-                        //p.Title = "Hidden Project";
-                        //p.Path = "C:/Hidden Path/";
+                        //p.Title = "Example Project ";
+                        //p.Path = "C:/Projects/ExamplePath/MyProj";
 
                         projectsFound.Add(p);
                     } // valid key
                 } // each key
             } // for each registry root
 
+            // NOTE sometimes projects are in wrong order, seems to be related to messing up your unity registry, the keys are received in created order (so if you had removed/modified them manually, it might return wrong order instead of 0 - 40)
+
             return projectsFound;
         } // Scan()
+
+        public static bool RemoveRecentProject(string projectPathToRemove)
+        {
+            var hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
+
+            // check each version path
+            for (int i = 0, len = registryPathsToCheck.Length; i < len; i++)
+            {
+                RegistryKey key = hklm.OpenSubKey(registryPathsToCheck[i], true);
+
+                if (key == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    //Console.WriteLine("Null registry key at " + registryPathsToCheck[i]);
+                }
+
+                // parse recent project paths
+                foreach (var valueName in key.GetValueNames())
+                {
+                    if (valueName.IndexOf("RecentlyUsedProjectPaths-") == 0)
+                    {
+                        string projectPath = "";
+                        // check if binary or not
+                        var valueKind = key.GetValueKind(valueName);
+                        if (valueKind == RegistryValueKind.Binary)
+                        {
+                            byte[] projectPathBytes = (byte[])key.GetValue(valueName);
+                            projectPath = Encoding.UTF8.GetString(projectPathBytes, 0, projectPathBytes.Length - 1);
+                        }
+                        else // should be string then
+                        {
+                            projectPath = (string)key.GetValue(valueName);
+                        }
+
+                        // if our project folder, remove registry item
+                        if (projectPath == projectPathToRemove)
+                        {
+                            Console.WriteLine("Deleted registery item: " + valueName + " projectPath=" + projectPath);
+                            key.DeleteValue(valueName);
+                            return true;
+                        }
+
+                    } // valid key
+                } // each key
+            } // for each registry root
+            return false;
+        } // RemoveRecentProject()
+
     } // class
 } // namespace
+
