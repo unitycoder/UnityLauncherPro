@@ -1139,14 +1139,7 @@ namespace UnityLauncherPro
 
         private void BtnOpenPlayerLogs_Click(object sender, RoutedEventArgs e)
         {
-            var logfolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/../LocalLow");
-            if (Directory.Exists(logfolder) == true)
-            {
-                if (Tools.LaunchExplorer(logfolder) == false)
-                {
-                    Console.WriteLine("Error> Directory not found: " + logfolder);
-                }
-            }
+            Tools.OpenAppdataSpecialFolder("../LocalLow");
         }
 
         private void BtnOpenADBLogCat_Click(object sender, RoutedEventArgs e)
@@ -1514,12 +1507,7 @@ namespace UnityLauncherPro
 
         private void BtnAssetPackages_Click(object sender, RoutedEventArgs e)
         {
-            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Unity", "Asset Store-5.x");
-            if (Directory.Exists(folder) == false) return;
-            if (Tools.LaunchExplorer(folder) == false)
-            {
-                Console.WriteLine("Cannot open folder.." + folder);
-            }
+            Tools.OpenAppdataSpecialFolder("../Roaming/Unity/Asset Store-5.x");
         }
 
         // sets selected unity version as preferred main unity version (to be preselected in case of unknown version projects, when creating new empty project, etc)
@@ -1739,14 +1727,7 @@ namespace UnityLauncherPro
 
         private void BtnOpenCrashLogs_Click(object sender, RoutedEventArgs e)
         {
-            var logfolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Unity", "Editor", "Crashes");
-            if (Directory.Exists(logfolder) == true)
-            {
-                if (Tools.LaunchExplorer(logfolder) == false)
-                {
-                    Console.WriteLine("Cannot open folder.." + logfolder);
-                }
-            }
+            Tools.OpenAppdataSpecialFolder("Temp/Unity/Editor/Crashes/");
         }
 
         // reorder grid item by index
@@ -2408,6 +2389,21 @@ namespace UnityLauncherPro
             searchProjectPathAlso = isChecked;
             Properties.Settings.Default.searchProjectPathAlso = isChecked;
             Properties.Settings.Default.Save();
+        }
+
+        private void BtnCrashDumps_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.OpenAppdataSpecialFolder("CrashDumps");
+        }
+
+        private void BtnGICache_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.OpenAppdataSpecialFolder("../LocalLow/Unity/Caches/GiCache");
+        }
+
+        private void BtnUnityCache_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.OpenAppdataSpecialFolder("Unity/cache");
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)

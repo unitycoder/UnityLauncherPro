@@ -1290,6 +1290,18 @@ namespace UnityLauncherPro
             OpenURL(moduleURL);
         }
 
+        public static void OpenAppdataSpecialFolder(string subfolder)
+        {
+            var logfolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), subfolder);
+            if (Directory.Exists(logfolder) == true)
+            {
+                if (Tools.LaunchExplorer(logfolder) == false)
+                {
+                    Console.WriteLine("Cannot open folder.." + logfolder);
+                }
+            }
+        }
+
     } // class
 } // namespace
 
