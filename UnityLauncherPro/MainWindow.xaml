@@ -868,6 +868,9 @@
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenCrashLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenCrashLogs_Click" ToolTip="Browse Crash logs folder">
                                         <Label Content="_Crash Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnAssetPackages" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse AssetStore downloads folder" Click="BtnAssetPackages_Click">
+                                        <Label Content="A_sset packages" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    </Button>
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnCrashDumps" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse Crash dumps folder" Click="BtnCrashDumps_Click">
                                         <Label Content="Crash _Dumps" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
@@ -876,9 +879,6 @@
                                     </Button>
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnGICache" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse Unity GI Cache folder" Click="BtnGICache_Click">
                                         <Label Content="_GI Cache" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-                                    </Button>
-                                    <Button Style="{StaticResource CustomButton}" x:Name="btnAssetPackages" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse AssetStore downloads folder" Click="BtnAssetPackages_Click">
-                                        <Label Content="A_sset packages" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
                                 </StackPanel>
                             </Border>

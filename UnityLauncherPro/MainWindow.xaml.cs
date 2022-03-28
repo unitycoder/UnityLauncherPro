@@ -624,6 +624,9 @@ namespace UnityLauncherPro
         private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
             FilterRecentProjects();
+            
+            // if nothing selected, select first item
+            if (gridRecent.SelectedIndex < 0) gridRecent.SelectedIndex = 0;
         }
 
         private void BtnAddProjectFolder_Click(object sender, RoutedEventArgs e)
@@ -687,7 +690,7 @@ namespace UnityLauncherPro
 
             // refresh installations, if already added some new ones
             UpdateUnityInstallationsList();
-
+            txtSearchBoxUpdates.Text = "";
             CallGetUnityUpdates();
 
             button.IsEnabled = true;
@@ -727,9 +730,9 @@ namespace UnityLauncherPro
                             txtSearchBox.Text = "";
                             break;
                         case Key.Up:
+                        case Key.Down:
                         case Key.Left:
                         case Key.Right:
-                        case Key.Down:
                             break;
                         case Key.F2: // edit arguments or project name
                             if (chkEnableProjectRename.IsChecked == false) return; //if rename not enabled
@@ -991,7 +994,11 @@ namespace UnityLauncherPro
                     break;
                 case Key.Tab:
                 case Key.Up:
-                    Tools.SetFocusToGrid(gridRecent);
+                    //Tools.SetFocusToGrid(gridRecent);
+                    var currentIndex = gridRecent.SelectedIndex - 1;
+                    //Console.WriteLine(currentIndex);
+                    if (currentIndex < 0) currentIndex = gridRecent.Items.Count - 1;
+                    gridRecent.SelectedIndex = currentIndex;
                     e.Handled = true;
                     break;
                 case Key.Down:
@@ -1002,8 +1009,11 @@ namespace UnityLauncherPro
                     //}
                     //else
                     //{
-                    Tools.SetFocusToGrid(gridRecent);
+                    //Tools.SetFocusToGrid(gridRecent);
                     //                    }
+
+                    // if in searchbox, then move selected index up or down
+                    gridRecent.SelectedIndex = ++gridRecent.SelectedIndex % gridRecent.Items.Count;
                     e.Handled = true; // to stay in first row
                     break;
                 default:
