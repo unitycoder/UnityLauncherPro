@@ -585,8 +585,8 @@
                                 <MenuItem x:Name="menuItemKillProcess" Header="Kill Process" Click="MenuItemKillProcess_Click" />
                                 <Separator/>
                                 <MenuItem x:Name="menuStartWebGLServer" Header="Start WebGL server" Click="MenuStartWebGLServer_Click" />
-                                <Separator/>
-                                <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />
+                                <!--<Separator/>
+                                <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />-->
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 
@@ -852,12 +852,12 @@
                         <RowDefinition Height="50*" />
                     </Grid.RowDefinitions>
                     <!-- 1st part -->
-                    <Grid Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left">
-                        <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top">
+                    <Grid Grid.Row="0" VerticalAlignment="Top">
+                        <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left">
                             <!--border to avoid next row moving when button is selected-->
-                            <Border VerticalAlignment="Top" Height="40" HorizontalAlignment="Left" Margin="0,0,0,2">
+                            <Border VerticalAlignment="Top" Height="40" Margin="0,0,0,2" HorizontalAlignment="Left">
                                 <!-- folders -->
-                                <StackPanel Orientation="Horizontal" Margin="0,4,10,4" VerticalAlignment="Top" Width="560">
+                                <StackPanel Orientation="Horizontal" Margin="0,4,10,4" VerticalAlignment="Top">
                                     <Label Content="Folders" Foreground="{DynamicResource ThemeButtonForeground}" />
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Browse Editor logs folder">
                                         <Label Content="_Editor Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
@@ -870,6 +870,15 @@
                                     </Button>
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnAssetPackages" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse AssetStore downloads folder" Click="BtnAssetPackages_Click">
                                         <Label Content="A_sset packages" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    </Button>
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnCrashDumps" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse Crash dumps folder" Click="BtnCrashDumps_Click">
+                                        <Label Content="Crash _Dumps" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    </Button>
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnUnityCache" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse Unity Cache folder" Click="BtnUnityCache_Click">
+                                        <Label Content="_Unity Cache" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    </Button>
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnGICache" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse Unity GI Cache folder" Click="BtnGICache_Click">
+                                        <Label Content="_GI Cache" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
                                 </StackPanel>
                             </Border>

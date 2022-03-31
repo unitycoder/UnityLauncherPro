@@ -238,22 +238,22 @@
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Red</Label>
                     <Slider x:Name="sliderRed" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderRed_ValueChanged" PreviewMouseLeftButtonDown="SliderRed_PreviewMouseLeftButtonDown" IsSnapToTickEnabled="True"/>
-                    <TextBox x:Name="txtRed" Text="{Binding ElementName=sliderRed,Path=Value}" Background="#FFAAAAAA" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" IsReadOnly="True" />
+                    <TextBox x:Name="txtRed" Text="{Binding ElementName=sliderRed,Path=Value}" Background="#FFAAAAAA" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Margin="5,0,0,8" KeyUp="TxtRed_KeyUp" PreviewKeyDown="TxtColorField_PreviewKeyDown" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Green</Label>
                     <Slider x:Name="sliderGreen"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderGreen_ValueChanged" PreviewMouseLeftButtonDown="SliderGreen_PreviewMouseLeftButtonDown" IsSnapToTickEnabled="True"/>
-                    <TextBox x:Name="txtGreen" Text="{Binding ElementName=sliderGreen,Path=Value}" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Background="#FFAAAAAA" Margin="5,0,0,8" IsReadOnly="True" />
+                    <TextBox x:Name="txtGreen" Text="{Binding ElementName=sliderGreen,Path=Value}" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Background="#FFAAAAAA" Margin="5,0,0,8" KeyUp="TxtGreen_KeyUp" PreviewKeyDown="TxtColorField_PreviewKeyDown" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Blue</Label>
                     <Slider x:Name="sliderBlue"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderBlue_ValueChanged" PreviewMouseLeftButtonDown="SliderBlue_PreviewMouseLeftButtonDown" IsSnapToTickEnabled="True"/>
-                    <TextBox x:Name="txtBlue" Text="{Binding ElementName=sliderBlue,Path=Value}" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Background="#FFAAAAAA" Margin="5,0,0,8" IsReadOnly="True" />
+                    <TextBox x:Name="txtBlue" Text="{Binding ElementName=sliderBlue,Path=Value}" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Background="#FFAAAAAA" Margin="5,0,0,8" KeyUp="TxtBlue_KeyUp" PreviewKeyDown="TxtColorField_PreviewKeyDown" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Foreground="#FFC1C1C1" Width="44">Alpha</Label>
                     <Slider x:Name="sliderAlpha"  AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="200" Height="28" Value="255" Maximum="255" LargeChange="0" SmallChange="1" ValueChanged="SliderAlpha_ValueChanged" PreviewMouseLeftButtonDown="SliderAlpha_PreviewMouseLeftButtonDown" IsSnapToTickEnabled="True"/>
-                    <TextBox x:Name="txtAlpha" Text="{Binding ElementName=sliderAlpha,Path=Value}" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Background="#FFAAAAAA" Margin="5,0,0,8" IsReadOnly="True" />
+                    <TextBox x:Name="txtAlpha" Text="{Binding ElementName=sliderAlpha,Path=Value}" VerticalAlignment="Center" IsUndoEnabled="True" Width="32" Background="#FFAAAAAA" Margin="5,0,0,8" KeyUp="TxtAlpha_KeyUp" PreviewKeyDown="TxtColorField_PreviewKeyDown" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Vertical" Margin="25,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
