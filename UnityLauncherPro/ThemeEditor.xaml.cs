@@ -241,5 +241,51 @@ namespace UnityLauncherPro
             previousSlider = (Slider)sender;
             previousValue = (int)previousSlider.Value;
         }
+
+        private void TxtRed_KeyUp(object sender, KeyEventArgs e)
+        {
+            GetColorFromTextBox((TextBox)sender, sliderRed);
+        }
+
+        private void TxtGreen_KeyUp(object sender, KeyEventArgs e)
+        {
+            GetColorFromTextBox((TextBox)sender, sliderGreen);
+        }
+
+        private void TxtBlue_KeyUp(object sender, KeyEventArgs e)
+        {
+            GetColorFromTextBox((TextBox)sender, sliderBlue);
+        }
+
+        private void TxtAlpha_KeyUp(object sender, KeyEventArgs e)
+        {
+            GetColorFromTextBox((TextBox)sender, sliderAlpha);
+        }
+
+        void GetColorFromTextBox(TextBox source, Slider target)
+        {
+            int col = 0;
+            if (int.TryParse(source.Text, out col))
+            {
+                bool overWrite = false;
+                if (col < 0) { col = 0; overWrite = true; }
+                if (col > 255) { col = 255; overWrite = true; }
+
+                source.Text = col + "";
+                target.Value = col;
+
+                if (overWrite == true) source.SelectAll();
+            }
+        }
+
+        private void TxtColorField_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape: // undo current textbox edit
+                    ((TextBox)sender).Undo();
+                    break;
+            }
+        }
     } // class
 } // namespace
