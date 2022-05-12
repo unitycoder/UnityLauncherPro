@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -481,7 +481,8 @@ namespace UnityLauncherPro
 
         public static bool VersionIsChinese(string version)
         {
-            return version.Contains("c1");
+            // return version.Contains("c1");
+            return Regex.IsMatch(version, "c\\d+");
         }
 
         // open release notes page in browser
@@ -642,7 +643,8 @@ namespace UnityLauncherPro
             // remove a,b,f,p
             cleanVersion = cleanVersion.Replace("a", ".");
             cleanVersion = cleanVersion.Replace("b", ".");
-            cleanVersion = cleanVersion.Replace("c1", "");
+            // cleanVersion = cleanVersion.Replace("c1", "");
+            cleanVersion = Regex.Replace(cleanVersion, "c\\d+", "");
             cleanVersion = cleanVersion.Replace("f", ".");
             cleanVersion = cleanVersion.Replace("p", ".");
 
