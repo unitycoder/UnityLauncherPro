@@ -54,6 +54,8 @@ namespace UnityLauncherPro
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
 
         string latestBuildReportProjectPath = null;
+        List<List<string>> buildReports = new List<List<string>>();
+        int currentBuildReport = 0;
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
         static extern IntPtr FindWindow(string cls, string win);
@@ -624,7 +626,7 @@ namespace UnityLauncherPro
         private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
             FilterRecentProjects();
-            
+
             // if nothing selected, select first item
             if (gridRecent.SelectedIndex < 0) gridRecent.SelectedIndex = 0;
         }
@@ -1801,22 +1803,49 @@ namespace UnityLauncherPro
 
         private void BtnRefreshBuildReport_Click(object sender, RoutedEventArgs e)
         {
-            var logFile = Path.Combine(Tools.GetEditorLogsFolder(), "Editor.log");
+            currentBuildReport = 0;
+            buildReports.Clear();
+            UpdateBuildReportLabelAndButtons();
 
+            btnPrevBuildReport.IsEnabled = false;
+            btnNextBuildReport.IsEnabled = false;
+
+            var logFile = Path.Combine(Tools.GetEditorLogsFolder(), "Editor.log");
             if (File.Exists(logFile) == false) return;
 
-            // NOTE this can fail on a HUGE log file
-            List<string> rows = new List<string>();
+            List<string> subList = null;
+
             try
             {
                 using (FileStream fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     using (StreamReader sr = new StreamReader(fs))
                     {
+                        bool collect = false;
                         // now we collect all lines, but could collect only those needed below
                         while (!sr.EndOfStream)
                         {
-                            rows.Add(sr.ReadLine());
+                            var line = sr.ReadLine();
+                            // build report starts, TODO collect report header also
+                            if (collect == false && line.IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
+                            {
+                                // init new list for this build report
+                                subList = new List<string>();
+                                collect = true;
+                                continue;
+                            }
+
+                            // build report ends
+                            if (collect == true && line.IndexOf("-------------------------------------------------------------------------------") == 0)
+                            {
+                                buildReports.Add(subList);
+                                collect = false;
+                            }
+
+                            if (collect == true)
+                            {
+                                subList.Add(line);
+                            }
                         }
                     }
                 }
@@ -1827,53 +1856,44 @@ namespace UnityLauncherPro
                 return;
             }
 
-            int startRow = -1;
-            int endRow = -1;
-
-            for (int i = 0, len = rows.Count; i < len; i++)
+            if (buildReports.Count < 1 || buildReports[0].Count < 1)
             {
-                // get current project path from log file
-                if (rows[i] == "-projectPath")
-                {
-                    latestBuildReportProjectPath = rows[i + 1];
-                    break;
-                }
-            }
-            if (string.IsNullOrEmpty(latestBuildReportProjectPath)) Console.WriteLine("Failed to parse project path from logfile..");
-
-            // loop backwards to find latest report
-            for (int i = rows.Count - 1; i >= 0; i--)
-            {
-                // find start of build report
-                if (rows[i].IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
-                {
-                    startRow = i + 1;
-                    // find end of report
-                    for (int k = i, len = rows.Count; k < len; k++)
-                    {
-                        if (rows[k].IndexOf("-------------------------------------------------------------------------------") == 0)
-                        {
-                            endRow = k - 1;
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
-
-            if (startRow == -1 || endRow == -1)
-            {
-                Console.WriteLine("Failed to parse Editor.Log (probably no build report there), start= " + startRow + " end= " + endRow);
+                Console.WriteLine("Failed to parse Editor.Log (probably no build reports there)");
                 return;
             }
 
-            var reportSource = new BuildReportItem[endRow - startRow];
+            DisplayBuildReport(currentBuildReport);
+        }
+
+        private void BtnPrevBuildReport_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayBuildReport(--currentBuildReport);
+        }
+
+        private void BtnNextBuildReport_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayBuildReport(++currentBuildReport);
+        }
+
+        void DisplayBuildReport(int index)
+        {
+            if (currentBuildReport < 0)
+            {
+                currentBuildReport = 0;
+            }
+
+            if (currentBuildReport > buildReports.Count)
+            {
+                currentBuildReport = buildReports.Count - 1;
+            }
+
+            // create build report rows array
+            var reportSource = new List<BuildReportItem>();
 
             // parse actual report rows
-            int index = 0;
-            for (int i = startRow; i < endRow; i++)
+            for (int i = 0, len = buildReports[currentBuildReport].Count; i < len; i++)
             {
-                var d = rows[i].Trim();
+                var d = buildReports[currentBuildReport][i].Trim();
 
                 // get tab after kb
                 var space1 = d.IndexOf('\t');
@@ -1886,20 +1906,36 @@ namespace UnityLauncherPro
                     continue;
                 }
 
+                // create single row
                 var r = new BuildReportItem();
                 r.Size = d.Substring(0, space1);
                 r.Percentage = d.Substring(space1 + 2, space2 - space1 - 1);
                 r.Path = d.Substring(space2 + 2, d.Length - space2 - 2);
                 r.Format = Path.GetExtension(r.Path);
-                reportSource[index++] = r;
+
+                reportSource.Add(r);
             }
+
+            gridBuildReport.ItemsSource = null;
+            gridBuildReport.Items.Clear();
             gridBuildReport.ItemsSource = reportSource;
 
+            UpdateBuildReportLabelAndButtons();
+        }
+
+        void UpdateBuildReportLabelAndButtons()
+        {
+            btnPrevBuildReport.IsEnabled = currentBuildReport > 0;
+            btnNextBuildReport.IsEnabled = currentBuildReport < buildReports.Count - 1;
+            lblBuildReportIndex.Content = (buildReports.Count == 0 ? 0 : (currentBuildReport + 1)) + "/" + (buildReports.Count);
         }
 
         private void BtnClearBuildReport_Click(object sender, RoutedEventArgs e)
         {
             gridBuildReport.ItemsSource = null;
+            currentBuildReport = 0;
+            buildReports.Clear();
+            UpdateBuildReportLabelAndButtons();
         }
 
         private void MenuStartWebGLServer_Click(object sender, RoutedEventArgs e)
@@ -2216,6 +2252,8 @@ namespace UnityLauncherPro
         {
             var item = GetSelectedBuildItem();
 
+            Console.WriteLine(item.Path);
+
             if (item != null)
             {
                 string filePath = Path.Combine(latestBuildReportProjectPath, item.Path);
@@ -2415,6 +2453,8 @@ namespace UnityLauncherPro
         {
             Tools.OpenAppdataSpecialFolder("Unity/cache");
         }
+
+
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
         //{

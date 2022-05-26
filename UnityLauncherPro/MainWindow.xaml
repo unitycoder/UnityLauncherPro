@@ -770,7 +770,7 @@
                 <Grid>
                     <!-- search box -->
                     <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchForeground}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUpdates}" Height="24" />
+                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUpdates}" Height="24" />
                         <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxUpdates" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUpdates_PreviewKeyDown" TextChanged="TxtSearchBoxUpdates_TextChanged" />
                         <Button x:Name="btnClearUpdatesSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUpdateSearchClick">
                             <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
@@ -910,8 +910,8 @@
 
                             <!-- search box -->
                             <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                                <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxBuildReport" Background="{DynamicResource ThemeTextBoxBackground}" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxBuildReport_PreviewKeyDown" TextChanged="TxtSearchBoxBuildReport_TextChanged" />
-                                <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxBuildReport}" Height="24" />
+                                <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxBuildReport}" Height="24" IsEnabled="False" />
+                                <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxBuildReport" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxBuildReport_PreviewKeyDown" TextChanged="TxtSearchBoxBuildReport_TextChanged" />
                                 <Button x:Name="btnClearBuildReportSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="BtnClearBuildReportSearch_Click">
                                     <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchCaret}" Padding="5,3,4,4" HorizontalAlignment="Center">
                                         <TextBlock.Style>
@@ -930,9 +930,12 @@
                                 </Button>
                             </Grid>
 
-
+                            <Label x:Name="lblBuildReportIndex" Height="26" Foreground="{DynamicResource ThemeSearchForeground}" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="10,0,0,0" Content="-/-"/>
+                            <Button x:Name="btnPrevBuildReport" Style="{StaticResource CustomButton}" ToolTip="Previous Build Report" Content="←" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="0,4,0,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnPrevBuildReport_Click" IsEnabled="False"/>
+                            <Button x:Name="btnNextBuildReport" Style="{StaticResource CustomButton}" ToolTip="Next Build Report" Content="→" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="8,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnNextBuildReport_Click" IsEnabled="False"/>
                         </StackPanel>
-                        <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick">
+                        
+                        <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" CanUserAddRows="False" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Size}" ClipboardContentBinding="{x:Null}" Header="Size" IsReadOnly="True" Width="75"/>
                                 <DataGridTextColumn Binding="{Binding Percentage}" ClipboardContentBinding="{x:Null}" Header="%" IsReadOnly="True" Width="55" />
