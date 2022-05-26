@@ -8,6 +8,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1940,9 +1942,13 @@ namespace UnityLauncherPro
 
         private void MenuStartWebGLServer_Click(object sender, RoutedEventArgs e)
         {
-            // runs unity SimpleWebServer.exe and launches default Browser into project build/ folder'
-
             var proj = GetSelectedProject();
+            LaunchWebGL(proj);
+        }
+
+        // runs unity SimpleWebServer.exe and launches default Browser into project build/ folder'
+        void LaunchWebGL(Project proj)
+        {
             var projPath = proj?.Path.Replace('/', '\\');
             if (string.IsNullOrEmpty(projPath) == true) return;
 
@@ -1970,13 +1976,37 @@ namespace UnityLauncherPro
             Random rnd = new Random();
             int port = rnd.Next(50000, 61000);
 
+            // check if port is available https://stackoverflow.com/a/2793289
+            //bool isAvailable = true;
+            //IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+            //IPEndPoint[] objEndPoints = ipGlobalProperties.GetActiveTcpListeners();
+
+            //// compare with existing ports, if available
+            //foreach (IPEndPoint tcpi in objEndPoints)
+            //{
+            //    if (tcpi.Port == port)
+            //    {
+            //        isAvailable = false;
+            //        break;
+            //    }
+            //}
+
+            bool serverLaunched = false;
+
+            //if (isAvailable == false)
+            //{
+            //    Console.WriteLine("failed to open port " + port + " (should be open already, or something else is using it?)");
+            //}
+            //else
+            //{
             // take process id from unity, if have it (then webserver closes automatically when unity is closed)
             var proc = ProcessHandler.Get(proj.Path);
             int pid = proc == null ? -1 : proc.Id;
             var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+                                                                                                           // TODO take process reference, so can check if its already running
+            serverLaunched = Tools.LaunchExe(monoExe, param);
+            //}
 
-            // then open browser
-            var serverLaunched = Tools.LaunchExe(monoExe, param);
             if (serverLaunched == true)
             {
                 Tools.OpenURL("http://localhost:" + port);
