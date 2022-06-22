@@ -2578,6 +2578,82 @@ namespace UnityLauncherPro
             Tools.OpenAppdataSpecialFolder("Unity/cache");
         }
 
+        private void MenuBatchBuildAndroid_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO
+            // get selected project path
+            var proj = GetSelectedProject();
+            if (string.IsNullOrEmpty(proj.Path)) return;
+
+            // create builder script template (with template string, that can be replaced with project related paths or names?)
+            // editor script should create required folders, if missing (output folder)
+            // copy editor build script to Assets/Editor/ folder (if already exists then what? Use UnityLauncherBuildSomething.cs name, so can overwrite..)
+            var editorScriptFolder = Path.Combine(proj.Path, "Editor");
+            if (Directory.Exists(editorScriptFolder) == false)
+            {
+                Directory.CreateDirectory(editorScriptFolder);
+                // TODO check if create failed
+            }
+
+            // create output file for editor script
+            var editorScriptFile = Path.Combine(editorScriptFolder, "UnityLauncherProBuilder.cs");
+
+            // TODO move to txt resource? and later load from local custom file if exists
+            var builderScript = @"
+            using System.Linq;
+            using UnityEditor;
+            using UnityEngine;
+            public static class Builder
+            {
+                public static void BuildAndroid()
+                {
+                    EditorUserBuildSettings.buildAppBundle = false;
+                    EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Gradle;
+                    PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
+                    PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+                    var settings = new BuildPlayerOptions();
+                    settings.scenes = EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(scene => scene.path).ToArray();
+                    settings.locationPathName = Application.dataPath + ""/../Builds/Android/###PROJECTNAME###.apk"";
+                    settings.target = BuildTarget.Android;
+                    settings.options = BuildOptions.None;
+                    var res = BuildPipeline.BuildPlayer(settings);
+                }
+            }";
+
+            // validate filename
+            var invalids = Path.GetInvalidFileNameChars();
+            var outputFile = String.Join("_", proj.Title.Split(invalids, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+            // replace spaces also, for old time(r)s
+            outputFile = outputFile.Replace(' ', '_');
+
+            // fill in project specific data
+            builderScript = builderScript.Replace("###PROJECTNAME###", outputFile);
+
+            Console.WriteLine("outputFile= " + outputFile);
+
+            Console.WriteLine("builderScript=" + builderScript);
+
+            //File.WriteAllText(editorScriptFile, builderScript);
+
+            // get selected project unity exe path
+            var unityExePath = Tools.GetUnityExePath(proj.Version);
+            if (unityExePath == null) return;
+
+            // create commandline string for building and launch it
+            // open output folder after build ready, maybe can do that from editor script easier?
+
+            var buildcmd = $"\"{unityExePath}\" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"Builder.BuildAndroid\" -buildTarget android -logFile -";
+            Console.WriteLine("buildcmd= " + buildcmd);
+
+            // example
+            //
+        }
+
+        private void MenuBatchBuildIOS_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("TODO build ios");
+        }
+
 
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
