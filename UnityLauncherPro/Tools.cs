@@ -374,23 +374,26 @@ namespace UnityLauncherPro
             return false;
         }
 
-        // run any exe
-        public static bool LaunchExe(string path, string param = null)
+        // run any exe, return process
+        public static Process LaunchExe(string path, string param = null)
         {
-            if (string.IsNullOrEmpty(path)) return false;
+            if (string.IsNullOrEmpty(path)) return null;
 
             if (File.Exists(path) == true)
             {
+                Process newProcess = null;
                 if (string.IsNullOrEmpty(param) == true)
                 {
-                    Console.WriteLine("LaunchExe=" + path);
-                    Process.Start(path);
+                    Console.WriteLine("LaunchExe= " + path);
+                    newProcess = Process.Start(path);
                 }
                 else
                 {
-                    var newProcess = new Process();
+                    //Console.WriteLine("param=" + param);
+
                     try
                     {
+                        newProcess = new Process();
                         newProcess.StartInfo.FileName = "\"" + path + "\"";
                         newProcess.StartInfo.Arguments = param;
                         newProcess.Start();
@@ -400,9 +403,9 @@ namespace UnityLauncherPro
                         Console.WriteLine(e);
                     }
                 }
-                return true;
+                return newProcess;
             }
-            return false;
+            return null;
         }
 
 
