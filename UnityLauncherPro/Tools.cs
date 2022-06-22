@@ -176,16 +176,13 @@ namespace UnityLauncherPro
             return res;
         }
 
-        public static void ExploreProjectFolder(Project proj)
+        public static void ExploreFolder(string path)
         {
-            if (proj != null)
+            if (path != null)
             {
-                if (proj.Path != null)
+                if (LaunchExplorer(path) == false)
                 {
-                    if (LaunchExplorer(proj.Path) == false)
-                    {
-                        //SetStatus("Error> Directory not found: " + folder);
-                    }
+                    //SetStatus("Error> Directory not found: " + folder);
                 }
             }
         }
@@ -389,13 +386,14 @@ namespace UnityLauncherPro
                 }
                 else
                 {
-                    //Console.WriteLine("param=" + param);
+                    Console.WriteLine("LaunchExe= " + path + " param=" + param);
 
                     try
                     {
                         newProcess = new Process();
                         newProcess.StartInfo.FileName = "\"" + path + "\"";
                         newProcess.StartInfo.Arguments = param;
+                        newProcess.EnableRaisingEvents = true; // needed to get Exited event
                         newProcess.Start();
                     }
                     catch (Exception e)
@@ -405,6 +403,7 @@ namespace UnityLauncherPro
                 }
                 return newProcess;
             }
+            Console.WriteLine("Failed to run exe: " + path + " " + param);
             return null;
         }
 
