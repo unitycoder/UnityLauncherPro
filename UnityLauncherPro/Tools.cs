@@ -1304,6 +1304,101 @@ namespace UnityLauncherPro
             }
         }
 
+        // NOTE android only at the moment
+        public static void BuildProject(Project proj, Platform platform)
+        {
+            Console.WriteLine("Building " + proj.Title + " for " + platform);
+            if (string.IsNullOrEmpty(proj.Path)) return;
+
+            // create builder script template (with template string, that can be replaced with project related paths or names?)
+            // copy editor build script to Assets/Editor/ folder (if already exists then what? Use UnityLauncherBuildSomething.cs name, so can overwrite..)
+            var editorScriptFolder = Path.Combine(proj.Path, "Assets", "Editor");
+            if (Directory.Exists(editorScriptFolder) == false) Directory.CreateDirectory(editorScriptFolder);
+            // TODO check if creation failed
+
+            // create output file for editor script
+            var editorScriptFile = Path.Combine(editorScriptFolder, "UnityLauncherProBuilder.cs");
+
+            // check build folder and create if missing
+            var outputFolder = Path.Combine(proj.Path, "Builds/" + platform + "/");
+            outputFolder = outputFolder.Replace('\\', '/'); // fix backslashes
+            Console.WriteLine("outputFolder= " + outputFolder);
+            if (Directory.Exists(outputFolder) == false) Directory.CreateDirectory(outputFolder);
+            // TODO check if creation failed
+
+            // cleanup filename from project name
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var outputFile = String.Join("_", proj.Title.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+            // replace spaces also, for old time(r)s
+            outputFile = outputFile.Replace(' ', '_');
+            outputFile = Path.Combine(outputFolder, outputFile + ".apk");
+            Console.WriteLine("outputFile= " + outputFile);
+
+            // TODO move to txt resource? and later load from local custom file if exists, and later open window or add settings for build options
+            // TODO different unity versions? wont work in older unitys right now
+            var builderScript = @"using System.Linq;
+using UnityEditor;
+using UnityEngine;
+public static class UnityLauncherProTools
+{
+    public static void BuildAndroid()
+    {
+        EditorUserBuildSettings.buildAppBundle = false;
+        EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Gradle;
+        PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
+        PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+        var settings = new BuildPlayerOptions();
+        settings.scenes = GetScenes();
+        settings.locationPathName = ""###OUTPUTFILE###"";
+        settings.target = BuildTarget.Android;
+        settings.options = BuildOptions.None;
+        var report = BuildPipeline.BuildPlayer(settings);
+    }
+    public static void BuildiOS() // Note need to match platform name
+    {
+        PlayerSettings.iOS.targetDevice = iOSTargetDevice.iPhoneAndiPad;
+        var settings = new BuildPlayerOptions();
+        settings.scenes = GetScenes();
+        settings.locationPathName = ""###OUTPUTFOLDER###"";
+        settings.target = BuildTarget.iOS;
+        settings.options = BuildOptions.None;
+        var report = BuildPipeline.BuildPlayer(settings);
+    }
+    static string[] GetScenes()
+    {
+        return EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(scene => scene.path).ToArray();
+    }
+}";
+
+            // fill in project specific data
+            builderScript = builderScript.Replace("###OUTPUTFILE###", outputFile); // android
+            builderScript = builderScript.Replace("###OUTPUTFOLDER###", outputFolder); // ios
+            Console.WriteLine("builderScript=" + builderScript);
+
+            File.WriteAllText(editorScriptFile, builderScript);
+            // TODO check if write failed
+
+            // get selected project unity exe path
+            var unityExePath = Tools.GetUnityExePath(proj.Version);
+            if (unityExePath == null) return;
+
+            // create commandline string for building and launch it
+            //var buildcmd = $"\"{unityExePath}\" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"Builder.BuildAndroid\" -buildTarget android -logFile -";
+            var buildParams = $" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"UnityLauncherProTools.Build{platform}\" -buildTarget {platform} -logFile -";
+            Console.WriteLine("buildcmd= " + buildParams);
+
+            // launch build
+            var proc = Tools.LaunchExe(unityExePath, buildParams);
+
+            // wait for process exit then open output folder
+            proc.Exited += (o, i) =>
+            {
+                Console.WriteLine("Build process exited: " + outputFolder);
+                Tools.ExploreFolder(outputFolder);
+            };
+
+        }
+
     } // class
 } // namespace
 

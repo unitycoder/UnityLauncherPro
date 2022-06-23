@@ -2580,93 +2580,14 @@ namespace UnityLauncherPro
 
         private void MenuBatchBuildAndroid_Click(object sender, RoutedEventArgs e)
         {
-            // get selected project path
             var proj = GetSelectedProject();
-            if (string.IsNullOrEmpty(proj.Path)) return;
-
-            // create builder script template (with template string, that can be replaced with project related paths or names?)
-            // copy editor build script to Assets/Editor/ folder (if already exists then what? Use UnityLauncherBuildSomething.cs name, so can overwrite..)
-            var editorScriptFolder = Path.Combine(proj.Path, "Assets", "Editor");
-            if (Directory.Exists(editorScriptFolder) == false)
-            {
-                Directory.CreateDirectory(editorScriptFolder);
-                // TODO check if creation failed
-            }
-
-            // create output file for editor script
-            var editorScriptFile = Path.Combine(editorScriptFolder, "UnityLauncherProBuilder.cs");
-
-            // check build folder and create if missing
-            var outputFolder = Path.Combine(proj.Path, "Builds/Android/");
-            outputFolder = outputFolder.Replace('\\', '/'); // fix backslashes
-            Console.WriteLine("outputFolder= " + outputFolder);
-            if (Directory.Exists(outputFolder) == false) Directory.CreateDirectory(outputFolder);
-            // TODO check if creation failed
-
-            // cleanup filename from project name
-            var invalidChars = Path.GetInvalidFileNameChars();
-            var outputFile = String.Join("_", proj.Title.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
-            // replace spaces also, for old time(r)s
-            outputFile = outputFile.Replace(' ', '_');
-            outputFile = Path.Combine(outputFolder, outputFile + ".apk");
-            Console.WriteLine("outputFile= " + outputFile);
-
-            // TODO move to txt resource? and later load from local custom file if exists, and later open window or add settings for build options
-            // TODO ios build script
-            var builderScript = @"
-            using System.Linq;
-            using UnityEditor;
-            using UnityEngine;
-            public static class UnityLauncherProTools
-            {
-                public static void BuildAndroid()
-                {
-                    EditorUserBuildSettings.buildAppBundle = false;
-                    EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Gradle;
-                    PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
-                    PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
-                    var settings = new BuildPlayerOptions();
-                    settings.scenes = EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(scene => scene.path).ToArray();
-                    settings.locationPathName = ""###OUTPUTFILE###"";
-                    settings.target = BuildTarget.Android;
-                    settings.options = BuildOptions.None;
-                    var res = BuildPipeline.BuildPlayer(settings);
-                }
-            }";
-
-            // fill in project specific data
-            builderScript = builderScript.Replace("###OUTPUTFILE###", outputFile);
-
-            Console.WriteLine("builderScript=" + builderScript);
-
-            File.WriteAllText(editorScriptFile, builderScript);
-            // TODO check if write failed
-
-            // get selected project unity exe path
-            var unityExePath = Tools.GetUnityExePath(proj.Version);
-            if (unityExePath == null) return;
-
-            // create commandline string for building and launch it
-            //var buildcmd = $"\"{unityExePath}\" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"Builder.BuildAndroid\" -buildTarget android -logFile -";
-            var buildParams = $" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"UnityLauncherProTools.BuildAndroid\" -buildTarget android -logFile -";
-            Console.WriteLine("buildcmd= " + buildParams);
-
-            var proc = Tools.LaunchExe(unityExePath, buildParams);
-            proc.Exited += (o, i) =>
-            {
-                Console.WriteLine("Build process exited: " + outputFolder);
-                Tools.ExploreFolder(outputFolder);
-                //Tools.BrowseForOutputFolder()
-            };
-            // TODO add event to follow process exit and show info after it? maybe from context menu? or open separate "building.." window, then can see more info there, and output log etc.
-
-            // open output folder after build ready, maybe can do that from editor script easier?
+            Tools.BuildProject(proj, Platform.Android);
         }
-
 
         private void MenuBatchBuildIOS_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("TODO build ios");
+            var proj = GetSelectedProject();
+            Tools.BuildProject(proj, Platform.iOS);
         }
 
 
