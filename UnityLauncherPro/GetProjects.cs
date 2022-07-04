@@ -15,7 +15,7 @@ namespace UnityLauncherPro
         public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Win64" }, { "StandaloneWindows", "Win" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
 
         // TODO separate scan and folders
-        public static List<Project> Scan(bool getGitBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false)
+        public static List<Project> Scan(bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false)
         {
             List<Project> projectsFound = new List<Project>();
 
@@ -98,6 +98,11 @@ namespace UnityLauncherPro
                         if (getGitBranch == true)
                         {
                             gitBranch = folderExists ? Tools.ReadGitBranchInfo(projectPath) : null;
+                            // check for plastic, if enabled
+                            if (getPlasticBranch == true && gitBranch == null)
+                            {
+                                gitBranch = folderExists ? Tools.ReadPlasticBranchInfo(projectPath) : null;
+                            }
                         }
 
                         string targetPlatform = "";

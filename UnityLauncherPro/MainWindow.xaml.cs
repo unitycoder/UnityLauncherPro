@@ -8,8 +8,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
-using System.Net;
-using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -110,7 +108,7 @@ namespace UnityLauncherPro
             }
 
             // update projects list
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
             gridRecent.Items.Clear();
             gridRecent.ItemsSource = projectsSource;
 
@@ -598,7 +596,7 @@ namespace UnityLauncherPro
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
             gridRecent.ItemsSource = projectsSource;
             // focus back
             Tools.SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
@@ -1943,169 +1941,8 @@ namespace UnityLauncherPro
         private void MenuStartWebGLServer_Click(object sender, RoutedEventArgs e)
         {
             var proj = GetSelectedProject();
-            LaunchWebGL(proj);
+            Tools.LaunchWebGL(proj, txtWebglRelativePath.Text);
         }
-
-        // runs unity SimpleWebServer.exe and launches default Browser into project build/ folder'
-        void LaunchWebGL(Project proj)
-        {
-            var projPath = proj?.Path.Replace('/', '\\');
-            if (string.IsNullOrEmpty(projPath) == true) return;
-
-            var buildPath = Path.Combine(projPath, "Builds", txtWebglRelativePath.Text);
-            if (Directory.Exists(buildPath) == false) return;
-
-            if (unityInstalledVersions.ContainsKey(proj.Version) == false) return;
-
-            // get mono and server exe paths
-            var editorPath = Path.GetDirectoryName(unityInstalledVersions[proj.Version]);
-
-            var monoToolsPath = Path.Combine(editorPath, "Data/MonoBleedingEdge/bin");
-            if (Directory.Exists(monoToolsPath) == false) return;
-
-            var webglToolsPath = Path.Combine(editorPath, "Data/PlaybackEngines/WebGLSupport/BuildTools");
-            if (Directory.Exists(webglToolsPath) == false) return;
-
-            var monoExe = Path.Combine(monoToolsPath, "mono.exe");
-            if (File.Exists(monoExe) == false) return;
-
-            var webExe = Path.Combine(webglToolsPath, "SimpleWebServer.exe");
-            if (File.Exists(webExe) == false) return;
-
-            // pick initial number for server, TODO make this default start port as setting field (later if needed..)
-            int port = 50000;
-
-            // check if this project already has server running and process is not closed
-            if (webglServerProcesses.ContainsKey(port) && webglServerProcesses[port].HasExited == false)
-            {
-                Console.WriteLine("Port found in cache: " + port + " process=" + webglServerProcesses[port]);
-
-                // check if project matches
-                if (webglServerProcesses[port].StartInfo.Arguments.IndexOf("\"" + buildPath + "\"") > -1)
-                {
-                    Console.WriteLine("this project already has webgl server running.. lets open browser url only");
-                    // then open browser url only
-                    Tools.OpenURL("http://localhost:" + port);
-                    return;
-
-                }
-                else
-                {
-                    Console.WriteLine("Port in use, but its different project: " + port);
-                    Console.WriteLine(webglServerProcesses[port].StartInfo.Arguments + " == " + "\"" + buildPath + "\"");
-
-                    // then open new port and process
-                    // -----------------------------------------------------------
-                    // check if port is available https://stackoverflow.com/a/2793289
-                    bool isAvailable = true;
-                    IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-                    IPEndPoint[] objEndPoints = ipGlobalProperties.GetActiveTcpListeners();
-
-                    // NOTE instead of iterating all ports, just try to open port, if fails, open next one
-                    // compare with existing ports, if available
-                    for (int i = 0; i < objEndPoints.Length; i++)
-                    {
-                        if (objEndPoints[i].Port == port)
-                        {
-                            port++;
-                            if (port > 65535)
-                            {
-                                Console.WriteLine("Failed to find open port..");
-                                return;
-                            }
-                        }
-                    }
-
-                    Console.WriteLine("Found available port: " + port);
-
-                    if (isAvailable == false)
-                    {
-                        Console.WriteLine("failed to open port " + port + " (should be open already, or something else is using it?)");
-                    }
-                    else
-                    {
-                        // take process id from unity, if have it (then webserver closes automatically when unity is closed)
-                        var proc = ProcessHandler.Get(proj.Path);
-                        int pid = proc == null ? -1 : proc.Id;
-                        var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
-
-                        var webglServerProcess = Tools.LaunchExe(monoExe, param);
-
-                        if (webglServerProcesses.ContainsKey(port))
-                        {
-                            Console.WriteLine("Error> Should not happen - this port is already in dictionary! port: " + port);
-                        }
-                        else // keep reference to this process on this port
-                        {
-                            // TODO how to remove process once its closed? (or unlikely to have many processes in total? can also remove during check, if process already null)
-                            webglServerProcesses.Add(port, webglServerProcess);
-                            Console.WriteLine("Added port " + port);
-                        }
-
-                        Tools.OpenURL("http://localhost:" + port);
-                    }
-                    // -----------------------------------------------------------
-
-                }
-            }
-            else
-            {
-                Console.WriteLine("Port not running in cache or process already closed, remove it from cache: " + port);
-                if (webglServerProcesses.ContainsKey(port)) webglServerProcesses.Remove(port);
-
-                // TODO remove duplicate code
-                // then open new process
-                // -----------------------------------------------------------
-                // check if port is available https://stackoverflow.com/a/2793289
-                bool isAvailable = true;
-                IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-                IPEndPoint[] objEndPoints = ipGlobalProperties.GetActiveTcpListeners();
-
-                // compare with existing ports, if available
-                for (int i = 0; i < objEndPoints.Length; i++)
-                {
-                    if (objEndPoints[i].Port == port)
-                    {
-                        // TODO doesnt stop at max port number 65535
-                        port++;
-                    }
-                }
-
-                Console.WriteLine("Found available port: " + port);
-
-                if (isAvailable == false)
-                {
-                    Console.WriteLine("failed to open port " + port + " (should be open already, or something else is using it?)");
-                }
-                else
-                {
-                    // take process id from unity, if have it(then webserver closes automatically when unity is closed)
-                    var proc = ProcessHandler.Get(proj.Path);
-                    int pid = proc == null ? -1 : proc.Id;
-                    var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
-
-                    var webglServerProcess = Tools.LaunchExe(monoExe, param);
-
-                    if (webglServerProcesses.ContainsKey(port))
-                    {
-                        Console.WriteLine("Error> Should not happen - this port is already in dictionary! port: " + port);
-                    }
-                    else // keep reference to this process on this port
-                    {
-                        // TODO how to remove process once its closed? (or unlikely to have many processes in total? can also remove during check, if process already null)
-                        webglServerProcesses.Add(port, webglServerProcess);
-                        Console.WriteLine("Added port " + port);
-                    }
-
-                    Tools.OpenURL("http://localhost:" + port);
-                }
-                // -----------------------------------------------------------
-
-            }
-        } // LaunchWebGL()
-
-        // reference to already running webgl server processes and ports
-        Dictionary<int, Process> webglServerProcesses = new Dictionary<int, Process>();
 
         private void TxtWebglRelativePath_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -2590,7 +2427,11 @@ namespace UnityLauncherPro
             Tools.BuildProject(proj, Platform.iOS);
         }
 
-
+        private void ChkCheckPlasticBranch_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.checkPlasticBranch = (bool)chkCheckPlasticBranch.IsChecked;
+            Properties.Settings.Default.Save();
+        }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
         //{

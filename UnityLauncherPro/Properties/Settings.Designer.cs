@@ -429,5 +429,17 @@ namespace UnityLauncherPro.Properties {
                 this["searchProjectPathAlso"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool checkPlasticBranch {
+            get {
+                return ((bool)(this["checkPlasticBranch"]));
+            }
+            set {
+                this["checkPlasticBranch"] = value;
+            }
+        }
     }
 }
