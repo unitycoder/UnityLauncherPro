@@ -1355,10 +1355,10 @@ namespace UnityLauncherPro
                 // restore read only
                 e.Column.IsReadOnly = true;
 
+                // entered empty name, then restore original name, if custom name was used. NOTE we could just remove custom projectname file then..
                 if (string.IsNullOrEmpty(newProjectNameString))
                 {
-                    Console.WriteLine("Project name is null: " + newProjectNameString);
-                    return;
+                    newProjectNameString = Path.GetFileName(projectPath);
                 }
 
                 //// cannot allow / or \ or . as last character (otherwise might have issues going parent folder?)
