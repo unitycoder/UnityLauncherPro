@@ -592,6 +592,7 @@
                                 </MenuItem>
                                 <!--<Separator/>
                                 <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />-->
+                                <MenuItem x:Name="menuCreateDesktopShortCut" Header="Create Shortcut on Desktop" Click="MenuCreateDesktopShortCut_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 
@@ -1035,21 +1036,20 @@
 
                         <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
                             <CheckBox  x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Experimental!)"  Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" ToolTip="Select target platform" HorizontalAlignment="Left"/>
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                 <CheckBox   x:Name="chkRunAutomatically" Content="Run automatically on startup"  ToolTip="Run automatically using startup registry key" HorizontalAlignment="Left" Checked="ChkRunAutomatically_Checked" Unchecked="ChkRunAutomatically_Checked"/>
                                 <CheckBox   x:Name="chkRunAutomaticallyMinimized" Content="as minimized"  ToolTip="Minimize to tray when started automatically" HorizontalAlignment="Left" Checked="ChkRunAutomaticallyMinimized_Checked" Unchecked="ChkRunAutomaticallyMinimized_Checked" Margin="5,0,0,3"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                 <CheckBox  x:Name="chkUseCustomLastModified" Content="Date format" ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkUseCustomLastModified_Checked" Unchecked="ChkUseCustomLastModified_Checked"/>
-                                <TextBox x:Name="txtCustomDateTimeFormat" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="150" ToolTip="Default is dd/MM/yyyy HH:mm:ss" Padding="0,3,0,0" Margin="5,0,0,0" Text="dd/MM/yyyy HH:mm:ss" LostFocus="TxtCustomDateTimeFormat_LostFocus" TextChanged="TxtCustomDateTimeFormat_TextChanged">
-                                </TextBox>
+                                <TextBox x:Name="txtCustomDateTimeFormat" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="150" ToolTip="Default is dd/MM/yyyy HH:mm:ss" Padding="0,3,0,0" Margin="5,0,0,0" Text="dd/MM/yyyy HH:mm:ss" LostFocus="TxtCustomDateTimeFormat_LostFocus" TextChanged="TxtCustomDateTimeFormat_TextChanged"/>
                             </StackPanel>
                             <CheckBox  x:Name="chkHumanFriendlyDateTime" Content="Use human friendly last modified"  ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkHumanFriendlyDateTime_Checked" Unchecked="ChkHumanFriendlyDateTime_Checked"/>
                             <CheckBox  x:Name="chkSearchProjectPath" Content="Search project path also"  ToolTip="Searches from project folder path and project name" HorizontalAlignment="Left" Checked="ChkSearchProjectPath_Checked" Unchecked="ChkSearchProjectPath_Checked"/>
-                            <Label Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,5,5,0">Project name:</Label>
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder"  Margin="3,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>
-                                <RadioButton x:Name="radioProjNameProductName" Content="Settings ProductName"  Margin="5,0,0,0" GroupName="toggleGroupProjectName" Checked="RadioProjNameProductName_Checked" ToolTip="Take project name from player settings ProductName field"/>
+                            <Label Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,5,5,0" HorizontalAlignment="Left">Project name:</Label>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder"  Margin="3,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder" HorizontalAlignment="Left"/>
+                                <RadioButton x:Name="radioProjNameProductName" Content="Settings ProductName"  Margin="5,0,0,0" GroupName="toggleGroupProjectName" Checked="RadioProjNameProductName_Checked" ToolTip="Take project name from player settings ProductName field" HorizontalAlignment="Left"/>
                             </StackPanel>
                             <!--<StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                 <TextBox x:Name="txtTemplatePackagesFolder" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" ToolTip="Folder for your custom unitypackage templates (for new project)" Padding="0,3,0,0" Width="110" TextChanged="TxtTemplatePackagesFolder_TextChanged" />
@@ -1058,12 +1058,20 @@
                             </StackPanel>-->
 
                             <Label Content="ADB args:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="0,1,0,-4" />
-                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4" HorizontalAlignment="Left">
                                 <TextBox x:Name="txtLogCatArgs" BorderBrush="Transparent" Text="-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="312" ToolTip="ADB commandline arguments" Padding="0,3,0,0" TextChanged="TxtLogCatArgs_TextChanged" Width="312" />
                                 <Button Style="{StaticResource CustomButton}" x:Name="btnResetLogCatArgs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Reset to default logcat args" Click="BtnResetLogCatArgs_Click">
                                     <Label Content="Reset" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                 </Button>
                             </StackPanel>
+                            
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4" HorizontalAlignment="Left">
+                                <TextBox x:Name="txtShortcutBatchFileFolder" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="150" ToolTip="Save generated .bat files here (they are run from Desktop Shortcut)" Padding="0,3,0,0" HorizontalAlignment="Left" MaxWidth="200" LostFocus="TxtShortcutBatchFileFolder_LostFocus" TextChanged="TxtShortcutBatchFileFolder_TextChanged" />
+                                <Button Style="{StaticResource CustomButton}" x:Name="btnBrowseBatchFileFolder" Content="..." Margin="6,0,0,0" MinWidth="22" Click="BtnBrowseBatchFileFolder_Click" MinHeight="22" FontSize="16" ToolTip="Browse for .bat folder (default location is inside AppData/UnityLauncherPro/ and works fine, so this is optional)" HorizontalAlignment="Left" />
+                                <Label Content="Shortcut .bat files folder" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" />
+                            </StackPanel>
+
+
 
                         </StackPanel>
                     </StackPanel>

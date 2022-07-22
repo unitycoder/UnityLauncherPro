@@ -1017,12 +1017,12 @@ namespace UnityLauncherPro
             Keyboard.Focus(row);
         }
 
-        public static string BrowseForOutputFolder(string title)
+        public static string BrowseForOutputFolder(string title, string initialDirectory = null)
         {
             // https://stackoverflow.com/a/50261723/5452781
             // Create a "Save As" dialog for selecting a directory (HACK)
             var dialog = new Microsoft.Win32.SaveFileDialog();
-            //dialog.InitialDirectory = "c:"; // Use current value for initial dir
+            if (initialDirectory != null) dialog.InitialDirectory = initialDirectory;
             dialog.Title = title;
             dialog.Filter = "Project Folder|*.Folder"; // Prevents displaying files
             dialog.FileName = "Project"; // Filename will then be "select.this.directory"
@@ -1592,6 +1592,43 @@ public static class UnityLauncherProTools
             }
         } // LaunchWebGL()
 
+        // creates .bat file to launch UnityLauncherPro and then .url link file on desktop, into that .bat file
+        public static bool CreateDesktopShortCut(Project proj, string batchFolder)
+        {
+            string lnkFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+
+            if (string.IsNullOrEmpty(batchFolder)) return false;
+
+            //string batchFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "UnityLauncherPro");
+            if (Directory.Exists(batchFolder) == false) Directory.CreateDirectory(batchFolder);
+            string batFileName = Path.Combine(batchFolder, proj.Title + ".bat");
+            string launcherExe = Process.GetCurrentProcess().MainModule.FileName;
+            string args = "-projectPath " + "\"" + proj.Path + "\" " + proj.Arguments;
+            string description = "Unity Project: " + proj.Title;
+
+            // create .bat file
+            var batLauncherData = "start \"\" \"" + launcherExe + "\"" + " " + args;
+            File.WriteAllText(batFileName, batLauncherData);
+
+            // create desktop link file
+            using (StreamWriter writer = new StreamWriter(lnkFileName + "\\" + proj.Title + ".url"))
+            {
+                writer.WriteLine("[InternetShortcut]");
+                writer.WriteLine("URL=file:///" + batFileName);
+                //writer.WriteLine("ShowCommand=7"); // doesnt work for minimized
+                writer.WriteLine("IconIndex=0");
+                writer.WriteLine("Arguments=-projectPath " + proj.Path);
+                // TODO maybe could take icon from project (but then need to convert into .ico)
+                string iconExe = GetUnityExePath(proj.Version);
+                if (iconExe == null) iconExe = launcherExe;
+                string icon = iconExe.Replace('\\', '/');
+                writer.WriteLine("IconFile=" + icon);
+            }
+
+            // TODO check for streamwriter and file write success
+
+            return true;
+        }
     } // class
 
 } // namespace

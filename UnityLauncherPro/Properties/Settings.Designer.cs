@@ -441,5 +441,17 @@ namespace UnityLauncherPro.Properties {
                 this["checkPlasticBranch"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string shortcutBatchFileFolder {
+            get {
+                return ((string)(this["shortcutBatchFileFolder"]));
+            }
+            set {
+                this["shortcutBatchFileFolder"] = value;
+            }
+        }
     }
 }

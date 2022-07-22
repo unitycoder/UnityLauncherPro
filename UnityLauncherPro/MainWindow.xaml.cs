@@ -424,6 +424,13 @@ namespace UnityLauncherPro
                     break;
             }
 
+            // set default .bat folder location to appdata/.., if nothing is set, or current one is invalid
+            if (string.IsNullOrEmpty(txtShortcutBatchFileFolder.Text) || Directory.Exists(txtShortcutBatchFileFolder.Text) == false)
+            {
+                Properties.Settings.Default.shortcutBatchFileFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+                txtShortcutBatchFileFolder.Text = Properties.Settings.Default.shortcutBatchFileFolder;
+            }
+
         } // LoadSettings()
 
 
@@ -1669,18 +1676,23 @@ namespace UnityLauncherPro
         bool isInitializing = true; // used to avoid doing things while still starting up
         private void ChkStreamerMode_Checked(object sender, RoutedEventArgs e)
         {
-            // TODO add "(streamer mode)" text in statusbar
+            // TODO could add "(streamer mode)" text in statusbar?
 
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             Properties.Settings.Default.streamerMode = isChecked;
             Properties.Settings.Default.Save();
 
-            // Create cellstyle and assign if enabled
+            // Create cellstyle and assign if streamermode is enabled
             Style cellStyle = new Style(typeof(DataGridCell));
             cellStyle.Setters.Add(new Setter(FontSizeProperty, 1.0));
             txtColumnTitle.CellStyle = isChecked ? cellStyle : null;
             txtColumnName.CellStyle = isChecked ? cellStyle : null;
+
+            Style txtBoxStyle = new Style(typeof(TextBox));
+            txtBoxStyle.Setters.Add(new Setter(FontSizeProperty, 1.0));
+            txtShortcutBatchFileFolder.Style = isChecked ? txtBoxStyle : null;
+            txtRootFolderForNewProjects.Style = isChecked ? txtBoxStyle : null;
 
             // need to reload list if user changed setting
             if (isInitializing == false)
@@ -2165,6 +2177,23 @@ namespace UnityLauncherPro
             }
         }
 
+        void ValidateFolderFromTextbox(TextBox textBox)
+        {
+            Console.WriteLine(textBox.Text);
+            if (Directory.Exists(textBox.Text) == true)
+            {
+                Properties.Settings.Default.shortcutBatchFileFolder = textBox.Text;
+                Properties.Settings.Default.Save();
+                textBox.BorderBrush = System.Windows.Media.Brushes.Transparent;
+            }
+            else // invalid format
+            {
+                textBox.BorderBrush = System.Windows.Media.Brushes.Red;
+                //Properties.Settings.Default.shortcutBatchFileFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+                //Properties.Settings.Default.Save();
+            }
+        }
+
         private void ChkHumanFriendlyDateTime_Checked(object sender, RoutedEventArgs e)
         {
             if (this.IsActive == false) return; // dont run code on window init
@@ -2431,6 +2460,43 @@ namespace UnityLauncherPro
         {
             Properties.Settings.Default.checkPlasticBranch = (bool)chkCheckPlasticBranch.IsChecked;
             Properties.Settings.Default.Save();
+        }
+
+        private void MenuCreateDesktopShortCut_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            var res = Tools.CreateDesktopShortCut(proj, txtShortcutBatchFileFolder.Text);
+            if (res == false)
+            {
+                Console.WriteLine("Failed to create shortcut, maybe batch folder location is invalid..");
+            }
+        }
+
+        private void TxtShortcutBatchFileFolder_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var folder = ((TextBox)sender).Text;
+            if (Directory.Exists(folder))
+            {
+                Properties.Settings.Default.shortcutBatchFileFolder = folder;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        private void TxtShortcutBatchFileFolder_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ValidateFolderFromTextbox((TextBox)sender);
+        }
+
+        private void BtnBrowseBatchFileFolder_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO change directory browsing window title (now its Project folder)
+            var folder = Tools.BrowseForOutputFolder("Select folder for .bat shortcut files", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName));
+            if (string.IsNullOrEmpty(folder) == false)
+            {
+                txtShortcutBatchFileFolder.Text = folder;
+                Properties.Settings.Default.shortcutBatchFileFolder = folder;
+                Properties.Settings.Default.Save();
+            }
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
