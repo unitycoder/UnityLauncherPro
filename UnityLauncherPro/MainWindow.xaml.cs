@@ -196,11 +196,19 @@ namespace UnityLauncherPro
                     proj.Path = projectPathArgument;
                     proj.Arguments = commandLineArguments;
 
-                    // check if force-update button is down
+                    // no version info or check if force-update button is down
                     // NOTE if keydown, window doesnt become active and focused
                     if (string.IsNullOrEmpty(version) || (Keyboard.Modifiers & ModifierKeys.Shift) != 0)
                     {
-                        Tools.DisplayUpgradeDialog(proj, null);
+                        if (Directory.Exists(Path.Combine(proj.Path, "Assets")) == true)
+                        {
+                            Tools.DisplayUpgradeDialog(proj, null);
+                        }
+                        else // no assets folder here, then its new project
+                        {
+                            //Tools.DisplayUpgradeDialog(proj, null);
+                            CreateNewEmptyProject(proj.Path);
+                        }
                     }
                     else
                     {
@@ -1591,18 +1599,29 @@ namespace UnityLauncherPro
             CreateNewEmptyProject();
         }
 
-        void CreateNewEmptyProject()
+        void CreateNewEmptyProject(string targetFolder = null)
         {
-            // first check if quick project path is assigned, if not, need to set it
-            if (Directory.Exists(txtRootFolderForNewProjects.Text) == false)
+            string rootFolder = txtRootFolderForNewProjects.Text;
+
+            // if have targetfolder, then use that instead of quick folder
+            if (targetFolder != null && Directory.Exists(targetFolder))
             {
-                tabControl.SelectedIndex = 4;
-                this.UpdateLayout();
-                txtRootFolderForNewProjects.Focus();
-                return;
+                rootFolder = targetFolder;
+            }
+            else
+            {
+                // check if quick root folder is set correctly
+                if (Directory.Exists(rootFolder) == false)
+                {
+                    tabControl.SelectedIndex = 4;
+                    this.UpdateLayout();
+                    txtRootFolderForNewProjects.Focus();
+                    return;
+                }
             }
 
-            if (chkAskNameForQuickProject.IsChecked == true)
+            // for new projects created from explorer, always ask for name
+            if (chkAskNameForQuickProject.IsChecked == true || targetFolder != null)
             {
                 // ask name
                 string newVersion = null;
@@ -1623,7 +1642,7 @@ namespace UnityLauncherPro
                     return;
                 }
 
-                NewProject modalWindow = new NewProject(newVersion, Tools.GetSuggestedProjectName(newVersion, txtRootFolderForNewProjects.Text), txtRootFolderForNewProjects.Text);
+                NewProject modalWindow = new NewProject(newVersion, Tools.GetSuggestedProjectName(newVersion, rootFolder), rootFolder);
                 modalWindow.ShowInTaskbar = this == null;
                 modalWindow.WindowStartupLocation = this == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
                 modalWindow.Topmost = this == null;
@@ -1634,11 +1653,10 @@ namespace UnityLauncherPro
 
                 if (results == true)
                 {
-                    var projectPath = txtRootFolderForNewProjects.Text;
-                    Console.WriteLine("Create project " + NewProject.newVersion + " : " + projectPath);
-                    if (string.IsNullOrEmpty(projectPath)) return;
+                    Console.WriteLine("Create project " + NewProject.newVersion + " : " + rootFolder);
+                    if (string.IsNullOrEmpty(rootFolder)) return;
 
-                    var p = Tools.FastCreateProject(NewProject.newVersion, projectPath, NewProject.newProjectName, NewProject.templateZipPath, NewProject.platformsForThisUnity, NewProject.selectedPlatform);
+                    var p = Tools.FastCreateProject(NewProject.newVersion, rootFolder, NewProject.newProjectName, NewProject.templateZipPath, NewProject.platformsForThisUnity, NewProject.selectedPlatform);
 
                     // add to list (just in case new project fails to start, then folder is already generated..)
                     if (p != null) AddNewProjectToList(p);
@@ -1649,7 +1667,7 @@ namespace UnityLauncherPro
                 }
 
             }
-            else // use automatic name
+            else // use automatic name (project is instantly created, without asking anything)
             {
                 string newVersion = null;
                 // if in maintab
@@ -1661,7 +1679,7 @@ namespace UnityLauncherPro
                 {
                     newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
                 }
-                var p = Tools.FastCreateProject(newVersion, txtRootFolderForNewProjects.Text);
+                var p = Tools.FastCreateProject(newVersion, rootFolder);
                 if (p != null) AddNewProjectToList(p);
             }
 
