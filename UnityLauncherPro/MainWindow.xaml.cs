@@ -53,7 +53,7 @@ namespace UnityLauncherPro
 
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
 
-        string latestBuildReportProjectPath = null;
+        string currentBuildReportProjectPath = null;
         List<List<string>> buildReports = new List<List<string>>();
         int currentBuildReport = 0;
 
@@ -791,11 +791,10 @@ namespace UnityLauncherPro
                     switch (e.Key)
                     {
                         case Key.F5: // refresh unitys
-                            UpdateUnityInstallationsList(); break;
+                            UpdateUnityInstallationsList();
+                            break;
                         case Key.Escape: // clear project search
                             txtSearchBoxUnity.Text = "";
-                            break;
-                        default: // any key
                             break;
                     }
                     break;
@@ -810,8 +809,6 @@ namespace UnityLauncherPro
                         case Key.Escape: // clear project search
                             txtSearchBoxUpdates.Text = "";
                             break;
-                        default: // any key
-                            break;
                     }
                     break;
 
@@ -821,8 +818,6 @@ namespace UnityLauncherPro
                     {
                         case Key.Escape: // clear search
                             txtSearchBoxBuildReport.Text = "";
-                            break;
-                        default: // any key
                             break;
                     }
                     break;
@@ -1739,6 +1734,7 @@ namespace UnityLauncherPro
         public void CopyRowFolderToClipBoard(object sender, ExecutedRoutedEventArgs e)
         {
             string path = null;
+
             if (tabControl.SelectedIndex == 0) // projects
             {
                 path = GetSelectedProject()?.Path;
@@ -1751,9 +1747,18 @@ namespace UnityLauncherPro
             {
                 path = GetSelectedUpdate()?.Version; // TODO copy url instead
             }
-            Console.WriteLine("CopyRowFolderToClipBoard=" + path);
+            else if (tabControl.SelectedIndex == 3) // tools
+            {
+                path = GetSelectedBuildItem().Path;
+                if (path != null) path = Path.Combine(currentBuildReportProjectPath, path);
+            }
 
-            if (string.IsNullOrEmpty(path) == false) Clipboard.SetText(path);
+            if (string.IsNullOrEmpty(path) == false)
+            {
+                // fix backslashes
+                path = path.Replace('\\', '/');
+                Clipboard.SetText(path);
+            }
         }
 
         public void CanExecute_Copy(object sender, CanExecuteRoutedEventArgs e)
@@ -1833,6 +1838,11 @@ namespace UnityLauncherPro
 
         private void BtnRefreshBuildReport_Click(object sender, RoutedEventArgs e)
         {
+            RefreshBuildReports();
+        }
+
+        void RefreshBuildReports()
+        {
             currentBuildReport = 0;
             buildReports.Clear();
             UpdateBuildReportLabelAndButtons();
@@ -1852,10 +1862,21 @@ namespace UnityLauncherPro
                     using (StreamReader sr = new StreamReader(fs))
                     {
                         bool collect = false;
-                        // now we collect all lines, but could collect only those needed below
+                        bool gotProjectPath = false;
+
                         while (!sr.EndOfStream)
                         {
                             var line = sr.ReadLine();
+
+                            // get current projectpath
+                            if (gotProjectPath == true)
+                            {
+                                currentBuildReportProjectPath = line;
+                                gotProjectPath = false;
+                            }
+                            if (line == "-projectPath") gotProjectPath = true;
+
+
                             // build report starts, TODO collect report header also
                             if (collect == false && line.IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
                             {
@@ -1882,12 +1903,16 @@ namespace UnityLauncherPro
             }
             catch (Exception)
             {
+                gridBuildReport.ItemsSource = null;
+                gridBuildReport.Items.Clear();
                 Console.WriteLine("Failed to open editor log: " + logFile);
                 return;
             }
 
             if (buildReports.Count < 1 || buildReports[0].Count < 1)
             {
+                gridBuildReport.ItemsSource = null;
+                gridBuildReport.Items.Clear();
                 Console.WriteLine("Failed to parse Editor.Log (probably no build reports there)");
                 return;
             }
@@ -2260,11 +2285,9 @@ namespace UnityLauncherPro
         {
             var item = GetSelectedBuildItem();
 
-            Console.WriteLine(item.Path);
-
             if (item != null)
             {
-                string filePath = Path.Combine(latestBuildReportProjectPath, item.Path);
+                string filePath = Path.Combine(currentBuildReportProjectPath, item.Path);
                 Tools.LaunchExplorerSelectFile(filePath);
             }
         }
@@ -2515,6 +2538,29 @@ namespace UnityLauncherPro
                 Properties.Settings.Default.shortcutBatchFileFolder = folder;
                 Properties.Settings.Default.Save();
             }
+        }
+
+        private void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.F5: // update build reports
+                    e.Handled = true;
+                    RefreshBuildReports();
+                    break;
+                case Key.Return: // open build report
+                    e.Handled = true;
+                    OpenSelectedBuildReportFile();
+                    break;
+            }
+        }
+
+        private void menuItemCopyPathToClipboard_Click(object sender, RoutedEventArgs e)
+        {
+            var path = GetSelectedBuildItem().Path;
+            if (path != null) path = Path.Combine(currentBuildReportProjectPath, path);
+            path = path.Replace('\\', '/');
+            Clipboard.SetText(path);
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
