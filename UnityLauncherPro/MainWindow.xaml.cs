@@ -2563,6 +2563,85 @@ namespace UnityLauncherPro
             Clipboard.SetText(path);
         }
 
+        private void gridRecent_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            SortHandler(sender, e);
+        }
+
+        // https://stackoverflow.com/a/2130557/5452781
+        void SortHandler(object sender, DataGridSortingEventArgs e)
+        {
+            DataGridColumn column = e.Column;
+
+            //Console.WriteLine("Sorted by " + column.Header);
+
+            IComparer comparer = null;
+
+            // prevent the built-in sort from sorting
+            e.Handled = true;
+
+            ListSortDirection direction = (column.SortDirection != ListSortDirection.Ascending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
+
+            //set the sort order on the column
+            column.SortDirection = direction;
+
+            //use a ListCollectionView to do the sort.
+            ListCollectionView lcv = (ListCollectionView)CollectionViewSource.GetDefaultView(gridRecent.ItemsSource);
+
+            comparer = new CustomProjectSort(direction, column.Header.ToString());
+
+            //apply the sort
+            lcv.CustomSort = comparer;
+        }
+
+        public class CustomProjectSort : IComparer
+        {
+            private ListSortDirection direction;
+            private string sortBy;
+
+            public CustomProjectSort(ListSortDirection direction, string sortBy)
+            {
+                this.direction = direction;
+                this.sortBy = sortBy;
+            }
+
+            // TODO cleanup this
+            public int Compare(Object a, Object b)
+            {
+                switch (sortBy)
+                {
+                    case "Project":
+                        return direction == ListSortDirection.Ascending ? ((Project)a).Title.CompareTo(((Project)b).Title) : ((Project)b).Title.CompareTo(((Project)a).Title);
+                    case "Version":
+                        return direction == ListSortDirection.Ascending ? Tools.VersionAsInt(((Project)a).Version).CompareTo(Tools.VersionAsInt(((Project)b).Version)) : Tools.VersionAsInt(((Project)b).Version).CompareTo(Tools.VersionAsInt(((Project)a).Version));
+                    case "Path":
+                        return direction == ListSortDirection.Ascending ? ((Project)a).Path.CompareTo(((Project)b).Path) : ((Project)b).Path.CompareTo(((Project)a).Path);
+                    case "Modified":
+                        return direction == ListSortDirection.Ascending ? ((DateTime)((Project)a).Modified).CompareTo(((Project)b).Modified) : ((DateTime)((Project)b).Modified).CompareTo(((Project)a).Modified);
+                    case "Arguments":
+                        // handle null values
+                        if (((Project)a).Arguments == null && ((Project)b).Arguments == null) return 0;
+                        if (((Project)a).Arguments == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((Project)b).Arguments == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? ((Project)a).Arguments.CompareTo(((Project)b).Arguments) : ((Project)b).Arguments.CompareTo(((Project)a).Arguments);
+                    case "Branch":
+                        // handle null values
+                        if (((Project)a).GITBranch == null && ((Project)b).GITBranch == null) return 0;
+                        if (((Project)a).GITBranch == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((Project)b).GITBranch == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? ((Project)a).GITBranch.CompareTo(((Project)b).GITBranch) : ((Project)b).GITBranch.CompareTo(((Project)a).GITBranch);
+                    case "Platform":
+                        // handle null values
+                        if (((Project)a).TargetPlatform == null && ((Project)b).TargetPlatform == null) return 0;
+                        if (((Project)a).TargetPlatform == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((Project)b).TargetPlatform == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? ((Project)a).TargetPlatform.CompareTo(((Project)b).TargetPlatform) : ((Project)b).TargetPlatform.CompareTo(((Project)a).TargetPlatform);
+                    default:
+                        return 0;
+                }
+            }
+        }
+
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
         //{
         //    var folder = Tools.BrowseForOutputFolder("Select unitypackage Templates folder");
