@@ -379,10 +379,43 @@
             </Grid>
         </ControlTemplate>
 
+        <ControlTemplate x:Key="HorizontalScrollBar" TargetType="{x:Type ScrollBar}">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition MaxWidth="18"/>
+                    <ColumnDefinition Width="0.00001*"/>
+                    <ColumnDefinition MaxWidth="18"/>
+                </Grid.ColumnDefinitions>
+                <!-- scrollbar background -->
+                <Border Grid.ColumnSpan="3" CornerRadius="2" Background="{DynamicResource ThemeScrollBarBackground}" />
+                <!-- scrollbar left button -->
+                <RepeatButton Grid.Column="0" Style="{StaticResource ScrollBarLineButton}" Width="18" Command="ScrollBar.LineLeftCommand" Content="M 4 0 L 4 8 L 0 4 Z" />
+                <Track Name="PART_Track" Grid.Column="1" IsDirectionReversed="False">
+                    <Track.DecreaseRepeatButton>
+                        <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageLeftCommand" />
+                    </Track.DecreaseRepeatButton>
+                    <Track.Thumb>
+                        <!-- scrollbar foreground -->
+                        <Thumb Style="{StaticResource ScrollBarThumb}" Margin="0,1,0,1" Background="{DynamicResource ThemeScrollBarFill}" BorderBrush="{x:Null}" />
+                    </Track.Thumb>
+                    <Track.IncreaseRepeatButton>
+                        <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageRightCommand" />
+                    </Track.IncreaseRepeatButton>
+                </Track>
+                <!-- scrollbar right button -->
+                <RepeatButton Grid.Column="3" Style="{StaticResource ScrollBarLineButton}" Width="18" Command="ScrollBar.LineRightCommand" Content="M 0 0 L 4 4 L 0 8 Z"/>
+            </Grid>
+        </ControlTemplate>
+
         <Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Width" Value="Auto"/>
+                    <Setter Property="Height" Value="18" />
+                    <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
+                </Trigger>
                 <Trigger Property="Orientation" Value="Vertical">
                     <Setter Property="Width" Value="18"/>
                     <Setter Property="Height" Value="Auto" />
@@ -851,12 +884,15 @@
             </TabItem>
 
             <!-- Tab: Tools -->
-            <TabItem Header="Tools" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
+            <TabItem Header="Tools" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True">
                 <Grid PreviewKeyDown="Grid_PreviewKeyDown">
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="124" />
+                        <RowDefinition Height="32" />
                         <RowDefinition Height="50*" />
                     </Grid.RowDefinitions>
+
                     <!-- 1st part -->
                     <Grid Grid.Row="0" VerticalAlignment="Top">
                         <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left">
@@ -906,6 +942,7 @@
                             </StackPanel>
                         </StackPanel>
                     </Grid>
+
                     <!-- 2nd part -->
                     <Grid Grid.Row="1" VerticalAlignment="Top">
                         <StackPanel Orientation="Horizontal" Margin="0">
@@ -913,6 +950,7 @@
                             <Button x:Name="btnClearBuildReport" Style="{StaticResource CustomButton}" ToolTip="Clear report" Content="🗑" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"  Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnClearBuildReport_Click" />
                             <Button x:Name="btnRefreshBuildReport" Style="{StaticResource CustomButton}" ToolTip="Get latest Build Report from Editor.log" Content="⟳" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshBuildReport_Click"/>
                             <!--<CheckBox x:Name="chkAutoUpdateBuildReport" Content="AutoUpdate" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" HorizontalAlignment="Right" VerticalAlignment="Top" Height="26" VerticalContentAlignment="Center" IsEnabled="False"/>-->
+
 
                             <!-- search box -->
                             <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
@@ -940,32 +978,54 @@
                             <Button x:Name="btnPrevBuildReport" Style="{StaticResource CustomButton}" ToolTip="Previous Build Report" Content="←" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="0,4,0,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnPrevBuildReport_Click" IsEnabled="False"/>
                             <Button x:Name="btnNextBuildReport" Style="{StaticResource CustomButton}" ToolTip="Next Build Report" Content="→" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="8,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnNextBuildReport_Click" IsEnabled="False"/>
                         </StackPanel>
+                    </Grid>
 
-                        <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" CanUserAddRows="False" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick">
-                            <DataGrid.CommandBindings>
-                                <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
-                            </DataGrid.CommandBindings>
+                    <!-- 3rd part -->
+                    <Grid Grid.Row="2" VerticalAlignment="Top">
+                        <Grid ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="64*" />
+                                <ColumnDefinition Width="30*" />
+                            </Grid.ColumnDefinitions>
+                            <!--Grid.Column="0"-->
+                            <DataGrid  x:Name="gridBuildReport"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Visible" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                                <DataGrid.CommandBindings>
+                                    <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
+                                </DataGrid.CommandBindings>
 
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Size}" ClipboardContentBinding="{x:Null}" Header="Size" IsReadOnly="True" Width="75"/>
-                                <DataGridTextColumn Binding="{Binding Percentage}" ClipboardContentBinding="{x:Null}" Header="%" IsReadOnly="True" Width="55" />
-                                <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True" Width="333" />
-                                <DataGridTextColumn Binding="{Binding Format}" ClipboardContentBinding="{x:Null}" Header="Format" IsReadOnly="True" Width="65"/>
-                            </DataGrid.Columns>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Size}" ClipboardContentBinding="{x:Null}" Header="Size" IsReadOnly="True" Width="75"/>
+                                    <DataGridTextColumn Binding="{Binding Percentage}" ClipboardContentBinding="{x:Null}" Header="%" IsReadOnly="True" Width="55" />
+                                    <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True" Width="333" />
+                                    <DataGridTextColumn Binding="{Binding Format}" ClipboardContentBinding="{x:Null}" Header="Format" IsReadOnly="True" Width="65"/>
+                                </DataGrid.Columns>
 
-                            <!-- right click context menu -->
-                            <DataGrid.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem x:Name="menuItemExploreBuildItem" Header="Open Explorer here" Click="MenuItemExploreBuildItem_Click" />
-                                    <MenuItem x:Name="menuItemCopyPathToClipboard" Header="Copy Path to clipboard" Click="menuItemCopyPathToClipboard_Click" />
-                                </ContextMenu>
-                            </DataGrid.ContextMenu>
+                                <!-- right click context menu -->
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem x:Name="menuItemExploreBuildItem" Header="Open Explorer here" Click="MenuItemExploreBuildItem_Click" />
+                                        <MenuItem x:Name="menuItemCopyPathToClipboard" Header="Copy Path to clipboard" Click="menuItemCopyPathToClipboard_Click" />
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
 
-                            <!-- sample data for testing -->
-                            <local:BuildReportItem Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
-                        </DataGrid>
+                                <!-- sample data for testing -->
+                                <local:BuildReportItem Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
+                                <local:BuildReportItem Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
+                                <local:BuildReportItem Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
+                            </DataGrid>
+
+                            <DataGrid Grid.Column="1" x:Name="gridBuildReportData"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalContentAlignment="Stretch">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Type" Binding="{Binding Category}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                                    <DataGridTextColumn Header="%" Binding="{Binding Percentage}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                                </DataGrid.Columns>
+                                <local:BuildReportItem Category="Texture" Size="10.0 mb" Percentage="50.0%" />
+                            </DataGrid>
+                        </Grid>
 
                     </Grid>
+                    <!--<DataGrid  x:Name="gridBuildReport"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Visible" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top">-->
 
                 </Grid>
             </TabItem>
