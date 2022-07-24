@@ -127,12 +127,7 @@ namespace UnityLauncherPro
                             if (vertemp.IndexOf(".") > -1) version = vertemp;
 
                         }
-                        // if still nothing, take a quess based on yaml year info, lets say 2011 is unity 3.5
-                        if (string.IsNullOrEmpty(version) == true && data[1].ToLower().IndexOf("unity3d.com,2011") > -1)
-                        {
-                            version = "3.5.7f1";
-                        }
-
+                        // if still nothing, TODO probably could find closer version info, if know what features were added to playersettings.assets and checking serializedVersion: .. number
                     }
                 }
             }

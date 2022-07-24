@@ -581,6 +581,7 @@
                                 <MenuItem x:Name="menuItemCopyPath" Header="Copy Project Path" Click="MenuItemCopyPath_Click" />
                                 <MenuItem x:Name="menuItemShowProjectInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
                                 <MenuItem x:Name="menuItemBrowsePersistentDataPath" Header="Open PersistentDataPath" Click="MenuItemBrowsePersistentDataPath_Click" />
+                                <MenuItem x:Name="menuCreateDesktopShortCut" Header="Create Shortcut on Desktop" Click="MenuCreateDesktopShortCut_Click" />
                                 <Separator/>
                                 <MenuItem x:Name="menuItemKillProcess" Header="Kill Process" Click="MenuItemKillProcess_Click" />
                                 <Separator/>
@@ -592,7 +593,6 @@
                                 </MenuItem>
                                 <!--<Separator/>
                                 <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />-->
-                                <MenuItem x:Name="menuCreateDesktopShortCut" Header="Create Shortcut on Desktop" Click="MenuCreateDesktopShortCut_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 
