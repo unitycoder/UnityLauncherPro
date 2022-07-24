@@ -988,7 +988,7 @@
                                 <ColumnDefinition Width="30*" />
                             </Grid.ColumnDefinitions>
                             <!--Grid.Column="0"-->
-                            <DataGrid  x:Name="gridBuildReport"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Visible" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                            <DataGrid  x:Name="gridBuildReport"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Auto" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Visible">
                                 <DataGrid.CommandBindings>
                                     <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                                 </DataGrid.CommandBindings>
@@ -1014,7 +1014,8 @@
                                 <local:BuildReportItem Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
                             </DataGrid>
 
-                            <DataGrid Grid.Column="1" x:Name="gridBuildReportData"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalContentAlignment="Stretch">
+                            <StackPanel Grid.Column="1" Orientation="Vertical">
+                            <DataGrid  x:Name="gridBuildReportData"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalContentAlignment="Stretch">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Type" Binding="{Binding Category}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
                                     <DataGridTextColumn Header="Size" Binding="{Binding Size}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
@@ -1022,8 +1023,11 @@
                                 </DataGrid.Columns>
                                 <local:BuildReportItem Category="Texture" Size="10.0 mb" Percentage="50.0%" />
                             </DataGrid>
-                        </Grid>
+                                <Label Content="Elapsed time:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+                                <TextBox CaretBrush="#FFE2E2E2" x:Name="txtBuildTime" Background="{DynamicResource ThemeTextBoxBackground}" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" UndoLimit="64" IsReadOnly="True" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="4,0,4,0" />
+                            </StackPanel>
 
+                        </Grid>
                     </Grid>
                     <!--<DataGrid  x:Name="gridBuildReport"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Visible" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top">-->
 

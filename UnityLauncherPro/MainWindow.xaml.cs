@@ -54,7 +54,8 @@ namespace UnityLauncherPro
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
 
         string currentBuildReportProjectPath = null;
-        List<List<string>> buildReports = new List<List<string>>();
+        //List<List<string>> buildReports = new List<List<string>>();
+        List<BuildReport> buildReports = new List<BuildReport>(); // multiple reports, each contains their own stats and items
         int currentBuildReport = 0;
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
@@ -1844,6 +1845,7 @@ namespace UnityLauncherPro
         void RefreshBuildReports()
         {
             currentBuildReport = 0;
+            // delete all reports
             buildReports.Clear();
             UpdateBuildReportLabelAndButtons();
 
@@ -1853,7 +1855,7 @@ namespace UnityLauncherPro
             var logFile = Path.Combine(Tools.GetEditorLogsFolder(), "Editor.log");
             if (File.Exists(logFile) == false) return;
 
-            List<string> subList = null;
+            BuildReport singleReport = new BuildReport();
 
             try
             {
@@ -1861,9 +1863,13 @@ namespace UnityLauncherPro
                 {
                     using (StreamReader sr = new StreamReader(fs))
                     {
-                        bool collect = false;
+                        bool collectRows = false; // actual log rows
+                        bool collectStats = false; // category stat rows
+                        bool collectedBuildTime = false;
+
                         bool gotProjectPath = false;
 
+                        // TODO cleanup here
                         while (!sr.EndOfStream)
                         {
                             var line = sr.ReadLine();
@@ -1877,25 +1883,112 @@ namespace UnityLauncherPro
                             if (line == "-projectPath") gotProjectPath = true;
 
 
-                            // build report starts, TODO collect report header also
-                            if (collect == false && line.IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
+                            // build report starts
+                            if (collectRows == false && line.IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
                             {
                                 // init new list for this build report
-                                subList = new List<string>();
-                                collect = true;
+                                singleReport.Items = new List<BuildReportItem>();
+                                collectRows = true;
+
+                                // category report ends
+                                if (collectRows == true)
+                                {
+                                    collectStats = false;
+                                }
+
                                 continue;
                             }
 
-                            // build report ends
-                            if (collect == true && line.IndexOf("-------------------------------------------------------------------------------") == 0)
+                            // build report category stats starts
+                            if (collectStats == false && line.IndexOf("Uncompressed usage by category (Percentages based on user generated assets only):") == 0)
                             {
-                                buildReports.Add(subList);
-                                collect = false;
+                                // init new list for this build report
+                                singleReport.Stats = new List<BuildReportItem>();
+                                collectStats = true;
+                                continue;
                             }
 
-                            if (collect == true)
+                            // build report ends with elapsed time
+                            if (collectedBuildTime == false && line.IndexOf("Build completed with a result of 'Succeeded' in ") == 0)
                             {
-                                subList.Add(line);
+                                var ms = line.Substring(line.IndexOf("(") + 1, line.IndexOf(")") - line.IndexOf("(") - 1).Trim().Replace(" ms", "");
+                                singleReport.ElapsedTimeMS = long.Parse(ms);
+                                collectedBuildTime = true;
+
+                                // get streamingassets folder size and add to report, NOTE need to recalculate sizes then?
+                                long streamingAssetFolderSize = Tools.GetFolderSizeInBytes(Path.Combine(currentBuildReportProjectPath, "Assets", "StreamingAssets"));
+                                singleReport.Stats.Insert(singleReport.Stats.Count - 1, new BuildReportItem() { Category = "StreamingAssets", Size = Tools.GetBytesReadable(streamingAssetFolderSize) });
+
+                                // add all rows and stat rows for this build report
+                                buildReports.Add(singleReport);
+
+                                // make new
+                                singleReport = new BuildReport();
+                                continue;
+                            }
+
+                            // build report ends for rows
+                            if (collectRows == true && line.IndexOf("-------------------------------------------------------------------------------") == 0)
+                            {
+                                collectRows = false;
+                                collectedBuildTime = false;
+                                continue;
+                            }
+
+                            // parse and add this line to current build report
+                            if (collectRows == true)
+                            {
+                                var line2 = line.Trim();
+                                // get tab after kb
+                                var space1 = line2.IndexOf('\t');
+                                // get % between % and path
+                                var space2 = line2.IndexOf('%');
+
+                                if (space1 == -1 || space2 == -1)
+                                {
+                                    Console.WriteLine(("Failed to parse build report row: " + line2));
+                                    continue;
+                                }
+
+                                // create single row
+                                var r = new BuildReportItem();
+                                r.Size = line2.Substring(0, space1);
+                                r.Percentage = line2.Substring(space1 + 2, space2 - space1 - 1);
+                                r.Path = line2.Substring(space2 + 2, line2.Length - space2 - 2);
+                                r.Format = Path.GetExtension(r.Path);
+
+                                singleReport.Items.Add(r);
+                            }
+
+
+                            if (collectStats == true)
+                            {
+                                var line2 = line.Trim();
+                                // get 2xspace after category name
+                                var space1 = line2.IndexOf("   ");
+                                // get tab after first size
+                                var space2 = line2.IndexOf('\t');
+                                // last row didnt contain tab "Complete build size"
+                                bool lastRow = false;
+                                if (space2 == -1)
+                                {
+                                    space2 = line2.Length - 1;
+                                    lastRow = true;
+                                }
+
+                                if (space1 == -1 || space2 == -1)
+                                {
+                                    Console.WriteLine(("(2) Failed to parse build report row: " + line2));
+                                    continue;
+                                }
+
+                                // create single row
+                                var r = new BuildReportItem();
+                                r.Category = line2.Substring(0, space1).Trim();
+                                r.Size = line2.Substring(space1 + 2, space2 - space1 - 1).Trim();
+                                if (lastRow == false) r.Percentage = line2.Substring(space2 + 2, line2.Length - space2 - 2).Trim();
+
+                                singleReport.Stats.Add(r);
                             }
                         }
                     }
@@ -1905,17 +1998,39 @@ namespace UnityLauncherPro
             {
                 gridBuildReport.ItemsSource = null;
                 gridBuildReport.Items.Clear();
-                Console.WriteLine("Failed to open editor log: " + logFile);
+
+                gridBuildReportData.ItemsSource = null;
+                gridBuildReportData.Items.Clear();
+
+                txtBuildTime.Text = "";
+
+                Console.WriteLine("Failed to open editor log or other error in parsing: " + logFile);
                 return;
             }
 
-            if (buildReports.Count < 1 || buildReports[0].Count < 1)
+            // no build reports found
+            if (buildReports.Count == 0)
             {
                 gridBuildReport.ItemsSource = null;
                 gridBuildReport.Items.Clear();
+
+                gridBuildReportData.ItemsSource = null;
+                gridBuildReportData.Items.Clear();
+
+                txtBuildTime.Text = "";
+
                 Console.WriteLine("Failed to parse Editor.Log (probably no build reports there)");
                 return;
             }
+
+            // remove streaming assets info, keep only for last build (because older builds might have had different files there, we dont know)
+            for (int i = 0; i < buildReports.Count - 1; i++)
+            {
+                buildReports[i].Stats[buildReports[i].Stats.Count - 2].Size = "???";
+            }
+
+            // reverse build reports, so that latest is first
+            buildReports.Reverse();
 
             DisplayBuildReport(currentBuildReport);
         }
@@ -1942,38 +2057,17 @@ namespace UnityLauncherPro
                 currentBuildReport = buildReports.Count - 1;
             }
 
-            // create build report rows array
-            var reportSource = new List<BuildReportItem>();
-
-            // parse actual report rows
-            for (int i = 0, len = buildReports[currentBuildReport].Count; i < len; i++)
-            {
-                var d = buildReports[currentBuildReport][i].Trim();
-
-                // get tab after kb
-                var space1 = d.IndexOf('\t');
-                // get % between % and path
-                var space2 = d.IndexOf('%');
-
-                if (space1 == -1 || space2 == -1)
-                {
-                    Console.WriteLine("Failed to parse build report row: " + d);
-                    continue;
-                }
-
-                // create single row
-                var r = new BuildReportItem();
-                r.Size = d.Substring(0, space1);
-                r.Percentage = d.Substring(space1 + 2, space2 - space1 - 1);
-                r.Path = d.Substring(space2 + 2, d.Length - space2 - 2);
-                r.Format = Path.GetExtension(r.Path);
-
-                reportSource.Add(r);
-            }
-
             gridBuildReport.ItemsSource = null;
             gridBuildReport.Items.Clear();
-            gridBuildReport.ItemsSource = reportSource;
+            gridBuildReport.ItemsSource = buildReports[currentBuildReport].Items;
+
+            gridBuildReportData.ItemsSource = null;
+            gridBuildReportData.Items.Clear();
+            gridBuildReportData.ItemsSource = buildReports[currentBuildReport].Stats;
+
+            var time = TimeSpan.FromMilliseconds(buildReports[currentBuildReport].ElapsedTimeMS);
+            var dt = new DateTime(time.Ticks);
+            txtBuildTime.Text = dt.ToString("HH 'hours' mm 'minutes' ss 'seconds'");
 
             UpdateBuildReportLabelAndButtons();
         }
@@ -1983,11 +2077,13 @@ namespace UnityLauncherPro
             btnPrevBuildReport.IsEnabled = currentBuildReport > 0;
             btnNextBuildReport.IsEnabled = currentBuildReport < buildReports.Count - 1;
             lblBuildReportIndex.Content = (buildReports.Count == 0 ? 0 : (currentBuildReport + 1)) + "/" + (buildReports.Count);
+            txtBuildTime.Text = "";
         }
 
         private void BtnClearBuildReport_Click(object sender, RoutedEventArgs e)
         {
             gridBuildReport.ItemsSource = null;
+            gridBuildReportData.ItemsSource = null;
             currentBuildReport = 0;
             buildReports.Clear();
             UpdateBuildReportLabelAndButtons();
