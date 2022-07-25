@@ -1649,10 +1649,11 @@ namespace UnityLauncherPro
 
                 if (results == true)
                 {
+                    // TODO check if that folder already exists (automatic naming avoids it, but manual naming could cause it)
                     Console.WriteLine("Create project " + NewProject.newVersion + " : " + rootFolder);
                     if (string.IsNullOrEmpty(rootFolder)) return;
 
-                    var p = Tools.FastCreateProject(NewProject.newVersion, rootFolder, NewProject.newProjectName, NewProject.templateZipPath, NewProject.platformsForThisUnity, NewProject.selectedPlatform);
+                    var p = Tools.FastCreateProject(NewProject.newVersion, rootFolder, NewProject.newProjectName, NewProject.templateZipPath, NewProject.platformsForThisUnity, NewProject.selectedPlatform, (bool)chkUseInitScript.IsChecked, txtCustomInitFile.Text);
 
                     // add to list (just in case new project fails to start, then folder is already generated..)
                     if (p != null) AddNewProjectToList(p);
@@ -1675,6 +1676,7 @@ namespace UnityLauncherPro
                 {
                     newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
                 }
+                // TODO custom init file here also
                 var p = Tools.FastCreateProject(newVersion, rootFolder);
                 if (p != null) AddNewProjectToList(p);
             }
@@ -2749,6 +2751,12 @@ namespace UnityLauncherPro
                         return 0;
                 }
             }
+        }
+
+        private void btnExploreScriptsFolder_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO later this script should be inside some unity project, for easier updating..
+            Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts"));
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)

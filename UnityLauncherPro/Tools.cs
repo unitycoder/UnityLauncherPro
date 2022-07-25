@@ -187,7 +187,7 @@ namespace UnityLauncherPro
         }
 
         // NOTE holding alt key (when using alt+o) brings up unity project selector
-        public static Process LaunchProject(Project proj, DataGrid dataGridRef = null)
+        public static Process LaunchProject(Project proj, DataGrid dataGridRef = null, bool useInitScript = false)
         {
             // validate
             if (proj == null) return null;
@@ -251,6 +251,11 @@ namespace UnityLauncherPro
                 if (string.IsNullOrEmpty(projTargetPlatform) == false)
                 {
                     unitycommandlineparameters += " -buildTarget " + projTargetPlatform;
+                }
+
+                if (useInitScript == true)
+                {
+                    unitycommandlineparameters += " -executeMethod UnityLauncherProTools.InitProject.Init";
                 }
 
                 Console.WriteLine("Start process: " + cmd + " " + unitycommandlineparameters);
@@ -1037,7 +1042,8 @@ namespace UnityLauncherPro
             return null;
         }
 
-        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null, string[] platformsForThisUnity = null, string platform = null)
+        // TODO too many params..
+        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null, string[] platformsForThisUnity = null, string platform = null, bool useInitScript = false, string initScriptPath = null)
         {
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
@@ -1064,8 +1070,6 @@ namespace UnityLauncherPro
             // if we didnt have name yet
             if (string.IsNullOrEmpty(projectName) == true)
             {
-                //Console.WriteLine("version=" + version);
-                //Console.WriteLine("baseFolder=" + baseFolder);
                 projectName = GetSuggestedProjectName(version, baseFolder);
                 // failed getting new path a-z
                 if (projectName == null) return null;
@@ -1081,6 +1085,21 @@ namespace UnityLauncherPro
                 TarLib.Tar.ExtractTarGz(templateZipPath, newPath);
             }
 
+            // copy init file into project
+            if (useInitScript == true)
+            {
+                var initScriptFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", initScriptPath);
+                Console.WriteLine("initScriptFile: " + initScriptFile);
+                if (File.Exists(initScriptFile) == true)
+                {
+                    var editorTargetFolder = Path.Combine(baseFolder, projectName, "Assets", "Scripts", "Editor");
+                    Console.WriteLine(editorTargetFolder);
+                    if (Directory.Exists(editorTargetFolder) == false) Directory.CreateDirectory(editorTargetFolder);
+                    var targetScriptFile = Path.Combine(editorTargetFolder, initScriptPath);
+                    if (File.Exists(targetScriptFile) == false) File.Copy(initScriptFile, targetScriptFile);
+                }
+            }
+
             // launch empty project
             var proj = new Project();
             proj.Title = projectName;
@@ -1089,8 +1108,10 @@ namespace UnityLauncherPro
             proj.TargetPlatforms = platformsForThisUnity;
             proj.TargetPlatform = platform;
             proj.Modified = DateTime.Now;
-            var proc = LaunchProject(proj);
+
+            var proc = LaunchProject(proj, null, useInitScript);
             ProcessHandler.Add(proj, proc);
+            
             return proj;
         } // FastCreateProject
 
@@ -1628,7 +1649,7 @@ public static class UnityLauncherProTools
         internal static long GetFolderSizeInBytes(string currentBuildReportProjectPath)
         {
             if (Directory.Exists(currentBuildReportProjectPath) == false) return 0;
-            
+
             return DirSize(new DirectoryInfo(currentBuildReportProjectPath));
         }
 
