@@ -1855,7 +1855,7 @@ namespace UnityLauncherPro
             var logFile = Path.Combine(Tools.GetEditorLogsFolder(), "Editor.log");
             if (File.Exists(logFile) == false) return;
 
-            BuildReport singleReport = new BuildReport();
+            BuildReport singleReport = null;// new BuildReport();
 
             try
             {
@@ -1902,15 +1902,28 @@ namespace UnityLauncherPro
                             // build report category stats starts
                             if (collectStats == false && line.IndexOf("Uncompressed usage by category (Percentages based on user generated assets only):") == 0)
                             {
+                                // start new
+                                singleReport = new BuildReport();
+
                                 // init new list for this build report
                                 singleReport.Stats = new List<BuildReportItem>();
                                 collectStats = true;
                                 continue;
                             }
 
+                            if (collectStats == false && line.IndexOf("Do a clean build to view the Asset build report information.") == 0)
+                            {
+                                // dont start collecting, no build report
+                                collectStats = false;
+                                continue;
+                            }
+
                             // build report ends with elapsed time
                             if (collectedBuildTime == false && line.IndexOf("Build completed with a result of 'Succeeded' in ") == 0)
                             {
+                                // it wasnt clean build, no report
+                                if (singleReport == null) continue;
+
                                 var ms = line.Substring(line.IndexOf("(") + 1, line.IndexOf(")") - line.IndexOf("(") - 1).Trim().Replace(" ms", "");
                                 singleReport.ElapsedTimeMS = long.Parse(ms);
                                 collectedBuildTime = true;
@@ -1922,8 +1935,8 @@ namespace UnityLauncherPro
                                 // add all rows and stat rows for this build report
                                 buildReports.Add(singleReport);
 
-                                // make new
-                                singleReport = new BuildReport();
+                                // erase old
+                                singleReport = null;
                                 continue;
                             }
 
@@ -2077,13 +2090,13 @@ namespace UnityLauncherPro
             btnPrevBuildReport.IsEnabled = currentBuildReport > 0;
             btnNextBuildReport.IsEnabled = currentBuildReport < buildReports.Count - 1;
             lblBuildReportIndex.Content = (buildReports.Count == 0 ? 0 : (currentBuildReport + 1)) + "/" + (buildReports.Count);
-            txtBuildTime.Text = "";
         }
 
         private void BtnClearBuildReport_Click(object sender, RoutedEventArgs e)
         {
             gridBuildReport.ItemsSource = null;
             gridBuildReportData.ItemsSource = null;
+            txtBuildTime.Text = "";
             currentBuildReport = 0;
             buildReports.Clear();
             UpdateBuildReportLabelAndButtons();
