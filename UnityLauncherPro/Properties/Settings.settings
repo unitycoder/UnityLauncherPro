@@ -113,5 +113,11 @@
   &lt;string&gt;C:\Program Files\&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
+    <Setting Name="customInitFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">InitializeProject.cs</Value>
+    </Setting>
+    <Setting Name="useInitScript" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

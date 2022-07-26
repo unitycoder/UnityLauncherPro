@@ -453,5 +453,29 @@ namespace UnityLauncherPro.Properties {
                 this["rootFolders"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("InitializeProject.cs")]
+        public string customInitFile {
+            get {
+                return ((string)(this["customInitFile"]));
+            }
+            set {
+                this["customInitFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useInitScript {
+            get {
+                return ((bool)(this["useInitScript"]));
+            }
+            set {
+                this["useInitScript"] = value;
+            }
+        }
     }
 }

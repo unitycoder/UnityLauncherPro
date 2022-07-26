@@ -255,7 +255,7 @@ namespace UnityLauncherPro
 
                 if (useInitScript == true)
                 {
-                    unitycommandlineparameters += " -executeMethod UnityLauncherProTools.InitProject.Init";
+                    unitycommandlineparameters += " -executeMethod UnityLauncherProTools.InitializeProject.Init";
                 }
 
                 Console.WriteLine("Start process: " + cmd + " " + unitycommandlineparameters);
@@ -1111,7 +1111,7 @@ namespace UnityLauncherPro
 
             var proc = LaunchProject(proj, null, useInitScript);
             ProcessHandler.Add(proj, proc);
-            
+
             return proj;
         } // FastCreateProject
 

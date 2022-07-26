@@ -204,7 +204,7 @@
                 <ComboBox Grid.Column="2" x:Name="cmbNewProjectTemplate" DisplayMemberPath="Key" SelectedIndex="0" Margin="6,0,0,0" TabIndex="2" DropDownOpened="CmbNewProjectTemplate_DropDownOpened"  />
             </Grid>
 
-            <Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ThemeButtonBackground}" Margin="0" FontSize="10" Padding="5,0,5,3" />
+            <Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ThemeButtonForegroundDisabled}" Margin="0" FontSize="10" Padding="5,0,5,3" />
             <Grid HorizontalAlignment="Stretch" Margin="0,8,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

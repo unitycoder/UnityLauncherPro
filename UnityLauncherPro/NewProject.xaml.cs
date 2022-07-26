@@ -19,7 +19,7 @@ namespace UnityLauncherPro
         int previousSelectedTemplateIndex = -1;
         int previousSelectedModuleIndex = -1;
 
-        public NewProject(string unityVersion, string suggestedName, string targetFolder)
+        public NewProject(string unityVersion, string suggestedName, string targetFolder, bool nameIsLocked = false)
         {
             isInitializing = true;
             InitializeComponent();
@@ -27,6 +27,8 @@ namespace UnityLauncherPro
             // get version
             newVersion = unityVersion;
             newName = suggestedName;
+
+            txtNewProjectName.IsEnabled = !nameIsLocked;
 
             txtNewProjectName.Text = newName;
             lblNewProjectFolder.Content = targetFolder;

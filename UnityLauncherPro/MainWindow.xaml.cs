@@ -440,6 +440,9 @@ namespace UnityLauncherPro
                 txtShortcutBatchFileFolder.Text = Properties.Settings.Default.shortcutBatchFileFolder;
             }
 
+            chkUseInitScript.IsChecked = Properties.Settings.Default.useInitScript;
+            txtCustomInitFile.Text = Properties.Settings.Default.customInitFile;
+
         } // LoadSettings()
 
 
@@ -1600,9 +1603,12 @@ namespace UnityLauncherPro
             string rootFolder = txtRootFolderForNewProjects.Text;
 
             // if have targetfolder, then use that instead of quick folder
-            if (targetFolder != null && Directory.Exists(targetFolder))
+            if (targetFolder != null)
             {
-                rootFolder = targetFolder;
+                if (Directory.Exists(targetFolder))
+                {
+                    rootFolder = Directory.GetParent(targetFolder).FullName;
+                }
             }
             else
             {
@@ -1619,7 +1625,6 @@ namespace UnityLauncherPro
             // for new projects created from explorer, always ask for name
             if (chkAskNameForQuickProject.IsChecked == true || targetFolder != null)
             {
-                // ask name
                 string newVersion = null;
 
                 // if in maintab
@@ -1638,7 +1643,8 @@ namespace UnityLauncherPro
                     return;
                 }
 
-                NewProject modalWindow = new NewProject(newVersion, Tools.GetSuggestedProjectName(newVersion, rootFolder), rootFolder);
+                var suggestedName = targetFolder != null ? Path.GetFileName(targetFolder) : Tools.GetSuggestedProjectName(newVersion, rootFolder);
+                NewProject modalWindow = new NewProject(newVersion, suggestedName, rootFolder, targetFolder != null);
                 modalWindow.ShowInTaskbar = this == null;
                 modalWindow.WindowStartupLocation = this == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
                 modalWindow.Topmost = this == null;
@@ -2757,6 +2763,38 @@ namespace UnityLauncherPro
         {
             // TODO later this script should be inside some unity project, for easier updating..
             Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts"));
+        }
+
+        private void txtCustomInitFile_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Return: // pressed enter in theme file text box
+                    Properties.Settings.Default.customInitFile = txtCustomInitFile.Text;
+                    Properties.Settings.Default.Save();
+                    break;
+            }
+        }
+
+        private void txtCustomInitFile_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var s = (TextBox)sender;
+            Properties.Settings.Default.customInitFile = s.Text;
+            Properties.Settings.Default.Save();
+        }
+
+        private void chkUseInitScript_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+            Properties.Settings.Default.useInitScript = isChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            gridSettingsBg.Focus();
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)

@@ -7,7 +7,7 @@
 		xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:converters="clr-namespace:UnityLauncherPro.Converters" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized">
+        Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized" MouseDown="Window_MouseDown">
     <Window.Resources>
 
         <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>
@@ -1036,7 +1036,7 @@
 
             <!-- Tab: Settings -->
             <TabItem Header="Settings" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
-                <Grid>
+                <Grid x:Name="gridSettingsBg" Focusable="True">
                     <Grid.RowDefinitions>
                         <!-- top labels-->
                         <RowDefinition Height="28" />
@@ -1141,9 +1141,9 @@
                             </StackPanel>
 
                             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                                <CheckBox  x:Name="chkUseInitScript" Content="Use Init script for new projects" ToolTip="..." HorizontalAlignment="Left"/>
+                                <CheckBox  x:Name="chkUseInitScript" Content="Use Init script for new projects" ToolTip="..." HorizontalAlignment="Left" Checked="chkUseInitScript_Checked" Unchecked="chkUseInitScript_Checked"/>
                                 <!--<Label Content="Init script for new projects" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" />-->
-                                <TextBox x:Name="txtCustomInitFile" BorderBrush="Transparent" MinWidth="128" ToolTip="Default is InitProject.cs" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="InitProject.cs" PreviewKeyDown="TxtCustomThemeFile_PreviewKeyDown" />
+                                <TextBox x:Name="txtCustomInitFile" BorderBrush="Transparent" MinWidth="128" ToolTip="Default is InitProject.cs" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="InitializeProject.cs" PreviewKeyDown="txtCustomInitFile_PreviewKeyDown" LostFocus="txtCustomInitFile_LostFocus" />
                                 <Button Style="{StaticResource CustomButton}" ToolTip="Explore Scripts folder" x:Name="btnExploreScriptsFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnExploreScriptsFolder_Click" Margin="5,0,0,0"/>
                             </StackPanel>
 
