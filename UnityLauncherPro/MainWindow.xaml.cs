@@ -582,7 +582,7 @@ namespace UnityLauncherPro
             dataGridUpdates.ItemsSource = null;
             var task = GetUnityUpdates.Scan();
             var items = await task;
-            Console.WriteLine("CallGetUnityUpdates=" + items == null);
+            //Console.WriteLine("CallGetUnityUpdates=" + items == null);
             if (items == null) return;
             updatesSource = GetUnityUpdates.Parse(items);
             if (updatesSource == null) return;
@@ -1159,7 +1159,12 @@ namespace UnityLauncherPro
                 if (Tools.LaunchExplorer(logfolder) == false)
                 {
                     Console.WriteLine("Cannot open folder.." + logfolder);
+                    SetStatus("Cannot open folder: " + logfolder);
                 }
+            }
+            else
+            {
+                SetStatus("Folder does not exist: " + logfolder);
             }
         }
 
@@ -1170,7 +1175,11 @@ namespace UnityLauncherPro
 
         private void BtnOpenADBLogCat_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(adbLogCatArgs)) return;
+            if (string.IsNullOrEmpty(adbLogCatArgs))
+            {
+                SetStatus("ADB logcat args not set in Settings tab");
+                return;
+            }
 
             try
             {
@@ -1184,6 +1193,7 @@ namespace UnityLauncherPro
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+                SetStatus("Cannot launch ADB logcat..");
             }
         }
 
@@ -1261,6 +1271,7 @@ namespace UnityLauncherPro
             else
             {
                 Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
+                SetStatus("Failed getting Unity Installer URL for " + unity?.Version);
             }
         }
 
@@ -1461,6 +1472,7 @@ namespace UnityLauncherPro
                 catch (Exception ex)
                 {
                     Console.WriteLine("Error saving launcher arguments: " + ex);
+                    SetStatus("Error saving launcher arguments: " + ex.Message);
                 }
             }
             else if (e.Column.DisplayIndex == 6) // platform dropdown
@@ -1640,6 +1652,7 @@ namespace UnityLauncherPro
                 if (string.IsNullOrEmpty(newVersion))
                 {
                     Console.WriteLine("Missing selected unity version");
+                    SetStatus("Missing selected unity version (its null)");
                     return;
                 }
 
@@ -1968,6 +1981,7 @@ namespace UnityLauncherPro
                                 if (space1 == -1 || space2 == -1)
                                 {
                                     Console.WriteLine(("Failed to parse build report row: " + line2));
+                                    SetStatus("Failed to parse build report row: " + line2);
                                     continue;
                                 }
 
@@ -2000,6 +2014,7 @@ namespace UnityLauncherPro
                                 if (space1 == -1 || space2 == -1)
                                 {
                                     Console.WriteLine(("(2) Failed to parse build report row: " + line2));
+                                    SetStatus("(2) Failed to parse build report row: " + line2);
                                     continue;
                                 }
 
@@ -2026,6 +2041,7 @@ namespace UnityLauncherPro
                 txtBuildTime.Text = "";
 
                 Console.WriteLine("Failed to open editor log or other error in parsing: " + logFile);
+                SetStatus("Failed to open editor log or other error in parsing: " + logFile);
                 return;
             }
 
@@ -2041,6 +2057,7 @@ namespace UnityLauncherPro
                 txtBuildTime.Text = "";
 
                 Console.WriteLine("Failed to parse Editor.Log (probably no build reports there)");
+                SetStatus("Failed to parse Editor.Log (probably no build reports there)");
                 return;
             }
 
@@ -2183,6 +2200,7 @@ namespace UnityLauncherPro
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
+                        SetStatus("Failed to parse color value: " + row[1]);
                     }
 
                 }
@@ -2190,6 +2208,7 @@ namespace UnityLauncherPro
             else
             {
                 Console.WriteLine("Theme file not found: " + themeFile);
+                SetStatus("Theme file not found: " + themeFile);
             }
         }
 
@@ -2339,7 +2358,7 @@ namespace UnityLauncherPro
 
         void ValidateFolderFromTextbox(TextBox textBox)
         {
-            Console.WriteLine(textBox.Text);
+            //Console.WriteLine(textBox.Text);
             if (Directory.Exists(textBox.Text) == true)
             {
                 Properties.Settings.Default.shortcutBatchFileFolder = textBox.Text;
@@ -2627,6 +2646,7 @@ namespace UnityLauncherPro
             if (res == false)
             {
                 Console.WriteLine("Failed to create shortcut, maybe batch folder location is invalid..");
+                SetStatus("Failed to create shortcut, maybe batch folder location is invalid: " + txtShortcutBatchFileFolder.Text);
             }
         }
 
@@ -2795,6 +2815,39 @@ namespace UnityLauncherPro
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             gridSettingsBg.Focus();
+        }
+
+        void SetStatus(string msg)
+        {
+            txtStatus.Text = msg;
+        }
+
+        private void btnPatchHubConfig_Click(object sender, RoutedEventArgs e)
+        {
+            // read the config file from %APPDATA%
+            var configFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "UnityHub", "editors.json");
+
+            var result = MessageBox.Show("This will modify current " + configFile + " file. Are you sure you want to continue? (This cannot be undone, we dont know which 'manual:'-value was already set to 'false' (but it shouldnt break anything)", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result == MessageBoxResult.Yes)
+            {
+                if (File.Exists(configFile) == true)
+                {
+                    // read the config file
+                    var json = File.ReadAllText(configFile);
+                    // replace the manual:true with manual:false using regex
+                    json = json.Replace("\"manual\":true", "\"manual\":false");
+
+                    Console.WriteLine(json);
+
+                    // write the config file
+                    File.WriteAllText(configFile, json);
+                    SetStatus("editors.json file saved");
+                }
+            }
+            else
+            {
+                SetStatus("Cancelled");
+            }
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)

@@ -1015,14 +1015,14 @@
                             </DataGrid>
 
                             <StackPanel Grid.Column="1" Orientation="Vertical">
-                            <DataGrid  x:Name="gridBuildReportData"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalContentAlignment="Stretch">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Type" Binding="{Binding Category}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
-                                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
-                                    <DataGridTextColumn Header="%" Binding="{Binding Percentage}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
-                                </DataGrid.Columns>
-                                <local:BuildReportItem Category="Texture" Size="10.0 mb" Percentage="50.0%" />
-                            </DataGrid>
+                                <DataGrid  x:Name="gridBuildReportData"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalContentAlignment="Stretch">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding Category}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                                        <DataGridTextColumn Header="Size" Binding="{Binding Size}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                                        <DataGridTextColumn Header="%" Binding="{Binding Percentage}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                                    </DataGrid.Columns>
+                                    <local:BuildReportItem Category="Texture" Size="10.0 mb" Percentage="50.0%" />
+                                </DataGrid>
                                 <Label Content="Elapsed time:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
                                 <TextBox CaretBrush="#FFE2E2E2" x:Name="txtBuildTime" Background="{DynamicResource ThemeTextBoxBackground}" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" UndoLimit="64" IsReadOnly="True" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="4,0,4,0" />
                             </StackPanel>
@@ -1051,7 +1051,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- top labels -->
-                    <Label Grid.Row="0" Content="Unity Installation Parent Folders" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom" ToolTip="Search will try to find Unity installations under these folders"/>
+                    <Label Grid.Row="0" Content="Unity Installation(s) Parent Folder(s)" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom" ToolTip="Search will try to find Unity installations under these folders"/>
                     <Label x:Name="lblFoundXInstallations" Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                     <!-- locations list -->
                     <ListBox x:Name="lstRootFolders" Grid.Row="1" Background="{DynamicResource ThemeButtonBackground}" Margin="4,0,2,0" Foreground="{DynamicResource ThemeButtonForeground}" >
@@ -1146,6 +1146,10 @@
                                 <TextBox x:Name="txtCustomInitFile" BorderBrush="Transparent" MinWidth="128" ToolTip="Default is InitProject.cs" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="InitializeProject.cs" PreviewKeyDown="txtCustomInitFile_PreviewKeyDown" LostFocus="txtCustomInitFile_LostFocus" />
                                 <Button Style="{StaticResource CustomButton}" ToolTip="Explore Scripts folder" x:Name="btnExploreScriptsFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnExploreScriptsFolder_Click" Margin="5,0,0,0"/>
                             </StackPanel>
+
+                            <Button  x:Name="btnPatchHubConfig" ToolTip="Modifies json file to set 'manual:true' values into 'false', so that can add modules using Hub. NOTE: This cannot be reversed (not keeping track which values was already 'false')" Style="{StaticResource CustomButton}" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top"  Click="btnPatchHubConfig_Click">
+                                <Label Content="Patch Hub editors.json" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                            </Button>
 
                         </StackPanel>
                     </StackPanel>
