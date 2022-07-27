@@ -380,7 +380,8 @@ namespace UnityLauncherPro
         {
             if (string.IsNullOrEmpty(path)) return null;
 
-            if (File.Exists(path) == true)
+            // not needed for exe's in PATH
+            //if (File.Exists(path) == true)
             {
                 Process newProcess = null;
                 if (string.IsNullOrEmpty(param) == true)
@@ -1645,6 +1646,7 @@ public static class UnityLauncherProTools
 
             return true;
         }
+
 
         internal static long GetFolderSizeInBytes(string currentBuildReportProjectPath)
         {

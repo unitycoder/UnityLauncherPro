@@ -619,6 +619,7 @@
                                 <MenuItem x:Name="menuItemKillProcess" Header="Kill Process" Click="MenuItemKillProcess_Click" />
                                 <Separator/>
                                 <MenuItem x:Name="menuStartWebGLServer" Header="Start WebGL server" Click="MenuStartWebGLServer_Click" />
+                                <MenuItem x:Name="menuInstallLastAPK" Header="Install &amp; Run latest APK" Click="menuInstallLastAPK_Click" />
                                 <Separator/>
                                 <MenuItem Header="Build">
                                     <MenuItem x:Name="menuBatchBuildAndroid" Header="Android" Click="MenuBatchBuildAndroid_Click"/>

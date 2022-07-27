@@ -2843,11 +2843,87 @@ namespace UnityLauncherPro
                     File.WriteAllText(configFile, json);
                     SetStatus("editors.json file saved");
                 }
+                else
+                {
+                    SetStatus(configFile + " not found");
+                }
             }
             else
             {
                 SetStatus("Cancelled");
             }
+        }
+
+        private void menuInstallLastAPK_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+
+            var yamlFile = Path.Combine(proj.Path, "Library", "PlayerDataCache", "Android", "ScriptsOnlyCache.yaml");
+            if (File.Exists(yamlFile) == false)
+            {
+                SetStatus("No ScriptsOnlyCache.yaml file found");
+                return;
+            }
+            var yaml = File.ReadAllLines(yamlFile);
+            // loop rows until "playerPath:"
+            string playerPath = null;
+            foreach (var row in yaml)
+            {
+                if (row.IndexOf("playerPath:") > -1)
+                {
+                    // get the player path
+                    playerPath = row.Substring(row.IndexOf(":") + 1).Trim();
+                    break;
+                }
+            }
+
+            if (playerPath == null)
+            {
+                SetStatus("No playerPath found in ScriptsOnlyCache.yaml");
+                return;
+            }
+
+            // install the apk using ADB using cmd (-r = replace app)
+            var cmd = "cmd.exe";// /C adb install -r \"{playerPath}\"";
+            var pars = $"/C adb install -r \"{playerPath}\"";
+
+            string packageName = null;
+
+            // get package name from ProjectSettings.asset
+            var psPath = Path.Combine(proj.Path, "ProjectSettings", "ProjectSettings.asset");
+            if (File.Exists(psPath) == true)
+            {
+                // read project settings
+                var rows = File.ReadAllLines(psPath);
+
+                // search applicationIdentifier, Android:
+                for (int i = 0, len = rows.Length; i < len; i++)
+                {
+                    // skip rows until companyname
+                    if (rows[i].Trim().IndexOf("applicationIdentifier:") > -1)
+                    {
+                        var temp = rows[i + 1].Trim();
+                        if (temp.IndexOf("Android:") > -1)
+                        {
+                            // get package name
+                            packageName = temp.Substring(temp.IndexOf(":") + 1).Trim();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(packageName) == false)
+            {
+                pars += $" && adb shell monkey -p {packageName} 1";
+            }
+
+            // TODO start cmd minimized
+            Tools.LaunchExe(cmd, pars);
+            // get apk name from path
+            var apkName = Path.GetFileName(playerPath);
+            if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
+            SetStatus("Installed APK:" + apkName);
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
