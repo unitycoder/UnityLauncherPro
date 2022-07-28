@@ -106,9 +106,17 @@ namespace UnityLauncherPro
         }
 
 
-
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
+            // check if projectname already exists
+            var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
+            if (Directory.Exists(targetPath) == true)
+            {
+                System.Console.WriteLine("Project already exists");
+                return;
+            }
+
+
             templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
             selectedPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
             UpdateSelectedVersion();
@@ -194,7 +202,6 @@ namespace UnityLauncherPro
 
             // validate new projectname that it doesnt exists already
             var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
-            System.Console.WriteLine(targetPath);
             if (Directory.Exists(targetPath) == true)
             {
                 System.Console.WriteLine("Project name already exists");
