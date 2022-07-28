@@ -17,16 +17,28 @@
                         <Border x:Name="shortcutbutton" BorderThickness="0" BorderBrush="Black" Background="{TemplateBinding Background}">
                             <ContentPresenter Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                         </Border>
+
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="Background" Value="#FF494949" />
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}" />
+                                <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForeground}" />
                             </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="{DynamicResource ThemeButtonBackgroundDisabled}" />
+                                <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForegroundDisabled}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter  Property="Background" Value="{DynamicResource ThemeButtonBackgroundMouseOver}" />
+                                <Setter Property="Foreground"  Value="{DynamicResource ThemeBrightText}"/>
+                            </Trigger>
+                            <!--TODO fix highlight on mousedown-->
                             <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="Background" Value="#FF0F0F0F" />
+                                <Setter  Property="Background"  Value="{DynamicResource ThemeButtonBackgroundPressed}" />
+                                <Setter Property="Foreground"  Value="{DynamicResource ThemeBrightText}"/>
                             </Trigger>
                             <Trigger Property="IsFocused" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="{DynamicResource ThemeSystemHighlight}" />
-                                <Setter TargetName="shortcutbutton" Property="BorderThickness" Value="1" />
+                                <Setter  Property="BorderBrush"  Value="{DynamicResource ThemeSystemHighlight}" />
+                                <Setter  Property="BorderThickness" TargetName="shortcutbutton" Value="1" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -210,11 +222,11 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="0,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" TabIndex="4" >
-                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="Cancel"/>
+                <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject"  Margin="0,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" TabIndex="4" >
+                    <Label  Content="Cancel" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                 </Button>
-                <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="3,0,0,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click" TabIndex="3">
-                    <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Create"/>
+                <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Margin="3,0,0,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click" TabIndex="3">
+                    <Label Content="_Create" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                 </Button>
             </Grid>
         </StackPanel>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,10 +20,14 @@ namespace UnityLauncherPro
         int previousSelectedTemplateIndex = -1;
         int previousSelectedModuleIndex = -1;
 
+        static string targetFolder = null;
+
         public NewProject(string unityVersion, string suggestedName, string targetFolder, bool nameIsLocked = false)
         {
             isInitializing = true;
             InitializeComponent();
+
+            NewProject.targetFolder = targetFolder;
 
             // get version
             newVersion = unityVersion;
@@ -183,8 +188,27 @@ namespace UnityLauncherPro
             }
         }
 
-        private void TxtNewProjectName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void TxtNewProjectName_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (isInitializing == true) return;
+
+            // validate new projectname that it doesnt exists already
+            var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
+            System.Console.WriteLine(targetPath);
+            if (Directory.Exists(targetPath) == true)
+            {
+                System.Console.WriteLine("Project name already exists");
+                txtNewProjectName.BorderBrush = Brushes.Red; // not visible if focused
+                btnCreateNewProject.IsEnabled = false;
+            }
+            else
+            {
+                txtNewProjectName.BorderBrush = null;
+                btnCreateNewProject.IsEnabled = true;
+            }
+
+            System.Console.WriteLine("newProjectName: " + txtNewProjectName.Text);
+
             newProjectName = txtNewProjectName.Text;
         }
 

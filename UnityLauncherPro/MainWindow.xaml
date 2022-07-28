@@ -268,6 +268,7 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForegroundDisabled}" />
+                                <Setter Property="Background" Value="{DynamicResource ThemeButtonBackgroundDisabled}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
                                 <Setter TargetName="shortcutbutton" Property="Background" Value="{DynamicResource ThemeButtonBackgroundMouseOver}" />
