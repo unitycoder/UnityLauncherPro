@@ -1153,6 +1153,11 @@
                                 <Label Content="Patch Hub editors.json" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                             </Button>
 
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,6,0,0">
+                                <TextBox x:Name="txtWebglPort" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="80" ToolTip="Initial port for first local WebGL webserver process (next one will be +1)" Padding="0,3,0,0" TextChanged="txtWebglPort_TextChanged" HorizontalAlignment="Left" Text="50000" LostFocus="txtWebglPort_LostFocus" />
+                                <Label Content="Initial WebGL local server port" Foreground="{DynamicResource ThemeButtonForeground}" />
+                            </StackPanel>
+
                         </StackPanel>
                     </StackPanel>
 

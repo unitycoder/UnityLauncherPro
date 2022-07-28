@@ -1466,8 +1466,9 @@ public static class UnityLauncherProTools
             var webExe = Path.Combine(webglToolsPath, "SimpleWebServer.exe");
             if (File.Exists(webExe) == false) return;
 
-            // pick initial number for server, TODO make this default start port as setting field (later if needed..)
-            int port = 50000;
+            int port = MainWindow.webglPort;
+            if (port < 50000) port = 50000;
+            if (port > 65534) port = 65534;
 
             // check if this project already has server running and process is not closed
             if (webglServerProcesses.ContainsKey(port) && webglServerProcesses[port].HasExited == false)
@@ -1502,7 +1503,7 @@ public static class UnityLauncherProTools
                         if (objEndPoints[i].Port == port)
                         {
                             port++;
-                            if (port > 65535)
+                            if (port > 65534)
                             {
                                 Console.WriteLine("Failed to find open port..");
                                 isAvailable = false;

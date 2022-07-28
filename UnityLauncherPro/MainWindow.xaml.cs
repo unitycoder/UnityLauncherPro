@@ -443,8 +443,12 @@ namespace UnityLauncherPro
             chkUseInitScript.IsChecked = Properties.Settings.Default.useInitScript;
             txtCustomInitFile.Text = Properties.Settings.Default.customInitFile;
 
+            // load webgl port
+            txtWebglPort.Text = "" + Properties.Settings.Default.webglPort;
+            webglPort = Properties.Settings.Default.webglPort;
         } // LoadSettings()
 
+        internal static int webglPort = 50000;
 
         private void SaveSettingsOnExit()
         {
@@ -2361,6 +2365,7 @@ namespace UnityLauncherPro
             //Console.WriteLine(textBox.Text);
             if (Directory.Exists(textBox.Text) == true)
             {
+                // NOTE this saves for shortcutbat setting, so cannot be used for another fields
                 Properties.Settings.Default.shortcutBatchFileFolder = textBox.Text;
                 Properties.Settings.Default.Save();
                 textBox.BorderBrush = System.Windows.Media.Brushes.Transparent;
@@ -2368,8 +2373,31 @@ namespace UnityLauncherPro
             else // invalid format
             {
                 textBox.BorderBrush = System.Windows.Media.Brushes.Red;
-                //Properties.Settings.Default.shortcutBatchFileFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-                //Properties.Settings.Default.Save();
+            }
+        }
+
+        void ValidateIntRange(TextBox textBox, int min, int max)
+        {
+            int num = 0;
+            if (int.TryParse(textBox.Text, out num))
+            {
+                if (num >= min && num <= max)
+                {
+                    textBox.BorderBrush = null;
+                    // NOTE this saves for shortcutbat setting, so cannot be used for another fields
+                    Properties.Settings.Default.webglPort = num;
+                    Properties.Settings.Default.Save();
+                    textBox.BorderBrush = null;
+                    SetStatus("WebGL port set to " + num);
+                }
+                else
+                {
+                    textBox.BorderBrush = System.Windows.Media.Brushes.Red;
+                }
+            }
+            else
+            {
+                textBox.BorderBrush = System.Windows.Media.Brushes.Red;
             }
         }
 
@@ -2933,6 +2961,43 @@ namespace UnityLauncherPro
             var apkName = Path.GetFileName(playerPath);
             if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
             SetStatus("Installed APK:" + apkName);
+        }
+
+        private void txtWebglPort_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (isInitializing == true) return;
+
+            var port = txtWebglPort.Text;
+            if (port.Length > 0)
+            {
+                // use tryparse
+                int portInt;
+                if (int.TryParse(port, out portInt) == true)
+                {
+                    if (portInt >= 50000 && portInt <= 65534)
+                    {
+                        // save port
+                        Properties.Settings.Default.webglPort = portInt;
+                        Properties.Settings.Default.Save();
+                        webglPort = portInt;
+                    }
+                    else
+                    {
+                        // invalid port
+                        SetStatus("WebGL port must be between 50000 and 60000");
+                    }
+                }
+                else
+                {
+                    // invalid port
+                    SetStatus("WebGL port must be a number");
+                }
+            }
+        }
+
+        private void txtWebglPort_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ValidateIntRange((TextBox)sender, 50000, 65534);
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)

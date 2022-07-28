@@ -105,7 +105,6 @@ namespace UnityLauncherPro
             //lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
         }
 
-
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
             // check if projectname already exists

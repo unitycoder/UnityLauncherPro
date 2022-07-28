@@ -477,5 +477,17 @@ namespace UnityLauncherPro.Properties {
                 this["useInitScript"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50000")]
+        public int webglPort {
+            get {
+                return ((int)(this["webglPort"]));
+            }
+            set {
+                this["webglPort"] = value;
+            }
+        }
     }
 }
