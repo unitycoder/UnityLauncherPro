@@ -2750,10 +2750,18 @@ namespace UnityLauncherPro
                     case "Project":
                         return direction == ListSortDirection.Ascending ? ((Project)a).Title.CompareTo(((Project)b).Title) : ((Project)b).Title.CompareTo(((Project)a).Title);
                     case "Version":
+                        // handle null values
+                        if (((Project)a).Version == null && ((Project)b).Version == null) return 0;
+                        if (((Project)a).Version == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((Project)b).Version == null) return direction == ListSortDirection.Ascending ? 1 : -1;
                         return direction == ListSortDirection.Ascending ? Tools.VersionAsInt(((Project)a).Version).CompareTo(Tools.VersionAsInt(((Project)b).Version)) : Tools.VersionAsInt(((Project)b).Version).CompareTo(Tools.VersionAsInt(((Project)a).Version));
                     case "Path":
                         return direction == ListSortDirection.Ascending ? ((Project)a).Path.CompareTo(((Project)b).Path) : ((Project)b).Path.CompareTo(((Project)a).Path);
                     case "Modified":
+                        // handle null values
+                        if (((Project)a).Modified == null && ((Project)b).Modified == null) return 0;
+                        if (((Project)a).Modified == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((Project)b).Modified == null) return direction == ListSortDirection.Ascending ? 1 : -1;
                         return direction == ListSortDirection.Ascending ? ((DateTime)((Project)a).Modified).CompareTo(((Project)b).Modified) : ((DateTime)((Project)b).Modified).CompareTo(((Project)a).Modified);
                     case "Arguments":
                         // handle null values
@@ -2913,6 +2921,7 @@ namespace UnityLauncherPro
                 }
             }
 
+            // launch app
             if (string.IsNullOrEmpty(packageName) == false)
             {
                 pars += $" && adb shell monkey -p {packageName} 1";

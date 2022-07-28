@@ -14,7 +14,6 @@ namespace UnityLauncherPro
         // convert target platform name into valid buildtarget platform name, NOTE this depends on unity version, now only 2019 and later are supported
         public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Win64" }, { "StandaloneWindows", "Win" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
 
-        // TODO separate scan and folders
         public static List<Project> Scan(bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false)
         {
             List<Project> projectsFound = new List<Project>();
@@ -152,6 +151,8 @@ namespace UnityLauncherPro
             } // for each registry root
 
             // NOTE sometimes projects are in wrong order, seems to be related to messing up your unity registry, the keys are received in created order (so if you had removed/modified them manually, it might return wrong order instead of 0 - 40)
+            // thats why need to sort projects list by modified date
+            projectsFound.Sort((x, y) => y.Modified.Value.CompareTo(x.Modified.Value));
 
             return projectsFound;
         } // Scan()
