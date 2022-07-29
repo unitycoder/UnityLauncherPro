@@ -2863,7 +2863,7 @@ namespace UnityLauncherPro
             // read the config file from %APPDATA%
             var configFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "UnityHub", "editors.json");
 
-            var result = MessageBox.Show("This will modify current " + configFile + " file. Are you sure you want to continue? (This cannot be undone, we dont know which 'manual:'-value was already set to 'false' (but it shouldnt break anything)", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show("This will modify current " + configFile + " file. Are you sure you want to continue? (This cannot be undone, we dont know which 'manual:'-value was already set to 'false' (but it shouldnt break anything))", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
                 if (File.Exists(configFile) == true)
