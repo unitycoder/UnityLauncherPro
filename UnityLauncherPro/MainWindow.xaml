@@ -510,7 +510,13 @@
 
         <!-- menubar -->
         <Grid Grid.Row="0" UseLayoutRounding="False">
-            <Rectangle Fill="{DynamicResource ThemeDarkMenuBar}" MouseDown="OnRectangleMouseDown" />
+            <Button  PreviewMouseDoubleClick="Button_PreviewMouseDoubleClick">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Rectangle Fill="{DynamicResource ThemeDarkMenuBar}" MouseDown="OnRectangleMouseDown"/>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
             <Image Source="Images/icon.png" RenderOptions.BitmapScalingMode="NearestNeighbor" HorizontalAlignment="Left" Width="16" Height="16" Margin="4,0,0,0" SnapsToDevicePixels="True" UseLayoutRounding="True" />
             <Label Content="UnityLauncherPro" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="{DynamicResource ThemeMainTitle}" FontSize="12" HorizontalAlignment="Left"  />
             <!-- minimize -->
@@ -1149,7 +1155,7 @@
                                 <Button Style="{StaticResource CustomButton}" ToolTip="Explore Scripts folder" x:Name="btnExploreScriptsFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnExploreScriptsFolder_Click" Margin="5,0,0,0"/>
                             </StackPanel>
 
-                            <Button  x:Name="btnPatchHubConfig" ToolTip="Modifies json file to set 'manual:true' values into 'false', so that can add modules using Hub. NOTE: This cannot be reversed (not keeping track which values was already 'false')" Style="{StaticResource CustomButton}" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top"  Click="btnPatchHubConfig_Click">
+                            <Button  x:Name="btnPatchHubConfig" ToolTip="Modifies json file to set 'manual:true' values into 'false', so that can add modules using Hub. NOTE: This cannot be reversed (not keeping track which values were already 'false')" Style="{StaticResource CustomButton}" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top"  Click="btnPatchHubConfig_Click">
                                 <Label Content="Patch Hub editors.json" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                             </Button>
 

@@ -3000,6 +3000,14 @@ namespace UnityLauncherPro
             ValidateIntRange((TextBox)sender, 50000, 65534);
         }
 
+        private void Button_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // only can do restore here, we dont want accidental maximize (max window not really needed)
+            if (this.WindowState == WindowState.Maximized) this.WindowState = WindowState.Normal;
+            // NOTE workaround for grid not focused when coming back from minimized window
+            Tools.SetFocusToGrid(gridRecent, GetSelectedProjectIndex());
+        }
+
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
         //{
         //    var folder = Tools.BrowseForOutputFolder("Select unitypackage Templates folder");

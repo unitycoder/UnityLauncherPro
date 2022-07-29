@@ -107,9 +107,9 @@ namespace UnityLauncherPro
 
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
-            // check if projectname already exists
+            // check if projectname already exists (only if should be automatically created name)
             var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
-            if (Directory.Exists(targetPath) == true)
+            if (txtNewProjectName.IsEnabled == true && Directory.Exists(targetPath) == true)
             {
                 System.Console.WriteLine("Project already exists");
                 return;
@@ -246,7 +246,8 @@ namespace UnityLauncherPro
             // new row selected, generate new project name for this version
             var k = gridAvailableVersions.SelectedItem as UnityInstallation;
             newVersion = k.Version;
-            GenerateNewName();
+            // no new name, if field is locked (because its folder name then)
+            if (txtNewProjectName.IsEnabled == true) GenerateNewName();
 
             // update templates list for selected unity version
             UpdateTemplatesDropDown(k.Path);
