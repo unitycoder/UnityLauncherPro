@@ -189,11 +189,10 @@ namespace UnityLauncherPro
         // NOTE holding alt key (when using alt+o) brings up unity project selector
         public static Process LaunchProject(Project proj, DataGrid dataGridRef = null, bool useInitScript = false)
         {
-            // validate
+            Console.WriteLine("Launching project " + proj.Title + " at " + proj.Path);
+
             if (proj == null) return null;
             if (Directory.Exists(proj.Path) == false) return null;
-
-            Console.WriteLine("Launching project " + proj.Title + " at " + proj.Path);
 
             // check if this project path has unity already running? (from lock file or process) 
             // NOTE this check only works if previous unity instance was started while we were running
@@ -223,6 +222,16 @@ namespace UnityLauncherPro
                 return null;
             }
 
+            // check if project version has changed? (list is not updated, for example pulled new version from git)
+            var version = GetProjectVersion(proj.Path);
+
+            if (string.IsNullOrEmpty(version) == false && version != proj.Version)
+            {
+                Console.WriteLine("Project version has changed from " + proj.Version + " to " + version);
+                proj.Version = version;
+            }
+
+            // check if we have this unity version installed
             var unityExePath = GetUnityExePath(proj.Version);
             if (unityExePath == null)
             {
@@ -230,10 +239,7 @@ namespace UnityLauncherPro
                 return null;
             }
 
-            // SetStatus("Launching project in Unity " + version);
-
             Process newProcess = new Process();
-
             try
             {
                 var cmd = "\"" + unityExePath + "\"";
