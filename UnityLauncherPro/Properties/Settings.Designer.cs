@@ -489,5 +489,42 @@ namespace UnityLauncherPro.Properties {
                 this["webglPort"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
+            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" />")]
+        public global::System.Collections.Specialized.StringCollection projectPaths {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["projectPaths"]));
+            }
+            set {
+                this["projectPaths"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool override40ProjectCount {
+            get {
+                return ((bool)(this["override40ProjectCount"]));
+            }
+            set {
+                this["override40ProjectCount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        public int maxProjectCount {
+            get {
+                return ((int)(this["maxProjectCount"]));
+            }
+            set {
+                this["maxProjectCount"] = value;
+            }
+        }
     }
 }

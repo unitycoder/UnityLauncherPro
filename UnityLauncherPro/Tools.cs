@@ -186,13 +186,39 @@ namespace UnityLauncherPro
             }
         }
 
+        // this runs before unity editor starts, so the project is not yet in registry (unless it already was there)
+        public static void AddProjectToHistory(string projectPath)
+        {
+            if (Properties.Settings.Default.projectPaths.Contains(projectPath) == false)
+            {
+                // TODO do we need to add as first?
+                Properties.Settings.Default.projectPaths.Insert(0, projectPath);
+
+                // remove last item, if too many
+                if (Properties.Settings.Default.projectPaths.Count > MainWindow.maxProjectCount)
+                {
+                    Properties.Settings.Default.projectPaths.RemoveAt(Properties.Settings.Default.projectPaths.Count - 1);
+                }
+
+                Console.WriteLine("AddProjectToHistory, count: " + Properties.Settings.Default.projectPaths.Count);
+
+                // TODO no need to save everytime?
+                Properties.Settings.Default.Save();
+
+                // TODO need to add into recent grid also? if old items disappear?
+            }
+        }
+
         // NOTE holding alt key (when using alt+o) brings up unity project selector
-        public static Process LaunchProject(Project proj, DataGrid dataGridRef = null, bool useInitScript = false)
+        public static Process LaunchProject(Project proj, DataGrid dataGridRef = null, bool useInitScript = false, bool upgrade = false)
         {
             Console.WriteLine("Launching project " + proj.Title + " at " + proj.Path);
 
             if (proj == null) return null;
             if (Directory.Exists(proj.Path) == false) return null;
+
+            // add this project to recent projects in preferences TODO only if enabled +40 projecs
+            AddProjectToHistory(proj.Path);
 
             // check if this project path has unity already running? (from lock file or process) 
             // NOTE this check only works if previous unity instance was started while we were running
@@ -222,20 +248,23 @@ namespace UnityLauncherPro
                 return null;
             }
 
-            // check if project version has changed? (list is not updated, for example pulled new version from git)
-            var version = GetProjectVersion(proj.Path);
-
-            if (string.IsNullOrEmpty(version) == false && version != proj.Version)
+            // if its upgrade, we dont want to check current version
+            if (upgrade == false)
             {
-                Console.WriteLine("Project version has changed from " + proj.Version + " to " + version);
-                proj.Version = version;
+                // check if project version has changed? (list is not updated, for example pulled new version from git)
+                var version = GetProjectVersion(proj.Path);
+                if (string.IsNullOrEmpty(version) == false && version != proj.Version)
+                {
+                    Console.WriteLine("Project version has changed from " + proj.Version + " to " + version);
+                    proj.Version = version;
+                }
             }
 
             // check if we have this unity version installed
             var unityExePath = GetUnityExePath(proj.Version);
             if (unityExePath == null)
             {
-                DisplayUpgradeDialog(proj, null);
+                DisplayUpgradeDialog(proj, null, useInitScript);
                 return null;
             }
 
@@ -735,7 +764,7 @@ namespace UnityLauncherPro
         */
         }
 
-        public static void DisplayUpgradeDialog(Project proj, MainWindow owner)
+        public static void DisplayUpgradeDialog(Project proj, MainWindow owner, bool useInitScript = false)
         {
             UpgradeWindow modalWindow = new UpgradeWindow(proj.Version, proj.Path, proj.Arguments);
             modalWindow.ShowInTaskbar = owner == null;
@@ -756,7 +785,7 @@ namespace UnityLauncherPro
 
                 // inject new version for this item
                 proj.Version = upgradeToVersion;
-                var proc = LaunchProject(proj);
+                var proc = LaunchProject(proj, null, false);
             }
             else
             {

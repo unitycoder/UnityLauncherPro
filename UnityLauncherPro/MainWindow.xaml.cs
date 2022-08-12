@@ -47,6 +47,9 @@ namespace UnityLauncherPro
         int lastSelectedProjectIndex = 0;
         Mutex myMutex;
         ThemeEditor themeEditorWindow;
+        internal static int webglPort = 50000;
+        internal static int maxProjectCount = 40;
+
 
         string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
         string adbLogCatArgs = defaultAdbLogCatArgs;
@@ -108,8 +111,14 @@ namespace UnityLauncherPro
                 }
             }
 
-            // update projects list
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
+            // TEST erase custom history data
+            //Properties.Settings.Default.projectPaths = null;
+            //Properties.Settings.Default.Save();
+
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths);
+
+            Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
+
             gridRecent.Items.Clear();
             gridRecent.ItemsSource = projectsSource;
 
@@ -203,7 +212,7 @@ namespace UnityLauncherPro
                     {
                         if (Directory.Exists(Path.Combine(proj.Path, "Assets")) == true)
                         {
-                            Tools.DisplayUpgradeDialog(proj, null);
+                            Tools.DisplayUpgradeDialog(proj, null, false);
                         }
                         else // no assets folder here, then its new project
                         {
@@ -446,9 +455,19 @@ namespace UnityLauncherPro
             // load webgl port
             txtWebglPort.Text = "" + Properties.Settings.Default.webglPort;
             webglPort = Properties.Settings.Default.webglPort;
-        } // LoadSettings()
 
-        internal static int webglPort = 50000;
+            txtMaxProjectCount.Text = Properties.Settings.Default.maxProjectCount.ToString();
+            chkOverride40ProjectCount.IsChecked = Properties.Settings.Default.override40ProjectCount;
+            if ((bool)chkOverride40ProjectCount.IsChecked)
+            {
+                maxProjectCount = Properties.Settings.Default.maxProjectCount;
+            }
+            else
+            {
+                maxProjectCount = 40;
+            }
+
+        } // LoadSettings()
 
         private void SaveSettingsOnExit()
         {
@@ -619,10 +638,12 @@ namespace UnityLauncherPro
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
+            //            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths);
             gridRecent.ItemsSource = projectsSource;
             // focus back
             Tools.SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
+            Console.WriteLine("RefreshRecentProjects: " + projectsSource.Count);
         }
 
         //
@@ -963,7 +984,7 @@ namespace UnityLauncherPro
             var proj = GetSelectedProject();
             if (proj == null) return;
 
-            Tools.DisplayUpgradeDialog(proj, this);
+            Tools.DisplayUpgradeDialog(proj, this, false);
         }
 
         private void GridRecent_Loaded(object sender, RoutedEventArgs e)
@@ -2376,7 +2397,7 @@ namespace UnityLauncherPro
             }
         }
 
-        void ValidateIntRange(TextBox textBox, int min, int max)
+        bool ValidateIntRange(TextBox textBox, int min, int max)
         {
             int num = 0;
             if (int.TryParse(textBox.Text, out num))
@@ -2384,11 +2405,7 @@ namespace UnityLauncherPro
                 if (num >= min && num <= max)
                 {
                     textBox.BorderBrush = null;
-                    // NOTE this saves for shortcutbat setting, so cannot be used for another fields
-                    Properties.Settings.Default.webglPort = num;
-                    Properties.Settings.Default.Save();
-                    textBox.BorderBrush = null;
-                    SetStatus("WebGL port set to " + num);
+                    return true;
                 }
                 else
                 {
@@ -2399,6 +2416,7 @@ namespace UnityLauncherPro
             {
                 textBox.BorderBrush = System.Windows.Media.Brushes.Red;
             }
+            return false;
         }
 
         private void ChkHumanFriendlyDateTime_Checked(object sender, RoutedEventArgs e)
@@ -2967,37 +2985,29 @@ namespace UnityLauncherPro
         {
             if (isInitializing == true) return;
 
-            var port = txtWebglPort.Text;
-            if (port.Length > 0)
+            var ok = ValidateIntRange((TextBox)sender, 50000, 65534);
+            if (ok)
             {
-                // use tryparse
-                int portInt;
-                if (int.TryParse(port, out portInt) == true)
-                {
-                    if (portInt >= 50000 && portInt <= 65534)
-                    {
-                        // save port
-                        Properties.Settings.Default.webglPort = portInt;
-                        Properties.Settings.Default.Save();
-                        webglPort = portInt;
-                    }
-                    else
-                    {
-                        // invalid port
-                        SetStatus("WebGL port must be between 50000 and 60000");
-                    }
-                }
-                else
-                {
-                    // invalid port
-                    SetStatus("WebGL port must be a number");
-                }
+                var num = int.Parse(((TextBox)sender).Text);
+                webglPort = num;
+                Properties.Settings.Default.webglPort = num;
+                Properties.Settings.Default.Save();
+                SetStatus("WebGL port set to " + num);
             }
         }
 
         private void txtWebglPort_LostFocus(object sender, RoutedEventArgs e)
         {
-            ValidateIntRange((TextBox)sender, 50000, 65534);
+            // TODO duplicate code
+            var ok = ValidateIntRange((TextBox)sender, 50000, 65534);
+            if (ok)
+            {
+                var num = int.Parse(((TextBox)sender).Text);
+                webglPort = num;
+                Properties.Settings.Default.webglPort = num;
+                Properties.Settings.Default.Save();
+                SetStatus("WebGL port set to " + num);
+            }
         }
 
         private void Button_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -3007,6 +3017,48 @@ namespace UnityLauncherPro
             // NOTE workaround for grid not focused when coming back from minimized window
             Tools.SetFocusToGrid(gridRecent, GetSelectedProjectIndex());
         }
+
+        private void chkOverride40ProjectCount_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            Properties.Settings.Default.override40ProjectCount = (bool)((CheckBox)sender).IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void txtMaxProjectCount_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            var ok = ValidateIntRange((TextBox)sender, 10, 1024);
+            maxProjectCount = 40;
+            if (ok)
+            {
+                var num = int.Parse(((TextBox)sender).Text);
+                maxProjectCount = num;
+                Properties.Settings.Default.maxProjectCount = num;
+                Properties.Settings.Default.Save();
+                SetStatus("Max project count set to " + num);
+            }
+        }
+
+        private void txtMaxProjectCount_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            // TODO duplicate code
+            var ok = ValidateIntRange((TextBox)sender, 10, 1024);
+            maxProjectCount = 40;
+            if (ok)
+            {
+                var num = int.Parse(((TextBox)sender).Text);
+                maxProjectCount = num;
+                Properties.Settings.Default.maxProjectCount = num;
+                Properties.Settings.Default.Save();
+                SetStatus("Max project count set to " + num);
+            }
+        }
+
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
         //{

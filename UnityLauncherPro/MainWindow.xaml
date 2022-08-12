@@ -677,6 +677,12 @@
                                     <Label Content="Initial WebGL local server port" Foreground="{DynamicResource ThemeButtonForeground}" />
                                 </StackPanel>
 
+                                <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,6,0,0">
+                                    <CheckBox  x:Name="chkOverride40ProjectCount" Content="Maximum recent projects count" ToolTip="(Experimental) Save all recent projects to preferences and merge into recent list" HorizontalAlignment="Left" Checked="chkOverride40ProjectCount_Checked" Unchecked="chkOverride40ProjectCount_Checked"/>
+                                    <TextBox x:Name="txtMaxProjectCount" Text="128" ToolTip="40 projects come from Unity registry, rest are added and taken from preferences data" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="50"  Padding="0,3,0,0" HorizontalAlignment="Left" Margin="10,0,0,0" LostFocus="txtMaxProjectCount_LostFocus" TextChanged="txtMaxProjectCount_TextChanged" />
+                                    <Label Content="(Experimental!)" Foreground="{DynamicResource ThemeButtonForeground}" />
+                                </StackPanel>
+
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
