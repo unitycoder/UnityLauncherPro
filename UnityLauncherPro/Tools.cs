@@ -191,7 +191,7 @@ namespace UnityLauncherPro
         {
             // fix backslashes
             projectPath = projectPath.Replace('\\', '/');
-            
+
             if (Properties.Settings.Default.projectPaths.Contains(projectPath) == false)
             {
                 // TODO do we need to add as first?
@@ -767,6 +767,18 @@ namespace UnityLauncherPro
         */
         }
 
+        // NOTE this doesnt modify the 2nd line in ProjectVersion.txt
+        static void SaveProjectVersion(Project proj)
+        {
+            var settingsPath = Path.Combine(proj.Path, "ProjectSettings", "ProjectVersion.txt");
+            if (File.Exists(settingsPath))
+            {
+                var versionRows = File.ReadAllLines(settingsPath);
+                versionRows[0] = "m_EditorVersion: " + proj.Version;
+                File.WriteAllLines(settingsPath, versionRows);
+            }
+        }
+
         public static void DisplayUpgradeDialog(Project proj, MainWindow owner, bool useInitScript = false)
         {
             UpgradeWindow modalWindow = new UpgradeWindow(proj.Version, proj.Path, proj.Arguments);
@@ -786,9 +798,12 @@ namespace UnityLauncherPro
                 // get selected version to upgrade for
                 Console.WriteLine("Upgrade to " + upgradeToVersion);
 
-                // inject new version for this item
+                // inject new version for this item, TODO inject version to ProjectSettings file, so then no alert from unity wrong version dialog
                 proj.Version = upgradeToVersion;
-                var proc = LaunchProject(proj, null, false);
+                SaveProjectVersion(proj);
+                var proc = LaunchProject(proj, dataGridRef: null, useInitScript: false, upgrade: true);
+
+                // TODO update datagrid row for new version
             }
             else
             {
