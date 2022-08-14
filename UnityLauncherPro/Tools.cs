@@ -189,6 +189,9 @@ namespace UnityLauncherPro
         // this runs before unity editor starts, so the project is not yet in registry (unless it already was there)
         public static void AddProjectToHistory(string projectPath)
         {
+            // fix backslashes
+            projectPath = projectPath.Replace('\\', '/');
+            
             if (Properties.Settings.Default.projectPaths.Contains(projectPath) == false)
             {
                 // TODO do we need to add as first?

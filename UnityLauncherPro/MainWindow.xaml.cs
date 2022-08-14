@@ -2312,7 +2312,7 @@ namespace UnityLauncherPro
                 var cmb = (ComboBox)sender;
                 //Console.WriteLine(cmb.SelectedValue);
                 var p = GetSelectedProject();
-                if (p != null) p.TargetPlatform = cmb.SelectedValue.ToString();
+                if (p != null && p.TargetPlatform!=null) p.TargetPlatform = cmb.SelectedValue.ToString();
             }
             catch (Exception ex)
             {
@@ -3024,6 +3024,14 @@ namespace UnityLauncherPro
 
             Properties.Settings.Default.override40ProjectCount = (bool)((CheckBox)sender).IsChecked;
             Properties.Settings.Default.Save();
+            if ((bool)chkOverride40ProjectCount.IsChecked)
+            {
+                maxProjectCount = Properties.Settings.Default.maxProjectCount;
+            }
+            else
+            {
+                maxProjectCount = 40;
+            }
         }
 
         private void txtMaxProjectCount_LostFocus(object sender, RoutedEventArgs e)
@@ -3046,7 +3054,7 @@ namespace UnityLauncherPro
         {
             if (this.IsActive == false) return; // dont run code on window init
 
-            // TODO duplicate code
+            // TODO remove duplicate code
             var ok = ValidateIntRange((TextBox)sender, 10, 1024);
             maxProjectCount = 40;
             if (ok)

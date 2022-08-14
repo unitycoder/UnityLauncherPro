@@ -54,6 +54,7 @@ namespace UnityLauncherPro
                         }
 
                         var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform);
+                        //Console.WriteLine(projectPath+" "+p.TargetPlatform);
 
                         // if want to hide project and folder path for screenshot
                         //p.Title = "Example Project ";
@@ -91,7 +92,7 @@ namespace UnityLauncherPro
                         }
                     }
 
-                    // if not found, add
+                    // if not found from full history list, add
                     if (found == false)
                     {
                         var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform);
@@ -102,12 +103,21 @@ namespace UnityLauncherPro
 
             // NOTE sometimes projects are in wrong order, seems to be related to messing up your unity registry, the keys are received in created order (so if you had removed/modified them manually, it might return wrong order instead of 0 - 40)
             // thats why need to sort projects list by modified date
-            projectsFound.Sort((x, y) => y.Modified.Value.CompareTo(x.Modified.Value));
+            // sort by modified date, projects without modified date are put to last, NOTE: this would remove projects without modified date (if they become last items, before trimming list on next step)
+            projectsFound.Sort((x, y) =>
+            {
+                if (x.Modified == null && y.Modified == null) return -1; // was 0
+                if (x.Modified == null) return 1;
+                if (y.Modified == null) return -1;
+                return y.Modified.Value.CompareTo(x.Modified.Value);
+                //return x.Modified.Value.CompareTo(y.Modified.Value); // BUG this breaks something, so that last item platform is wrong (for project that is missing from disk) ?
+            });
+            //projectsFound.Sort((x, y) => y.Modified.Value.CompareTo(x.Modified.Value));
 
             // trim list to max amount TODO only if enabled in settings
             if (projectsFound.Count > MainWindow.maxProjectCount)
             {
-                Console.WriteLine("Trimming projects list to " + MainWindow.maxProjectCount + " projects");
+                //Console.WriteLine("Trimming projects list to " + MainWindow.maxProjectCount + " projects");
                 projectsFound.RemoveRange(MainWindow.maxProjectCount, projectsFound.Count - MainWindow.maxProjectCount);
             }
 
@@ -116,8 +126,9 @@ namespace UnityLauncherPro
 
         static Project GetProjectInfo(string projectPath, bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false)
         {
-            // first check if whole folder exists, if not, skip
             bool folderExists = Directory.Exists(projectPath);
+
+            // if displaying missing folders are disabled, and folder doesnt exists, skip this project
             if (showMissingFolders == false && folderExists == false) return null;
 
             string projectName = "";
@@ -163,10 +174,11 @@ namespace UnityLauncherPro
                 }
             }
 
-            string targetPlatform = "";
+            string targetPlatform = null;
             if (showTargetPlatform == true)
             {
                 targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : null;
+                //if (projectPath.Contains("Shader")) Console.WriteLine(projectPath + " targetPlatform=" + targetPlatform);
             }
 
             var p = new Project();
@@ -197,7 +209,6 @@ namespace UnityLauncherPro
 
             // bubblegum(TM) solution, fill available platforms for this unity version, for this project
             p.TargetPlatforms = Tools.GetPlatformsForUnityVersion(projectVersion);
-
             p.folderExists = folderExists;
             return p;
         }

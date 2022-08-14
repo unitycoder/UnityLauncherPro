@@ -668,9 +668,12 @@
                                     <Button Style="{StaticResource CustomButton}" ToolTip="Explore Scripts folder" x:Name="btnExploreScriptsFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnExploreScriptsFolder_Click" Margin="5,0,0,0"/>
                                 </StackPanel>
 
-                                <Button  x:Name="btnPatchHubConfig" ToolTip="Modifies json file to set 'manual:true' values into 'false', so that can add modules using Hub. NOTE: This cannot be reversed (not keeping track which values were already 'false')" Style="{StaticResource CustomButton}" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top"  Click="btnPatchHubConfig_Click">
-                                    <Label Content="Patch Hub editors.json" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-                                </Button>
+                                <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,6,0,0">
+                                    <Button  x:Name="btnPatchHubConfig" ToolTip="Modifies json file to set 'manual:true' values into 'false', so that can add modules using Hub. NOTE: This cannot be reversed (not keeping track which values were already 'false')" Style="{StaticResource CustomButton}" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top"  Click="btnPatchHubConfig_Click">
+                                        <Label Content="Patch Hub editors.json" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    </Button>
+                                    <Label Content="*If want to install modeules from Hub" Foreground="{DynamicResource ThemeButtonForeground}" />
+                                </StackPanel>
 
                                 <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,6,0,0">
                                     <TextBox x:Name="txtWebglPort" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="80" ToolTip="Initial port for first local WebGL webserver process (next one will be +1)" Padding="0,3,0,0" TextChanged="txtWebglPort_TextChanged" HorizontalAlignment="Left" Text="50000" LostFocus="txtWebglPort_LostFocus" />
