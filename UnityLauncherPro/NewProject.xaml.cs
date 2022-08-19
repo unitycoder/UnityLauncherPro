@@ -275,5 +275,10 @@ namespace UnityLauncherPro
         {
             previousSelectedModuleIndex = cmbNewProjectPlatform.SelectedIndex;
         }
+
+        private void gridAvailableVersions_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            BtnCreateNewProject_Click(null, null);
+        }
     }
 }

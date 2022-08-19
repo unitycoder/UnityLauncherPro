@@ -223,7 +223,7 @@ namespace UnityLauncherPro
             // add this project to recent projects in preferences TODO only if enabled +40 projecs
             AddProjectToHistory(proj.Path);
 
-            // check if this project path has unity already running? (from lock file or process) 
+            // check if this project path has unity already running? (from process) 
             // NOTE this check only works if previous unity instance was started while we were running
             if (ProcessHandler.IsRunning(proj.Path))
             {
