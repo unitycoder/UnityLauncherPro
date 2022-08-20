@@ -144,6 +144,12 @@ namespace UnityLauncherPro
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
         {
             Tools.SetFocusToGrid(gridAvailableVersions);
+
+            // bolded for current item
+            DataGridRow row = (DataGridRow)((DataGrid)sender).ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
+            if (row == null) return;
+            row.Foreground = Brushes.White;
+            row.FontWeight = FontWeights.Bold;
         }
 
         private void GridAvailableVersions_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -162,6 +168,5 @@ namespace UnityLauncherPro
             upgradeVersion = k.Value.Key;
             DialogResult = true;
         }
-
     }
 }

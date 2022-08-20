@@ -258,7 +258,7 @@ namespace UnityLauncherPro
         {
             // set initial default row color
             DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
-            // if now unitys available
+            // if no unitys available
             if (row == null) return;
             //row.Background = Brushes.Green;
             row.Foreground = Brushes.White;
@@ -276,9 +276,15 @@ namespace UnityLauncherPro
             previousSelectedModuleIndex = cmbNewProjectPlatform.SelectedIndex;
         }
 
-        private void gridAvailableVersions_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void gridAvailableVersions_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            BtnCreateNewProject_Click(null, null);
+            // check that we clicked actually on a row
+            var src = VisualTreeHelper.GetParent((DependencyObject)e.OriginalSource);
+            var srcType = src.GetType();
+            if (srcType == typeof(ContentPresenter))
+            {
+                BtnCreateNewProject_Click(null, null);
+            }
         }
     }
 }
