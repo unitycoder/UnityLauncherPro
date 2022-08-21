@@ -1132,6 +1132,13 @@ namespace UnityLauncherPro
                     var proc = Tools.LaunchProject(proj);
                     //ProcessHandler.Add(proj, proc);
                     break;
+                case Key.Delete:
+                    //    // TODO if have enabled deleting projects in settings, NOTE: this would then require undo also (if accidentally delete projects from list with few keypresses, the context menu is less accident prone)
+                    //    // if edit mode, dont override keys
+                    if (IsEditingCell(gridRecent) == true) return;
+                    e.Handled = true;
+                    //    MenuRemoveProject_Click(null, null);
+                    break;
                 default:
                     break;
             }
@@ -2312,7 +2319,7 @@ namespace UnityLauncherPro
                 var cmb = (ComboBox)sender;
                 //Console.WriteLine(cmb.SelectedValue);
                 var p = GetSelectedProject();
-                if (p != null && p.TargetPlatform!=null) p.TargetPlatform = cmb.SelectedValue.ToString();
+                if (p != null && p.TargetPlatform != null) p.TargetPlatform = cmb.SelectedValue.ToString();
             }
             catch (Exception ex)
             {
@@ -2607,6 +2614,8 @@ namespace UnityLauncherPro
 
         private void MenuRemoveProject_Click(object sender, RoutedEventArgs e)
         {
+            // delete if enabled in settings
+
             var proj = GetSelectedProject();
             if (proj == null) return;
             if (GetProjects.RemoveRecentProject(proj.Path))

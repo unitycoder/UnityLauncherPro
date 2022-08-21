@@ -144,8 +144,8 @@
                                     <MenuItem x:Name="menuBatchBuildAndroid" Header="Android" Click="MenuBatchBuildAndroid_Click"/>
                                     <MenuItem x:Name="menuBatchBuildIOS" Header="IOS" Click="MenuBatchBuildIOS_Click"/>
                                 </MenuItem>
-                                <!--<Separator/>
-                                <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />-->
+                                <Separator/>
+                                <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 

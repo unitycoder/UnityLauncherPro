@@ -213,8 +213,11 @@ namespace UnityLauncherPro
             return p;
         }
 
+        // removes project from unity registry recent projects, OR if its our custom list, remove from there
         public static bool RemoveRecentProject(string projectPathToRemove)
         {
+            bool result = false;
+
             var hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
 
             // check each version path
@@ -254,13 +257,30 @@ namespace UnityLauncherPro
                         {
                             Console.WriteLine("Deleted registery item: " + valueName + " projectPath=" + projectPath);
                             key.DeleteValue(valueName);
-                            return true;
+                            //return true;
+                            result = true;
+                            // TODO should break both loops
+                            //break;
+                            goto jumpCustomHistory;
                         }
 
                     } // valid key
                 } // each key
             } // for each registry root
-            return false;
+
+        jumpCustomHistory:
+            // check if its in our custom list, NOTE should only do if custom list is enabled
+            if (Properties.Settings.Default.projectPaths.Contains(projectPathToRemove))
+            {
+                Properties.Settings.Default.projectPaths.Remove(projectPathToRemove);
+                Properties.Settings.Default.Save();
+                Console.WriteLine("Deleted recent history item: " + projectPathToRemove + " from custom list");
+                //return true;
+                result = true;
+            }
+
+
+            return result;
         } // RemoveRecentProject()
 
     } // class
