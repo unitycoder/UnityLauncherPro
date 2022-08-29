@@ -1981,9 +1981,18 @@ namespace UnityLauncherPro
                                 singleReport.ElapsedTimeMS = long.Parse(ms);
                                 collectedBuildTime = true;
 
-                                // get streamingassets folder size and add to report, NOTE need to recalculate sizes then?
-                                long streamingAssetFolderSize = Tools.GetFolderSizeInBytes(Path.Combine(currentBuildReportProjectPath, "Assets", "StreamingAssets"));
-                                singleReport.Stats.Insert(singleReport.Stats.Count - 1, new BuildReportItem() { Category = "StreamingAssets", Size = Tools.GetBytesReadable(streamingAssetFolderSize) });
+                                if (string.IsNullOrEmpty(currentBuildReportProjectPath) == false)
+                                {
+                                    // get streamingassets folder size and add to report, NOTE need to recalculate sizes then?
+                                    string streamingAssetPath = Path.Combine(currentBuildReportProjectPath, "Assets", "StreamingAssets");
+                                    var streamingAssetFolderSize = Tools.GetFolderSizeInBytes(streamingAssetPath);
+                                    singleReport.Stats.Insert(singleReport.Stats.Count - 1, new BuildReportItem() { Category = "StreamingAssets", Size = Tools.GetBytesReadable(streamingAssetFolderSize) });
+                                }
+                                else
+                                {
+                                    // this can happen if editor log file was overwritten with another running editor? (so that start of the log file doesnt contain project path)
+                                    Console.WriteLine("Failed to get project path from build report..");
+                                }
 
                                 // add all rows and stat rows for this build report
                                 buildReports.Add(singleReport);
@@ -2062,7 +2071,7 @@ namespace UnityLauncherPro
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 gridBuildReport.ItemsSource = null;
                 gridBuildReport.Items.Clear();
@@ -2073,7 +2082,8 @@ namespace UnityLauncherPro
                 txtBuildTime.Text = "";
 
                 Console.WriteLine("Failed to open editor log or other error in parsing: " + logFile);
-                SetStatus("Failed to open editor log or other error in parsing: " + logFile);
+                Console.WriteLine(e);
+                SetStatus("Failed to open editor log or other parsing error..");
                 return;
             }
 

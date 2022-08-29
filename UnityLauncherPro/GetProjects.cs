@@ -77,8 +77,7 @@ namespace UnityLauncherPro
             // scan info for custom folders (if not already on the list)
             if (AllProjectPaths != null)
             {
-                // custom full list (may contain duplicates)
-                //foreach (var p in projectsFound)
+                // iterate custom full project history
                 foreach (var projectPath in AllProjectPaths)
                 {
                     // check if registry list contains this path
@@ -92,7 +91,7 @@ namespace UnityLauncherPro
                         }
                     }
 
-                    // if not found from full history list, add
+                    // if not found from full history list, add to projects list
                     if (found == false)
                     {
                         var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform);

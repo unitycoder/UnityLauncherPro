@@ -1704,6 +1704,7 @@ public static class UnityLauncherProTools
 
         internal static long GetFolderSizeInBytes(string currentBuildReportProjectPath)
         {
+            // FIXME: 0 is not really correct for missing folder..
             if (Directory.Exists(currentBuildReportProjectPath) == false) return 0;
 
             return DirSize(new DirectoryInfo(currentBuildReportProjectPath));
