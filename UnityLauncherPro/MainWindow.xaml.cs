@@ -989,8 +989,8 @@ namespace UnityLauncherPro
 
         private void GridRecent_Loaded(object sender, RoutedEventArgs e)
         {
-            //Console.WriteLine("GridRecent_Loaded");
             Tools.SetFocusToGrid(gridRecent);
+            SetStatus("Ready (" + projectsSource.Count + " projects)");
         }
 
         private void BtnExploreUnity_Click(object sender, RoutedEventArgs e)
