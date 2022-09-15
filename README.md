@@ -34,7 +34,7 @@ https://forum.unity.com/threads/unity-launcher-launch-correct-unity-versions-for
 https://github.com/unitycoder/UnityLauncherPro/wiki
 
 ### Development
-See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro/tree/dev
+See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro/tree/dev <br>
 Pre-releases are sometimes available from dev branch: https://github.com/unitycoder/UnityLauncherPro/releases
 
 ### Screenshots
