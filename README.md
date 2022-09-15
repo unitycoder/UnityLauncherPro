@@ -7,6 +7,7 @@ Handle all your Unity versions and Projects easily!
 ## Features
 - Automagically Open Projects with Correct Unity Version
 - Display Recent Projects list with last modified date and project version info
+- List more than 40 recent projects!
 - Quickly Explore Project Folders
 - List installed Unity versions, can easily Run, Explore installation folder, View release notes
 - Download Missing Unity Versions in Browser
@@ -34,6 +35,7 @@ https://github.com/unitycoder/UnityLauncherPro/wiki
 
 ### Development
 See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro/tree/dev
+Pre-releases are sometimes available from dev branch: https://github.com/unitycoder/UnityLauncherPro/releases
 
 ### Screenshots
 
