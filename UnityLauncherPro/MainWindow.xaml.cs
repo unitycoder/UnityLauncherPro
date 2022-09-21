@@ -50,7 +50,6 @@ namespace UnityLauncherPro
         internal static int webglPort = 50000;
         internal static int maxProjectCount = 40;
 
-
         string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
         string adbLogCatArgs = defaultAdbLogCatArgs;
 
@@ -1496,16 +1495,27 @@ namespace UnityLauncherPro
                 // save arguments to projectsettings folder
                 string outputFile = Path.Combine(projectPath, projSettingsFolder, launcherArgumentsFile);
 
-                try
+                if (string.IsNullOrEmpty(newcellValue.Trim()) == true)
                 {
-                    StreamWriter sw = new StreamWriter(outputFile);
-                    sw.WriteLine(newcellValue);
-                    sw.Close();
+                    // its empty value, so we remove the file (to avoid wasting time reading empty file)
+                    if (File.Exists(outputFile))
+                    {
+                        File.Delete(outputFile);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine("Error saving launcher arguments: " + ex);
-                    SetStatus("Error saving launcher arguments: " + ex.Message);
+                    try
+                    {
+                        StreamWriter sw = new StreamWriter(outputFile);
+                        sw.WriteLine(newcellValue);
+                        sw.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error saving launcher arguments: " + ex);
+                        SetStatus("Error saving launcher arguments: " + ex.Message);
+                    }
                 }
             }
             else if (e.Column.DisplayIndex == 6) // platform dropdown
