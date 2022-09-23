@@ -59,6 +59,7 @@ namespace UnityLauncherPro
                     DateTime? installDate = Tools.GetLastModifiedTime(dataFolder);
                     UnityInstallation unity = new UnityInstallation();
                     unity.Version = version;
+                    unity.VersionCode = Tools.VersionAsInt(version); // cached version code
                     unity.Path = exePath;
                     unity.Installed = installDate;
                     unity.IsPreferred = (version == MainWindow.preferredVersion);
@@ -83,7 +84,7 @@ namespace UnityLauncherPro
             } // all root folders
 
             // sort by version
-            results.Sort((s1, s2) => Tools.VersionAsInt(s2.Version).CompareTo(Tools.VersionAsInt(s1.Version)));
+            results.Sort((s1, s2) => s2.VersionCode.CompareTo(s1.VersionCode));
 
             return results.ToArray();
         } // scan()

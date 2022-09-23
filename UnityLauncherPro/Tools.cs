@@ -658,7 +658,7 @@ namespace UnityLauncherPro
         {
             string result = null;
 
-            // add current version to list
+            // add current version to list, to sort it with others
             allAvailable.Add(currentVersion);
 
             // sort list
@@ -675,58 +675,34 @@ namespace UnityLauncherPro
             return result;
         }
 
-        // string to integer for sorting by version 2017.1.5f1 > 2017010501
+        // returns version as integer, for easier sorting between versions: 2019.4.19f1 = 2019041901
         public static int VersionAsInt(string version)
         {
             int result = 0;
-            if (string.IsNullOrEmpty(version)) return result;
 
-            // cleanup 32bit version name
+            // cleanup 32bit version name, TODO is this needed anymore?
             string cleanVersion = version.Replace("(32-bit)", "");
 
-            // remove a,b,f,p
-            cleanVersion = cleanVersion.Replace("a", ".");
-            cleanVersion = cleanVersion.Replace("b", ".");
-            cleanVersion = cleanVersion.Replace("c1", "");
-            cleanVersion = cleanVersion.Replace("f", ".");
-            cleanVersion = cleanVersion.Replace("p", ".");
+            // remove a (alpha),b (beta),f (final?),p (path),c (china final)
+            cleanVersion = cleanVersion.Replace("a", ".1.");
+            cleanVersion = cleanVersion.Replace("b", ".2.");
+            cleanVersion = cleanVersion.Replace("c", ".3."); // NOTE this was 'c1'
+            cleanVersion = cleanVersion.Replace("f", ".4.");
+            cleanVersion = cleanVersion.Replace("p", ".5.");
 
             // split values
             string[] splitted = cleanVersion.Split('.');
-            if (splitted != null && splitted.Length > 0)
+            if (splitted.Length > 1)
             {
                 int multiplier = 1;
                 for (int i = 0, length = splitted.Length; i < length; i++)
                 {
-                    int n = int.Parse(splitted[splitted.Length - 1 - i]);
+                    int n = int.Parse(splitted[length - 1 - i]);
                     result += n * multiplier;
-                    multiplier *= 100;
+                    multiplier *= 10;
                 }
             }
             return result;
-        }
-
-        private static string FindNearestVersionFromSimilarVersions(string version, IEnumerable<string> allAvailable)
-        {
-            Dictionary<string, string> stripped = new Dictionary<string, string>();
-            var enumerable = allAvailable as string[] ?? allAvailable.ToArray();
-
-            foreach (var t in enumerable)
-            {
-                stripped.Add(new Regex("[a-zA-z]").Replace(t, "."), t);
-            }
-
-            var comparableVersion = new Regex("[a-zA-z]").Replace(version, ".");
-            if (!stripped.ContainsKey(comparableVersion))
-            {
-                stripped.Add(comparableVersion, version);
-            }
-
-            var comparables = stripped.Keys.OrderBy(x => x).ToList();
-            var actualIndex = comparables.IndexOf(comparableVersion);
-
-            if (actualIndex < stripped.Count - 1) return stripped[comparables[actualIndex + 1]];
-            return null;
         }
 
         // https://stackoverflow.com/a/1619103/5452781
