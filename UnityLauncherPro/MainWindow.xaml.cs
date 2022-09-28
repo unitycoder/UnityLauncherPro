@@ -908,9 +908,24 @@ namespace UnityLauncherPro
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             var win = (Window)sender;
-            Properties.Settings.Default.windowWidth = (int)win.Width;
-            Properties.Settings.Default.windowHeight = (int)win.Height;
+            //Properties.Settings.Default.windowWidth = (int)win.Width;
+            //Properties.Settings.Default.windowHeight = (int)win.Height;
+            // save new size instead, to fix DPI scaling issue
+            Properties.Settings.Default.windowWidth = (int)e.NewSize.Width;
+            Properties.Settings.Default.windowHeight = (int)e.NewSize.Height;
             Properties.Settings.Default.Save();
+
+            //Console.WriteLine("Window_SizeChanged: " + win.Width + "x" + win.Height + " e:" + e.NewSize.Width + "x" + e.NewSize.Height);
+
+            //// get current screen DPI
+            //PresentationSource source = PresentationSource.FromVisual(this);
+            //double dpiX, dpiY;
+            //if (source != null)
+            //{
+            //    dpiX = 96.0 * source.CompositionTarget.TransformToDevice.M11;
+            //    dpiY = 96.0 * source.CompositionTarget.TransformToDevice.M22;
+            //    Console.WriteLine("new dpi: " + dpiX + "x" + dpiY);
+            //}
         }
 
         private void BtnLaunchProject_Click(object sender, RoutedEventArgs e)
