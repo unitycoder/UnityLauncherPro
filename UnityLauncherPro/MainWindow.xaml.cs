@@ -608,6 +608,9 @@ namespace UnityLauncherPro
             if (items == null) return;
             updatesSource = GetUnityUpdates.Parse(items);
             if (updatesSource == null) return;
+
+
+
             dataGridUpdates.ItemsSource = updatesSource;
         }
 
@@ -908,33 +911,17 @@ namespace UnityLauncherPro
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             var win = (Window)sender;
-            //Properties.Settings.Default.windowWidth = (int)win.Width;
-            //Properties.Settings.Default.windowHeight = (int)win.Height;
             // save new size instead, to fix DPI scaling issue
             Properties.Settings.Default.windowWidth = (int)e.NewSize.Width;
             Properties.Settings.Default.windowHeight = (int)e.NewSize.Height;
             Properties.Settings.Default.Save();
-
-            //Console.WriteLine("Window_SizeChanged: " + win.Width + "x" + win.Height + " e:" + e.NewSize.Width + "x" + e.NewSize.Height);
-
-            //// get current screen DPI
-            //PresentationSource source = PresentationSource.FromVisual(this);
-            //double dpiX, dpiY;
-            //if (source != null)
-            //{
-            //    dpiX = 96.0 * source.CompositionTarget.TransformToDevice.M11;
-            //    dpiY = 96.0 * source.CompositionTarget.TransformToDevice.M22;
-            //    Console.WriteLine("new dpi: " + dpiX + "x" + dpiY);
-            //}
         }
 
         private void BtnLaunchProject_Click(object sender, RoutedEventArgs e)
         {
             var proj = GetSelectedProject();
             var proc = Tools.LaunchProject(proj, gridRecent);
-
             //ProcessHandler.Add(proj, proc);
-
             Tools.SetFocusToGrid(gridRecent);
         }
 
@@ -2791,13 +2778,79 @@ namespace UnityLauncherPro
             Clipboard.SetText(path);
         }
 
+        private void dataGridUpdates_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            SortHandlerUpdates(sender, e);
+        }
+
+        // TODO combine similar methods
+        void SortHandlerUpdates(object sender, DataGridSortingEventArgs e)
+        {
+            DataGridColumn column = e.Column;
+
+            //Console.WriteLine("Sorted by " + column.Header);
+
+            IComparer comparer = null;
+
+            // prevent the built-in sort from sorting
+            e.Handled = true;
+
+            ListSortDirection direction = (column.SortDirection != ListSortDirection.Ascending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
+
+            //set the sort order on the column
+            column.SortDirection = direction;
+
+            //use a ListCollectionView to do the sort.
+            ListCollectionView lcv = (ListCollectionView)CollectionViewSource.GetDefaultView(dataGridUpdates.ItemsSource);
+
+            Console.WriteLine("Sorted by " + column.Header + " " + direction);
+
+            comparer = new CustomUpdatesSort(direction, column.Header.ToString());
+
+            //apply the sort
+            lcv.CustomSort = comparer;
+        }
+
+        public class CustomUpdatesSort : IComparer
+        {
+            private ListSortDirection direction;
+            private string sortBy;
+
+            public CustomUpdatesSort(ListSortDirection direction, string sortBy)
+            {
+                this.direction = direction;
+                this.sortBy = sortBy;
+            }
+
+            public int Compare(Object a, Object b)
+            {
+                switch (sortBy)
+                {
+                    case "Version":
+                        // handle null values
+                        if (((Updates)a).Version == null && ((Updates)b).Version == null) return 0;
+                        if (((Updates)a).Version == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((Updates)b).Version == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? Tools.VersionAsInt(((Updates)a).Version).CompareTo(Tools.VersionAsInt(((Updates)b).Version)) : Tools.VersionAsInt(((Updates)b).Version).CompareTo(Tools.VersionAsInt(((Updates)a).Version));
+                    case "Released":
+                        // handle null values
+                        if (((Updates)a).ReleaseDate == null && ((Updates)b).ReleaseDate == null) return 0;
+                        if (((Updates)a).ReleaseDate == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((Updates)b).ReleaseDate == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? ((DateTime)((Updates)a).ReleaseDate).CompareTo(((Updates)b).ReleaseDate) : ((DateTime)((Updates)b).ReleaseDate).CompareTo(((Updates)a).ReleaseDate);
+                    default:
+                        return 0;
+                }
+            }
+        }
+
         private void gridRecent_Sorting(object sender, DataGridSortingEventArgs e)
         {
-            SortHandler(sender, e);
+            SortHandlerRecentProjects(sender, e);
         }
 
         // https://stackoverflow.com/a/2130557/5452781
-        void SortHandler(object sender, DataGridSortingEventArgs e)
+        void SortHandlerRecentProjects(object sender, DataGridSortingEventArgs e)
         {
             DataGridColumn column = e.Column;
 
@@ -3111,7 +3164,6 @@ namespace UnityLauncherPro
                 SetStatus("Max project count set to " + num);
             }
         }
-
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
         //{
