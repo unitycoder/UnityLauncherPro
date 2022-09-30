@@ -268,7 +268,7 @@ namespace UnityLauncherPro
 
         void FilterUnitys()
         {
-            _filterString = txtSearchBoxUnity.Text;
+            _filterString = txtSearchBoxUnity.Text.Trim();
             ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUnitys.ItemsSource);
             collection.Filter = UnitysFilter;
             if (dataGridUnitys.Items.Count > 0)
@@ -297,7 +297,20 @@ namespace UnityLauncherPro
         private bool UpdatesFilter(object item)
         {
             Updates unity = item as Updates;
-            return (unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+            bool haveSearchString = string.IsNullOrEmpty(_filterString) == false;
+            bool matchString = unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+
+            bool checkedAlphas = (bool)chkAlphas.IsChecked;
+            bool checkedBetas = (bool)chkBetas.IsChecked;
+
+            bool matchAlphas = checkedAlphas && unity.Version.IndexOf("a", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+            bool matchBetas = checkedBetas && unity.Version.IndexOf("b", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+
+            // TODO there must be simpler way : D
+            if (checkedAlphas && checkedBetas) return haveSearchString ? (matchString && (matchAlphas || matchBetas)) : (matchAlphas || matchBetas);
+            if (checkedAlphas) return haveSearchString ? matchString && matchAlphas : matchAlphas;
+            if (checkedBetas) return haveSearchString ? matchString && matchBetas : matchBetas;
+            return matchString;
         }
 
         private bool UnitysFilter(object item)
@@ -3163,6 +3176,11 @@ namespace UnityLauncherPro
                 Properties.Settings.Default.Save();
                 SetStatus("Max project count set to " + num);
             }
+        }
+
+        private void chkAlphas_Checked(object sender, RoutedEventArgs e)
+        {
+            FilterUpdates();
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
