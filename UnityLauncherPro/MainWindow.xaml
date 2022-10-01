@@ -10,6 +10,7 @@
         Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized" MouseDown="Window_MouseDown">
     <Window.Resources>
         <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>
+        <converters:ReleaseDateConverter x:Key="releaseDateConverter"/>
     </Window.Resources>
 
     <!-- UI -->
@@ -338,7 +339,6 @@
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUpdates}" Value="">
                                                 <Setter Property="Visibility" Value="Hidden"/>
-
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUpdates}" Value="{x:Null}">
                                                 <Setter Property="Visibility" Value="Hidden"/>
@@ -350,8 +350,10 @@
                         </Button>
                     </Grid>
 
-                    <CheckBox x:Name="chkAlphas" Content="Alpha" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,6,0,0" Checked="chkAlphas_Checked" Unchecked="chkAlphas_Checked"/>
-                    <CheckBox x:Name="chkBetas" Content="Beta" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="300,6,0,0" Unchecked="chkAlphas_Checked" Checked="chkAlphas_Checked"/>
+                    <RadioButton x:Name="rdoAll" Content="All" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,2,0,0" Checked="rdoAll_Checked" IsChecked="True" GroupName="groupUpdateFilter" />
+                    <RadioButton x:Name="rdoLTS" Content="LTS" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="287,2,0,0" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
+                    <RadioButton x:Name="rdoAlphas" Content="Alpha" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="340,2,0,0" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
+                    <RadioButton x:Name="rdoBetas" Content="Beta" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="400,2,0,0" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
 
                     <Button Style="{StaticResource CustomButton}" ToolTip="Fetch released versions" x:Name="btnRefreshUpdatesList" Content="⟳" Height="22" Width="26" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="OnGetUnityUpdatesClick"/>
                     <DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUpdates_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUpdates_PreviewMouseDoubleClick" Sorting="dataGridUpdates_Sorting">
@@ -359,7 +361,17 @@
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                         </DataGrid.CommandBindings>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}"  MinWidth="100" Header="Released" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding ReleaseDate, Converter={StaticResource releaseDateConverter}}" ClipboardContentBinding="{x:Null}"  MinWidth="100" Header="Released" IsReadOnly="True">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <TextBlock Text="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
                             <DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="222">
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">

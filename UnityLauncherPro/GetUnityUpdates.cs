@@ -52,13 +52,14 @@ namespace UnityLauncherPro
             if (receivedList == null && receivedList.Length < 1) return null;
             Array.Reverse(receivedList);
             var updates = new List<Updates>();
-            // parse into data
+            // parse into data, TODO remove duplicates
             for (int i = 0, len = receivedList.Length; i < len; i++)
             {
                 var row = receivedList[i].Split(',');
                 var versionTemp = row[6].Trim('"');
+                if (versionTemp.Length < 1) continue;
                 var u = new Updates();
-                u.ReleaseDate = DateTime.ParseExact(row[3], "MM/dd/yyyy", CultureInfo.InvariantCulture); //DateTime ? lastUpdated = Tools.GetLastModifiedTime(csprojFile);
+                u.ReleaseDate = DateTime.ParseExact(row[3], "MM/dd/yyyy", CultureInfo.InvariantCulture);
                 u.Version = versionTemp;
                 updates.Add(u);
             }

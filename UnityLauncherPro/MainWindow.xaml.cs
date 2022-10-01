@@ -297,19 +297,42 @@ namespace UnityLauncherPro
         private bool UpdatesFilter(object item)
         {
             Updates unity = item as Updates;
-            bool haveSearchString = string.IsNullOrEmpty(_filterString) == false;
-            bool matchString = unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) > -1;
 
-            bool checkedAlphas = (bool)chkAlphas.IsChecked;
-            bool checkedBetas = (bool)chkBetas.IsChecked;
+            bool haveSearchString = string.IsNullOrEmpty(_filterString) == false;
+            bool matchString = haveSearchString && unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+
+            bool checkedAlls = (bool)rdoAll.IsChecked;
+            bool checkedLTSs = (bool)rdoLTS.IsChecked;
+            bool checkedAlphas = (bool)rdoAlphas.IsChecked;
+            bool checkedBetas = (bool)rdoBetas.IsChecked;
+
+            bool matchLTS = false;
+            if (checkedLTSs)
+            {
+                var version = unity.Version.Split('.');
+                var versionInt = int.Parse(version[0]);
+                var versionMinor = int.Parse(version[1]);
+                // https://unity3d.com/unity/qa/lts-releases
+                matchLTS = (versionInt >= 2017 && versionMinor == 4) || (versionInt > 2019 && versionMinor == 3);
+            }
 
             bool matchAlphas = checkedAlphas && unity.Version.IndexOf("a", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
             bool matchBetas = checkedBetas && unity.Version.IndexOf("b", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
 
-            // TODO there must be simpler way : D
-            if (checkedAlphas && checkedBetas) return haveSearchString ? (matchString && (matchAlphas || matchBetas)) : (matchAlphas || matchBetas);
-            if (checkedAlphas) return haveSearchString ? matchString && matchAlphas : matchAlphas;
-            if (checkedBetas) return haveSearchString ? matchString && matchBetas : matchBetas;
+            // match search string and some radiobutton
+            if (haveSearchString)
+            {
+                if (checkedAlls) return matchString;
+                if (checkedLTSs) return matchString && matchLTS;
+                if (checkedAlphas) return matchString && matchAlphas;
+                if (checkedBetas) return matchString && matchBetas;
+            }
+            else // no search text, filter by radiobuttons
+            {
+                if (checkedAlls || matchLTS || matchAlphas || matchBetas) return true;
+            }
+
+            // fallback
             return matchString;
         }
 
@@ -621,9 +644,6 @@ namespace UnityLauncherPro
             if (items == null) return;
             updatesSource = GetUnityUpdates.Parse(items);
             if (updatesSource == null) return;
-
-
-
             dataGridUpdates.ItemsSource = updatesSource;
         }
 
@@ -2816,8 +2836,6 @@ namespace UnityLauncherPro
             //use a ListCollectionView to do the sort.
             ListCollectionView lcv = (ListCollectionView)CollectionViewSource.GetDefaultView(dataGridUpdates.ItemsSource);
 
-            Console.WriteLine("Sorted by " + column.Header + " " + direction);
-
             comparer = new CustomUpdatesSort(direction, column.Header.ToString());
 
             //apply the sort
@@ -3178,8 +3196,9 @@ namespace UnityLauncherPro
             }
         }
 
-        private void chkAlphas_Checked(object sender, RoutedEventArgs e)
+        private void rdoAll_Checked(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
             FilterUpdates();
         }
 

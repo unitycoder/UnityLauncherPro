@@ -80,6 +80,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\ReleaseDateConverter.cs" />
     <Compile Include="Converters\LastModifiedConverter.cs" />
     <Compile Include="Data\BuildReport.cs" />
     <Compile Include="Data\BuildReportItem.cs" />
