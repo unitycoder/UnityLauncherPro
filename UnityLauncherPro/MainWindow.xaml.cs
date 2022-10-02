@@ -384,6 +384,38 @@ namespace UnityLauncherPro
 
             // update installations folder listbox
             lstRootFolders.Items.Clear();
+
+            // check if no installation root folders are added, then add default folder(s), this usually happens only on first run (or if user has not added any folders)
+            if (Properties.Settings.Default.rootFolders.Count == 0)
+            {
+                // default hub installation folder
+                string baseFolder = "\\Program Files\\Unity\\Hub\\Editor";
+                string baseFolder2 = "\\Program Files\\";
+                string defaultFolder1 = "C:" + baseFolder;
+                string defaultFolder2 = "D:" + baseFolder;
+                string defaultFolder3 = "C:" + baseFolder2;
+                string defaultFolder4 = "D:" + baseFolder2;
+                if (Directory.Exists(defaultFolder1))
+                {
+                    Properties.Settings.Default.rootFolders.Add(defaultFolder1);
+                }
+                else if (Directory.Exists(defaultFolder2))
+                {
+                    Properties.Settings.Default.rootFolders.Add(defaultFolder2);
+                }
+                else if (Directory.Exists(defaultFolder3))
+                {
+                    if (GetUnityInstallations.HasUnityInstallations(defaultFolder3))
+                    {
+                        Properties.Settings.Default.rootFolders.Add(defaultFolder3);
+                    }
+                    else if (GetUnityInstallations.HasUnityInstallations(defaultFolder4))
+                    {
+                        Properties.Settings.Default.rootFolders.Add(defaultFolder4);
+                    }
+                }
+            }
+
             lstRootFolders.ItemsSource = Properties.Settings.Default.rootFolders;
 
             // restore recent project datagrid column widths
@@ -1729,8 +1761,8 @@ namespace UnityLauncherPro
 
                 if (string.IsNullOrEmpty(newVersion))
                 {
-                    Console.WriteLine("Missing selected unity version");
-                    SetStatus("Missing selected unity version (its null)");
+                    Console.WriteLine("Missing selected Unity version");
+                    SetStatus("Missing selected Unity version (it's null, this should not happen)");
                     return;
                 }
 

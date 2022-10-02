@@ -21,7 +21,7 @@ namespace UnityLauncherPro
             // unityversion, exe_path
             List<UnityInstallation> results = new List<UnityInstallation>();
 
-            // iterate all root folders
+            // iterate all folders under root folders
             foreach (string rootFolder in rootFolders)
             {
                 // if folder exists
@@ -88,6 +88,26 @@ namespace UnityLauncherPro
 
             return results.ToArray();
         } // scan()
+
+        public static bool HasUnityInstallations(string path)
+        {
+            var directories = Directory.GetDirectories(path);
+            
+            // loop folders inside root
+            for (int i = 0, length = directories.Length; i < length; i++)
+            {
+                var editorFolder = Path.Combine(directories[i], "Editor");
+                if (Directory.Exists(editorFolder) == false) continue;
+
+                var editorExe = Path.Combine(editorFolder, "Unity.exe");
+                if (File.Exists(editorExe) == false) continue;
+                
+                // have atleast 1 installation
+                return true;
+            }
+
+            return false;
+        }
 
         // scans unity installation folder for installed platforms
         static string[] GetPlatforms(string dataFolder)
