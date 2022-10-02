@@ -47,7 +47,7 @@ Pre-releases are sometimes available from dev branch: https://github.com/unityco
 
 ![image](https://user-images.githubusercontent.com/5438317/154346224-8aa8d547-8495-47cf-baca-4cb31639344b.png)
 
-![image](https://user-images.githubusercontent.com/5438317/154346049-4426f504-a437-4119-8d1c-f3d4d3fa434c.png)
+![image](https://user-images.githubusercontent.com/5438317/193452933-02684483-a15e-481a-b09a-afe48d16a4f3.png)
 
 ### Perform tasks on selected project
 ![image](https://user-images.githubusercontent.com/5438317/120828528-4da59c80-c565-11eb-8b11-9cf739cde306.png)
@@ -64,6 +64,8 @@ Pre-releases are sometimes available from dev branch: https://github.com/unityco
 ### View and Select current platform
 ![unitylauncherpro_platform](https://user-images.githubusercontent.com/5438317/132997691-5ed50f1d-e285-4c83-b356-46c1e3f431e4.gif)
 
+### Rename Project title
+![pro-rename](https://user-images.githubusercontent.com/5438317/193453048-aa5527c6-a345-4f93-b934-f68ac2524cac.gif)
 
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
