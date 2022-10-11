@@ -687,7 +687,7 @@
                                     <Button  x:Name="btnPatchHubConfig" ToolTip="Modifies json file to set 'manual:true' values into 'false', so that can add modules using Hub. NOTE: This cannot be reversed (not keeping track which values were already 'false')" Style="{StaticResource CustomButton}" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top"  Click="btnPatchHubConfig_Click">
                                         <Label Content="Patch Hub editors.json" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
-                                    <Label Content="*If want to install modeules from Hub" Foreground="{DynamicResource ThemeButtonForeground}" />
+                                    <Label Content="*If want to install modules from Hub" Foreground="{DynamicResource ThemeButtonForeground}" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,6,0,0">

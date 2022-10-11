@@ -213,7 +213,7 @@ namespace UnityLauncherPro
                 btnCreateNewProject.IsEnabled = true;
             }
 
-            System.Console.WriteLine("newProjectName: " + txtNewProjectName.Text);
+            //System.Console.WriteLine("newProjectName: " + txtNewProjectName.Text);
 
             newProjectName = txtNewProjectName.Text;
         }

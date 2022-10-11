@@ -1122,7 +1122,7 @@ namespace UnityLauncherPro
                 Console.WriteLine("initScriptFile: " + initScriptFile);
                 if (File.Exists(initScriptFile) == true)
                 {
-                    var editorTargetFolder = Path.Combine(baseFolder, projectName, "Assets", "Scripts", "Editor");
+                    var editorTargetFolder = Path.Combine(baseFolder, projectName, "Assets", "Editor");
                     Console.WriteLine(editorTargetFolder);
                     if (Directory.Exists(editorTargetFolder) == false) Directory.CreateDirectory(editorTargetFolder);
                     var targetScriptFile = Path.Combine(editorTargetFolder, initScriptPath);
