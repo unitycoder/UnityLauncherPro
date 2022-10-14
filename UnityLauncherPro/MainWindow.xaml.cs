@@ -2894,7 +2894,7 @@ namespace UnityLauncherPro
                         if (((Updates)a).Version == null && ((Updates)b).Version == null) return 0;
                         if (((Updates)a).Version == null) return direction == ListSortDirection.Ascending ? -1 : 1;
                         if (((Updates)b).Version == null) return direction == ListSortDirection.Ascending ? 1 : -1;
-                        return direction == ListSortDirection.Ascending ? Tools.VersionAsInt(((Updates)a).Version).CompareTo(Tools.VersionAsInt(((Updates)b).Version)) : Tools.VersionAsInt(((Updates)b).Version).CompareTo(Tools.VersionAsInt(((Updates)a).Version));
+                        return direction == ListSortDirection.Ascending ? Tools.VersionAsLong(((Updates)a).Version).CompareTo(Tools.VersionAsLong(((Updates)b).Version)) : Tools.VersionAsLong(((Updates)b).Version).CompareTo(Tools.VersionAsLong(((Updates)a).Version));
                     case "Released":
                         // handle null values
                         if (((Updates)a).ReleaseDate == null && ((Updates)b).ReleaseDate == null) return 0;
@@ -2961,7 +2961,7 @@ namespace UnityLauncherPro
                         if (((Project)a).Version == null && ((Project)b).Version == null) return 0;
                         if (((Project)a).Version == null) return direction == ListSortDirection.Ascending ? -1 : 1;
                         if (((Project)b).Version == null) return direction == ListSortDirection.Ascending ? 1 : -1;
-                        return direction == ListSortDirection.Ascending ? Tools.VersionAsInt(((Project)a).Version).CompareTo(Tools.VersionAsInt(((Project)b).Version)) : Tools.VersionAsInt(((Project)b).Version).CompareTo(Tools.VersionAsInt(((Project)a).Version));
+                        return direction == ListSortDirection.Ascending ? Tools.VersionAsLong(((Project)a).Version).CompareTo(Tools.VersionAsLong(((Project)b).Version)) : Tools.VersionAsLong(((Project)b).Version).CompareTo(Tools.VersionAsLong(((Project)a).Version));
                     case "Path":
                         return direction == ListSortDirection.Ascending ? ((Project)a).Path.CompareTo(((Project)b).Path) : ((Project)b).Path.CompareTo(((Project)a).Path);
                     case "Modified":

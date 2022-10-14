@@ -6,7 +6,7 @@ namespace UnityLauncherPro
     public class UnityInstallation : IValueConverter
     {
         public string Version { set; get; }
-        public int VersionCode { set; get; } // version as int, for sorting
+        public long VersionCode { set; get; } // version as number, for sorting
         public string Path { set; get; } // exe path
         public DateTime? Installed { set; get; }
 

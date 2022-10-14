@@ -662,7 +662,7 @@ namespace UnityLauncherPro
             allAvailable.Add(currentVersion);
 
             // sort list
-            allAvailable.Sort((s1, s2) => VersionAsInt(s2).CompareTo(VersionAsInt(s1)));
+            allAvailable.Sort((s1, s2) => VersionAsLong(s2).CompareTo(VersionAsLong(s1)));
 
             // check version above our current version
             int currentIndex = allAvailable.IndexOf(currentVersion);
@@ -676,9 +676,9 @@ namespace UnityLauncherPro
         }
 
         // returns version as integer, for easier sorting between versions: 2019.4.19f1 = 2019041901
-        public static int VersionAsInt(string version)
+        public static long VersionAsLong(string version)
         {
-            int result = 0;
+            long result = 0;
 
             // cleanup 32bit version name, TODO is this needed anymore?
             string cleanVersion = version.Replace("(32-bit)", "");
@@ -694,12 +694,12 @@ namespace UnityLauncherPro
             string[] splitted = cleanVersion.Split('.');
             if (splitted.Length > 1)
             {
-                int multiplier = 1;
-                for (int i = 0, length = splitted.Length; i < length; i++)
+                long multiplier = 1;
+                for (long i = 0, length = splitted.Length; i < length; i++)
                 {
-                    int n = int.Parse(splitted[length - 1 - i]);
+                    long n = int.Parse(splitted[length - 1 - i]);
                     result += n * multiplier;
-                    multiplier *= 10;
+                    multiplier *= 50;
                 }
             }
             return result;

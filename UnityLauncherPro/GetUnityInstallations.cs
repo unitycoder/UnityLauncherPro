@@ -59,7 +59,7 @@ namespace UnityLauncherPro
                     DateTime? installDate = Tools.GetLastModifiedTime(dataFolder);
                     UnityInstallation unity = new UnityInstallation();
                     unity.Version = version;
-                    unity.VersionCode = Tools.VersionAsInt(version); // cached version code
+                    unity.VersionCode = Tools.VersionAsLong(version); // cached version code
                     unity.Path = exePath;
                     unity.Installed = installDate;
                     unity.IsPreferred = (version == MainWindow.preferredVersion);
@@ -92,7 +92,7 @@ namespace UnityLauncherPro
         public static bool HasUnityInstallations(string path)
         {
             var directories = Directory.GetDirectories(path);
-            
+
             // loop folders inside root
             for (int i = 0, length = directories.Length; i < length; i++)
             {
@@ -101,7 +101,7 @@ namespace UnityLauncherPro
 
                 var editorExe = Path.Combine(editorFolder, "Unity.exe");
                 if (File.Exists(editorExe) == false) continue;
-                
+
                 // have atleast 1 installation
                 return true;
             }
