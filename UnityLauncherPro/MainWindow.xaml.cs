@@ -710,7 +710,8 @@ namespace UnityLauncherPro
             gridRecent.ItemsSource = projectsSource;
             // focus back
             Tools.SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
-            Console.WriteLine("RefreshRecentProjects: " + projectsSource.Count);
+            //Console.WriteLine("RefreshRecentProjects: " + projectsSource.Count);
+            SetStatus("Ready (" + projectsSource.Count + " projects)");
         }
 
         //
