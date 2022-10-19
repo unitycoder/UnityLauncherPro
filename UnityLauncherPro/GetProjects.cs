@@ -64,7 +64,7 @@ namespace UnityLauncherPro
                         {
                             projectsFound.Add(p);
 
-                            // test adding to history
+                            // add found projects to history also (gets added only if its not already there)
                             Tools.AddProjectToHistory(p.Path);
                         }
                     } // valid key
@@ -77,10 +77,10 @@ namespace UnityLauncherPro
             // scan info for custom folders (if not already on the list)
             if (AllProjectPaths != null)
             {
-                // iterate custom full project history
+                // iterate custom full projects history
                 foreach (var projectPath in AllProjectPaths)
                 {
-                    // check if registry list contains this path
+                    // check if registry list contains this path already, then skip it
                     bool found = false;
                     for (int i = 0, len = projectsFound.Count; i < len; i++)
                     {
@@ -91,7 +91,7 @@ namespace UnityLauncherPro
                         }
                     }
 
-                    // if not found from full history list, add to projects list
+                    // if not found from registry, add to recent projects list
                     if (found == false)
                     {
                         var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform);
@@ -100,20 +100,19 @@ namespace UnityLauncherPro
                 }
             }
 
-            // NOTE sometimes projects are in wrong order, seems to be related to messing up your unity registry, the keys are received in created order (so if you had removed/modified them manually, it might return wrong order instead of 0 - 40)
+            // sometimes projects are in wrong order, seems to be related to messing up your unity registry, the keys are received in created order (so if you had removed/modified them manually, it might return wrong order instead of 0 - 40)
             // thats why need to sort projects list by modified date
             // sort by modified date, projects without modified date are put to last, NOTE: this would remove projects without modified date (if they become last items, before trimming list on next step)
             projectsFound.Sort((x, y) =>
             {
-                if (x.Modified == null && y.Modified == null) return -1; // was 0
+                if (x.Modified == null && y.Modified == null) return 0; // cannot be -1, https://stackoverflow.com/a/42821992/5452781
                 if (x.Modified == null) return 1;
                 if (y.Modified == null) return -1;
                 return y.Modified.Value.CompareTo(x.Modified.Value);
                 //return x.Modified.Value.CompareTo(y.Modified.Value); // BUG this breaks something, so that last item platform is wrong (for project that is missing from disk) ?
             });
-            //projectsFound.Sort((x, y) => y.Modified.Value.CompareTo(x.Modified.Value));
 
-            // trim list to max amount TODO only if enabled in settings
+            // trim list to max amount
             if (projectsFound.Count > MainWindow.maxProjectCount)
             {
                 //Console.WriteLine("Trimming projects list to " + MainWindow.maxProjectCount + " projects");
@@ -129,7 +128,6 @@ namespace UnityLauncherPro
 
             // if displaying missing folders are disabled, and folder doesnt exists, skip this project
             if (showMissingFolders == false && folderExists == false) return null;
-
             string projectName = "";
 
             // get project name from full path
@@ -179,7 +177,6 @@ namespace UnityLauncherPro
                 targetPlatform = folderExists ? Tools.GetTargetPlatform(projectPath) : null;
                 //if (projectPath.Contains("Shader")) Console.WriteLine(projectPath + " targetPlatform=" + targetPlatform);
             }
-
             var p = new Project();
 
             switch (MainWindow.projectNameSetting)
