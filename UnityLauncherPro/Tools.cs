@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using UnityLauncherPro.Helpers;
 
 namespace UnityLauncherPro
@@ -1378,6 +1379,11 @@ namespace UnityLauncherPro
         public static void BuildProject(Project proj, Platform platform)
         {
             Console.WriteLine("Building " + proj.Title + " for " + platform);
+            SetStatus("Build process started: " + DateTime.Now.ToString("HH:mm:ss"));
+
+            // TODO use theme colors, keep list of multiple builds, if click status button show list of builds, if click for single build (show output folder)
+            SetBuildStatus(Colors.Red);
+
             if (string.IsNullOrEmpty(proj.Path)) return;
 
             // create builder script template (with template string, that can be replaced with project related paths or names?)
@@ -1454,7 +1460,7 @@ public static class UnityLauncherProTools
 
             // create commandline string for building and launch it
             //var buildcmd = $"\"{unityExePath}\" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"Builder.BuildAndroid\" -buildTarget android -logFile -";
-            var buildParams = $" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"UnityLauncherProTools.Build{platform}\" -buildTarget {platform} -logFile -";
+            var buildParams = $" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"UnityLauncherProTools.Build{platform}\" -buildTarget {platform} -logFile \"{outputFolder}/../build.log\"";
             Console.WriteLine("buildcmd= " + buildParams);
 
             // launch build
@@ -1465,6 +1471,9 @@ public static class UnityLauncherProTools
             {
                 Console.WriteLine("Build process exited: " + outputFolder);
                 Tools.ExploreFolder(outputFolder);
+                SetStatus("Build process finished: " + DateTime.Now.ToString("HH:mm:ss"));
+                // TODO set color based on results
+                SetBuildStatus(Colors.Green);
             };
 
         }
@@ -1752,6 +1761,19 @@ public static class UnityLauncherProTools
             readable = (readable / 1024);
             // Return formatted number with suffix
             return readable.ToString("0.### ") + suffix;
+        }
+
+        public static MainWindow mainWindow;
+
+        // set status bar in main thread
+        public static void SetStatus(string text)
+        {
+            mainWindow.Dispatcher.Invoke(() => { mainWindow.SetStatus(text); });
+        }
+
+        public static void SetBuildStatus(Color color)
+        {
+            mainWindow.Dispatcher.Invoke(() => { mainWindow.SetBuildStatus(color); });
         }
 
     } // class

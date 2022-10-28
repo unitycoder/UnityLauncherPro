@@ -86,6 +86,8 @@ namespace UnityLauncherPro
             Resizable_BorderLess_Chrome.CaptionHeight = 1.0;
             WindowChrome.SetWindowChrome(this, Resizable_BorderLess_Chrome);
 
+            Tools.mainWindow = this;
+
             // need to load here to get correct window size early
             LoadSettings();
         }
@@ -3033,9 +3035,14 @@ namespace UnityLauncherPro
             gridSettingsBg.Focus();
         }
 
-        void SetStatus(string msg)
+        public void SetStatus(string msg)
         {
             txtStatus.Text = msg;
+        }
+
+        public void SetBuildStatus(System.Windows.Media.Color color)
+        {
+            btnBuildStatus.Foreground = new SolidColorBrush(color);
         }
 
         private void btnPatchHubConfig_Click(object sender, RoutedEventArgs e)

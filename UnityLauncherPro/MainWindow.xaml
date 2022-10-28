@@ -715,8 +715,13 @@
         </TabControl>
 
         <Grid Grid.Row="2" UseLayoutRounding="False">
-            <StatusBar VerticalAlignment="Bottom" Margin="3,1,20,1" Background="{x:Null}" Foreground="{DynamicResource ThemeStatusText}">
-                <TextBlock x:Name="txtStatus" Margin="6,1,3,0"  VerticalAlignment="Center" Text="Ready"/>
+            <StatusBar VerticalAlignment="Center" Margin="3,0,15,0" Background="{x:Null}" Foreground="{DynamicResource ThemeStatusText}">
+                <StatusBarItem>
+                    <TextBlock x:Name="txtStatus" Margin="6,0,3,0"  VerticalAlignment="Center" Text="Ready"/>
+                </StatusBarItem>
+                <StatusBarItem HorizontalAlignment="Right">
+                    <Label x:Name="btnBuildStatus" Content="◯" ToolTip="Builds" Foreground="{DynamicResource ThemeButtonForegroundDisabled}" Padding="0,0,0,0"/>
+                </StatusBarItem>
             </StatusBar>
         </Grid>
     </Grid>
