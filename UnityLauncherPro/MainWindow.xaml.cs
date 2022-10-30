@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
@@ -18,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
 using UnityLauncherPro.Helpers;
+using UnityLauncherPro.Properties;
 
 namespace UnityLauncherPro
 {
@@ -352,190 +354,220 @@ namespace UnityLauncherPro
 
         void LoadSettings()
         {
-            // form size
-            this.Width = Properties.Settings.Default.windowWidth;
-            this.Height = Properties.Settings.Default.windowHeight;
-
-            chkMinimizeToTaskbar.IsChecked = Properties.Settings.Default.minimizeToTaskbar;
-            chkRegisterExplorerMenu.IsChecked = Properties.Settings.Default.registerExplorerMenu;
-
-            // update settings window
-            chkQuitAfterCommandline.IsChecked = Properties.Settings.Default.closeAfterExplorer;
-            chkQuitAfterOpen.IsChecked = Properties.Settings.Default.closeAfterProject;
-            chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
-            chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
-            chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
-            chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
-            chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
-            chkEnableProjectRename.IsChecked = Properties.Settings.Default.enableProjectRename;
-            chkStreamerMode.IsChecked = Properties.Settings.Default.streamerMode;
-            chkShowPlatform.IsChecked = Properties.Settings.Default.showTargetPlatform;
-            chkUseCustomTheme.IsChecked = Properties.Settings.Default.useCustomTheme;
-            txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
-            txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
-            txtCustomThemeFile.Text = Properties.Settings.Default.themeFile;
-
-            chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
-            chkRunAutomatically.IsChecked = Properties.Settings.Default.runAutomatically;
-            chkRunAutomaticallyMinimized.IsChecked = Properties.Settings.Default.runAutomaticallyMinimized;
-
-            // update optional grid columns, hidden or visible
-            gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
-            gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
-            gridRecent.Columns[6].Visibility = (bool)chkShowPlatform.IsChecked ? Visibility.Visible : Visibility.Collapsed;
-
-            // update installations folder listbox
-            lstRootFolders.Items.Clear();
-
-            // check if no installation root folders are added, then add default folder(s), this usually happens only on first run (or if user has not added any folders)
-            if (Properties.Settings.Default.rootFolders.Count == 0)
+            // catch corrupted config file
+            try
             {
-                // default hub installation folder
-                string baseFolder = "\\Program Files\\Unity\\Hub\\Editor";
-                string baseFolder2 = "\\Program Files\\";
-                string defaultFolder1 = "C:" + baseFolder;
-                string defaultFolder2 = "D:" + baseFolder;
-                string defaultFolder3 = "C:" + baseFolder2;
-                string defaultFolder4 = "D:" + baseFolder2;
-                if (Directory.Exists(defaultFolder1))
+                Settings.Default.Reload();
+                // form size
+                this.Width = Properties.Settings.Default.windowWidth;
+                this.Height = Properties.Settings.Default.windowHeight;
+
+                chkMinimizeToTaskbar.IsChecked = Properties.Settings.Default.minimizeToTaskbar;
+                chkRegisterExplorerMenu.IsChecked = Properties.Settings.Default.registerExplorerMenu;
+
+                // update settings window
+                chkQuitAfterCommandline.IsChecked = Properties.Settings.Default.closeAfterExplorer;
+                chkQuitAfterOpen.IsChecked = Properties.Settings.Default.closeAfterProject;
+                chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
+                chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
+                chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
+                chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
+                chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
+                chkEnableProjectRename.IsChecked = Properties.Settings.Default.enableProjectRename;
+                chkStreamerMode.IsChecked = Properties.Settings.Default.streamerMode;
+                chkShowPlatform.IsChecked = Properties.Settings.Default.showTargetPlatform;
+                chkUseCustomTheme.IsChecked = Properties.Settings.Default.useCustomTheme;
+                txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
+                txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
+                txtCustomThemeFile.Text = Properties.Settings.Default.themeFile;
+
+                chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
+                chkRunAutomatically.IsChecked = Properties.Settings.Default.runAutomatically;
+                chkRunAutomaticallyMinimized.IsChecked = Properties.Settings.Default.runAutomaticallyMinimized;
+
+                // update optional grid columns, hidden or visible
+                gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+                gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+                gridRecent.Columns[6].Visibility = (bool)chkShowPlatform.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+
+                // update installations folder listbox
+                lstRootFolders.Items.Clear();
+
+                // check if no installation root folders are added, then add default folder(s), this usually happens only on first run (or if user has not added any folders)
+                if (Properties.Settings.Default.rootFolders.Count == 0)
                 {
-                    Properties.Settings.Default.rootFolders.Add(defaultFolder1);
-                }
-                else if (Directory.Exists(defaultFolder2))
-                {
-                    Properties.Settings.Default.rootFolders.Add(defaultFolder2);
-                }
-                else if (Directory.Exists(defaultFolder3))
-                {
-                    if (GetUnityInstallations.HasUnityInstallations(defaultFolder3))
+                    // default hub installation folder
+                    string baseFolder = "\\Program Files\\Unity\\Hub\\Editor";
+                    string baseFolder2 = "\\Program Files\\";
+                    string defaultFolder1 = "C:" + baseFolder;
+                    string defaultFolder2 = "D:" + baseFolder;
+                    string defaultFolder3 = "C:" + baseFolder2;
+                    string defaultFolder4 = "D:" + baseFolder2;
+                    if (Directory.Exists(defaultFolder1))
                     {
-                        Properties.Settings.Default.rootFolders.Add(defaultFolder3);
+                        Properties.Settings.Default.rootFolders.Add(defaultFolder1);
                     }
-                    else if (GetUnityInstallations.HasUnityInstallations(defaultFolder4))
+                    else if (Directory.Exists(defaultFolder2))
                     {
-                        Properties.Settings.Default.rootFolders.Add(defaultFolder4);
+                        Properties.Settings.Default.rootFolders.Add(defaultFolder2);
                     }
-                }
-            }
-
-            lstRootFolders.ItemsSource = Properties.Settings.Default.rootFolders;
-
-            // restore recent project datagrid column widths
-            int[] gridColumnWidths = Properties.Settings.Default.gridColumnWidths;
-            if (gridColumnWidths != null)
-            {
-                for (int i = 0; i < gridColumnWidths.Length; ++i)
-                {
-                    if (i >= gridRecent.Columns.Count) break; // too many columns were saved, probably some test columns
-                    gridRecent.Columns[i].Width = gridColumnWidths[i];
-                }
-            }
-
-            // restore buildreport datagrid column widths
-            gridColumnWidths = Properties.Settings.Default.gridColumnWidthsBuildReport;
-            if (gridColumnWidths != null)
-            {
-                for (int i = 0; i < gridColumnWidths.Length; ++i)
-                {
-                    if (i >= gridBuildReport.Columns.Count) break; // too many columns were saved, probably some test columns
-                    gridBuildReport.Columns[i].Width = gridColumnWidths[i];
-                }
-            }
-
-            // other setting vars
-            preferredVersion = Properties.Settings.Default.preferredVersion;
-
-            // get last modified date format
-            chkUseCustomLastModified.IsChecked = Properties.Settings.Default.useCustomLastModified;
-            txtCustomDateTimeFormat.Text = Properties.Settings.Default.customDateFormat;
-
-            if (Properties.Settings.Default.useCustomLastModified)
-            {
-                currentDateFormat = Properties.Settings.Default.customDateFormat;
-            }
-            else // use default
-            {
-                currentDateFormat = defaultDateFormat;
-            }
-
-            chkHumanFriendlyDateTime.IsChecked = Properties.Settings.Default.useHumandFriendlyLastModified;
-            // if both enabled, then disable custom
-            if (chkHumanFriendlyDateTime.IsChecked == true && chkUseCustomLastModified.IsChecked == true)
-            {
-                chkUseCustomLastModified.IsChecked = false;
-            }
-
-            useHumanFriendlyDateFormat = Properties.Settings.Default.useHumandFriendlyLastModified;
-            searchProjectPathAlso = Properties.Settings.Default.searchProjectPathAlso;
-            chkSearchProjectPath.IsChecked = searchProjectPathAlso;
-
-            // recent grid column display index order
-            var order = Properties.Settings.Default.recentColumnsOrder;
-
-            // if we dont have any values, get & set them now
-            // also, if user has disabled optional columns, saved order must be reset to default
-            if (order == null || gridRecent.Columns.Count != Properties.Settings.Default.recentColumnsOrder.Length)
-            {
-                Properties.Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
-                for (int i = 0; i < gridRecent.Columns.Count; i++)
-                {
-                    Properties.Settings.Default.recentColumnsOrder[i] = gridRecent.Columns[i].DisplayIndex;
-                }
-                Properties.Settings.Default.Save();
-            }
-            else // load existing order
-            {
-                for (int i = 0; i < gridRecent.Columns.Count; i++)
-                {
-                    if (Properties.Settings.Default.recentColumnsOrder[i] > -1)
+                    else if (Directory.Exists(defaultFolder3))
                     {
-                        gridRecent.Columns[i].DisplayIndex = Properties.Settings.Default.recentColumnsOrder[i];
+                        if (GetUnityInstallations.HasUnityInstallations(defaultFolder3))
+                        {
+                            Properties.Settings.Default.rootFolders.Add(defaultFolder3);
+                        }
+                        else if (GetUnityInstallations.HasUnityInstallations(defaultFolder4))
+                        {
+                            Properties.Settings.Default.rootFolders.Add(defaultFolder4);
+                        }
                     }
                 }
+
+                lstRootFolders.ItemsSource = Properties.Settings.Default.rootFolders;
+
+                // restore recent project datagrid column widths
+                int[] gridColumnWidths = Properties.Settings.Default.gridColumnWidths;
+                if (gridColumnWidths != null)
+                {
+                    for (int i = 0; i < gridColumnWidths.Length; ++i)
+                    {
+                        if (i >= gridRecent.Columns.Count) break; // too many columns were saved, probably some test columns
+                        gridRecent.Columns[i].Width = gridColumnWidths[i];
+                    }
+                }
+
+                // restore buildreport datagrid column widths
+                gridColumnWidths = Properties.Settings.Default.gridColumnWidthsBuildReport;
+                if (gridColumnWidths != null)
+                {
+                    for (int i = 0; i < gridColumnWidths.Length; ++i)
+                    {
+                        if (i >= gridBuildReport.Columns.Count) break; // too many columns were saved, probably some test columns
+                        gridBuildReport.Columns[i].Width = gridColumnWidths[i];
+                    }
+                }
+
+                // other setting vars
+                preferredVersion = Properties.Settings.Default.preferredVersion;
+
+                // get last modified date format
+                chkUseCustomLastModified.IsChecked = Properties.Settings.Default.useCustomLastModified;
+                txtCustomDateTimeFormat.Text = Properties.Settings.Default.customDateFormat;
+
+                if (Properties.Settings.Default.useCustomLastModified)
+                {
+                    currentDateFormat = Properties.Settings.Default.customDateFormat;
+                }
+                else // use default
+                {
+                    currentDateFormat = defaultDateFormat;
+                }
+
+                chkHumanFriendlyDateTime.IsChecked = Properties.Settings.Default.useHumandFriendlyLastModified;
+                // if both enabled, then disable custom
+                if (chkHumanFriendlyDateTime.IsChecked == true && chkUseCustomLastModified.IsChecked == true)
+                {
+                    chkUseCustomLastModified.IsChecked = false;
+                }
+
+                useHumanFriendlyDateFormat = Properties.Settings.Default.useHumandFriendlyLastModified;
+                searchProjectPathAlso = Properties.Settings.Default.searchProjectPathAlso;
+                chkSearchProjectPath.IsChecked = searchProjectPathAlso;
+
+                // recent grid column display index order
+                var order = Properties.Settings.Default.recentColumnsOrder;
+
+                // if we dont have any values, get & set them now
+                // also, if user has disabled optional columns, saved order must be reset to default
+                if (order == null || gridRecent.Columns.Count != Properties.Settings.Default.recentColumnsOrder.Length)
+                {
+                    Properties.Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
+                    for (int i = 0; i < gridRecent.Columns.Count; i++)
+                    {
+                        Properties.Settings.Default.recentColumnsOrder[i] = gridRecent.Columns[i].DisplayIndex;
+                    }
+                    Properties.Settings.Default.Save();
+                }
+                else // load existing order
+                {
+                    for (int i = 0; i < gridRecent.Columns.Count; i++)
+                    {
+                        if (Properties.Settings.Default.recentColumnsOrder[i] > -1)
+                        {
+                            gridRecent.Columns[i].DisplayIndex = Properties.Settings.Default.recentColumnsOrder[i];
+                        }
+                    }
+                }
+
+                adbLogCatArgs = Properties.Settings.Default.adbLogCatArgs;
+                txtLogCatArgs.Text = adbLogCatArgs;
+
+                projectNameSetting = Properties.Settings.Default.projectName;
+                switch (projectNameSetting)
+                {
+                    case 0:
+                        radioProjNameFolder.IsChecked = true;
+                        break;
+                    case 1:
+                        radioProjNameProductName.IsChecked = true;
+                        break;
+                    default:
+                        radioProjNameFolder.IsChecked = true;
+                        break;
+                }
+
+                // set default .bat folder location to appdata/.., if nothing is set, or current one is invalid
+                if (string.IsNullOrEmpty(txtShortcutBatchFileFolder.Text) || Directory.Exists(txtShortcutBatchFileFolder.Text) == false)
+                {
+                    Properties.Settings.Default.shortcutBatchFileFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+                    txtShortcutBatchFileFolder.Text = Properties.Settings.Default.shortcutBatchFileFolder;
+                }
+
+                chkUseInitScript.IsChecked = Properties.Settings.Default.useInitScript;
+                txtCustomInitFile.Text = Properties.Settings.Default.customInitFile;
+
+                // load webgl port
+                txtWebglPort.Text = "" + Properties.Settings.Default.webglPort;
+                webglPort = Properties.Settings.Default.webglPort;
+
+                txtMaxProjectCount.Text = Properties.Settings.Default.maxProjectCount.ToString();
+                chkOverride40ProjectCount.IsChecked = Properties.Settings.Default.override40ProjectCount;
+                if ((bool)chkOverride40ProjectCount.IsChecked)
+                {
+                    maxProjectCount = Properties.Settings.Default.maxProjectCount;
+                }
+                else
+                {
+                    maxProjectCount = 40;
+                }
             }
-
-            adbLogCatArgs = Properties.Settings.Default.adbLogCatArgs;
-            txtLogCatArgs.Text = adbLogCatArgs;
-
-            projectNameSetting = Properties.Settings.Default.projectName;
-            switch (projectNameSetting)
+            catch (ConfigurationErrorsException ex)
             {
-                case 0:
-                    radioProjNameFolder.IsChecked = true;
-                    break;
-                case 1:
-                    radioProjNameProductName.IsChecked = true;
-                    break;
-                default:
-                    radioProjNameFolder.IsChecked = true;
-                    break;
+                string filename = ((ConfigurationErrorsException)ex.InnerException).Filename;
+
+                if (MessageBox.Show("This may be due to a Windows crash/BSOD.\n" +
+                                      "Click 'Yes' to use automatic backup (if exists, otherwise settings are reset), then start application again.\n\n" +
+                                      "Click 'No' to exit now (and delete user.config manually)\n\nCorrupted file: " + filename,
+                                      appName + " - Corrupt user settings",
+                                      MessageBoxButton.YesNo,
+                                      MessageBoxImage.Error) == MessageBoxResult.Yes)
+                {
+
+                    // try to use backup
+                    string backupFilename = filename + ".bak";
+                    if (File.Exists(backupFilename))
+                    {
+                        File.Copy(backupFilename, filename, true);
+                    }
+                    else
+                    {
+                        File.Delete(filename);
+                    }
+                }
+                // need to restart, otherwise settings not loaded
+                Process.GetCurrentProcess().Kill();
             }
-
-            // set default .bat folder location to appdata/.., if nothing is set, or current one is invalid
-            if (string.IsNullOrEmpty(txtShortcutBatchFileFolder.Text) || Directory.Exists(txtShortcutBatchFileFolder.Text) == false)
-            {
-                Properties.Settings.Default.shortcutBatchFileFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-                txtShortcutBatchFileFolder.Text = Properties.Settings.Default.shortcutBatchFileFolder;
-            }
-
-            chkUseInitScript.IsChecked = Properties.Settings.Default.useInitScript;
-            txtCustomInitFile.Text = Properties.Settings.Default.customInitFile;
-
-            // load webgl port
-            txtWebglPort.Text = "" + Properties.Settings.Default.webglPort;
-            webglPort = Properties.Settings.Default.webglPort;
-
-            txtMaxProjectCount.Text = Properties.Settings.Default.maxProjectCount.ToString();
-            chkOverride40ProjectCount.IsChecked = Properties.Settings.Default.override40ProjectCount;
-            if ((bool)chkOverride40ProjectCount.IsChecked)
-            {
-                maxProjectCount = Properties.Settings.Default.maxProjectCount;
-            }
-            else
-            {
-                maxProjectCount = 40;
-            }
-
         } // LoadSettings()
 
         private void SaveSettingsOnExit()
@@ -597,10 +629,13 @@ namespace UnityLauncherPro
                 }
             }
             Properties.Settings.Default.gridColumnWidthsBuildReport = gridWidths.ToArray();
-
             Properties.Settings.Default.projectName = projectNameSetting;
-
             Properties.Settings.Default.Save();
+
+            // make backup
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+            var FullFileName = config.FilePath;
+            File.Copy(FullFileName, FullFileName + ".bak", true);
         }
 
         void UpdateUnityInstallationsList()
@@ -978,6 +1013,8 @@ namespace UnityLauncherPro
         // save window size after resize
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             var win = (Window)sender;
             // save new size instead, to fix DPI scaling issue
             Properties.Settings.Default.windowWidth = (int)e.NewSize.Width;
