@@ -1845,8 +1845,8 @@ namespace UnityLauncherPro
                 {
                     newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
                 }
-                // TODO custom init file here also
-                var p = Tools.FastCreateProject(newVersion, rootFolder);
+                var p = Tools.FastCreateProject(newVersion, rootFolder, null, null, null, null, (bool)chkUseInitScript.IsChecked, txtCustomInitFile.Text);
+
                 if (p != null) AddNewProjectToList(p);
             }
 

@@ -192,7 +192,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool enableProjectRename {
             get {
                 return ((bool)(this["enableProjectRename"]));
@@ -216,7 +216,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool showTargetPlatform {
             get {
                 return ((bool)(this["showTargetPlatform"]));

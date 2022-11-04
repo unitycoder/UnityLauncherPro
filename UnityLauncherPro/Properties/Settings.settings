@@ -45,13 +45,13 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="enableProjectRename" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="streamerMode" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="showTargetPlatform" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="webglBuildPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
