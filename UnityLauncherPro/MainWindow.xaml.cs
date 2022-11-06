@@ -34,7 +34,7 @@ namespace UnityLauncherPro
         public static ObservableDictionary<string, string> unityInstalledVersions = new ObservableDictionary<string, string>(); // versionID and installation folder
         public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
         public static readonly string projectNameFile = "ProjectName.txt";
-        public static string preferredVersion = "none";
+        public static string preferredVersion = null;
         public static int projectNameSetting = 0; // 0 = folder or ProjectName.txt if exists, 1=ProductName
 
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
@@ -310,18 +310,9 @@ namespace UnityLauncherPro
             bool checkedAlphas = (bool)rdoAlphas.IsChecked;
             bool checkedBetas = (bool)rdoBetas.IsChecked;
 
-            bool matchLTS = false;
-            if (checkedLTSs)
-            {
-                var version = unity.Version.Split('.');
-                var versionInt = int.Parse(version[0]);
-                var versionMinor = int.Parse(version[1]);
-                // https://unity3d.com/unity/qa/lts-releases
-                matchLTS = (versionInt >= 2017 && versionMinor == 4) || (versionInt > 2019 && versionMinor == 3);
-            }
-
-            bool matchAlphas = checkedAlphas && unity.Version.IndexOf("a", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
-            bool matchBetas = checkedBetas && unity.Version.IndexOf("b", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+            bool matchLTS = checkedLTSs && Tools.IsLTS(unity.Version);
+            bool matchAlphas = checkedAlphas && Tools.IsAlpha(unity.Version);
+            bool matchBetas = checkedBetas && Tools.IsBeta(unity.Version);
 
             // match search string and some radiobutton
             if (haveSearchString)
@@ -1804,7 +1795,8 @@ namespace UnityLauncherPro
                     Console.WriteLine("Missing selected Unity version, probably launching from context menu");
                     newVersion = preferredVersion;
                     // if no preferred version, use latest
-                    if (preferredVersion == null) newVersion = unityInstallationsSource[0].Version;
+                    if (string.IsNullOrEmpty(newVersion)) newVersion = unityInstallationsSource[0].Version;
+
                 }
 
                 var suggestedName = targetFolder != null ? Path.GetFileName(targetFolder) : Tools.GetSuggestedProjectName(newVersion, rootFolder);

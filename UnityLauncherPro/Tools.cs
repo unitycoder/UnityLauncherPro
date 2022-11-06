@@ -1777,6 +1777,27 @@ public static class UnityLauncherProTools
             mainWindow.Dispatcher.Invoke(() => { mainWindow.SetBuildStatus(color); });
         }
 
+        // https://unity3d.com/unity/alpha
+        public static bool IsAlpha(string version)
+        {
+            return version.IndexOf("a", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+        }
+
+        // https://unity3d.com/beta/
+        public static bool IsBeta(string version)
+        {
+            return version.IndexOf("b", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+        }
+
+        // https://unity3d.com/unity/qa/lts-releases
+        public static bool IsLTS(string versionRaw)
+        {
+            var version = versionRaw.Split('.');
+            var versionInt = int.Parse(version[0]);
+            var versionMinor = int.Parse(version[1]);
+            return (versionInt >= 2017 && versionMinor == 4) || (versionInt > 2019 && versionMinor == 3);
+        }
+
     } // class
 
 } // namespace

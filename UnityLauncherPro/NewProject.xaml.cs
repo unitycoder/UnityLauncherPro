@@ -38,9 +38,29 @@ namespace UnityLauncherPro
             txtNewProjectName.Text = newName;
             lblNewProjectFolder.Content = targetFolder;
 
-            // fill available versions, TODO could show which modules are installed
-            if (gridAvailableVersions.ItemsSource == null) gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
+            // fill available versions
+            if (gridAvailableVersions.ItemsSource == null)
+            {
+                // get release type info (not done in mainwindow yet, to avoid doing extra stuff)
+                for (int i = 0, len = MainWindow.unityInstallationsSource.Length; i < len; i++)
+                {
+                    var vers = MainWindow.unityInstallationsSource[i].Version;
+                    if (Tools.IsLTS(vers))
+                    {
+                        MainWindow.unityInstallationsSource[i].ReleaseType = "LTS";
+                    }
+                    else if (Tools.IsAlpha(vers))
+                    {
+                        MainWindow.unityInstallationsSource[i].ReleaseType = "Alpha";
+                    }
+                    else if (Tools.IsBeta(vers))
+                    {
+                        MainWindow.unityInstallationsSource[i].ReleaseType = "Beta";
+                    }
+                }
 
+                gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
+            }
             // we have that version installed
             if (MainWindow.unityInstalledVersions.ContainsKey(unityVersion) == true)
             {

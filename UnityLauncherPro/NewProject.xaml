@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="Create New Project" Height="460" Width="450" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="Create New Project" Height="460" Width="450" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
 
     <Grid>
         <StackPanel Margin="10,3">
@@ -13,7 +13,8 @@
             <DataGrid x:Name="gridAvailableVersions" KeyboardNavigation.TabNavigation = "None" SelectionMode="Single" Height="270" Margin="0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="1"  Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" PreviewMouseDoubleClick="gridAvailableVersions_PreviewMouseDoubleClick">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Version" Binding="{Binding Version}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
-                    <DataGridTextColumn Header="Platforms" Binding="{Binding PlatformsCombined}" IsReadOnly="True" CanUserResize="False" MinWidth="370" />
+                    <DataGridTextColumn Header="Platforms" Binding="{Binding PlatformsCombined}" IsReadOnly="True" CanUserResize="False" MinWidth="270" />
+                    <DataGridTextColumn Header="Release" Binding="{Binding ReleaseType}" IsReadOnly="True" CanUserResize="False" MinWidth="70" />
                 </DataGrid.Columns>
             </DataGrid>
 
