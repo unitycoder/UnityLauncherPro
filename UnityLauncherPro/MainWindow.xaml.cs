@@ -184,7 +184,7 @@ namespace UnityLauncherPro
                 var commandLineArgs = args[1];
                 if (commandLineArgs == "-projectPath")
                 {
-                    Console.WriteLine("Launching from commandline ...");
+                    Console.WriteLine("Launching from commandline...");
 
                     // path
                     var projectPathArgument = args[2];
@@ -1801,9 +1801,10 @@ namespace UnityLauncherPro
 
                 if (string.IsNullOrEmpty(newVersion))
                 {
-                    Console.WriteLine("Missing selected Unity version");
-                    SetStatus("Missing selected Unity version (it's null, this should not happen)");
-                    return;
+                    Console.WriteLine("Missing selected Unity version, probably launching from context menu");
+                    newVersion = preferredVersion;
+                    // if no preferred version, use latest
+                    if (preferredVersion == null) newVersion = unityInstallationsSource[0].Version;
                 }
 
                 var suggestedName = targetFolder != null ? Path.GetFileName(targetFolder) : Tools.GetSuggestedProjectName(newVersion, rootFolder);
