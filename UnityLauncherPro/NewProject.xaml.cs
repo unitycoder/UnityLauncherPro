@@ -108,21 +108,36 @@ namespace UnityLauncherPro
             // get modules and stick into combobox, NOTE we already have this info from GetProjects.Scan, so could access it
             platformsForThisUnity = Tools.GetPlatformsForUnityVersion(version);
             cmbNewProjectPlatform.ItemsSource = platformsForThisUnity;
-            //System.Console.WriteLine(Tools.GetPlatformsForUnityVersion(version).Length);
 
             var lastUsedPlatform = Properties.Settings.Default.newProjectPlatform;
 
             for (int i = 0; i < platformsForThisUnity.Length; i++)
             {
                 // set default platform (win64) if never used this setting before
-                if ((lastUsedPlatform == null && platformsForThisUnity[i].ToLower() == "win64") || platformsForThisUnity[i] == lastUsedPlatform)
+                if ((string.IsNullOrEmpty(lastUsedPlatform) && platformsForThisUnity[i].ToLower() == "win64") || platformsForThisUnity[i] == lastUsedPlatform)
                 {
                     cmbNewProjectPlatform.SelectedIndex = i;
                     break;
                 }
             }
 
-            //lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
+            // if nothing found, use win64
+            if (cmbNewProjectPlatform.SelectedIndex == -1)
+            {
+                //cmbNewProjectPlatform.SelectedIndex = cmbNewProjectPlatform.Items.Count > 1 ? 1 : 0;
+                for (int i = 0; i < platformsForThisUnity.Length; i++)
+                {
+                    if (platformsForThisUnity[i].ToLower() == "win64")
+                    {
+                        cmbNewProjectPlatform.SelectedIndex = i;
+                        break;
+                    }
+                }
+
+                // if still nothing, use first
+                if (cmbNewProjectPlatform.SelectedIndex == -1) cmbNewProjectPlatform.SelectedIndex = 0;
+                //lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
+            }
         }
 
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)

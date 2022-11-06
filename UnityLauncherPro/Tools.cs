@@ -301,7 +301,7 @@ namespace UnityLauncherPro
 
                 newProcess.StartInfo.Arguments = unitycommandlineparameters;
                 newProcess.EnableRaisingEvents = true;
-                newProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden; // needed for unity 2023 for some reason? (otherwise console popups briefly)
+                //newProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden; // needed for unity 2023 for some reason? (otherwise console popups briefly), Cannot use this, whole Editor is invisible then
                 newProcess.Start();
 
                 if (Properties.Settings.Default.closeAfterProject)
