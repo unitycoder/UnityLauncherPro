@@ -2739,9 +2739,18 @@ namespace UnityLauncherPro
 
             var proj = GetSelectedProject();
             if (proj == null) return;
+            
             if (GetProjects.RemoveRecentProject(proj.Path))
             {
                 RefreshRecentProjects();
+            }
+            else
+            {
+                // we had added this project manually, without opening yet, just remove item
+                projectsSource.Remove(proj);
+                gridRecent.Items.Refresh();
+                Tools.SetFocusToGrid(gridRecent);
+                gridRecent.SelectedIndex = 0;
             }
         }
 
