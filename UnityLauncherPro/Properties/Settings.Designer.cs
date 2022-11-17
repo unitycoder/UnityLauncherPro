@@ -25,7 +25,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        [global::System.Configuration.DefaultSettingValueAttribute("880")]
         public int windowWidth {
             get {
                 return ((int)(this["windowWidth"]));
@@ -144,7 +144,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool AllowSingleInstanceOnly {
             get {
                 return ((bool)(this["AllowSingleInstanceOnly"]));
@@ -264,7 +264,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool enablePlatformSelection {
             get {
                 return ((bool)(this["enablePlatformSelection"]));
@@ -312,7 +312,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool useHumandFriendlyLastModified {
             get {
                 return ((bool)(this["useHumandFriendlyLastModified"]));
@@ -505,7 +505,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool override40ProjectCount {
             get {
                 return ((bool)(this["override40ProjectCount"]));
@@ -517,7 +517,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
         public int maxProjectCount {
             get {
                 return ((int)(this["maxProjectCount"]));

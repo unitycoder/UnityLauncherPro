@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="windowWidth" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">600</Value>
+      <Value Profile="(Default)">880</Value>
     </Setting>
     <Setting Name="windowHeight" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">650</Value>
@@ -33,7 +33,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AllowSingleInstanceOnly" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="preferredVersion" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -63,7 +63,7 @@
       <Value Profile="(Default)">theme.ini</Value>
     </Setting>
     <Setting Name="enablePlatformSelection" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="runAutomatically" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -75,7 +75,7 @@
       <Value Profile="(Default)">dd/MM/yyyy HH:mm:ss</Value>
     </Setting>
     <Setting Name="useHumandFriendlyLastModified" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="recentColumnsOrder" Type="System.Int32[]" Scope="User">
       <Value Profile="(Default)" />
@@ -127,10 +127,10 @@
 &lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" /&gt;</Value>
     </Setting>
     <Setting Name="override40ProjectCount" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="maxProjectCount" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">40</Value>
+      <Value Profile="(Default)">50</Value>
     </Setting>
   </Settings>
 </SettingsFile>

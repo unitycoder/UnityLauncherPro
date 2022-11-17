@@ -204,7 +204,7 @@ namespace UnityLauncherPro
                     Properties.Settings.Default.projectPaths.RemoveAt(Properties.Settings.Default.projectPaths.Count - 1);
                 }
 
-                Console.WriteLine("AddProjectToHistory, count: " + Properties.Settings.Default.projectPaths.Count);
+                //Console.WriteLine("AddProjectToHistory, count: " + Properties.Settings.Default.projectPaths.Count);
 
                 // TODO no need to save everytime?
                 Properties.Settings.Default.Save();
