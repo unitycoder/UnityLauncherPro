@@ -2739,7 +2739,7 @@ namespace UnityLauncherPro
 
             var proj = GetSelectedProject();
             if (proj == null) return;
-            
+
             if (GetProjects.RemoveRecentProject(proj.Path))
             {
                 RefreshRecentProjects();
@@ -3039,7 +3039,10 @@ namespace UnityLauncherPro
         private void btnExploreScriptsFolder_Click(object sender, RoutedEventArgs e)
         {
             // TODO later this script should be inside some unity project, for easier updating..
-            Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts"));
+            if (Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts")) == false)
+            {
+                Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory));
+            }
         }
 
         private void txtCustomInitFile_PreviewKeyDown(object sender, KeyEventArgs e)

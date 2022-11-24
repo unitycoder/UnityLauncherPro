@@ -1772,18 +1772,21 @@ public static class UnityLauncherProTools
         // https://unity3d.com/unity/alpha
         public static bool IsAlpha(string version)
         {
+            if (string.IsNullOrEmpty(version)) return false; 
             return version.IndexOf("a", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
         }
 
         // https://unity3d.com/beta/
         public static bool IsBeta(string version)
         {
+            if (string.IsNullOrEmpty(version)) return false;
             return version.IndexOf("b", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
         }
 
         // https://unity3d.com/unity/qa/lts-releases
         public static bool IsLTS(string versionRaw)
         {
+            if (string.IsNullOrEmpty(versionRaw)) return false;
             var version = versionRaw.Split('.');
             var versionInt = int.Parse(version[0]);
             var versionMinor = int.Parse(version[1]);

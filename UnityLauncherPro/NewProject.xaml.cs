@@ -44,16 +44,16 @@ namespace UnityLauncherPro
                 // get release type info (not done in mainwindow yet, to avoid doing extra stuff)
                 for (int i = 0, len = MainWindow.unityInstallationsSource.Length; i < len; i++)
                 {
-                    var vers = MainWindow.unityInstallationsSource[i].Version;
-                    if (Tools.IsLTS(vers))
+                    var ver = MainWindow.unityInstallationsSource[i].Version;
+                    if (Tools.IsLTS(ver))
                     {
                         MainWindow.unityInstallationsSource[i].ReleaseType = "LTS";
                     }
-                    else if (Tools.IsAlpha(vers))
+                    else if (Tools.IsAlpha(ver))
                     {
                         MainWindow.unityInstallationsSource[i].ReleaseType = "Alpha";
                     }
-                    else if (Tools.IsBeta(vers))
+                    else if (Tools.IsBeta(ver))
                     {
                         MainWindow.unityInstallationsSource[i].ReleaseType = "Beta";
                     }
