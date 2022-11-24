@@ -460,31 +460,23 @@ namespace UnityLauncherPro
             string url = "";
             if (VersionIsArchived(version) == true)
             {
-                // remove f#
-                version = Regex.Replace(version, @"f.", "", RegexOptions.IgnoreCase);
+                // remove f#, TODO should remove c# from china version ?
+                version = Regex.Replace(version, @"f[0-9]{1,2}", "", RegexOptions.IgnoreCase);
 
                 string padding = "unity-";
                 string whatsnew = "whats-new";
 
                 if (version.Contains("5.6")) padding = "";
-                if (version.Contains("2017.1")) whatsnew = "whatsnew";
                 if (version.Contains("2018.2")) whatsnew = "whatsnew";
                 if (version.Contains("2018.3")) padding = "";
                 if (version.Contains("2018.1")) whatsnew = "whatsnew";
                 if (version.Contains("2017.4.")) padding = "";
                 if (version.Contains("2018.4.")) padding = "";
-                if (version.Contains("2019")) padding = "";
-                if (version.Contains("2020")) padding = "";
-                if (version.Contains("2021")) padding = "";
-                if (version.Contains("2022")) padding = "";
-                if (version.Contains("2023")) padding = "";
-                if (version.Contains("2024")) padding = "";
-                if (version.Contains("2025")) padding = "";
-                if (version.Contains("2026")) padding = "";
-                if (version.Contains("2027")) padding = "";
-                if (version.Contains("2028")) padding = "";
-                if (version.Contains("2029")) padding = "";
-                if (version.Contains("2030")) padding = "";
+
+                // later versions seem to follow this
+                var year = int.Parse(version.Split('.')[0]);
+                if (year >= 2019) padding = "";
+
                 url = "https://unity3d.com/unity/" + whatsnew + "/" + padding + version;
             }
             else
