@@ -283,6 +283,7 @@
                                     <MenuItem x:Name="menuItemDownloadIOSModule" Header="Download IOS module" Click="MenuItemDownloadIOSModule_Click"/>
                                     <MenuItem x:Name="menuItemDownloadWebGLModule" Header="Download WebGL module" Click="MenuItemDownloadWebGLModule_Click" />
                                     <MenuItem x:Name="menuItemDownloadLinuxModule" Header="Download Linux modules" Click="MenuItemDownloadLinuxModule_Click"/>
+                                    <MenuItem x:Name="menuItemDownloadIL2CPPModule" Header="Download IL2CPP module" Click="menuItemDownloadIL2CPPModule_Click"/>
                                 </MenuItem>
                             </ContextMenu>
                         </DataGrid.ContextMenu>

@@ -3284,6 +3284,13 @@ namespace UnityLauncherPro
             FilterUpdates();
         }
 
+        private void menuItemDownloadIL2CPPModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Windows-IL2CPP");
+        }
+
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
         //{
         //    var folder = Tools.BrowseForOutputFolder("Select unitypackage Templates folder");

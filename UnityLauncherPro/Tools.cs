@@ -376,6 +376,7 @@ namespace UnityLauncherPro
             {
                 for (int i = folder.Length - 1; i > -1; i--)
                 {
+                    // TODO path.separator
                     if (folder[i] == '/')
                     {
                         if (Directory.Exists(folder.Substring(0, i)))
