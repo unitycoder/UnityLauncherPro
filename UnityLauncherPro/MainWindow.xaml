@@ -284,6 +284,8 @@
                                     <MenuItem x:Name="menuItemDownloadWebGLModule" Header="Download WebGL module" Click="MenuItemDownloadWebGLModule_Click" />
                                     <MenuItem x:Name="menuItemDownloadLinuxModule" Header="Download Linux modules" Click="MenuItemDownloadLinuxModule_Click"/>
                                     <MenuItem x:Name="menuItemDownloadIL2CPPModule" Header="Download IL2CPP module" Click="menuItemDownloadIL2CPPModule_Click"/>
+                                    <MenuItem x:Name="menuItemDownloadWinDedicatedServerModule" Header="Download Windows Dedicated module" Click="menuItemDownloadWinDedicatedServerModule_Click"/>
+                                    <MenuItem x:Name="menuItemDownloadLinuxDedicatedServerModule" Header="Download Linux Dedicated module" Click="menuItemDownloadLinuxDedicatedServerModule_Click"/>
                                 </MenuItem>
                             </ContextMenu>
                         </DataGrid.ContextMenu>

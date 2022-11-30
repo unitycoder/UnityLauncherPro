@@ -238,14 +238,16 @@ namespace UnityLauncherPro
             var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
             if (Directory.Exists(targetPath) == true)
             {
-                System.Console.WriteLine("Project name already exists");
+                System.Console.WriteLine("Project already exists");
                 txtNewProjectName.BorderBrush = Brushes.Red; // not visible if focused
+                txtNewProjectName.ToolTip = "Project folder already exists";
                 btnCreateNewProject.IsEnabled = false;
             }
             else
             {
                 txtNewProjectName.BorderBrush = null;
                 btnCreateNewProject.IsEnabled = true;
+                txtNewProjectName.ToolTip = "";
             }
 
             //System.Console.WriteLine("newProjectName: " + txtNewProjectName.Text);
