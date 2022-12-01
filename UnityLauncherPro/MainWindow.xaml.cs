@@ -1650,6 +1650,9 @@ namespace UnityLauncherPro
             // cancel if editing cell, because often try to double click to edit instead
             if (IsEditingCell(gridRecent)) return;
 
+            // check if not clicked on the row
+            if (e.OriginalSource.GetType() != typeof(TextBlock)) return;
+
             // cancel run if double clicked Arguments or Platform editable field
             var currentColumnCell = gridRecent.CurrentCell.Column.DisplayIndex;
             if (currentColumnCell == 4 || currentColumnCell == 6) return;
