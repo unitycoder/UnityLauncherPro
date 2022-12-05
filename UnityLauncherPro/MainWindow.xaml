@@ -43,7 +43,7 @@
         </Grid>
 
         <!-- main content : Tabs -->
-        <TabControl Grid.Row="1" x:Name="tabControl"  Background="{DynamicResource ThemeMainBackgroundColor}" BorderBrush="{x:Null}" Padding="0" Margin="0" SelectionChanged="OnTabSelectionChanged">
+        <TabControl Grid.Row="1" x:Name="tabControl"  Background="{DynamicResource ThemeMainBackgroundColor}" BorderBrush="{x:Null}" Padding="0" Margin="0" SelectionChanged="OnTabSelectionChanged" PreviewKeyDown="tabControl_PreviewKeyDown">
 
             <!-- Tab: Projects-->
             <TabItem Header="Projects" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}">

@@ -657,12 +657,7 @@ namespace UnityLauncherPro
         {
             return (Project)gridRecent.SelectedItem;
         }
-
-        int GetSelectedProjectIndex()
-        {
-            return gridRecent.SelectedIndex;
-        }
-
+        
         UnityInstallation GetSelectedUnity()
         {
             return (UnityInstallation)dataGridUnitys.SelectedItem;
@@ -755,7 +750,7 @@ namespace UnityLauncherPro
             this.WindowState = WindowState.Normal;
             notifyIcon.Visible = false;
             // NOTE workaround for grid not focused when coming back from minimized window
-            Tools.SetFocusToGrid(gridRecent, GetSelectedProjectIndex());
+            Tools.SetFocusToGrid(gridRecent, gridRecent.SelectedIndex);
         }
 
         private void OnRectangleMouseDown(object sender, MouseButtonEventArgs e)
@@ -3229,7 +3224,7 @@ namespace UnityLauncherPro
             // only can do restore here, we dont want accidental maximize (max window not really needed)
             if (this.WindowState == WindowState.Maximized) this.WindowState = WindowState.Normal;
             // NOTE workaround for grid not focused when coming back from minimized window
-            Tools.SetFocusToGrid(gridRecent, GetSelectedProjectIndex());
+            Tools.SetFocusToGrid(gridRecent, gridRecent.SelectedIndex);
         }
 
         private void chkOverride40ProjectCount_Checked(object sender, RoutedEventArgs e)
@@ -3306,6 +3301,26 @@ namespace UnityLauncherPro
             var unity = GetSelectedUnity();
             if (unity == null) return;
             Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Linux-Server");
+        }
+
+        private void tabControl_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // if press up or down, while tab control is focused, move focus to grid
+            if (e.Key == Key.Up || e.Key == Key.Down)
+            {
+                if (tabControl.SelectedIndex == 0)
+                {
+                    Tools.SetFocusToGrid(gridRecent, gridRecent.SelectedIndex);
+                }
+                else if (tabControl.SelectedIndex == 1)
+                {
+                    Tools.SetFocusToGrid(dataGridUnitys, dataGridUnitys.SelectedIndex);
+                }
+                else if (tabControl.SelectedIndex == 2)
+                {
+                    Tools.SetFocusToGrid(dataGridUpdates, dataGridUpdates.SelectedIndex);
+                }
+            }
         }
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
