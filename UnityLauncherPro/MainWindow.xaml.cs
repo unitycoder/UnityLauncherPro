@@ -1852,8 +1852,6 @@ namespace UnityLauncherPro
         bool isInitializing = true; // used to avoid doing things while still starting up
         private void ChkStreamerMode_Checked(object sender, RoutedEventArgs e)
         {
-            // TODO could add "(streamer mode)" text in statusbar?
-
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             Properties.Settings.Default.streamerMode = isChecked;
@@ -1864,6 +1862,7 @@ namespace UnityLauncherPro
             cellStyle.Setters.Add(new Setter(FontSizeProperty, 1.0));
             txtColumnTitle.CellStyle = isChecked ? cellStyle : null;
             txtColumnName.CellStyle = isChecked ? cellStyle : null;
+            txtColumnGitBranch.CellStyle = isChecked ? cellStyle : null;
 
             Style txtBoxStyle = new Style(typeof(TextBox));
             txtBoxStyle.Setters.Add(new Setter(FontSizeProperty, 1.0));
