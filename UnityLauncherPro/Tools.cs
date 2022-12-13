@@ -216,9 +216,10 @@ namespace UnityLauncherPro
         // NOTE holding alt key (when using alt+o) brings up unity project selector
         public static Process LaunchProject(Project proj, DataGrid dataGridRef = null, bool useInitScript = false, bool upgrade = false)
         {
-            Console.WriteLine("Launching project " + proj.Title + " at " + proj.Path);
-
             if (proj == null) return null;
+
+            Console.WriteLine("Launching project " + proj?.Title + " at " + proj?.Path);
+
             if (Directory.Exists(proj.Path) == false) return null;
 
             // add this project to recent projects in preferences TODO only if enabled +40 projecs

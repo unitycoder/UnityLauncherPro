@@ -657,7 +657,7 @@ namespace UnityLauncherPro
         {
             return (Project)gridRecent.SelectedItem;
         }
-        
+
         UnityInstallation GetSelectedUnity()
         {
             return (UnityInstallation)dataGridUnitys.SelectedItem;
@@ -1019,7 +1019,7 @@ namespace UnityLauncherPro
         private void BtnExplore_Click(object sender, RoutedEventArgs e)
         {
             var proj = GetSelectedProject();
-            Tools.ExploreFolder(proj.Path);
+            Tools.ExploreFolder(proj?.Path);
             Tools.SetFocusToGrid(gridRecent);
         }
 
