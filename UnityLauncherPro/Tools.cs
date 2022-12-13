@@ -548,9 +548,9 @@ namespace UnityLauncherPro
         {
             string exeURL = ParseDownloadURLFromWebpage(version);
 
-            Console.WriteLine("exeURL=" + exeURL);
+            Console.WriteLine("download exeURL= (" + exeURL + ")");
 
-            if (string.IsNullOrEmpty(exeURL) == false)
+            if (string.IsNullOrEmpty(exeURL) == false && exeURL.StartsWith("https") == true)
             {
                 //SetStatus("Download installer in browser: " + exeURL);
                 Process.Start(exeURL);
@@ -573,9 +573,9 @@ namespace UnityLauncherPro
             {
                 // get correct page url
                 string website = "https://unity3d.com/get-unity/download/archive";
-                if (Tools.VersionIsPatch(version)) website = "https://unity3d.com/unity/qa/patch-releases";
-                if (Tools.VersionIsBeta(version)) website = "https://unity3d.com/unity/beta/" + version;
-                if (Tools.VersionIsAlpha(version)) website = "https://unity3d.com/unity/alpha/" + version;
+                if (VersionIsPatch(version)) website = "https://unity3d.com/unity/qa/patch-releases";
+                if (VersionIsBeta(version)) website = "https://unity.com/releases/editor/beta/" + version;
+                if (VersionIsAlpha(version)) website = "https://unity.com/releases/editor/alpha/" + version;
 
                 // fix unity server problem, some pages says 404 found if no url params
                 website += "?unitylauncherpro";
@@ -633,9 +633,14 @@ namespace UnityLauncherPro
                     {
                         if (lines[i].Contains("UnityDownloadAssistant.exe"))
                         {
-                            int start = lines[i].IndexOf('"') + 1;
-                            int end = lines[i].IndexOf('"', start);
-                            url = lines[i].Substring(start, end - start) + "#version=" + version;
+                            // parse download url from this html line
+                            string pattern = @"https://beta\.unity3d\.com/download/[a-zA-Z0-9]+/UnityDownloadAssistant\.exe";
+                            Match match = Regex.Match(lines[i], pattern);
+                            if (match.Success)
+                            {
+                                url = match.Value;
+                                //Console.WriteLine("url= " + url);
+                            }
                             break;
                         }
                     }
@@ -646,6 +651,7 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(url))
             {
                 //SetStatus("Cannot find UnityDownloadAssistant.exe for this version.");
+                Console.WriteLine("Installer not found from URL..");
             }
             return url;
         }
@@ -1774,7 +1780,7 @@ public static class UnityLauncherProTools
         // https://unity3d.com/unity/alpha
         public static bool IsAlpha(string version)
         {
-            if (string.IsNullOrEmpty(version)) return false; 
+            if (string.IsNullOrEmpty(version)) return false;
             return version.IndexOf("a", 0, StringComparison.CurrentCultureIgnoreCase) > -1;
         }
 
