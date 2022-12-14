@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="Upgrade Project Version" Height="533.165" Width="418.684" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="319" MinHeight="555" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewKeyDown="Window_PreviewKeyDown" ShowInTaskbar="False">
+        Title="Upgrade Project Version" Height="533.165" Width="419" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="319" MinHeight="555" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewKeyDown="Window_PreviewKeyDown" ShowInTaskbar="False">
 
     <Grid>
         <StackPanel Orientation="Horizontal">
@@ -13,22 +13,38 @@
             <TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtCurrentVersion" Background="{DynamicResource ThemeDarkMenuBar}" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="0,16,0,0" UndoLimit="64" Text="Version" IsReadOnly="True" VerticalAlignment="Top" />
         </StackPanel>
         <Label x:Name="lblAvailableVersions" Content="Available Unity Versions" HorizontalAlignment="Left" Margin="9,94,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ThemeButtonForeground}"/>
-        <Button Style="{StaticResource CustomButton}" x:Name="btnDownload" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="0,47,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="35" Click="BtnDownload_Click" Width="150" >
-            <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Download in Browser"/>
-        </Button>
-        <Button Style="{StaticResource CustomButton}" x:Name="btnOpenReleasePage" ToolTip="Open Release Notes Page in Browser" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="9,47,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="35" Click="BtnOpenReleasePage_Click" Width="150" >
-            <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Open Release Notes"/>
-        </Button>
+        
+        <StackPanel Orientation="Horizontal" Margin="9,47,9,0">
+            <Button Style="{StaticResource CustomButton}" x:Name="btnOpenReleasePage" ToolTip="Open Release Notes Page in Browser" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="35" Click="BtnOpenReleasePage_Click" Width="125" >
+                <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Open Release Notes"/>
+            </Button>
+            <Button Style="{StaticResource CustomButton}" x:Name="btnDownload" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="9,0,9,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="35" Click="BtnDownload_Click" Width="125" >
+                <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="Download in _Browser"/>
+            </Button>
+            <Button Style="{StaticResource CustomButton}" x:Name="btnInstall" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="35" Width="125" Click="btnInstall_Click" >
+                <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Download &amp; Install"/>
+            </Button>
+        </StackPanel>
+        
         <Button Style="{StaticResource CustomButton}" x:Name="btnCancelUpgrade" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="9,434,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" Width="111" VerticalAlignment="Top" Height="51" Click="BtnCancelUpgrade_Click" >
             <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Cancel"/>
         </Button>
-        <Button Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" ToolTip="Launch with selected Unity version" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="0,434,8,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" Width="159" VerticalAlignment="Top" Height="51" Click="BtnUpgradeProject_Click" >
+        <Button Style="{StaticResource CustomButton}" x:Name="btnUpgradeProject" ToolTip="Launch with selected Unity version" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="0,434,10,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" Width="159" VerticalAlignment="Top" Height="51" Click="BtnUpgradeProject_Click" >
             <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Upgrade Project"/>
         </Button>
-        <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" HorizontalAlignment="Left" Height="304" Margin="10,121,0,0" VerticalAlignment="Top" Width="393" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+
+        <!--<DataGrid x:Name="gridAvailableVersions" KeyboardNavigation.TabNavigation = "None" SelectionMode="Single" Height="270" Margin="0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="1"  Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" PreviewMouseDoubleClick="gridAvailableVersions_PreviewMouseDoubleClick">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" />
-                <DataGridTextColumn Header="Value" Binding="{Binding Value}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Version" Binding="{Binding Version}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                <DataGridTextColumn Header="Platforms" Binding="{Binding PlatformsCombined}" IsReadOnly="True" CanUserResize="False" MinWidth="270" />
+                <DataGridTextColumn Header="Release" Binding="{Binding ReleaseType}" IsReadOnly="True" CanUserResize="False" MinWidth="70" />
+            </DataGrid.Columns>
+        </DataGrid>-->
+
+        <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" Height="304" Margin="10,121,10,0" VerticalAlignment="Top" Width="383" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled"  ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                <DataGridTextColumn Header="Value" Binding="{Binding Value}" IsReadOnly="True" CanUserResize="False" />
             </DataGrid.Columns>
         </DataGrid>
 

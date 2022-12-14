@@ -563,6 +563,86 @@ namespace UnityLauncherPro
             }
         }
 
+        public static void DownloadAndInstall(string url, string version)
+        {
+            string exeURL = ParseDownloadURLFromWebpage(version);
+
+            Console.WriteLine("download exeURL= (" + exeURL + ")");
+
+            if (string.IsNullOrEmpty(exeURL) == false && exeURL.StartsWith("https") == true)
+            {
+                //SetStatus("Download installer in browser: " + exeURL);
+                // download url file to temp
+                string tempFile = Path.GetTempPath() + "UnityDownloadAssistant-" + version.Replace(".", "_") + ".exe";
+                //Console.WriteLine("download tempFile= (" + tempFile + ")");
+                if (File.Exists(tempFile) == true) File.Delete(tempFile);
+ 
+                // TODO make async
+                if (DownloadFile(exeURL, tempFile) == true)
+                {
+                    // run installer, copy current existing version path to clipboard, NOTE this probably never happens? unless install same version again..
+                    if (MainWindow.unityInstalledVersions.ContainsKey(version) == true)
+                    {
+                        string path = MainWindow.unityInstalledVersions[version];
+                        if (string.IsNullOrEmpty(path) == false)
+                        {
+                            // copy to clipboard
+                            Clipboard.SetText(path);
+                        }
+                    }
+                    else // no same version, copy last item from root folders
+                    {
+                        if (Properties.Settings.Default.rootFolders.Count > 0)
+                        {
+                            string path = Properties.Settings.Default.rootFolders[Properties.Settings.Default.rootFolders.Count - 1];
+                            if (string.IsNullOrEmpty(path) == false)
+                            {
+                                Clipboard.SetText(path);
+                            }
+                        }
+                    }
+
+                    Process process = Process.Start(tempFile);
+                    process.EnableRaisingEvents = true;
+                    process.Exited += (sender, e) => DeleteTempFile(tempFile);
+                    // TODO refresh upgrade dialog after installer finished
+                }
+            }
+            else // not found
+            {
+                //SetStatus("Error> Cannot find installer executable ... opening website instead");
+                url = "https://unity3d.com/get-unity/download/archive";
+                Process.Start(url + "#installer-not-found---version-" + version);
+            }
+        }
+
+        static void DeleteTempFile(string path)
+        {
+            if (File.Exists(path) == true)
+            {
+                Console.WriteLine("DeleteTempFile: " + path);
+                File.Delete(path);
+            }
+        }
+
+        static bool DownloadFile(string url, string tempFile)
+        {
+            bool result = false;
+            try
+            {
+                using (WebClient client = new WebClient())
+                {
+                    client.DownloadFile(url, tempFile);
+                    result = true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error> DownloadFile: " + e);
+            }
+            return result;
+        }
+
         // parse Unity installer exe from release page
         // thanks to https://github.com/softfruit
         public static string ParseDownloadURLFromWebpage(string version)

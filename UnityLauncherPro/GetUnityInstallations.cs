@@ -15,7 +15,7 @@ namespace UnityLauncherPro
         // returns unity installations
         public static UnityInstallation[] Scan()
         {
-            // convert settings list to string array
+            // get list from settings
             var rootFolders = Properties.Settings.Default.rootFolders;
 
             // unityversion, exe_path

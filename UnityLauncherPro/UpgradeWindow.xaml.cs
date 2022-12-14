@@ -20,15 +20,21 @@ namespace UnityLauncherPro
             InitializeComponent();
             txtCurrentVersion.Text = currentVersion;
             gridAvailableVersions.ItemsSource = MainWindow.unityInstalledVersions;
-
             gridAvailableVersions.SelectedItem = null;
 
-            // autoselect nearest one FIXME doesnt work with 5.x (should suggest next highest installed in 201x.x)
+            // we have current version info in project
             if (string.IsNullOrEmpty(currentVersion) == false)
             {
                 // enable release and dl buttons
                 btnOpenReleasePage.IsEnabled = true;
                 btnDownload.IsEnabled = true;
+
+                // if dont have exact version, show red outline
+                if (MainWindow.unityInstalledVersions.ContainsKey(currentVersion) == false)
+                {
+                    txtCurrentVersion.BorderBrush = Brushes.Red;
+                    txtCurrentVersion.BorderThickness = new Thickness(1);
+                }
 
                 // find nearest version
                 string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
@@ -48,7 +54,7 @@ namespace UnityLauncherPro
                     }
                 }
             }
-            else // we dont have current version
+            else // we dont have current version info in project
             {
                 btnOpenReleasePage.IsEnabled = false;
                 btnDownload.IsEnabled = false;
@@ -103,6 +109,19 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(url) == false)
             {
                 Tools.DownloadInBrowser(url, txtCurrentVersion.Text);
+            }
+            else
+            {
+                Console.WriteLine("Failed getting Unity Installer URL for " + txtCurrentVersion.Text);
+            }
+        }
+
+        private void btnInstall_Click(object sender, RoutedEventArgs e)
+        {
+            string url = Tools.GetUnityReleaseURL(txtCurrentVersion.Text);
+            if (string.IsNullOrEmpty(url) == false)
+            {
+                Tools.DownloadAndInstall(url, txtCurrentVersion.Text);
             }
             else
             {
@@ -168,5 +187,7 @@ namespace UnityLauncherPro
             upgradeVersion = k.Value.Key;
             DialogResult = true;
         }
+
+
     }
 }
