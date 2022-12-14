@@ -411,15 +411,19 @@
                     <Grid VerticalAlignment="Bottom" Margin="4,0,8,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="20*" />
-                            <ColumnDefinition Width="45*" />
+                            <ColumnDefinition Width="33*" />
+                            <ColumnDefinition Width="33*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="32" />
                         </Grid.RowDefinitions>
-                        <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnDonwloadInBrowser"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnDonwloadInBrowser_Click">
+                        <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnDownloadInBrowser"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnDownloadInBrowser_Click">
                             <Label Content="_Download in browser" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
-                        <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite"  Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
+                        <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnDownloadInstallUpdate"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="btnDownloadInstallUpdate_Click">
+                            <Label Content="Download &amp; Install" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                        </Button>
+                        <Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
                             <Label Content="Release _Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
                     </Grid>

@@ -21,7 +21,7 @@
             <Button Style="{StaticResource CustomButton}" x:Name="btnDownload" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" Margin="9,0,9,0" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="35" Click="BtnDownload_Click" Width="125" >
                 <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="Download in _Browser"/>
             </Button>
-            <Button Style="{StaticResource CustomButton}" x:Name="btnInstall" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="35" Width="125" Click="btnInstall_Click" >
+            <Button Style="{StaticResource CustomButton}" x:Name="btnInstall" Background="{DynamicResource ThemeButtonBackground}" Foreground="#FFC1C1C1" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="35" Width="125" Click="btnInstall_Click" ToolTip="Downloads Unity web installer into Temp folder and runs it (Root folder path is copied to clipboard)" >
                 <Label Foreground="{DynamicResource ThemeButtonForeground}" Content="_Download &amp; Install"/>
             </Button>
         </StackPanel>

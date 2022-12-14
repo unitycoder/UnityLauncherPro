@@ -649,6 +649,8 @@ namespace UnityLauncherPro
         {
             string url = "";
 
+            if (string.IsNullOrEmpty(version)) return null;
+
             using (WebClient client = new WebClient())
             {
                 // get correct page url

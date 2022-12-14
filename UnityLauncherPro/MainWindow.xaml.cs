@@ -1385,7 +1385,7 @@ namespace UnityLauncherPro
             UpdateUnityInstallationsList();
         }
 
-        private void BtnDonwloadInBrowser_Click(object sender, RoutedEventArgs e)
+        private void BtnDownloadInBrowser_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
             string url = Tools.GetUnityReleaseURL(unity?.Version);
@@ -1397,6 +1397,20 @@ namespace UnityLauncherPro
             {
                 Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
                 SetStatus("Failed getting Unity Installer URL for " + unity?.Version);
+            }
+        }
+
+        private void btnDownloadInstallUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            string url = Tools.GetUnityReleaseURL(unity?.Version);
+            if (string.IsNullOrEmpty(url) == false)
+            {
+                Tools.DownloadAndInstall(url, unity?.Version);
+            }
+            else
+            {
+                Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
             }
         }
 
@@ -2694,7 +2708,7 @@ namespace UnityLauncherPro
         {
             var unity = GetSelectedUpdate();
             string exeURL = Tools.ParseDownloadURLFromWebpage(unity?.Version);
-            Tools.DownloadInBrowser(exeURL, unity?.Version);
+            if (exeURL != null) Tools.DownloadInBrowser(exeURL, unity?.Version);
         }
 
         private void MenuItemDownloadLinuxModule_Click(object sender, RoutedEventArgs e)
@@ -3321,6 +3335,8 @@ namespace UnityLauncherPro
                 }
             }
         }
+
+
 
         //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
         //{
