@@ -248,7 +248,7 @@
 
                     <Button Style="{StaticResource CustomButton}" ToolTip="Refresh installations (F5)" x:Name="btnRefreshUnityList" Content="⟳" Height="22" Width="26" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshUnityList_Click"/>
 
-                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick">
+                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" CanUserAddRows="False" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick">
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                         </DataGrid.CommandBindings>
@@ -292,6 +292,9 @@
                                     <MenuItem x:Name="menuItemDownloadWinDedicatedServerModule" Header="Download Windows Dedicated module" Click="menuItemDownloadWinDedicatedServerModule_Click"/>
                                     <MenuItem x:Name="menuItemDownloadLinuxDedicatedServerModule" Header="Download Linux Dedicated module" Click="menuItemDownloadLinuxDedicatedServerModule_Click"/>
                                 </MenuItem>
+                                <Separator></Separator>
+                                <MenuItem x:Name="menuUninstallEditor" Header="Uninstall" Click="menuUninstallEditor_Click"/>
+
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 
@@ -662,7 +665,7 @@
 
                                 </StackPanel>
                             </GroupBox>
-                            
+
                             <GroupBox Grid.Row="3" Header="UI" VerticalAlignment="Top" Margin="3,0,0,0">
                                 <StackPanel Grid.Row="3" Orientation="Vertical" Margin="3,5,0,0" >
                                     <CheckBox  x:Name="chkHumanFriendlyDateTime" Content="Use human friendly Last Modified"  ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkHumanFriendlyDateTime_Checked" Unchecked="ChkHumanFriendlyDateTime_Checked"/>

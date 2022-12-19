@@ -576,7 +576,7 @@ namespace UnityLauncherPro
                 string tempFile = Path.GetTempPath() + "UnityDownloadAssistant-" + version.Replace(".", "_") + ".exe";
                 //Console.WriteLine("download tempFile= (" + tempFile + ")");
                 if (File.Exists(tempFile) == true) File.Delete(tempFile);
- 
+
                 // TODO make async
                 if (DownloadFile(exeURL, tempFile) == true)
                 {
@@ -1281,7 +1281,7 @@ namespace UnityLauncherPro
         {
             // get platforms array for this unity version
             // TODO use dictionary instead of looping versions
-            for (int i = 0; i < MainWindow.unityInstallationsSource.Length; i++)
+            for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
             {
                 if (MainWindow.unityInstallationsSource[i].Version == version)
                 {
@@ -1883,6 +1883,54 @@ public static class UnityLauncherProTools
             return (versionInt >= 2017 && versionMinor == 4) || (versionInt > 2019 && versionMinor == 3);
         }
 
+        internal static void UninstallEditor(string path, string version)
+        {
+            if (string.IsNullOrEmpty(path)) return;
+            if (string.IsNullOrEmpty(version)) return;
+
+            // run uninstaller from path
+            var installFolder = Path.GetDirectoryName(path);
+            var uninstaller = Path.Combine(installFolder, "Uninstall.exe");
+            // TODO could be optional setting for non-silent uninstall
+            LaunchExe(uninstaller, "/S");
+            // remove firewall settings
+            var cmd = "netsh advfirewall firewall delete rule name=all program=\"" + path + "\"";
+            Console.WriteLine("Cleanup firewall: " + cmd);
+            LaunchExe("cmd.exe", "/c " + cmd);
+
+            if (int.Parse(version.Substring(0, 4)) <= 2017)
+            {
+                var nodeFolder = Path.Combine(installFolder, "Editor", "Data", "Tools", "nodejs", "node.exe");
+                cmd = "netsh advfirewall firewall delete rule name=all program=\"" + nodeFolder + "\"";
+                Console.WriteLine("Cleanup firewall <= 2017: " + cmd);
+                LaunchExe("cmd.exe", "/c " + cmd);
+            }
+            // remove registry entries
+            var unityKeyName = "HKEY_CURRENT_USER\\Software\\Unity Technologies\\Installer\\Unity " + version;
+            cmd = "reg delete " + unityKeyName + " /f";
+            Console.WriteLine("Removing registry key: " + cmd);
+            LaunchExe("cmd.exe", "/c " + cmd);
+
+            // remove startmenu item
+            var startMenuFolder = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
+            var unityIcon = Path.Combine(startMenuFolder, "Unity " + version + "(64-bit)");
+            if (Directory.Exists(unityIcon))
+            {
+                Console.WriteLine("Removing startmenu folder: " + unityIcon);
+                Directory.Delete(unityIcon, true);
+            }
+
+            // remove desktop icon
+            var desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            unityIcon = Path.Combine(startMenuFolder, "Unity " + version + ".lnk");
+            if (File.Exists(unityIcon))
+            {
+                Console.WriteLine("Removing desktop icon: " + unityIcon);
+                File.Delete(unityIcon);
+            }
+
+
+        }
     } // class
 
 } // namespace

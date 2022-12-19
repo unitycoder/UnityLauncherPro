@@ -13,7 +13,7 @@ namespace UnityLauncherPro
 
 
         // returns unity installations
-        public static UnityInstallation[] Scan()
+        public static List<UnityInstallation> Scan()
         {
             // get list from settings
             var rootFolders = Properties.Settings.Default.rootFolders;
@@ -86,7 +86,7 @@ namespace UnityLauncherPro
             // sort by version
             results.Sort((s1, s2) => s2.VersionCode.CompareTo(s1.VersionCode));
 
-            return results.ToArray();
+            return results;
         } // scan()
 
         public static bool HasUnityInstallations(string path)

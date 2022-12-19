@@ -42,7 +42,7 @@ namespace UnityLauncherPro
             if (gridAvailableVersions.ItemsSource == null)
             {
                 // get release type info (not done in mainwindow yet, to avoid doing extra stuff)
-                for (int i = 0, len = MainWindow.unityInstallationsSource.Length; i < len; i++)
+                for (int i = 0, len = MainWindow.unityInstallationsSource.Count; i < len; i++)
                 {
                     var ver = MainWindow.unityInstallationsSource[i].Version;
                     if (Tools.IsLTS(ver))
@@ -65,7 +65,7 @@ namespace UnityLauncherPro
             if (MainWindow.unityInstalledVersions.ContainsKey(unityVersion) == true)
             {
                 // find this unity version, TODO theres probably easier way than looping all
-                for (int i = 0; i < MainWindow.unityInstallationsSource.Length; i++)
+                for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
                 {
                     if (MainWindow.unityInstallationsSource[i].Version == newVersion)
                     {

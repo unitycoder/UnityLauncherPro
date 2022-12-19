@@ -30,7 +30,7 @@ namespace UnityLauncherPro
         public static bool useHumanFriendlyDateFormat = false;
         public static bool searchProjectPathAlso = false;
         public static List<Project> projectsSource;
-        public static UnityInstallation[] unityInstallationsSource;
+        public static List<UnityInstallation> unityInstallationsSource;
         public static ObservableDictionary<string, string> unityInstalledVersions = new ObservableDictionary<string, string>(); // versionID and installation folder
         public static readonly string launcherArgumentsFile = "LauncherArguments.txt";
         public static readonly string projectNameFile = "ProjectName.txt";
@@ -640,7 +640,7 @@ namespace UnityLauncherPro
             // also make dictionary of installed unitys, to search faster
             unityInstalledVersions.Clear();
 
-            for (int i = 0, len = unityInstallationsSource.Length; i < len; i++)
+            for (int i = 0, len = unityInstallationsSource.Count; i < len; i++)
             {
                 var version = unityInstallationsSource[i].Version;
                 // NOTE cannot have same version id in 2 places with this
@@ -650,7 +650,7 @@ namespace UnityLauncherPro
                 }
             }
 
-            lblFoundXInstallations.Content = "Found " + unityInstallationsSource.Length + " installations";
+            lblFoundXInstallations.Content = "Found " + unityInstallationsSource.Count + " installations";
         }
 
         Project GetSelectedProject()
@@ -2747,7 +2747,6 @@ namespace UnityLauncherPro
         private void MenuRemoveProject_Click(object sender, RoutedEventArgs e)
         {
             // delete if enabled in settings
-
             var proj = GetSelectedProject();
             if (proj == null) return;
 
@@ -3316,6 +3315,21 @@ namespace UnityLauncherPro
             Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Linux-Server");
         }
 
+        private void menuUninstallEditor_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.UninstallEditor(unity.Path, unity.Version);
+
+            var currentIndex = dataGridUnitys.SelectedIndex;
+
+            // TODO refresh list after exe's have finished (but for now just remove after hit uninstall, since would need to keep track of uninstall exes)
+            unityInstallationsSource.Remove(unity);
+            dataGridUnitys.Items.Refresh();
+            Tools.SetFocusToGrid(dataGridUnitys);
+            dataGridUnitys.SelectedIndex = currentIndex - 1 < 0 ? 0 : currentIndex - 1;
+        }
+
         private void tabControl_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             // if press up or down, while tab control is focused, move focus to grid
@@ -3335,6 +3349,8 @@ namespace UnityLauncherPro
                 }
             }
         }
+
+
 
 
 
