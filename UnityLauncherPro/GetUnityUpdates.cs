@@ -44,26 +44,39 @@ namespace UnityLauncherPro
             return result;
         }
 
-        public static Updates[] Parse(string items)// object sender, DownloadStringCompletedEventArgs e)
+        public static Updates[] Parse(string items)
         {
             isDownloadingUnityList = false;
             //SetStatus("Downloading list of Unity versions ... done");
             var receivedList = items.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             if (receivedList == null && receivedList.Length < 1) return null;
             Array.Reverse(receivedList);
-            var updates = new List<Updates>();
+            var releases = new Dictionary<string, Updates>();
             // parse into data
+            string prevVersion = null;
             for (int i = 0, len = receivedList.Length; i < len; i++)
             {
                 var row = receivedList[i].Split(',');
                 var versionTemp = row[6].Trim('"');
-                var u = new Updates();
-                u.ReleaseDate = DateTime.ParseExact(row[3], "MM/dd/yyyy", CultureInfo.InvariantCulture); //DateTime ? lastUpdated = Tools.GetLastModifiedTime(csprojFile);
-                u.Version = versionTemp;
-                updates.Add(u);
+
+                if (versionTemp.Length < 1) continue;
+                if (prevVersion == versionTemp) continue;
+
+                if (releases.ContainsKey(versionTemp) == false)
+                {
+                    var u = new Updates();
+                    u.ReleaseDate = DateTime.ParseExact(row[3], "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    u.Version = versionTemp;
+                    releases.Add(versionTemp, u);
+                }
+
+                prevVersion = versionTemp;
             }
 
-            return updates.ToArray();
+            // convert to array
+            var results = new Updates[releases.Count];
+            releases.Values.CopyTo(results, 0);
+            return results;
         }
 
     }

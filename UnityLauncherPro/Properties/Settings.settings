@@ -3,16 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="windowWidth" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">600</Value>
+      <Value Profile="(Default)">880</Value>
     </Setting>
     <Setting Name="windowHeight" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">650</Value>
-    </Setting>
-    <Setting Name="rootFolders" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
-&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;string&gt;C:\Program Files\&lt;/string&gt;
-&lt;/ArrayOfString&gt;</Value>
     </Setting>
     <Setting Name="minimizeToTaskbar" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -39,7 +33,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AllowSingleInstanceOnly" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="preferredVersion" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -51,13 +45,13 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="enableProjectRename" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="streamerMode" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="showTargetPlatform" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="webglBuildPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -69,7 +63,7 @@
       <Value Profile="(Default)">theme.ini</Value>
     </Setting>
     <Setting Name="enablePlatformSelection" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="runAutomatically" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -81,7 +75,7 @@
       <Value Profile="(Default)">dd/MM/yyyy HH:mm:ss</Value>
     </Setting>
     <Setting Name="useHumandFriendlyLastModified" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="recentColumnsOrder" Type="System.Int32[]" Scope="User">
       <Value Profile="(Default)" />
@@ -102,10 +96,41 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="newProjectPlatform" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">win64</Value>
     </Setting>
     <Setting Name="searchProjectPathAlso" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="checkPlasticBranch" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="shortcutBatchFileFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="rootFolders" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;string&gt;C:\Program Files\&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="customInitFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">InitializeProject.cs</Value>
+    </Setting>
+    <Setting Name="useInitScript" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="webglPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50000</Value>
+    </Setting>
+    <Setting Name="projectPaths" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" /&gt;</Value>
+    </Setting>
+    <Setting Name="override40ProjectCount" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="maxProjectCount" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50</Value>
     </Setting>
   </Settings>
 </SettingsFile>

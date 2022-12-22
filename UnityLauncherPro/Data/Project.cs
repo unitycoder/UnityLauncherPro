@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -12,9 +11,9 @@ namespace UnityLauncherPro
         public string Path { set; get; }
         public DateTime? Modified { set; get; }
         public string Arguments { set; get; }
-        public string GITBranch { set; get; }
+        public string GITBranch { set; get; } // TODO rename to Branch
         //public string TargetPlatform { set; get; }
-        public string TargetPlatform { set; get; }
+        public string TargetPlatform { set; get; } // TODO rename to Platform
         public string[] TargetPlatforms { set; get; }
         public bool folderExists { set; get; }
 

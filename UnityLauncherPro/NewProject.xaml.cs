@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,26 +20,52 @@ namespace UnityLauncherPro
         int previousSelectedTemplateIndex = -1;
         int previousSelectedModuleIndex = -1;
 
-        public NewProject(string unityVersion, string suggestedName, string targetFolder)
+        static string targetFolder = null;
+
+        public NewProject(string unityVersion, string suggestedName, string targetFolder, bool nameIsLocked = false)
         {
             isInitializing = true;
             InitializeComponent();
+
+            NewProject.targetFolder = targetFolder;
 
             // get version
             newVersion = unityVersion;
             newName = suggestedName;
 
+            txtNewProjectName.IsEnabled = !nameIsLocked;
+
             txtNewProjectName.Text = newName;
             lblNewProjectFolder.Content = targetFolder;
 
-            // fill available versions, TODO could show which modules are installed
-            if (gridAvailableVersions.ItemsSource == null) gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
+            // fill available versions
+            if (gridAvailableVersions.ItemsSource == null)
+            {
+                // get release type info (not done in mainwindow yet, to avoid doing extra stuff)
+                for (int i = 0, len = MainWindow.unityInstallationsSource.Count; i < len; i++)
+                {
+                    var ver = MainWindow.unityInstallationsSource[i].Version;
+                    if (Tools.IsLTS(ver))
+                    {
+                        MainWindow.unityInstallationsSource[i].ReleaseType = "LTS";
+                    }
+                    else if (Tools.IsAlpha(ver))
+                    {
+                        MainWindow.unityInstallationsSource[i].ReleaseType = "Alpha";
+                    }
+                    else if (Tools.IsBeta(ver))
+                    {
+                        MainWindow.unityInstallationsSource[i].ReleaseType = "Beta";
+                    }
+                }
 
+                gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
+            }
             // we have that version installed
             if (MainWindow.unityInstalledVersions.ContainsKey(unityVersion) == true)
             {
                 // find this unity version, TODO theres probably easier way than looping all
-                for (int i = 0; i < MainWindow.unityInstallationsSource.Length; i++)
+                for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
                 {
                     if (MainWindow.unityInstallationsSource[i].Version == newVersion)
                     {
@@ -81,27 +108,49 @@ namespace UnityLauncherPro
             // get modules and stick into combobox, NOTE we already have this info from GetProjects.Scan, so could access it
             platformsForThisUnity = Tools.GetPlatformsForUnityVersion(version);
             cmbNewProjectPlatform.ItemsSource = platformsForThisUnity;
-            //System.Console.WriteLine(Tools.GetPlatformsForUnityVersion(version).Length);
 
             var lastUsedPlatform = Properties.Settings.Default.newProjectPlatform;
 
             for (int i = 0; i < platformsForThisUnity.Length; i++)
             {
                 // set default platform (win64) if never used this setting before
-                if ((lastUsedPlatform == null && platformsForThisUnity[i].ToLower() == "win64") || platformsForThisUnity[i] == lastUsedPlatform)
+                if ((string.IsNullOrEmpty(lastUsedPlatform) && platformsForThisUnity[i].ToLower() == "win64") || platformsForThisUnity[i] == lastUsedPlatform)
                 {
                     cmbNewProjectPlatform.SelectedIndex = i;
                     break;
                 }
             }
 
-            //lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
+            // if nothing found, use win64
+            if (cmbNewProjectPlatform.SelectedIndex == -1)
+            {
+                //cmbNewProjectPlatform.SelectedIndex = cmbNewProjectPlatform.Items.Count > 1 ? 1 : 0;
+                for (int i = 0; i < platformsForThisUnity.Length; i++)
+                {
+                    if (platformsForThisUnity[i].ToLower() == "win64")
+                    {
+                        cmbNewProjectPlatform.SelectedIndex = i;
+                        break;
+                    }
+                }
+
+                // if still nothing, use first
+                if (cmbNewProjectPlatform.SelectedIndex == -1) cmbNewProjectPlatform.SelectedIndex = 0;
+                //lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
+            }
         }
-
-
 
         private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
+            // check if projectname already exists (only if should be automatically created name)
+            var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
+            if (txtNewProjectName.IsEnabled == true && Directory.Exists(targetPath) == true)
+            {
+                System.Console.WriteLine("Project already exists");
+                return;
+            }
+
+
             templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
             selectedPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
             UpdateSelectedVersion();
@@ -181,8 +230,28 @@ namespace UnityLauncherPro
             }
         }
 
-        private void TxtNewProjectName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void TxtNewProjectName_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (isInitializing == true) return;
+
+            // validate new projectname that it doesnt exists already
+            var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
+            if (Directory.Exists(targetPath) == true)
+            {
+                System.Console.WriteLine("Project already exists");
+                txtNewProjectName.BorderBrush = Brushes.Red; // not visible if focused
+                txtNewProjectName.ToolTip = "Project folder already exists";
+                btnCreateNewProject.IsEnabled = false;
+            }
+            else
+            {
+                txtNewProjectName.BorderBrush = null;
+                btnCreateNewProject.IsEnabled = true;
+                txtNewProjectName.ToolTip = "";
+            }
+
+            //System.Console.WriteLine("newProjectName: " + txtNewProjectName.Text);
+
             newProjectName = txtNewProjectName.Text;
         }
 
@@ -214,7 +283,8 @@ namespace UnityLauncherPro
             // new row selected, generate new project name for this version
             var k = gridAvailableVersions.SelectedItem as UnityInstallation;
             newVersion = k.Version;
-            GenerateNewName();
+            // no new name, if field is locked (because its folder name then)
+            if (txtNewProjectName.IsEnabled == true) GenerateNewName();
 
             // update templates list for selected unity version
             UpdateTemplatesDropDown(k.Path);
@@ -225,7 +295,7 @@ namespace UnityLauncherPro
         {
             // set initial default row color
             DataGridRow row = (DataGridRow)gridAvailableVersions.ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
-            // if now unitys available
+            // if no unitys available
             if (row == null) return;
             //row.Background = Brushes.Green;
             row.Foreground = Brushes.White;
@@ -241,6 +311,17 @@ namespace UnityLauncherPro
         private void CmbNewProjectPlatform_DropDownOpened(object sender, System.EventArgs e)
         {
             previousSelectedModuleIndex = cmbNewProjectPlatform.SelectedIndex;
+        }
+
+        private void gridAvailableVersions_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // check that we clicked actually on a row
+            var src = VisualTreeHelper.GetParent((DependencyObject)e.OriginalSource);
+            var srcType = src.GetType();
+            if (srcType == typeof(ContentPresenter))
+            {
+                BtnCreateNewProject_Click(null, null);
+            }
         }
     }
 }

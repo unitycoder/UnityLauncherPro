@@ -20,15 +20,21 @@ namespace UnityLauncherPro
             InitializeComponent();
             txtCurrentVersion.Text = currentVersion;
             gridAvailableVersions.ItemsSource = MainWindow.unityInstalledVersions;
-
             gridAvailableVersions.SelectedItem = null;
 
-            // autoselect nearest one FIXME doesnt work with 5.x (should suggest next highest installed in 201x.x)
+            // we have current version info in project
             if (string.IsNullOrEmpty(currentVersion) == false)
             {
                 // enable release and dl buttons
                 btnOpenReleasePage.IsEnabled = true;
                 btnDownload.IsEnabled = true;
+
+                // if dont have exact version, show red outline
+                if (MainWindow.unityInstalledVersions.ContainsKey(currentVersion) == false)
+                {
+                    txtCurrentVersion.BorderBrush = Brushes.Red;
+                    txtCurrentVersion.BorderThickness = new Thickness(1);
+                }
 
                 // find nearest version
                 string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
@@ -48,7 +54,7 @@ namespace UnityLauncherPro
                     }
                 }
             }
-            else // we dont have current version
+            else // we dont have current version info in project
             {
                 btnOpenReleasePage.IsEnabled = false;
                 btnDownload.IsEnabled = false;
@@ -110,6 +116,19 @@ namespace UnityLauncherPro
             }
         }
 
+        private void btnInstall_Click(object sender, RoutedEventArgs e)
+        {
+            string url = Tools.GetUnityReleaseURL(txtCurrentVersion.Text);
+            if (string.IsNullOrEmpty(url) == false)
+            {
+                Tools.DownloadAndInstall(url, txtCurrentVersion.Text);
+            }
+            else
+            {
+                Console.WriteLine("Failed getting Unity Installer URL for " + txtCurrentVersion.Text);
+            }
+        }
+
         private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             // override Enter for datagrid
@@ -144,6 +163,12 @@ namespace UnityLauncherPro
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
         {
             Tools.SetFocusToGrid(gridAvailableVersions);
+
+            // bolded for current item
+            DataGridRow row = (DataGridRow)((DataGrid)sender).ItemContainerGenerator.ContainerFromIndex(gridAvailableVersions.SelectedIndex);
+            if (row == null) return;
+            row.Foreground = Brushes.White;
+            row.FontWeight = FontWeights.Bold;
         }
 
         private void GridAvailableVersions_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -162,6 +187,7 @@ namespace UnityLauncherPro
             upgradeVersion = k.Value.Key;
             DialogResult = true;
         }
+
 
     }
 }

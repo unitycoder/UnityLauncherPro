@@ -12,7 +12,7 @@ namespace UnityLauncherPro.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.3.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -25,7 +25,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        [global::System.Configuration.DefaultSettingValueAttribute("880")]
         public int windowWidth {
             get {
                 return ((int)(this["windowWidth"]));
@@ -44,20 +44,6 @@ namespace UnityLauncherPro.Properties {
             }
             set {
                 this["windowHeight"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>C:\\Program Files\\</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection rootFolders {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["rootFolders"]));
-            }
-            set {
-                this["rootFolders"] = value;
             }
         }
         
@@ -158,7 +144,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool AllowSingleInstanceOnly {
             get {
                 return ((bool)(this["AllowSingleInstanceOnly"]));
@@ -206,7 +192,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool enableProjectRename {
             get {
                 return ((bool)(this["enableProjectRename"]));
@@ -230,7 +216,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool showTargetPlatform {
             get {
                 return ((bool)(this["showTargetPlatform"]));
@@ -278,7 +264,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool enablePlatformSelection {
             get {
                 return ((bool)(this["enablePlatformSelection"]));
@@ -326,7 +312,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool useHumandFriendlyLastModified {
             get {
                 return ((bool)(this["useHumandFriendlyLastModified"]));
@@ -408,7 +394,7 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("win64")]
         public string newProjectPlatform {
             get {
                 return ((string)(this["newProjectPlatform"]));
@@ -427,6 +413,117 @@ namespace UnityLauncherPro.Properties {
             }
             set {
                 this["searchProjectPathAlso"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool checkPlasticBranch {
+            get {
+                return ((bool)(this["checkPlasticBranch"]));
+            }
+            set {
+                this["checkPlasticBranch"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string shortcutBatchFileFolder {
+            get {
+                return ((string)(this["shortcutBatchFileFolder"]));
+            }
+            set {
+                this["shortcutBatchFileFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
+            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
+            "tring>C:\\Program Files\\</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection rootFolders {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["rootFolders"]));
+            }
+            set {
+                this["rootFolders"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("InitializeProject.cs")]
+        public string customInitFile {
+            get {
+                return ((string)(this["customInitFile"]));
+            }
+            set {
+                this["customInitFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useInitScript {
+            get {
+                return ((bool)(this["useInitScript"]));
+            }
+            set {
+                this["useInitScript"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50000")]
+        public int webglPort {
+            get {
+                return ((int)(this["webglPort"]));
+            }
+            set {
+                this["webglPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
+            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" />")]
+        public global::System.Collections.Specialized.StringCollection projectPaths {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["projectPaths"]));
+            }
+            set {
+                this["projectPaths"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool override40ProjectCount {
+            get {
+                return ((bool)(this["override40ProjectCount"]));
+            }
+            set {
+                this["override40ProjectCount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int maxProjectCount {
+            get {
+                return ((int)(this["maxProjectCount"]));
+            }
+            set {
+                this["maxProjectCount"] = value;
             }
         }
     }

@@ -32,7 +32,8 @@
     <SolidColorBrush x:Key="ThemeScrollBarEnabledForeground" Color="#FF000000"/>
 
     <!--buttons-->
-    <SolidColorBrush x:Key="ThemeButtonForegroundDisabled" Color="#FF707070"/>
+    <SolidColorBrush x:Key="ThemeButtonForegroundDisabled" Color="#FF505050"/>
+    <SolidColorBrush x:Key="ThemeButtonBackgroundDisabled" Color="#44707070"/>
     <SolidColorBrush x:Key="ThemeButtonBackgroundMouseOver" Color="#FF494949"/>
     <SolidColorBrush x:Key="ThemeButtonBackgroundPressed" Color="#FF0F0F0F"/>
     <SolidColorBrush x:Key="ThemeButtonBackground" Color="#FF3F3F46"/>

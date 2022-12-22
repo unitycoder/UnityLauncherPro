@@ -1,6 +1,10 @@
 version: 1.0.{build}
+branches:
+  only:
+  - dev
 skip_tags: true
-image: Visual Studio 2017
+skip_branch_with_pr: true
+image: Visual Studio 2022
 configuration: Release
 only_commits:
   message: /#build/
@@ -16,3 +20,6 @@ deploy:
   auth_token:
     secure: kmYSrl7Mx/PFDGcyC5gS/vpW2UJCVguEXZsQ0LtkfwmSzx+3noZOyPrbZQ8uWX2B
   artifact: deploy
+  prerelease: true
+  on:
+    branch: dev

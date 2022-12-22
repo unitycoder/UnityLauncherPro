@@ -13,15 +13,15 @@ namespace UnityLauncherPro
 
 
         // returns unity installations
-        public static UnityInstallation[] Scan()
+        public static List<UnityInstallation> Scan()
         {
-            // convert settings list to string array
+            // get list from settings
             var rootFolders = Properties.Settings.Default.rootFolders;
 
             // unityversion, exe_path
             List<UnityInstallation> results = new List<UnityInstallation>();
 
-            // iterate all root folders
+            // iterate all folders under root folders
             foreach (string rootFolder in rootFolders)
             {
                 // if folder exists
@@ -59,6 +59,7 @@ namespace UnityLauncherPro
                     DateTime? installDate = Tools.GetLastModifiedTime(dataFolder);
                     UnityInstallation unity = new UnityInstallation();
                     unity.Version = version;
+                    unity.VersionCode = Tools.VersionAsLong(version); // cached version code
                     unity.Path = exePath;
                     unity.Installed = installDate;
                     unity.IsPreferred = (version == MainWindow.preferredVersion);
@@ -83,10 +84,30 @@ namespace UnityLauncherPro
             } // all root folders
 
             // sort by version
-            results.Sort((s1, s2) => Tools.VersionAsInt(s2.Version).CompareTo(Tools.VersionAsInt(s1.Version)));
+            results.Sort((s1, s2) => s2.VersionCode.CompareTo(s1.VersionCode));
 
-            return results.ToArray();
+            return results;
         } // scan()
+
+        public static bool HasUnityInstallations(string path)
+        {
+            var directories = Directory.GetDirectories(path);
+
+            // loop folders inside root
+            for (int i = 0, length = directories.Length; i < length; i++)
+            {
+                var editorFolder = Path.Combine(directories[i], "Editor");
+                if (Directory.Exists(editorFolder) == false) continue;
+
+                var editorExe = Path.Combine(editorFolder, "Unity.exe");
+                if (File.Exists(editorExe) == false) continue;
+
+                // have atleast 1 installation
+                return true;
+            }
+
+            return false;
+        }
 
         // scans unity installation folder for installed platforms
         static string[] GetPlatforms(string dataFolder)

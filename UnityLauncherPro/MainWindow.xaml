@@ -7,466 +7,13 @@
 		xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:converters="clr-namespace:UnityLauncherPro.Converters" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="600" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized">
+        Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="780" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized" MouseDown="Window_MouseDown">
     <Window.Resources>
-
         <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>
-
-        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="16" />
-                </Grid.ColumnDefinitions>
-                <!--combobox right edge rounding-->
-                <Border x:Name="Border" Grid.ColumnSpan="2" CornerRadius="0" BorderThickness="0" Background="{x:Null}">
-                </Border>
-                <!--combobox left edge corner rounding and background color-->
-                <Border Grid.Column="0" CornerRadius="0" Margin="0" Background="{DynamicResource ThemeButtonBackground}"/>
-                <!--combobox arrow-->
-                <Path x:Name="Arrow" Fill="{DynamicResource ThemeScrollBarEnabledForeground}" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0 Z" />
-            </Grid>
-
-            <!--mouseover combobox main-->
-            <ControlTemplate.Triggers>
-                <Trigger Property="UIElement.IsMouseOver" Value="True">
-                    <Setter Property="Panel.Background" TargetName="Border" Value="{DynamicResource ThemeDataGridRowMouseOver}" />
-                </Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-
-        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
-            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
-        </ControlTemplate>
-
-        <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <Setter Property="OverridesDefaultStyle" Value="true" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
-            <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
-            <Setter Property="MinWidth" Value="120" />
-            <Setter Property="MinHeight" Value="20" />
-
-            <!--test fix for System.Windows.Data Error: 4-->
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ComboBox}">
-                        <Grid>
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal" />
-                                    <VisualState x:Name="MouseOver"/>
-                                    <VisualState x:Name="Disabled"/>
-                                </VisualStateGroup>
-                                <VisualStateGroup x:Name="EditStates">
-                                    <VisualState x:Name="Editable">
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="PART_EditableTextBox">
-                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ContentSite">
-                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Uneditable" />
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                            <ToggleButton x:Name="ToggleButton" Template="{StaticResource ComboBoxToggleButton}" Grid.Column="2" Focusable="false" ClickMode="Press"
-                        IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
-                            <ContentPresenter x:Name="ContentSite"
-                            IsHitTestVisible="False"
-                            Content="{TemplateBinding SelectionBoxItem}"
-                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                            Margin="3,3,23,3"
-                            VerticalAlignment="Stretch"
-                            HorizontalAlignment="Left">
-                            </ContentPresenter>
-                            <TextBox x:Name="PART_EditableTextBox" Style="{x:Null}" Template="{StaticResource ComboBoxTextBox}" HorizontalAlignment="Left"
-                   VerticalAlignment="Bottom" Margin="3,3,23,3" Focusable="True" Background="Red" Visibility="Hidden" IsReadOnly="{TemplateBinding IsReadOnly}" />
-                            <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
-                                <Grid x:Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                    <Border x:Name="DropDownBorder" BorderThickness="1" BorderBrush="{DynamicResource ThemeDropDownBorderBorderBrush}" Background="{DynamicResource ThemeDropDownBorderBackground}"/>
-                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
-                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
-                                    </ScrollViewer>
-                                </Grid>
-                            </Popup>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="HasItems" Value="false">
-                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95" />
-                            </Trigger>
-                            <Trigger Property="IsGrouping" Value="true">
-                                <Setter Property="ScrollViewer.CanContentScroll"
-                    Value="false" />
-                            </Trigger>
-                            <Trigger SourceName="Popup" Property="AllowsTransparency" Value="true">
-                                <Setter TargetName="DropDownBorder" Property="CornerRadius" Value="0" />
-                                <Setter TargetName="DropDownBorder" Property="Margin" Value="0,2,0,0" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- error 4 comes from this whole part? -->
-        <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <!--<Setter Property="OverridesDefaultStyle" Value="true" />-->
-            <!-- test fix for error 4 https://gist.github.com/TobiasSekan/73a93c2dfea4a051ff72abb5218d6f8f-->
-            <!--<Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Center" />-->
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
-                        <Border x:Name="Border" Padding="0" SnapsToDevicePixels="true" Background="Transparent">
-                            <ContentPresenter />
-                        </Border>
-
-                        <!--mouseover colors for dropdown combobox https://stackoverflow.com/a/39228553/5452781 -->
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="ComboBoxItem.IsMouseOver" Value="True">
-                                <Setter TargetName="Border"  Property="Background" Value="DarkBlue"></Setter>
-                            </Trigger>
-                            <Trigger Property="ComboBoxItem.IsSelected" Value="True">
-                                <Setter TargetName="Border"  Property="Background" Value="{DynamicResource ThemeDataGridRowSelectedBackground}"></Setter>
-                                <Setter TargetName="Border"  Property="TextElement.Foreground" Value="White"></Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-
-        <!-- platform dropdown menu -->
-        <ObjectDataProvider x:Key="platformEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type Type="local:Platform"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
-
-        <!-- colors for unity missing installatios -->
-        <local:UnityInstallation x:Key="VersionInstalledConverter"/>
-        <local:Project x:Key="ProjectExistsConverter"/>
-
-        <!-- tabs -->
-        <Style x:Key="TabItemStyle1" TargetType="{x:Type TabItem}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type TabItem}">
-                        <Border x:Name="Border" BorderThickness="0" Padding="15,5,15,5" Margin="1,0,0,0" BorderBrush="{x:Null}">
-                            <ContentPresenter x:Name="ContentSite" ContentSource="Header" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="False">
-                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource ThemeDeactiveTabForeground}"/>
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeDeactiveTabBackground}" />
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource ThemeBrightText}"/>
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeMainBackgroundColor}"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeMainBackgroundColor}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- datagrid header -->
-        <Style x:Key="HeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
-            <Setter Property="Background" Value="{DynamicResource ThemeDatagridHeaderBackground}" />
-            <Setter Property="Foreground" Value="{DynamicResource ThemeDatagridHeaderForeground}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ThemeDatagridLines}" />
-            <Setter Property="BorderThickness" Value="0,0,1,1" />
-            <Setter Property="SnapsToDevicePixels" Value="True" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="Height" Value="28" />
-            <Setter Property="Padding" Value="6,2,2,2" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- datagrid rows & row selection -->
-        <Style TargetType="{x:Type DataGridRow}">
-            <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}" />
-            <Setter Property="BorderBrush" Value="{x:Null}" />
-            <Setter Property="BorderThickness" Value="0,0,0,0" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource ThemeDataGridRowMouseOver}"/>
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource ThemeDataGridRowSelectedBackground}" />
-                </Trigger>
-            </Style.Triggers>
-            <Style.Resources>
-                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>-->
-
-                <!--<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource ThemeGridRowHighlight}"/>-->
-                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource ThemeGridRowHighlight}"/>-->
-
-                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource ThemeGridRowHighlight.Color}"/>-->
-                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{Binding DynamicResource ThemeGridRowHighlight, Converter={StaticResource solidColorBrushToColorConverter}, ElementName=SolidColorBrush}"/>-->
-                <!--<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource Color1}"/>-->
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">Transparent</SolidColorBrush>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}">Transparent</SolidColorBrush>
-                <!--<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">Red</SolidColorBrush>-->
-            </Style.Resources>
-        </Style>
-
-        <!-- datagrid hide selected cell borders -->
-        <Style TargetType="{x:Type DataGridCell}">
-            <Setter Property="BorderBrush" Value="Transparent" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-            <Setter Property="Margin" Value="0,0.5,0,0.5" />
-            <Style.Triggers>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="Transparent" />
-                </Trigger>
-                <Trigger Property="IsSelected" Value="False">
-                    <Setter Property="Background" Value="Transparent" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="NoFocusCellStyle" TargetType="{x:Type DataGridCell}">
-            <!--<Setter Property="Focusable" Value="False"/>-->
-        </Style>
-
-        <!-- custom buttons -->
-        <Style x:Key="CustomButton" TargetType="{x:Type Button}">
-            <Setter Property="SnapsToDevicePixels" Value="true"/>
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="Background" Value="{DynamicResource ThemeButtonBackground}"/>
-            <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForeground}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="shortcutbutton" BorderThickness="0" BorderBrush="Black" Background="{TemplateBinding Background}">
-                            <ContentPresenter Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForegroundDisabled}" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="Background" Value="{DynamicResource ThemeButtonBackgroundMouseOver}" />
-                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{DynamicResource ThemeBrightText}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="Background" Value="{DynamicResource ThemeButtonBackgroundPressed}" />
-                                <Setter Property="TextElement.Foreground" TargetName="shortcutbutton" Value="{DynamicResource ThemeBrightText}"/>
-                            </Trigger>
-                            <Trigger Property="IsFocused" Value="true">
-                                <Setter TargetName="shortcutbutton" Property="BorderBrush" Value="{DynamicResource ThemeSystemHighlight}" />
-                                <Setter TargetName="shortcutbutton" Property="BorderThickness" Value="1" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- scrollbar top/bottom arrow buttons -->
-        <Style x:Key="ScrollBarLineButton" TargetType="{x:Type RepeatButton}">
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="Focusable" Value="false"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type RepeatButton}">
-                        <!-- button background -->
-                        <Border x:Name="Border" Margin="1" CornerRadius="0" BorderThickness="0" Background="{DynamicResource ThemeButtonBackground}" BorderBrush="{x:Null}">
-                            <!-- arrow sign -->
-                            <Path HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ThemeScrollArrowForeground}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <!-- NOTE order matters, if pressed is before mouseover, then it gets overwritten -->
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeTextBoxBackground}" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollArrowPressed}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Foreground" Value="{DynamicResource ThemeScrollBarEnabledForeground}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="ScrollBarPageButton" TargetType="{x:Type RepeatButton}">
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="IsTabStop" Value="false"/>
-            <Setter Property="Focusable" Value="false"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type RepeatButton}">
-                        <Border Background="Transparent" />
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- scroll thumb (elevator) bar -->
-        <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="IsTabStop" Value="false"/>
-            <Setter Property="Focusable" Value="false"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Thumb}">
-                        <Border x:Name="Border" CornerRadius="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" />
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeScrollBarThumbFill}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <ControlTemplate x:Key="VerticalScrollBar" TargetType="{x:Type ScrollBar}">
-            <Grid >
-                <Grid.RowDefinitions>
-                    <RowDefinition MaxHeight="18"/>
-                    <RowDefinition Height="0.00001*"/>
-                    <RowDefinition MaxHeight="18"/>
-                </Grid.RowDefinitions>
-                <!-- scrollbar background -->
-                <Border Grid.RowSpan="3" CornerRadius="0" Background="{DynamicResource ThemeScrollBarBackground}" />
-                <!-- scrollbar top button -->
-                <RepeatButton Grid.Row="0" Style="{StaticResource ScrollBarLineButton}" Height="18" Command="ScrollBar.LineUpCommand"  Content="M 0 4 L 8 4 L 4 0 Z" />
-                <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
-                    <Track.DecreaseRepeatButton>
-                        <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageUpCommand" />
-                    </Track.DecreaseRepeatButton>
-                    <Track.Thumb>
-                        <!-- scrollbar foreground -->
-                        <Thumb Style="{StaticResource ScrollBarThumb}" Margin="1,0,1,0" Background="{DynamicResource ThemeScrollBarFill}" BorderBrush="{x:Null}"/>
-                    </Track.Thumb>
-                    <Track.IncreaseRepeatButton>
-                        <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageDownCommand" />
-                    </Track.IncreaseRepeatButton>
-                </Track>
-                <!-- scrollbar bottom button -->
-                <RepeatButton Grid.Row="3" Style="{StaticResource ScrollBarLineButton}" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" />
-            </Grid>
-        </ControlTemplate>
-
-        <Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}">
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Style.Triggers>
-                <Trigger Property="Orientation" Value="Vertical">
-                    <Setter Property="Width" Value="18"/>
-                    <Setter Property="Height" Value="Auto" />
-                    <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <BooleanToVisibilityConverter x:Key="MyBoolToVisibilityConverter" />
-
-
-        <!--checkboxes-->
-        <Style x:Key="{x:Type CheckBox}" TargetType="{x:Type CheckBox}">
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForeground}"/>
-            <Setter Property="OverridesDefaultStyle" Value="True"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-
-            <Setter Property="Margin" Value="1 0 0 3"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <BulletDecorator Background="Transparent">
-                            <BulletDecorator.Bullet>
-                                <Border x:Name="Border" Margin="0 1 0 0" Width="14" Height="13" CornerRadius="0" Background="{DynamicResource ThemeRadioCheckBoxBackground}" BorderThickness="1" BorderBrush="#404040">
-                                    <Path Width="8" Height="8" x:Name="CheckMark" SnapsToDevicePixels="False" Stroke="#000000" StrokeThickness="1.75" Data="M 0 3 L 3 6 L 7 0" Margin="1,1,0,0" />
-                                </Border>
-                            </BulletDecorator.Bullet>
-                            <ContentPresenter Margin="3,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" RecognizesAccessKey="True"/>
-                        </BulletDecorator>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="false">
-                                <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="{x:Null}">
-                                <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource ThemeSystemHighlight}" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ThemeButtonForeground}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!--radiobuttons-->
-        <Style x:Key="{x:Type RadioButton}" TargetType="{x:Type RadioButton}">
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="OverridesDefaultStyle" Value="True"/>
-            <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForeground}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type RadioButton}">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
-                            <Grid>
-                                <Ellipse x:Name="TargetEllipse" Width="12" Height="12" Fill="{DynamicResource ThemeRadioCheckBoxBackground}" Stroke="Transparent" />
-                                <Ellipse x:Name="CheckedEllipse" Width="6" Height="6" Fill="{DynamicResource ThemeRadioButtonSelected}" Visibility="Collapsed"/>
-                            </Grid>
-                            <Label Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"/>
-                        </StackPanel>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="CheckedEllipse" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="TargetEllipse" Property="Stroke" Value="{DynamicResource ThemeSystemHighlight}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-
-
+        <converters:ReleaseDateConverter x:Key="releaseDateConverter"/>
     </Window.Resources>
 
-
     <!-- UI -->
-
     <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="23" />
@@ -476,7 +23,13 @@
 
         <!-- menubar -->
         <Grid Grid.Row="0" UseLayoutRounding="False">
-            <Rectangle Fill="{DynamicResource ThemeDarkMenuBar}" MouseDown="OnRectangleMouseDown" />
+            <Button  PreviewMouseDoubleClick="Button_PreviewMouseDoubleClick">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Rectangle Fill="{DynamicResource ThemeDarkMenuBar}" MouseDown="OnRectangleMouseDown"/>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
             <Image Source="Images/icon.png" RenderOptions.BitmapScalingMode="NearestNeighbor" HorizontalAlignment="Left" Width="16" Height="16" Margin="4,0,0,0" SnapsToDevicePixels="True" UseLayoutRounding="True" />
             <Label Content="UnityLauncherPro" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="{DynamicResource ThemeMainTitle}" FontSize="12" HorizontalAlignment="Left"  />
             <!-- minimize -->
@@ -490,7 +43,7 @@
         </Grid>
 
         <!-- main content : Tabs -->
-        <TabControl Grid.Row="1" x:Name="tabControl"  Background="{DynamicResource ThemeMainBackgroundColor}" BorderBrush="{x:Null}" Padding="0" Margin="0" SelectionChanged="OnTabSelectionChanged">
+        <TabControl Grid.Row="1" x:Name="tabControl"  Background="{DynamicResource ThemeMainBackgroundColor}" BorderBrush="{x:Null}" Padding="0" Margin="0" SelectionChanged="OnTabSelectionChanged" PreviewKeyDown="tabControl_PreviewKeyDown">
 
             <!-- Tab: Projects-->
             <TabItem Header="Projects" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}">
@@ -517,10 +70,10 @@
                         </Button>
                     </Grid>
 
-                    <Button Style="{StaticResource CustomButton}" ToolTip="Add existing project" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="0,4,34,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" TabIndex="10" />
-                    <Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshProjectList_Click" TabIndex="11"/>
+                    <Button Style="{StaticResource CustomButton}" ToolTip="Browse and add existing project to list" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="0,4,38,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" TabIndex="10" />
+                    <Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="26" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshProjectList_Click" TabIndex="11"/>
 
-                    <DataGrid x:Name="gridRecent" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" ContextMenuOpening="GridRecent_ContextMenuOpening" BeginningEdit="GridRecent_BeginningEdit" RowHeight="21" ColumnReordered="GridRecent_ColumnReordered" >
+                    <DataGrid x:Name="gridRecent" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" ContextMenuOpening="GridRecent_ContextMenuOpening" BeginningEdit="GridRecent_BeginningEdit" RowHeight="21" ColumnReordered="GridRecent_ColumnReordered" Sorting="gridRecent_Sorting" >
 
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
@@ -531,6 +84,11 @@
                             <DataGridTextColumn x:Name="txtColumnTitle"  CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="Project" IsReadOnly="True" Width="150"/>
 
                             <DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" Width="72">
+                                <DataGridTextColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="Version" IsHitTestVisible="False" />
+                                    </DataTemplate>
+                                </DataGridTextColumn.HeaderTemplate>
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Setter Property="Foreground" Value="{DynamicResource ThemeGridRedText}" />
@@ -557,7 +115,7 @@
                             <!--<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Modified, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True" Width="120"/>-->
                             <DataGridTextColumn Binding="{Binding Modified, Converter={StaticResource lastModifiedConverter}}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True" Width="120"/>
                             <DataGridTextColumn Binding="{Binding Arguments}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Arguments" IsReadOnly="False" Width="100"/>
-                            <DataGridTextColumn Binding="{Binding GITBranch}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Branch" IsReadOnly="True" Width="60"/>
+                            <DataGridTextColumn x:Name="txtColumnGitBranch" Binding="{Binding GITBranch}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}" Header="Branch" IsReadOnly="True" Width="60"/>
                             <!--TODO platform as dropdown?-->
                             <!--<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding TargetPlatform}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
                             <!--<DataGridComboBoxColumn x:Name="cmbPlatform" CellStyle="{StaticResource NoFocusCellStyle}" SelectedItemBinding="{Binding TargetPlatform, NotifyOnSourceUpdated=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
@@ -567,7 +125,7 @@
                             <DataGridTemplateColumn Header="Platform" Width="90">
                                 <DataGridTemplateColumn.CellTemplate >
                                     <DataTemplate >
-                                        <ComboBox ItemsSource="{Binding TargetPlatforms}" SelectedValue="{Binding TargetPlatform}" x:Name="cmbPlatformSelection" OverridesDefaultStyle="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" IsEnabled="{Binding ElementName=chkEnablePlatformSelection, Path=IsChecked}"   Height="18"  Foreground="{DynamicResource ThemeButtonForeground}" DropDownClosed="CmbPlatformSelection_DropDownClosed" MinWidth="80"/>
+                                        <ComboBox Style="{StaticResource DataGridComboBox}" ItemsSource="{Binding TargetPlatforms}" SelectedValue="{Binding TargetPlatform}" x:Name="cmbPlatformSelection" OverridesDefaultStyle="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" IsEnabled="{Binding ElementName=chkEnablePlatformSelection, Path=IsChecked}"   Height="18"  Foreground="{DynamicResource ThemeButtonForeground}" DropDownClosed="CmbPlatformSelection_DropDownClosed" MinWidth="80"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -581,12 +139,19 @@
                                 <MenuItem x:Name="menuItemCopyPath" Header="Copy Project Path" Click="MenuItemCopyPath_Click" />
                                 <MenuItem x:Name="menuItemShowProjectInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
                                 <MenuItem x:Name="menuItemBrowsePersistentDataPath" Header="Open PersistentDataPath" Click="MenuItemBrowsePersistentDataPath_Click" />
+                                <MenuItem x:Name="menuCreateDesktopShortCut" Header="Create Shortcut on Desktop" Click="MenuCreateDesktopShortCut_Click" />
                                 <Separator/>
                                 <MenuItem x:Name="menuItemKillProcess" Header="Kill Process" Click="MenuItemKillProcess_Click" />
                                 <Separator/>
                                 <MenuItem x:Name="menuStartWebGLServer" Header="Start WebGL server" Click="MenuStartWebGLServer_Click" />
-                                <!--<Separator/>
-                                <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />-->
+                                <MenuItem x:Name="menuInstallLastAPK" Header="Install &amp; Run latest APK" Click="menuInstallLastAPK_Click" />
+                                <Separator/>
+                                <MenuItem Header="Build">
+                                    <MenuItem x:Name="menuBatchBuildAndroid" Header="Android" Click="MenuBatchBuildAndroid_Click"/>
+                                    <MenuItem x:Name="menuBatchBuildIOS" Header="IOS" Click="MenuBatchBuildIOS_Click"/>
+                                </MenuItem>
+                                <Separator/>
+                                <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 
@@ -681,9 +246,9 @@
                         </Button>
                     </Grid>
 
-                    <Button Style="{StaticResource CustomButton}" ToolTip="Refresh installations (F5)" x:Name="btnRefreshUnityList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshUnityList_Click"/>
+                    <Button Style="{StaticResource CustomButton}" ToolTip="Refresh installations (F5)" x:Name="btnRefreshUnityList" Content="⟳" Height="22" Width="26" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshUnityList_Click"/>
 
-                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick">
+                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" CanUserAddRows="False" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick">
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                         </DataGrid.CommandBindings>
@@ -723,7 +288,13 @@
                                     <MenuItem x:Name="menuItemDownloadIOSModule" Header="Download IOS module" Click="MenuItemDownloadIOSModule_Click"/>
                                     <MenuItem x:Name="menuItemDownloadWebGLModule" Header="Download WebGL module" Click="MenuItemDownloadWebGLModule_Click" />
                                     <MenuItem x:Name="menuItemDownloadLinuxModule" Header="Download Linux modules" Click="MenuItemDownloadLinuxModule_Click"/>
+                                    <MenuItem x:Name="menuItemDownloadIL2CPPModule" Header="Download IL2CPP module" Click="menuItemDownloadIL2CPPModule_Click"/>
+                                    <MenuItem x:Name="menuItemDownloadWinDedicatedServerModule" Header="Download Windows Dedicated module" Click="menuItemDownloadWinDedicatedServerModule_Click"/>
+                                    <MenuItem x:Name="menuItemDownloadLinuxDedicatedServerModule" Header="Download Linux Dedicated module" Click="menuItemDownloadLinuxDedicatedServerModule_Click"/>
                                 </MenuItem>
+                                <Separator></Separator>
+                                <MenuItem x:Name="menuUninstallEditor" Header="Uninstall" Click="menuUninstallEditor_Click"/>
+
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 
@@ -770,7 +341,7 @@
                 <Grid>
                     <!-- search box -->
                     <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchForeground}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUpdates}" Height="24" />
+                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUpdates}" Height="24" />
                         <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxUpdates" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUpdates_PreviewKeyDown" TextChanged="TxtSearchBoxUpdates_TextChanged" />
                         <Button x:Name="btnClearUpdatesSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUpdateSearchClick">
                             <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
@@ -779,7 +350,6 @@
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUpdates}" Value="">
                                                 <Setter Property="Visibility" Value="Hidden"/>
-
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUpdates}" Value="{x:Null}">
                                                 <Setter Property="Visibility" Value="Hidden"/>
@@ -791,13 +361,28 @@
                         </Button>
                     </Grid>
 
-                    <Button Style="{StaticResource CustomButton}" ToolTip="Fetch released versions" x:Name="btnRefreshUpdatesList" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="OnGetUnityUpdatesClick"/>
-                    <DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUpdates_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUpdates_PreviewMouseDoubleClick">
+                    <RadioButton x:Name="rdoAll" Content="All" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,2,0,0" Checked="rdoAll_Checked" IsChecked="True" GroupName="groupUpdateFilter" />
+                    <RadioButton x:Name="rdoLTS" Content="LTS" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="287,2,0,0" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
+                    <RadioButton x:Name="rdoAlphas" Content="Alpha" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="340,2,0,0" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
+                    <RadioButton x:Name="rdoBetas" Content="Beta" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="400,2,0,0" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
+
+                    <Button Style="{StaticResource CustomButton}" ToolTip="Fetch released versions" x:Name="btnRefreshUpdatesList" Content="⟳" Height="22" Width="26" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="OnGetUnityUpdatesClick"/>
+                    <DataGrid x:Name="dataGridUpdates"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="DataGridUpdates_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUpdates_PreviewMouseDoubleClick" Sorting="dataGridUpdates_Sorting">
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                         </DataGrid.CommandBindings>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" ClipboardContentBinding="{x:Null}"  MinWidth="100" Header="Released" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding ReleaseDate, Converter={StaticResource releaseDateConverter}}" ClipboardContentBinding="{x:Null}"  MinWidth="100" Header="Released" IsReadOnly="True">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <TextBlock Text="{Binding ReleaseDate, StringFormat=\{0:dd/MM/yyyy\}}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
                             <DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="222">
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
@@ -829,15 +414,19 @@
                     <Grid VerticalAlignment="Bottom" Margin="4,0,8,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="20*" />
-                            <ColumnDefinition Width="45*" />
+                            <ColumnDefinition Width="33*" />
+                            <ColumnDefinition Width="33*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="32" />
                         </Grid.RowDefinitions>
-                        <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnDonwloadInBrowser"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnDonwloadInBrowser_Click">
+                        <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnDownloadInBrowser"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnDownloadInBrowser_Click">
                             <Label Content="_Download in browser" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
-                        <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite"  Margin="8,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
+                        <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnDownloadInstallUpdate"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="btnDownloadInstallUpdate_Click">
+                            <Label Content="Download &amp; Install" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                        </Button>
+                        <Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
                             <Label Content="Release _Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
                     </Grid>
@@ -845,12 +434,15 @@
             </TabItem>
 
             <!-- Tab: Tools -->
-            <TabItem Header="Tools" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
-                <Grid>
+            <TabItem Header="Tools" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True">
+                <Grid PreviewKeyDown="Grid_PreviewKeyDown">
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="124" />
+                        <RowDefinition Height="32" />
                         <RowDefinition Height="50*" />
                     </Grid.RowDefinitions>
+
                     <!-- 1st part -->
                     <Grid Grid.Row="0" VerticalAlignment="Top">
                         <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left">
@@ -900,6 +492,7 @@
                             </StackPanel>
                         </StackPanel>
                     </Grid>
+
                     <!-- 2nd part -->
                     <Grid Grid.Row="1" VerticalAlignment="Top">
                         <StackPanel Orientation="Horizontal" Margin="0">
@@ -908,10 +501,11 @@
                             <Button x:Name="btnRefreshBuildReport" Style="{StaticResource CustomButton}" ToolTip="Get latest Build Report from Editor.log" Content="⟳" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshBuildReport_Click"/>
                             <!--<CheckBox x:Name="chkAutoUpdateBuildReport" Content="AutoUpdate" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" HorizontalAlignment="Right" VerticalAlignment="Top" Height="26" VerticalContentAlignment="Center" IsEnabled="False"/>-->
 
+
                             <!-- search box -->
                             <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                                <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxBuildReport" Background="{DynamicResource ThemeTextBoxBackground}" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxBuildReport_PreviewKeyDown" TextChanged="TxtSearchBoxBuildReport_TextChanged" />
-                                <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxBuildReport}" Height="24" />
+                                <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxBuildReport}" Height="24" IsEnabled="False" />
+                                <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxBuildReport" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxBuildReport_PreviewKeyDown" TextChanged="TxtSearchBoxBuildReport_TextChanged" />
                                 <Button x:Name="btnClearBuildReportSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="BtnClearBuildReportSearch_Click">
                                     <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchCaret}" Padding="5,3,4,4" HorizontalAlignment="Center">
                                         <TextBlock.Style>
@@ -930,42 +524,76 @@
                                 </Button>
                             </Grid>
 
-
+                            <Label x:Name="lblBuildReportIndex" Height="26" Foreground="{DynamicResource ThemeSearchForeground}" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="10,0,0,0" Content="-/-"/>
+                            <Button x:Name="btnPrevBuildReport" Style="{StaticResource CustomButton}" ToolTip="Previous Build Report" Content="←" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="0,4,0,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnPrevBuildReport_Click" IsEnabled="False"/>
+                            <Button x:Name="btnNextBuildReport" Style="{StaticResource CustomButton}" ToolTip="Next Build Report" Content="→" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="8,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnNextBuildReport_Click" IsEnabled="False"/>
                         </StackPanel>
-                        <DataGrid x:Name="gridBuildReport"  SelectionMode="Single" Margin="4,30,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Size}" ClipboardContentBinding="{x:Null}" Header="Size" IsReadOnly="True" Width="75"/>
-                                <DataGridTextColumn Binding="{Binding Percentage}" ClipboardContentBinding="{x:Null}" Header="%" IsReadOnly="True" Width="55" />
-                                <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True" Width="333" />
-                                <DataGridTextColumn Binding="{Binding Format}" ClipboardContentBinding="{x:Null}" Header="Format" IsReadOnly="True" Width="65"/>
-                            </DataGrid.Columns>
-
-                            <!-- right click context menu -->
-                            <DataGrid.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem x:Name="menuItemExploreBuildItem" Header="Open Explorer here" Click="MenuItemExploreBuildItem_Click" />
-                                </ContextMenu>
-                            </DataGrid.ContextMenu>
-
-                            <!-- sample data for testing -->
-                            <local:BuildReportItem Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
-                        </DataGrid>
-
                     </Grid>
+
+                    <!-- 3rd part -->
+                    <Grid Grid.Row="2" VerticalAlignment="Top">
+                        <Grid ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="64*" />
+                                <ColumnDefinition Width="30*" />
+                            </Grid.ColumnDefinitions>
+                            <!--Grid.Column="0"-->
+                            <DataGrid  x:Name="gridBuildReport"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Auto" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                                <DataGrid.CommandBindings>
+                                    <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
+                                </DataGrid.CommandBindings>
+
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Size}" ClipboardContentBinding="{x:Null}" Header="Size" IsReadOnly="True" Width="75"/>
+                                    <DataGridTextColumn Binding="{Binding Percentage}" ClipboardContentBinding="{x:Null}" Header="%" IsReadOnly="True" Width="55" />
+                                    <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True" Width="333" />
+                                    <DataGridTextColumn Binding="{Binding Format}" ClipboardContentBinding="{x:Null}" Header="Format" IsReadOnly="True" Width="65"/>
+                                </DataGrid.Columns>
+
+                                <!-- right click context menu -->
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem x:Name="menuItemExploreBuildItem" Header="Open Explorer here" Click="MenuItemExploreBuildItem_Click" />
+                                        <MenuItem x:Name="menuItemCopyPathToClipboard" Header="Copy Path to clipboard" Click="menuItemCopyPathToClipboard_Click" />
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+
+                                <!-- sample data for testing -->
+                                <local:BuildReportItem Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
+                                <local:BuildReportItem Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
+                                <local:BuildReportItem Size="10.0 mb" Percentage="50.0%" Path="Assets/Textures/sample.png" />
+                            </DataGrid>
+
+                            <StackPanel Grid.Column="1" Orientation="Vertical">
+                                <DataGrid  x:Name="gridBuildReportData"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalContentAlignment="Stretch">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding Category}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                                        <DataGridTextColumn Header="Size" Binding="{Binding Size}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                                        <DataGridTextColumn Header="%" Binding="{Binding Percentage}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                                    </DataGrid.Columns>
+                                    <local:BuildReportItem Category="Texture" Size="10.0 mb" Percentage="50.0%" />
+                                </DataGrid>
+                                <Label Content="Elapsed time:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+                                <TextBox CaretBrush="#FFE2E2E2" x:Name="txtBuildTime" Background="{DynamicResource ThemeTextBoxBackground}" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" UndoLimit="64" IsReadOnly="True" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="4,0,4,0" />
+                            </StackPanel>
+
+                        </Grid>
+                    </Grid>
+                    <!--<DataGrid  x:Name="gridBuildReport"  SelectionMode="Single" CanUserAddRows="False" Margin="4,0,2,0" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Visible" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" VerticalAlignment="Top" PreviewMouseDoubleClick="GridBuildReport_PreviewMouseDoubleClick" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top">-->
 
                 </Grid>
             </TabItem>
 
             <!-- Tab: Settings -->
             <TabItem Header="Settings" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}" Background="Black">
-                <Grid>
+                <Grid x:Name="gridSettingsBg" Focusable="True" VerticalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <!-- top labels-->
-                        <RowDefinition Height="28" />
+                        <RowDefinition Height="26" />
                         <!-- install locations list box -->
-                        <RowDefinition Height="30*" />
+                        <RowDefinition Height="70" />
                         <!-- list buttons -->
-                        <RowDefinition Height="33" />
+                        <RowDefinition Height="31" />
                         <!-- settings -->
                         <RowDefinition Height="70*" />
                         <!-- links -->
@@ -973,15 +601,15 @@
                     </Grid.RowDefinitions>
 
                     <!-- top labels -->
-                    <Label Grid.Row="0" Content="Unity Installation Parent Folders" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom" ToolTip="Search will try to find Unity installations under these folders"/>
+                    <Label Grid.Row="0" Content="Unity Installation(s) Parent Folder(s)" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Bottom" ToolTip="Search will try to find Unity installations under these folders"/>
                     <Label x:Name="lblFoundXInstallations" Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                     <!-- locations list -->
-                    <ListBox x:Name="lstRootFolders" Grid.Row="1" Background="{DynamicResource ThemeButtonBackground}" Margin="4,0,2,0" Foreground="{DynamicResource ThemeButtonForeground}" >
+                    <ListBox x:Name="lstRootFolders" Grid.Row="1" Background="{DynamicResource ThemeButtonBackground}" Margin="4,0,2,0" Foreground="{DynamicResource ThemeButtonForeground}" VerticalAlignment="Top" MinHeight="65" >
                         <System:String>c:\Program Files</System:String>
                     </ListBox>
                     <!-- locations add/remove -->
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0" >
-                        <Button Style="{StaticResource CustomButton}" x:Name="btnAddInstallationFolder"   Margin="5,4,0,3" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnAddInstallationFolder_Click" Width="116">
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0" VerticalAlignment="Top" >
+                        <Button Style="{StaticResource CustomButton}" x:Name="btnAddInstallationFolder"   Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnAddInstallationFolder_Click" Width="116">
                             <Label Content="_Add Folder" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
                         <Button Style="{StaticResource CustomButton}" x:Name="btnRemoveInstallationFolder"   Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnRemoveInstallationFolder_Click">
@@ -990,76 +618,134 @@
                     </StackPanel>
                     <!-- settings-->
                     <StackPanel Grid.Row="3" Orientation="Horizontal">
-                        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
-                            <CheckBox  x:Name="chkMinimizeToTaskbar" Content="Minimize to tray"  Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged"  ToolTip="When minimized, hides application into taskbar icon area" HorizontalAlignment="Left" />
-                            <CheckBox  x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu"  Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" ToolTip="Install registry entry for Explorer context menu" HorizontalAlignment="Left"/>
-                            <CheckBox  x:Name="chkQuitAfterOpen" Content="Close after opening project"  Checked="ChkQuitAfterOpen_CheckedChanged" Unchecked="ChkQuitAfterOpen_CheckedChanged" ToolTip="Closes launcher after running project (not really useful)" HorizontalAlignment="Left"/>
-                            <CheckBox  x:Name="chkQuitAfterCommandline" Content="Close after launching from Explorer"  Unchecked="ChkQuitAfterCommandline_CheckedChanged" Checked="ChkQuitAfterCommandline_CheckedChanged" ToolTip="Close launcher after running from commandline or Explorer (recommended)" HorizontalAlignment="Left"/>
-                            <CheckBox  x:Name="chkShowLauncherArgumentsColumn" Content="Show commandline arguments column"  Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" ToolTip="Shows column for custom project commandline params" HorizontalAlignment="Left"/>
-                            <CheckBox   x:Name="chkShowGitBranchColumn" Content="Show git branch column" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged" ToolTip="Shows column for project git branch info" HorizontalAlignment="Left"/>
-                            <CheckBox  x:Name="chkShowMissingFolderProjects" Content="Show projects that don't exist on disk"  Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" ToolTip="List in recent projects, even if the project folder is missing" HorizontalAlignment="Left"/>
-                            <CheckBox  x:Name="chkAllowSingleInstanceOnly" Content="Allow single instance only"  Checked="ChkAllowSingleInstanceOnly_CheckedChanged" Unchecked="ChkAllowSingleInstanceOnly_CheckedChanged" ToolTip="Activates already running instance, instead of starting new exe (not working if app is minized to taskbar)" HorizontalAlignment="Left"/>
-                            <CheckBox  x:Name="chkEnableProjectRename" Content="Enable Project title rename (F2)"  ToolTip="Renames project title only, DOES NOT rename project folder! New name is saved into ProjectSettings/ProjectName.txt" Checked="ChkEnableProjectRename_Checked" Unchecked="ChkEnableProjectRename_Checked" HorizontalAlignment="Left"/>
-                            <CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project"  Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" ToolTip="If disabled, uses automatic quick project naming" HorizontalAlignment="Left"/>
-                            <CheckBox x:Name="chkStreamerMode" Content="Streamer Mode (hide project names and folders)"  ToolTip="Hide project names and folders in main view" Checked="ChkStreamerMode_Checked" Unchecked="ChkStreamerMode_Checked" HorizontalAlignment="Left"/>
-                            <CheckBox  x:Name="chkShowPlatform" Content="Show current target platform (if exists in .csproj)"  ToolTip="Shows target platform column" Checked="ChkShowPlatform_Checked" Unchecked="ChkShowPlatform_Checked" HorizontalAlignment="Left"/>
-                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                                <CheckBox  x:Name="chkUseCustomTheme" Content="Load custom theme" ToolTip="Loads theme.ini from application folder" Checked="ChkUseCustomTheme_Checked" Unchecked="ChkUseCustomTheme_Checked" HorizontalAlignment="Left"/>
-                                <TextBox x:Name="txtCustomThemeFile" BorderBrush="Transparent" MinWidth="128" ToolTip="Default is theme.ini" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="theme.ini" LostFocus="TxtCustomThemeFile_LostFocus" PreviewKeyDown="TxtCustomThemeFile_PreviewKeyDown" />
-                                <Button Style="{StaticResource CustomButton}" ToolTip="Reload theme" x:Name="btnReloadTheme" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnReloadTheme_Click" Margin="5,0,0,0"/>
-                                <Button Style="{StaticResource CustomButton}" ToolTip="Explore Themes folder" x:Name="btnExploreFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnExploreFolder_Click" Margin="5,0,0,0"/>
-                                <Button Style="{StaticResource CustomButton}" ToolTip="Open theme editor" x:Name="btnThemeEditor" Content="✎" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnThemeEditor_Click" Margin="5,0,0,0"/>
-                            </StackPanel>
 
-                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBox x:Name="txtRootFolderForNewProjects" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="300" ToolTip="Root folder for quick New Projects (so that you dont have to pick project folder every time)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" />
-                                <Button Style="{StaticResource CustomButton}" x:Name="btnBrowseProjectRootFolder" Content="..." Margin="6,0,0,0" MinWidth="22" Click="BtnBrowseProjectRootFolder_Click" MinHeight="22" FontSize="16" ToolTip="Browse for new projects root folder.." />
-                                <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ThemeButtonForeground}" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="3" Orientation="Horizontal">
-                                <TextBox x:Name="txtWebglRelativePath" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="200" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. Used for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
-                                <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ThemeButtonForeground}" />
-                            </StackPanel>
+                        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,0,3,3" >
+
+                            <GroupBox Grid.Row="3" Header="Projects" VerticalAlignment="Top" Margin="3,0,0,0">
+                                <StackPanel Grid.Row="3" Orientation="Vertical" Margin="3,5,0,0" >
+
+                                    <CheckBox  x:Name="chkSearchProjectPath" Content="Search project path also"  ToolTip="Searches from project folder path and project name" HorizontalAlignment="Left" Checked="ChkSearchProjectPath_Checked" Unchecked="ChkSearchProjectPath_Checked"/>
+                                    <CheckBox  x:Name="chkEnableProjectRename" Content="Enable Project title rename (F2)"  ToolTip="Renames project title only, DOES NOT rename project folder! New name is saved into ProjectSettings/ProjectName.txt" Checked="ChkEnableProjectRename_Checked" Unchecked="ChkEnableProjectRename_Checked" HorizontalAlignment="Left"/>
+                                    <CheckBox  x:Name="chkShowPlatform" Content="Show current target platform (if exists in .csproj)"  ToolTip="Shows target platform column" Checked="ChkShowPlatform_Checked" Unchecked="ChkShowPlatform_Checked" HorizontalAlignment="Left"/>
+                                    <CheckBox  x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Experimental!)"  Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" ToolTip="Select target platform" HorizontalAlignment="Left"/>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,0">
+                                        <CheckBox   x:Name="chkShowGitBranchColumn" Content="Show git branch column" Checked="ChkShowGitBranchColumn_CheckedChanged" Unchecked="ChkShowGitBranchColumn_CheckedChanged" ToolTip="Shows column for project git branch info" HorizontalAlignment="Left"/>
+                                        <CheckBox   x:Name="chkCheckPlasticBranch" Content="Check for Plastic branch" ToolTip="Checks for plastic branch, if .git doesnt exists" HorizontalAlignment="Left" Margin="14,0,0,3" Checked="ChkCheckPlasticBranch_Checked" Unchecked="ChkCheckPlasticBranch_Checked"/>
+                                    </StackPanel>
+                                    <CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project"  Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" ToolTip="If disabled, uses automatic quick project naming (Should be enabled, unless you want instant project creation)" HorizontalAlignment="Left"/>
+                                    <CheckBox  x:Name="chkShowMissingFolderProjects" Content="Show projects that don't exist on disk"  Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" ToolTip="List in recent projects, even if the project folder is missing" HorizontalAlignment="Left"/>
+                                    <CheckBox  x:Name="chkShowLauncherArgumentsColumn" Content="Show commandline arguments column"  Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" ToolTip="Shows column for custom project commandline params" HorizontalAlignment="Left"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <Label Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,5,5,0" HorizontalAlignment="Left">Project name:</Label>
+                                        <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder"  Margin="3,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder" HorizontalAlignment="Left"/>
+                                        <RadioButton x:Name="radioProjNameProductName" Content="Settings ProductName"  Margin="5,0,0,0" GroupName="toggleGroupProjectName" Checked="RadioProjNameProductName_Checked" ToolTip="Take project name from player settings ProductName field" HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,0">
+                                        <CheckBox  x:Name="chkOverride40ProjectCount" Content="Maximum recent projects count" ToolTip="(Experimental) Save all recent projects to preferences and merge into recent list" HorizontalAlignment="Left" Checked="chkOverride40ProjectCount_Checked" Unchecked="chkOverride40ProjectCount_Checked"/>
+                                        <TextBox x:Name="txtMaxProjectCount" Text="128" ToolTip="40 projects come from Unity registry, rest are added and taken from preferences data" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="50"  Padding="0,3,0,0" HorizontalAlignment="Left" Margin="5,0,0,0" LostFocus="txtMaxProjectCount_LostFocus" TextChanged="txtMaxProjectCount_TextChanged" Height="22" />
+                                        <Label Content="(Experimental!)" Foreground="{DynamicResource ThemeButtonForeground}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
+                                        <CheckBox  x:Name="chkUseInitScript" Content="Use Init script for new projects" ToolTip="..." HorizontalAlignment="Left" Checked="chkUseInitScript_Checked" Unchecked="chkUseInitScript_Checked"/>
+                                        <!--<Label Content="Init script for new projects" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" />-->
+                                        <TextBox x:Name="txtCustomInitFile" BorderBrush="Transparent" MinWidth="128" ToolTip="Default is InitProject.cs" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="InitializeProject.cs" PreviewKeyDown="txtCustomInitFile_PreviewKeyDown" LostFocus="txtCustomInitFile_LostFocus" />
+                                        <Button Style="{StaticResource CustomButton}" ToolTip="Explore Scripts folder" x:Name="btnExploreScriptsFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnExploreScriptsFolder_Click" Margin="5,0,0,0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
+                                        <Label Content="Root Folder for New Projects" Foreground="{DynamicResource ThemeButtonForeground}" Padding="2,3,5,3" />
+                                        <TextBox x:Name="txtRootFolderForNewProjects" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="256" ToolTip="Root folder for quick New Projects (so that you dont have to pick project folder every time)" Padding="0,3,0,0" TextChanged="TxtRootFolderForNewProjects_TextChanged" Width="150" />
+                                        <Button Style="{StaticResource CustomButton}" x:Name="btnBrowseProjectRootFolder" Content="..." Margin="6,0,0,0" MinWidth="22" Click="BtnBrowseProjectRootFolder_Click" MinHeight="22" FontSize="16" ToolTip="Browse for new projects root folder.." />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal">
+                                        <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ThemeButtonForeground}" Padding="2,3,5,3" />
+                                        <TextBox x:Name="txtWebglRelativePath" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="192" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. Used for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
+                                    </StackPanel>
+
+
+                                </StackPanel>
+                            </GroupBox>
+
+                            <GroupBox Grid.Row="3" Header="UI" VerticalAlignment="Top" Margin="3,0,0,0">
+                                <StackPanel Grid.Row="3" Orientation="Vertical" Margin="3,5,0,0" >
+                                    <CheckBox  x:Name="chkHumanFriendlyDateTime" Content="Use human friendly Last Modified"  ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkHumanFriendlyDateTime_Checked" Unchecked="ChkHumanFriendlyDateTime_Checked"/>
+
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <CheckBox  x:Name="chkUseCustomLastModified" Content="Date format" ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkUseCustomLastModified_Checked" Unchecked="ChkUseCustomLastModified_Checked"/>
+                                        <TextBox x:Name="txtCustomDateTimeFormat" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="150" ToolTip="Default is dd/MM/yyyy HH:mm:ss" Padding="0,3,0,0" Margin="5,0,0,0" Text="dd/MM/yyyy HH:mm:ss" LostFocus="TxtCustomDateTimeFormat_LostFocus" TextChanged="TxtCustomDateTimeFormat_TextChanged"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
+                                        <CheckBox  x:Name="chkUseCustomTheme" Content="Load custom theme" ToolTip="Loads theme.ini from application folder" Checked="ChkUseCustomTheme_Checked" Unchecked="ChkUseCustomTheme_Checked" HorizontalAlignment="Left"/>
+                                        <TextBox x:Name="txtCustomThemeFile" BorderBrush="Transparent" MinWidth="128" ToolTip="Default is theme.ini" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="theme.ini" LostFocus="TxtCustomThemeFile_LostFocus" PreviewKeyDown="TxtCustomThemeFile_PreviewKeyDown" />
+                                        <Button Style="{StaticResource CustomButton}" ToolTip="Reload theme" x:Name="btnReloadTheme" Content="⟳" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnReloadTheme_Click" Margin="5,0,0,0"/>
+                                        <Button Style="{StaticResource CustomButton}" ToolTip="Explore Themes folder" x:Name="btnExploreFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnExploreFolder_Click" Margin="5,0,0,0"/>
+                                        <Button Style="{StaticResource CustomButton}" ToolTip="Open theme editor" x:Name="btnThemeEditor" Content="✎" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnThemeEditor_Click" Margin="5,0,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,10,3,3" >
-                            <CheckBox  x:Name="chkEnablePlatformSelection" Content="Enable Platform Selection (Experimental!)"  Checked="ChkEnablePlatformSelection_Checked" Unchecked="ChkEnablePlatformSelection_Checked" ToolTip="Select target platform" HorizontalAlignment="Left"/>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox   x:Name="chkRunAutomatically" Content="Run automatically on startup"  ToolTip="Run automatically using startup registry key" HorizontalAlignment="Left" Checked="ChkRunAutomatically_Checked" Unchecked="ChkRunAutomatically_Checked"/>
-                                <CheckBox   x:Name="chkRunAutomaticallyMinimized" Content="as minimized"  ToolTip="Minimize to tray when started automatically" HorizontalAlignment="Left" Checked="ChkRunAutomaticallyMinimized_Checked" Unchecked="ChkRunAutomaticallyMinimized_Checked" Margin="5,0,0,3"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox  x:Name="chkUseCustomLastModified" Content="Date format" ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkUseCustomLastModified_Checked" Unchecked="ChkUseCustomLastModified_Checked"/>
-                                <TextBox x:Name="txtCustomDateTimeFormat" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="150" ToolTip="Default is dd/MM/yyyy HH:mm:ss" Padding="0,3,0,0" Margin="5,0,0,0" Text="dd/MM/yyyy HH:mm:ss" LostFocus="TxtCustomDateTimeFormat_LostFocus" TextChanged="TxtCustomDateTimeFormat_TextChanged">
-                                </TextBox>
-                            </StackPanel>
-                            <CheckBox  x:Name="chkHumanFriendlyDateTime" Content="Use human friendly last modified"  ToolTip="Last modified date format" HorizontalAlignment="Left" Checked="ChkHumanFriendlyDateTime_Checked" Unchecked="ChkHumanFriendlyDateTime_Checked"/>
-                            <CheckBox  x:Name="chkSearchProjectPath" Content="Search project path also"  ToolTip="Searches from project folder path and project name" HorizontalAlignment="Left" Checked="ChkSearchProjectPath_Checked" Unchecked="ChkSearchProjectPath_Checked"/>
-                            <Label Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,5,5,0">Project name:</Label>
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioProjNameFolder" Content="ProjectName.txt or Folder"  Margin="3,0,0,0" GroupName="toggleGroupProjectName" IsChecked="True" Checked="RadioProjNameFolder_Checked" ToolTip="Take project name from project folder name OR ProjectName.txt if file exists in ProjectSettings/ folder"/>
-                                <RadioButton x:Name="radioProjNameProductName" Content="Settings ProductName"  Margin="5,0,0,0" GroupName="toggleGroupProjectName" Checked="RadioProjNameProductName_Checked" ToolTip="Take project name from player settings ProductName field"/>
-                            </StackPanel>
-                            <!--<StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="5,0,0,0" >
+
+                            <GroupBox Grid.Row="3" Header="General" VerticalAlignment="Top" Margin="0,0,3,0">
+                                <StackPanel Grid.Row="3" Orientation="Vertical" Margin="3,5,0,0" >
+                                    <CheckBox  x:Name="chkMinimizeToTaskbar" Content="Minimize to tray"  Checked="ChkMinimizeToTaskbar_CheckedChanged" Unchecked="ChkMinimizeToTaskbar_CheckedChanged"  ToolTip="When minimized, hides application into taskbar icon area" HorizontalAlignment="Left" />
+                                    <CheckBox  x:Name="chkQuitAfterOpen" Content="Close after opening project"  Checked="ChkQuitAfterOpen_CheckedChanged" Unchecked="ChkQuitAfterOpen_CheckedChanged" ToolTip="Closes launcher after running project (not really useful)" HorizontalAlignment="Left"/>
+                                    <CheckBox  x:Name="chkQuitAfterCommandline" Content="Close after launching from Explorer"  Unchecked="ChkQuitAfterCommandline_CheckedChanged" Checked="ChkQuitAfterCommandline_CheckedChanged" ToolTip="Close launcher after running from commandline or Explorer (recommended)" HorizontalAlignment="Left"/>
+                                    <CheckBox  x:Name="chkAllowSingleInstanceOnly" Content="Allow single instance only"  Checked="ChkAllowSingleInstanceOnly_CheckedChanged" Unchecked="ChkAllowSingleInstanceOnly_CheckedChanged" ToolTip="Activates already running instance, instead of starting new exe (not working if app is minized to taskbar)" HorizontalAlignment="Left"/>
+                                    <CheckBox x:Name="chkStreamerMode" Content="Streamer Mode (hide project names and folders)"  ToolTip="Hide project names and folders in main view" Checked="ChkStreamerMode_Checked" Unchecked="ChkStreamerMode_Checked" HorizontalAlignment="Left"/>
+
+                                    <!--<StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                 <TextBox x:Name="txtTemplatePackagesFolder" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" ToolTip="Folder for your custom unitypackage templates (for new project)" Padding="0,3,0,0" Width="110" TextChanged="TxtTemplatePackagesFolder_TextChanged" />
                                 <Button Style="{StaticResource CustomButton}" x:Name="btnBrowseTemplateUnityPackagesFolder" Content="..." Margin="6,0,0,0" MinWidth="22" MinHeight="22" FontSize="16" ToolTip="Browse for new projects root folder.." Click="BtnBrowseTemplateUnityPackagesFolder_Click" />
                                 <Label Content="UnityPackage Templates Folder" Foreground="{DynamicResource ThemeButtonForeground}" />
                             </StackPanel>-->
 
-                            <Label Content="ADB args:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="0,1,0,-4" />
-                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBox x:Name="txtLogCatArgs" BorderBrush="Transparent" Text="-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="312" ToolTip="ADB commandline arguments" Padding="0,3,0,0" TextChanged="TxtLogCatArgs_TextChanged" Width="312" />
-                                <Button Style="{StaticResource CustomButton}" x:Name="btnResetLogCatArgs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Reset to default logcat args" Click="BtnResetLogCatArgs_Click">
-                                    <Label Content="Reset" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
-                                </Button>
-                            </StackPanel>
 
+
+                                </StackPanel>
+                            </GroupBox>
+
+                            <GroupBox Grid.Row="3" Header="System" VerticalAlignment="Top" Margin="0,0,3,0">
+                                <StackPanel Grid.Row="3" Orientation="Vertical" Margin="3,5,0,0" >
+                                    <CheckBox  x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu"  Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" ToolTip="Install registry entry for Explorer context menu" HorizontalAlignment="Left"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <CheckBox   x:Name="chkRunAutomatically" Content="Run automatically on startup"  ToolTip="Run automatically using startup registry key" HorizontalAlignment="Left" Checked="ChkRunAutomatically_Checked" Unchecked="ChkRunAutomatically_Checked"/>
+                                        <CheckBox   x:Name="chkRunAutomaticallyMinimized" Content="as minimized"  ToolTip="Minimize to tray when started automatically" HorizontalAlignment="Left" Checked="ChkRunAutomaticallyMinimized_Checked" Unchecked="ChkRunAutomaticallyMinimized_Checked" Margin="5,0,0,3"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,6,0,0">
+                                        <Label Content="Initial WebGL server port" Foreground="{DynamicResource ThemeButtonForeground}" />
+                                        <TextBox x:Name="txtWebglPort" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="80" ToolTip="Initial port for first local WebGL webserver process (next one will be +1)" Padding="0,3,0,0" TextChanged="txtWebglPort_TextChanged" HorizontalAlignment="Left" Text="50000" LostFocus="txtWebglPort_LostFocus" Margin="1,0,0,0" Height="22" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4" HorizontalAlignment="Left">
+                                        <Label Content="Shortcut .bat files folder" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" />
+                                        <TextBox x:Name="txtShortcutBatchFileFolder" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="169" ToolTip="Save generated .bat files here (they are run from Desktop Shortcut)" Padding="0,3,0,0" HorizontalAlignment="Left" MaxWidth="169" LostFocus="TxtShortcutBatchFileFolder_LostFocus" TextChanged="TxtShortcutBatchFileFolder_TextChanged" Margin="5,0,0,0" Height="22" />
+                                        <Button Style="{StaticResource CustomButton}" x:Name="btnBrowseBatchFileFolder" Content="..." Margin="5,0,0,0" MinWidth="22" Click="BtnBrowseBatchFileFolder_Click" MinHeight="22" FontSize="16" ToolTip="Browse for .bat folder (default location is inside AppData/UnityLauncherPro/ and works fine, so this is optional)" HorizontalAlignment="Left" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4" HorizontalAlignment="Left">
+                                        <Label Content="ADB args:" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="0,1,0,-4" />
+                                        <TextBox x:Name="txtLogCatArgs" BorderBrush="Transparent" Text="-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" MinWidth="250" ToolTip="ADB commandline arguments" Padding="0,3,0,0" TextChanged="TxtLogCatArgs_TextChanged" Width="250" Height="22" />
+                                        <Button Style="{StaticResource CustomButton}" x:Name="btnResetLogCatArgs" Margin="5,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Reset to default logcat args" Click="BtnResetLogCatArgs_Click">
+                                            <Label Content="Reset" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                        </Button>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,6,0,0">
+                                        <Button  x:Name="btnPatchHubConfig" ToolTip="Modifies json file to set 'manual:true' values into 'false', so that can add modules using Hub. NOTE: This cannot be reversed (not keeping track which values were already 'false')" Style="{StaticResource CustomButton}" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top"  Click="btnPatchHubConfig_Click">
+                                            <Label Content="Patch Hub editors.json" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                        </Button>
+                                        <Label Content="*If want to install modules from Hub" Foreground="{DynamicResource ThemeButtonForeground}" />
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </GroupBox>
                         </StackPanel>
+
                     </StackPanel>
 
                     <!-- links-->
-                    <Button Grid.Row="4" Style="{StaticResource CustomButton}" x:Name="btnOpenGithub" Margin="0,0,15,10" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnOpenGithub_Click">
-                        <Label Content="_View in Github" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                    <Button Grid.Row="4" Style="{StaticResource CustomButton}" x:Name="btnOpenGithub" Margin="0,0,15,10" BorderBrush="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="BtnOpenGithub_Click">
+                        <Label Content="View in Github" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                     </Button>
 
                 </Grid>
@@ -1067,8 +753,13 @@
         </TabControl>
 
         <Grid Grid.Row="2" UseLayoutRounding="False">
-            <StatusBar VerticalAlignment="Bottom" Margin="3,1,20,1" Background="{x:Null}" Foreground="{DynamicResource ThemeStatusText}">
-                <TextBlock x:Name="txtStatus" Margin="6,1,3,0"  VerticalAlignment="Center" Text="Ready"/>
+            <StatusBar VerticalAlignment="Center" Margin="3,0,15,0" Background="{x:Null}" Foreground="{DynamicResource ThemeStatusText}">
+                <StatusBarItem>
+                    <TextBlock x:Name="txtStatus" Margin="6,0,3,0"  VerticalAlignment="Center" Text="Ready"/>
+                </StatusBarItem>
+                <StatusBarItem HorizontalAlignment="Right">
+                    <Label x:Name="btnBuildStatus" Content="◯" ToolTip="Builds" Foreground="{DynamicResource ThemeButtonForegroundDisabled}" Padding="0,0,0,0"/>
+                </StatusBarItem>
             </StatusBar>
         </Grid>
     </Grid>
