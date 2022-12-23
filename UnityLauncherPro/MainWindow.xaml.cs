@@ -128,8 +128,9 @@ namespace UnityLauncherPro
             // clear updates grid
             dataGridUpdates.Items.Clear();
 
-            // clear buildreport grid
+            // clear buildreport grids
             gridBuildReport.Items.Clear();
+            gridBuildReportData.Items.Clear();
 
             // build notifyicon (using windows.forms)
             notifyIcon = new System.Windows.Forms.NotifyIcon();
