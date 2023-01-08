@@ -602,9 +602,19 @@ namespace UnityLauncherPro
                         }
                     }
 
-                    Process process = Process.Start(tempFile);
-                    process.EnableRaisingEvents = true;
-                    process.Exited += (sender, e) => DeleteTempFile(tempFile);
+                    Process process;
+                    // if user clicks NO to UAC, this fails (so added try-catch)
+                    try
+                    {
+                        process = Process.Start(tempFile);
+                        process.EnableRaisingEvents = true;
+                        process.Exited += (sender, e) => DeleteTempFile(tempFile);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Failed to run exe: " + tempFile);
+                        DeleteTempFile(tempFile);
+                    }
                     // TODO refresh upgrade dialog after installer finished
                 }
             }
