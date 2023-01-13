@@ -335,7 +335,7 @@ namespace UnityLauncherPro
         private bool UnitysFilter(object item)
         {
             UnityInstallation unity = item as UnityInstallation;
-            return (unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+            return (unity.Version?.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1) || (unity.ReleaseType?.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1) || (unity.PlatformsCombined?.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
         }
 
         private bool BuildReportFilter(object item)
@@ -907,7 +907,7 @@ namespace UnityLauncherPro
                     }
 
                     break;
-                case 1: // Unitys
+                case 1: // Unitys/Editors
 
                     switch (e.Key)
                     {
@@ -916,6 +916,13 @@ namespace UnityLauncherPro
                             break;
                         case Key.Escape: // clear project search
                             txtSearchBoxUnity.Text = "";
+                            break;
+                        default:
+                            if (txtSearchBoxUnity.IsFocused == false)
+                            {
+                                txtSearchBoxUnity.Focus();
+                                txtSearchBoxUnity.Select(txtSearchBoxUnity.Text.Length, 0);
+                            }
                             break;
                     }
                     break;
@@ -951,7 +958,7 @@ namespace UnityLauncherPro
         private async void OnTabSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // if going into updates tab, fetch list (first time only)
-            if (((TabControl)sender).SelectedIndex == (int)Tabs.Updates)
+            if (tabControl.SelectedIndex == (int)Tabs.Updates)
             {
                 // if we dont have previous results yet, TODO scan again if previous was 24hrs ago
                 if (updatesSource == null)
@@ -3350,27 +3357,6 @@ namespace UnityLauncherPro
                 }
             }
         }
-
-
-
-
-
-        //private void BtnBrowseTemplateUnityPackagesFolder_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var folder = Tools.BrowseForOutputFolder("Select unitypackage Templates folder");
-        //    if (string.IsNullOrEmpty(folder) == false)
-        //    {
-        //        txtTemplatePackagesFolder.Text = folder;
-        //        Properties.Settings.Default.templatePackagesFolder = folder;
-        //        Properties.Settings.Default.Save();
-        //    }
-        //}
-
-        //private void TxtTemplatePackagesFolder_TextChanged(object sender, TextChangedEventArgs e)
-        //{
-        //    Properties.Settings.Default.templatePackagesFolder = txtTemplatePackagesFolder.Text;
-        //    Properties.Settings.Default.Save();
-        //}
 
     } // class
 } //namespace

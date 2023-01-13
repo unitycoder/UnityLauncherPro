@@ -266,11 +266,12 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="123"/>
-                            <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True"/>
-                            <DataGridTextColumn Binding="{Binding Installed, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Installed" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="90"/>
+                            <DataGridTextColumn Header="Release" Binding="{Binding ReleaseType}" IsReadOnly="True" CanUserResize="False" MinWidth="50" />
                             <DataGridTextColumn Binding="{Binding PlatformsCombined}" ClipboardContentBinding="{x:Null}" Header="Platforms" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Installed, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Installed" IsReadOnly="True"/>
                             <DataGridTextColumn Binding="{Binding ProjectCount}" ClipboardContentBinding="{x:Null}" Header="Projects" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True"/>
                         </DataGrid.Columns>
 
                         <!-- right click context menu -->
