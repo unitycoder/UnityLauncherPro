@@ -362,6 +362,7 @@ namespace UnityLauncherPro
                 chkQuitAfterOpen.IsChecked = Properties.Settings.Default.closeAfterProject;
                 chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
                 chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
+                chkCheckPlasticBranch.IsChecked = Properties.Settings.Default.checkPlasticBranch;
                 chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
                 chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
                 chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
