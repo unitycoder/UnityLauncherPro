@@ -36,6 +36,7 @@ namespace UnityLauncherPro
         public static readonly string projectNameFile = "ProjectName.txt";
         public static string preferredVersion = null;
         public static int projectNameSetting = 0; // 0 = folder or ProjectName.txt if exists, 1=ProductName
+        public static readonly string initScriptFileFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "InitializeProject.cs");
 
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
@@ -473,30 +474,30 @@ namespace UnityLauncherPro
 
                 // if we dont have any values, get & set them now
                 // also, if user has disabled optional columns, saved order must be reset to default
-                if (order == null || gridRecent.Columns.Count != Properties.Settings.Default.recentColumnsOrder.Length)
+                if (order == null || gridRecent.Columns.Count != Settings.Default.recentColumnsOrder.Length)
                 {
-                    Properties.Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
+                    Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
                     for (int i = 0; i < gridRecent.Columns.Count; i++)
                     {
-                        Properties.Settings.Default.recentColumnsOrder[i] = gridRecent.Columns[i].DisplayIndex;
+                        Settings.Default.recentColumnsOrder[i] = gridRecent.Columns[i].DisplayIndex;
                     }
-                    Properties.Settings.Default.Save();
+                    Settings.Default.Save();
                 }
                 else // load existing order
                 {
                     for (int i = 0; i < gridRecent.Columns.Count; i++)
                     {
-                        if (Properties.Settings.Default.recentColumnsOrder[i] > -1)
+                        if (Settings.Default.recentColumnsOrder[i] > -1)
                         {
-                            gridRecent.Columns[i].DisplayIndex = Properties.Settings.Default.recentColumnsOrder[i];
+                            gridRecent.Columns[i].DisplayIndex = Settings.Default.recentColumnsOrder[i];
                         }
                     }
                 }
 
-                adbLogCatArgs = Properties.Settings.Default.adbLogCatArgs;
+                adbLogCatArgs = Settings.Default.adbLogCatArgs;
                 txtLogCatArgs.Text = adbLogCatArgs;
 
-                projectNameSetting = Properties.Settings.Default.projectName;
+                projectNameSetting = Settings.Default.projectName;
                 switch (projectNameSetting)
                 {
                     case 0:
@@ -513,22 +514,22 @@ namespace UnityLauncherPro
                 // set default .bat folder location to appdata/.., if nothing is set, or current one is invalid
                 if (string.IsNullOrEmpty(txtShortcutBatchFileFolder.Text) || Directory.Exists(txtShortcutBatchFileFolder.Text) == false)
                 {
-                    Properties.Settings.Default.shortcutBatchFileFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-                    txtShortcutBatchFileFolder.Text = Properties.Settings.Default.shortcutBatchFileFolder;
+                    Settings.Default.shortcutBatchFileFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+                    txtShortcutBatchFileFolder.Text = Settings.Default.shortcutBatchFileFolder;
                 }
 
-                chkUseInitScript.IsChecked = Properties.Settings.Default.useInitScript;
-                txtCustomInitFile.Text = Properties.Settings.Default.customInitFile;
+                chkUseInitScript.IsChecked = Settings.Default.useInitScript;
+                txtCustomInitFileURL.Text = Settings.Default.customInitFileURL;
 
                 // load webgl port
-                txtWebglPort.Text = "" + Properties.Settings.Default.webglPort;
-                webglPort = Properties.Settings.Default.webglPort;
+                txtWebglPort.Text = "" + Settings.Default.webglPort;
+                webglPort = Settings.Default.webglPort;
 
-                txtMaxProjectCount.Text = Properties.Settings.Default.maxProjectCount.ToString();
-                chkOverride40ProjectCount.IsChecked = Properties.Settings.Default.override40ProjectCount;
+                txtMaxProjectCount.Text = Settings.Default.maxProjectCount.ToString();
+                chkOverride40ProjectCount.IsChecked = Settings.Default.override40ProjectCount;
                 if ((bool)chkOverride40ProjectCount.IsChecked)
                 {
-                    maxProjectCount = Properties.Settings.Default.maxProjectCount;
+                    maxProjectCount = Settings.Default.maxProjectCount;
                 }
                 else
                 {
@@ -1836,7 +1837,7 @@ namespace UnityLauncherPro
                     Console.WriteLine("Create project " + NewProject.newVersion + " : " + rootFolder);
                     if (string.IsNullOrEmpty(rootFolder)) return;
 
-                    var p = Tools.FastCreateProject(NewProject.newVersion, rootFolder, NewProject.newProjectName, NewProject.templateZipPath, NewProject.platformsForThisUnity, NewProject.selectedPlatform, (bool)chkUseInitScript.IsChecked, txtCustomInitFile.Text);
+                    var p = Tools.FastCreateProject(NewProject.newVersion, rootFolder, NewProject.newProjectName, NewProject.templateZipPath, NewProject.platformsForThisUnity, NewProject.selectedPlatform, (bool)chkUseInitScript.IsChecked, initScriptFileFullPath);
 
                     // add to list (just in case new project fails to start, then folder is already generated..)
                     if (p != null) AddNewProjectToList(p);
@@ -1859,7 +1860,7 @@ namespace UnityLauncherPro
                 {
                     newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
                 }
-                var p = Tools.FastCreateProject(newVersion, rootFolder, null, null, null, null, (bool)chkUseInitScript.IsChecked, txtCustomInitFile.Text);
+                var p = Tools.FastCreateProject(newVersion, rootFolder, null, null, null, null, (bool)chkUseInitScript.IsChecked, initScriptFileFullPath);
 
                 if (p != null) AddNewProjectToList(p);
             }
@@ -3055,31 +3056,32 @@ namespace UnityLauncherPro
             }
         }
 
+
+
         private void btnExploreScriptsFolder_Click(object sender, RoutedEventArgs e)
         {
-            // TODO later this script should be inside some unity project, for easier updating..
-            if (Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts")) == false)
+            if (Tools.LaunchExplorer(initScriptFileFullPath) == false)
             {
-                Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory));
+                Tools.LaunchExplorer(Path.GetDirectoryName(initScriptFileFullPath));
             }
         }
 
-        private void txtCustomInitFile_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void txtCustomInitFileURL_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
                 case Key.Return: // pressed enter in theme file text box
-                    Properties.Settings.Default.customInitFile = txtCustomInitFile.Text;
-                    Properties.Settings.Default.Save();
+                    Settings.Default.customInitFileURL = txtCustomInitFileURL.Text;
+                    Settings.Default.Save();
                     break;
             }
         }
 
-        private void txtCustomInitFile_LostFocus(object sender, RoutedEventArgs e)
+        private void txtCustomInitFileURL_LostFocus(object sender, RoutedEventArgs e)
         {
             var s = (TextBox)sender;
-            Properties.Settings.Default.customInitFile = s.Text;
-            Properties.Settings.Default.Save();
+            Settings.Default.customInitFileURL = s.Text;
+            Settings.Default.Save();
         }
 
         private void chkUseInitScript_Checked(object sender, RoutedEventArgs e)
@@ -3087,8 +3089,8 @@ namespace UnityLauncherPro
             if (this.IsActive == false) return; // dont run code on window init
 
             var isChecked = (bool)((CheckBox)sender).IsChecked;
-            Properties.Settings.Default.useInitScript = isChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.useInitScript = isChecked;
+            Settings.Default.Save();
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -3359,6 +3361,10 @@ namespace UnityLauncherPro
             }
         }
 
+        private void btnFetchLatestInitScript_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.DownloadInitScript(initScriptFileFullPath, txtCustomInitFileURL.Text);
+        }
     } // class
 } //namespace
 

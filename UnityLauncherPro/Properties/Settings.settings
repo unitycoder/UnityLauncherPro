@@ -113,9 +113,6 @@
   &lt;string&gt;C:\Program Files\&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
-    <Setting Name="customInitFile" Type="System.String" Scope="User">
-      <Value Profile="(Default)">InitializeProject.cs</Value>
-    </Setting>
     <Setting Name="useInitScript" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -131,6 +128,9 @@
     </Setting>
     <Setting Name="maxProjectCount" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="customInitFileURL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs</Value>
     </Setting>
   </Settings>
 </SettingsFile>

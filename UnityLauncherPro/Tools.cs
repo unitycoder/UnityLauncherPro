@@ -626,6 +626,77 @@ namespace UnityLauncherPro
             }
         }
 
+        static readonly string initFileDefaultURL = "https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs";
+
+        public static void DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
+        {
+            string currentInitScriptFolder = Path.GetDirectoryName(currentInitScriptFullPath);
+            string currentInitScriptFile = Path.GetFileName(currentInitScriptFullPath);
+            string tempFile = Path.Combine(Path.GetTempPath(), currentInitScriptFile);
+            bool isLocalFile = false;
+
+            if (string.IsNullOrEmpty(currentInitScriptLocationOrURL) == true) currentInitScriptLocationOrURL = initFileDefaultURL;
+
+            // check if its URL or local file
+            if (currentInitScriptLocationOrURL.ToLower().StartsWith("http") == true)
+            {
+                // download into temp first
+                if (DownloadFile(currentInitScriptLocationOrURL, tempFile) == false) return;
+            }
+            else // file is in local folders/drives/projects
+            {
+                // check if file exists
+                if (File.Exists(currentInitScriptLocationOrURL) == false) return;
+                tempFile = currentInitScriptLocationOrURL;
+                isLocalFile = true;
+            }
+
+            // if got file
+            if (File.Exists(tempFile) == true)
+            {
+                // just in case file is locked
+                try
+                {
+                    // small validation to check if its valid editor script
+                    var tempContent = File.ReadAllText(tempFile);
+                    if (tempContent.IndexOf("public class InitializeProject") > 0 && tempContent.IndexOf("namespace UnityLauncherProTools") > 0 && tempContent.IndexOf("public static void Init()") > 0)
+                    {
+                        // move old file as backup
+                        if (File.Exists(currentInitScriptFullPath))
+                        {
+                            string oldScriptFullPath = Path.Combine(currentInitScriptFolder, currentInitScriptFile + ".bak");
+                            if (File.Exists(oldScriptFullPath)) File.Delete(oldScriptFullPath);
+                            File.Move(currentInitScriptFullPath, oldScriptFullPath);
+                        }
+                        // move new file here (need to delete old to overwrite)
+                        if (File.Exists(currentInitScriptFullPath)) File.Delete(currentInitScriptFullPath);
+
+                        // local file copy, not move
+                        if (isLocalFile == true)
+                        {
+                            File.Copy(tempFile, currentInitScriptFullPath);
+                        }
+                        else
+                        {
+                            File.Move(tempFile, currentInitScriptFullPath);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid c# init file..(missing correct Namespace, Class or Method)");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("File exception: " + e.Message);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Failed to download init script from: " + currentInitScriptLocationOrURL);
+            }
+        }
+
         static void DeleteTempFile(string path)
         {
             if (File.Exists(path) == true)
@@ -643,6 +714,7 @@ namespace UnityLauncherPro
                 using (WebClient client = new WebClient())
                 {
                     client.DownloadFile(url, tempFile);
+                    // TODO check if actually exists
                     result = true;
                 }
             }
@@ -817,7 +889,7 @@ namespace UnityLauncherPro
                         grid.SelectedIndex--;
                     }
                     // disable wrap around
-                    
+
                     //else
                     //{
                      //   grid.SelectedIndex = grid.Items.Count - 1;
@@ -1212,15 +1284,13 @@ namespace UnityLauncherPro
             // copy init file into project
             if (useInitScript == true)
             {
-                var initScriptFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", initScriptPath);
-                Console.WriteLine("initScriptFile: " + initScriptFile);
-                if (File.Exists(initScriptFile) == true)
+                if (File.Exists(initScriptPath) == true)
                 {
                     var editorTargetFolder = Path.Combine(baseFolder, projectName, "Assets", "Editor");
-                    Console.WriteLine(editorTargetFolder);
                     if (Directory.Exists(editorTargetFolder) == false) Directory.CreateDirectory(editorTargetFolder);
-                    var targetScriptFile = Path.Combine(editorTargetFolder, initScriptPath);
-                    if (File.Exists(targetScriptFile) == false) File.Copy(initScriptFile, targetScriptFile);
+                    var targetScriptFile = Path.Combine(editorTargetFolder, Path.GetFileName(initScriptPath));
+                    // TODO overwrite old file, there shouldnt be anything here
+                    if (File.Exists(targetScriptFile) == false) File.Copy(initScriptPath, targetScriptFile);
                 }
             }
 

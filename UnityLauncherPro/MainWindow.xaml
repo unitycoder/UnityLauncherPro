@@ -647,10 +647,12 @@
                                         <Label Content="(Experimental!)" Foreground="{DynamicResource ThemeButtonForeground}" />
                                     </StackPanel>
                                     <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
-                                        <CheckBox  x:Name="chkUseInitScript" Content="Use Init script for new projects" ToolTip="..." HorizontalAlignment="Left" Checked="chkUseInitScript_Checked" Unchecked="chkUseInitScript_Checked"/>
-                                        <!--<Label Content="Init script for new projects" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Left" />-->
-                                        <TextBox x:Name="txtCustomInitFile" BorderBrush="Transparent" MinWidth="128" ToolTip="Default is InitProject.cs" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="InitializeProject.cs" PreviewKeyDown="txtCustomInitFile_PreviewKeyDown" LostFocus="txtCustomInitFile_LostFocus" />
-                                        <Button Style="{StaticResource CustomButton}" ToolTip="Explore Scripts folder" x:Name="btnExploreScriptsFolder" Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnExploreScriptsFolder_Click" Margin="5,0,0,0"/>
+                                        <CheckBox  x:Name="chkUseInitScript" Content="Use Init script for new projects" ToolTip="Runs editor script on new project (to do custom setup)" HorizontalAlignment="Left" Checked="chkUseInitScript_Checked" Unchecked="chkUseInitScript_Checked"/>
+                                        <TextBox x:Name="txtCustomInitFileURL" BorderBrush="Transparent" MinWidth="191" MaxWidth="191" ToolTip="URL OR local folder to fetch init file from (NOTE: Not automatically fetched, only if press Fetch button)" Padding="0,3,0,0" Margin="5,0,0,0" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  Text="https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs" PreviewKeyDown="txtCustomInitFileURL_PreviewKeyDown" LostFocus="txtCustomInitFileURL_LostFocus" />
+                                        <Button x:Name="btnExploreScriptsFolder" Style="{StaticResource CustomButton}" ToolTip="Explore Scripts folder"  Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnExploreScriptsFolder_Click" Margin="5,0,0,0"/>
+                                        <Button Style="{StaticResource CustomButton}" x:Name="btnFetchLatestInitScript" Margin="5,0,0,0" FontSize="11" Height="24" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Copies latest script from this location (Renames existing script as *.bak)" Click="btnFetchLatestInitScript_Click">
+                                            <Label Content="Fetch" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                        </Button>
                                     </StackPanel>
 
                                     <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
@@ -662,7 +664,6 @@
                                         <Label Content="Webgl Relative Build Path (inside Builds/)" Foreground="{DynamicResource ThemeButtonForeground}" Padding="2,3,5,3" />
                                         <TextBox x:Name="txtWebglRelativePath" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="192" ToolTip="Inside Builds/ folder you might have separate folder for webgl builds, like webgl/. Used for starting WebGL server there" Padding="0,3,0,0" TextChanged="TxtWebglRelativePath_TextChanged" />
                                     </StackPanel>
-
 
                                 </StackPanel>
                             </GroupBox>
