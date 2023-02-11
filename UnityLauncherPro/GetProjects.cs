@@ -146,12 +146,22 @@ namespace UnityLauncherPro
 
             //Console.WriteLine("valueName="+ valueName+"  , projectName =" + projectName);
 
-            // get last modified date from most recent date of solution or folder
-            string solutionPath = Path.Combine(projectPath, $"{projectName}.sln");
-            bool solutionExists = File.Exists(solutionPath);
-            DateTime? solutionLastUpdated = solutionExists ? Tools.GetLastModifiedTime(solutionPath) : null;
-            DateTime? folderLastUpdated = folderExists ? Tools.GetLastModifiedTime(projectPath) : null;
-            DateTime? lastUpdated = solutionLastUpdated > folderLastUpdated ? solutionLastUpdated : folderLastUpdated;
+            // get project last modified date from the most recently modified file or folder in project folder
+            DateTime? lastUpdated = null;
+            if (folderExists)
+            {
+                List<string> projectContents = new List<string>();
+                projectContents.AddRange(Directory.GetFiles(projectPath));
+                projectContents.AddRange(Directory.GetDirectories(projectPath));
+                
+                lastUpdated = Tools.GetLastModifiedTime(projectPath);
+                foreach (string file in projectContents)
+                {
+                    DateTime? lastModified = Tools.GetLastModifiedTime(file);
+                    if (lastModified > lastUpdated)
+                        lastUpdated = lastModified;
+                }
+            }
 
             // get project version
             string projectVersion = folderExists ? Tools.GetProjectVersion(projectPath) : null;
