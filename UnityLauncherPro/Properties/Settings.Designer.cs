@@ -527,5 +527,29 @@ namespace UnityLauncherPro.Properties {
                 this["customInitFileURL"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string currentSortColumn {
+            get {
+                return ((string)(this["currentSortColumn"]));
+            }
+            set {
+                this["currentSortColumn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool currentSortDirectionAscending {
+            get {
+                return ((bool)(this["currentSortDirectionAscending"]));
+            }
+            set {
+                this["currentSortDirectionAscending"] = value;
+            }
+        }
     }
 }

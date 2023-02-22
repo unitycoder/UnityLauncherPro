@@ -132,5 +132,11 @@
     <Setting Name="customInitFileURL" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs</Value>
     </Setting>
+    <Setting Name="currentSortColumn" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="currentSortDirectionAscending" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

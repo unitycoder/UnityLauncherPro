@@ -1094,6 +1094,22 @@ namespace UnityLauncherPro
             Tools.SetFocusToGrid(gridRecent);
             // if coming from explorer launch, and missing unity version, projectsource is still null?
             if (projectsSource != null) SetStatus("Ready (" + projectsSource.Count + " projects)");
+
+            // use saved sort columns
+            if (string.IsNullOrEmpty(Settings.Default.currentSortColumn) == false)
+            {
+                // check if that column exists in headers
+                foreach (DataGridColumn column in gridRecent.Columns)
+                {
+                    if (column.Header.ToString() == Settings.Default.currentSortColumn)
+                    {
+                        // TODO Project binding is to Title, not project
+                        Settings.Default.currentSortColumn = Settings.Default.currentSortColumn.Replace("Project", "Title");
+                        gridRecent.Items.SortDescriptions.Add(new SortDescription(Settings.Default.currentSortColumn, Settings.Default.currentSortDirectionAscending ? ListSortDirection.Ascending : ListSortDirection.Descending));
+                        break;
+                    }
+                }
+            }
         }
 
         private void BtnExploreUnity_Click(object sender, RoutedEventArgs e)
@@ -1885,7 +1901,7 @@ namespace UnityLauncherPro
             Style cellStyle = new Style(typeof(DataGridCell));
             cellStyle.Setters.Add(new Setter(FontSizeProperty, 1.0));
             txtColumnTitle.CellStyle = isChecked ? cellStyle : null;
-            txtColumnName.CellStyle = isChecked ? cellStyle : null;
+            txtColumnPath.CellStyle = isChecked ? cellStyle : null;
             txtColumnGitBranch.CellStyle = isChecked ? cellStyle : null;
 
             Style txtBoxStyle = new Style(typeof(TextBox));
@@ -2915,7 +2931,6 @@ namespace UnityLauncherPro
         {
             DataGridColumn column = e.Column;
 
-            //Console.WriteLine("Sorted by " + column.Header);
 
             IComparer comparer = null;
 
@@ -2981,12 +2996,21 @@ namespace UnityLauncherPro
 
             //Console.WriteLine("Sorted by " + column.Header);
 
+            // save current sort to prefs
+            Settings.Default.currentSortColumn = column.Header.ToString();
+
             IComparer comparer = null;
 
             // prevent the built-in sort from sorting
             e.Handled = true;
 
+            // load sort dir
+            column.SortDirection = Settings.Default.currentSortDirectionAscending ? ListSortDirection.Ascending : ListSortDirection.Descending;
+
             ListSortDirection direction = (column.SortDirection != ListSortDirection.Ascending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
+
+            // save
+            Settings.Default.currentSortDirectionAscending = direction == ListSortDirection.Ascending;
 
             //set the sort order on the column
             column.SortDirection = direction;

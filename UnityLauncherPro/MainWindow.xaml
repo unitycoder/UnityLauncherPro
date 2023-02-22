@@ -89,7 +89,7 @@
                                 </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" Width="72">
+                            <DataGridTextColumn Header="Version" Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" IsReadOnly="True" Width="72">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="Version" IsHitTestVisible="False" />
@@ -107,7 +107,7 @@
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
                             <!--CellStyle="{StaticResource NoFocusCellStyle"}-->
-                            <DataGridTextColumn Header="Path" x:Name="txtColumnName" Binding="{Binding Path}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="185">
+                            <DataGridTextColumn Header="Path" x:Name="txtColumnPath" Binding="{Binding Path}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="185">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="Path" IsHitTestVisible="False" />
