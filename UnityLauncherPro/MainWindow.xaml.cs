@@ -1466,8 +1466,8 @@ namespace UnityLauncherPro
 
         private void ChkMinimizeToTaskbar_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.minimizeToTaskbar = (bool)chkMinimizeToTaskbar.IsChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.minimizeToTaskbar = (bool)chkMinimizeToTaskbar.IsChecked;
+            Settings.Default.Save();
         }
 
         private void ChkRegisterExplorerMenu_CheckedChanged(object sender, RoutedEventArgs e)
@@ -1481,35 +1481,38 @@ namespace UnityLauncherPro
                 Tools.RemoveContextMenuRegistry(contextRegRoot);
             }
 
-            Properties.Settings.Default.registerExplorerMenu = (bool)chkRegisterExplorerMenu.IsChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.registerExplorerMenu = (bool)chkRegisterExplorerMenu.IsChecked;
+            Settings.Default.Save();
         }
 
         private void ChkShowLauncherArgumentsColumn_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.showArgumentsColumn = (bool)chkShowLauncherArgumentsColumn.IsChecked;
-            Properties.Settings.Default.Save();
+            if (this.IsActive == false) return; // dont run code on window init
+            Settings.Default.showArgumentsColumn = (bool)chkShowLauncherArgumentsColumn.IsChecked;
+            Settings.Default.Save();
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+            RefreshRecentProjects();
         }
 
         private void ChkShowGitBranchColumn_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.showGitBranchColumn = (bool)chkShowGitBranchColumn.IsChecked;
-            Properties.Settings.Default.Save();
+            if (this.IsActive == false) return; // dont run code on window init
+            Settings.Default.showGitBranchColumn = (bool)chkShowGitBranchColumn.IsChecked;
+            Settings.Default.Save();
             gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+            RefreshRecentProjects();
         }
-
 
         private void ChkQuitAfterOpen_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.closeAfterProject = (bool)chkQuitAfterOpen.IsChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.closeAfterProject = (bool)chkQuitAfterOpen.IsChecked;
+            Settings.Default.Save();
         }
 
         private void ChkQuitAfterCommandline_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.closeAfterExplorer = (bool)chkQuitAfterCommandline.IsChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.closeAfterExplorer = (bool)chkQuitAfterCommandline.IsChecked;
+            Settings.Default.Save();
         }
 
         private void MenuItemShowProjectInExplorer_Click(object sender, RoutedEventArgs e)
@@ -1730,14 +1733,14 @@ namespace UnityLauncherPro
 
         private void ChkShowMissingFolderProjects_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.showProjectsMissingFolder = (bool)chkShowMissingFolderProjects.IsChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.showProjectsMissingFolder = (bool)chkShowMissingFolderProjects.IsChecked;
+            Settings.Default.Save();
         }
 
         private void ChkAllowSingleInstanceOnly_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.AllowSingleInstanceOnly = (bool)chkAllowSingleInstanceOnly.IsChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.AllowSingleInstanceOnly = (bool)chkAllowSingleInstanceOnly.IsChecked;
+            Settings.Default.Save();
         }
 
         private void BtnAssetPackages_Click(object sender, RoutedEventArgs e)
@@ -1749,8 +1752,8 @@ namespace UnityLauncherPro
         private void MenuItemSetPreferredUnityVersion_Click(object sender, RoutedEventArgs e)
         {
             var ver = GetSelectedUnity().Version;
-            Properties.Settings.Default.preferredVersion = ver;
-            Properties.Settings.Default.Save();
+            Settings.Default.preferredVersion = ver;
+            Settings.Default.Save();
 
             preferredVersion = ver;
             // TODO update unity list or just set value?
@@ -1938,8 +1941,8 @@ namespace UnityLauncherPro
         {
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
-            Properties.Settings.Default.showTargetPlatform = isChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.showTargetPlatform = isChecked;
+            Settings.Default.Save();
 
             gridRecent.Columns[6].Visibility = (bool)chkShowPlatform.IsChecked ? Visibility.Visible : Visibility.Collapsed;
 
@@ -2841,8 +2844,8 @@ namespace UnityLauncherPro
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             searchProjectPathAlso = isChecked;
-            Properties.Settings.Default.searchProjectPathAlso = isChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.searchProjectPathAlso = isChecked;
+            Settings.Default.Save();
         }
 
         private void BtnCrashDumps_Click(object sender, RoutedEventArgs e)
@@ -2874,8 +2877,10 @@ namespace UnityLauncherPro
 
         private void ChkCheckPlasticBranch_Checked(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.checkPlasticBranch = (bool)chkCheckPlasticBranch.IsChecked;
-            Properties.Settings.Default.Save();
+            if (this.IsActive == false) return; // dont run code on window init
+            Settings.Default.checkPlasticBranch = (bool)chkCheckPlasticBranch.IsChecked;
+            Settings.Default.Save();
+            RefreshRecentProjects();
         }
 
         private void MenuCreateDesktopShortCut_Click(object sender, RoutedEventArgs e)
@@ -2894,8 +2899,8 @@ namespace UnityLauncherPro
             var folder = ((TextBox)sender).Text;
             if (Directory.Exists(folder))
             {
-                Properties.Settings.Default.shortcutBatchFileFolder = folder;
-                Properties.Settings.Default.Save();
+                Settings.Default.shortcutBatchFileFolder = folder;
+                Settings.Default.Save();
             }
         }
 
