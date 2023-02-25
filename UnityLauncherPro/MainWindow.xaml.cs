@@ -731,12 +731,24 @@ namespace UnityLauncherPro
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
-            //            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked);
             projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths);
             gridRecent.ItemsSource = projectsSource;
+
+            // fix sorting on refresh
+            foreach (DataGridColumn column in gridRecent.Columns)
+            {
+                if (column.Header.ToString() == Settings.Default.currentSortColumn)
+                {
+                    // TODO FIXME, hack for correct direction on refresh only
+                    Settings.Default.currentSortDirectionAscending = !Settings.Default.currentSortDirectionAscending;
+                    var g = new DataGridSortingEventArgs(column);
+                    SortHandlerRecentProjects(gridRecent, g);
+                    break;
+                }
+            }
+
             // focus back
             Tools.SetFocusToGrid(gridRecent, lastSelectedProjectIndex);
-            //Console.WriteLine("RefreshRecentProjects: " + projectsSource.Count);
             SetStatus("Ready (" + projectsSource.Count + " projects)");
         }
 
@@ -1094,7 +1106,11 @@ namespace UnityLauncherPro
             Tools.SetFocusToGrid(gridRecent);
             // if coming from explorer launch, and missing unity version, projectsource is still null?
             if (projectsSource != null) SetStatus("Ready (" + projectsSource.Count + " projects)");
+            RefreshSorting();
+        }
 
+        void RefreshSorting()
+        {
             // use saved sort columns
             if (string.IsNullOrEmpty(Settings.Default.currentSortColumn) == false)
             {
@@ -1103,9 +1119,13 @@ namespace UnityLauncherPro
                 {
                     if (column.Header.ToString() == Settings.Default.currentSortColumn)
                     {
-                        // TODO Project binding is to Title, not project
+                        // TODO FIXME Project binding is to Title, not projects
                         Settings.Default.currentSortColumn = Settings.Default.currentSortColumn.Replace("Project", "Title");
-                        gridRecent.Items.SortDescriptions.Add(new SortDescription(Settings.Default.currentSortColumn, Settings.Default.currentSortDirectionAscending ? ListSortDirection.Ascending : ListSortDirection.Descending));
+
+                        // TODO FIXME, hack for correct direction on this refresh
+                        Settings.Default.currentSortDirectionAscending = !Settings.Default.currentSortDirectionAscending;
+                        var g = new DataGridSortingEventArgs(column);
+                        SortHandlerRecentProjects(gridRecent, g);
                         break;
                     }
                 }
@@ -1139,8 +1159,6 @@ namespace UnityLauncherPro
         {
             GoLookForUpdatesForThisUnity();
         }
-
-
 
         // if press up/down in search box, move to first item in results
         private void TxtSearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -2994,8 +3012,6 @@ namespace UnityLauncherPro
         {
             DataGridColumn column = e.Column;
 
-            //Console.WriteLine("Sorted by " + column.Header);
-
             // save current sort to prefs
             Settings.Default.currentSortColumn = column.Header.ToString();
 
@@ -3010,7 +3026,7 @@ namespace UnityLauncherPro
             ListSortDirection direction = (column.SortDirection != ListSortDirection.Ascending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
 
             // save
-            Settings.Default.currentSortDirectionAscending = direction == ListSortDirection.Ascending;
+            Settings.Default.currentSortDirectionAscending = (direction == ListSortDirection.Ascending);
 
             //set the sort order on the column
             column.SortDirection = direction;
