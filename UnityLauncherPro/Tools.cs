@@ -1167,14 +1167,14 @@ namespace UnityLauncherPro
 
         public static bool HasFocus(DependencyObject obj, Control control, bool checkChildren)
         {
-            var oFocused = System.Windows.Input.FocusManager.GetFocusedElement(obj) as DependencyObject;
+            var oFocused = FocusManager.GetFocusedElement(obj) as DependencyObject;
             if (!checkChildren)
                 return oFocused == control;
             while (oFocused != null)
             {
                 if (oFocused == control)
                     return true;
-                oFocused = System.Windows.Media.VisualTreeHelper.GetParent(oFocused);
+                oFocused = VisualTreeHelper.GetParent(oFocused);
             }
             return false;
         }
@@ -1201,23 +1201,32 @@ namespace UnityLauncherPro
             if (row == null)
             {
                 targetGrid.UpdateLayout();
-                // scroll to view if outside
-                targetGrid.ScrollIntoView(targetGrid.Items[index]);
-                row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
+                if (index < targetGrid.Items.Count)
+                {
+                    // scroll selected into view
+                    targetGrid.ScrollIntoView(targetGrid.Items[index]);
+                    row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
+                }
+                else
+                {
+                    Console.WriteLine("selected row out of bounds: " + index);
+                }
             }
             // NOTE does this causes move below?
             //row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up)); // works better than Up
-
-            row.Focus();
-            Keyboard.Focus(row);
+            if (row != null)
+            {
+                row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up)); // works better than Up
+                row.Focus();
+                Keyboard.Focus(row);
+            }
         }
 
         public static string BrowseForOutputFolder(string title, string initialDirectory = null)
         {
             // https://stackoverflow.com/a/50261723/5452781
             // Create a "Save As" dialog for selecting a directory (HACK)
-            var dialog = new Microsoft.Win32.SaveFileDialog();
+            var dialog = new SaveFileDialog();
             if (initialDirectory != null) dialog.InitialDirectory = initialDirectory;
             dialog.Title = title;
             dialog.Filter = "Project Folder|*.Folder"; // Prevents displaying files
@@ -1297,11 +1306,12 @@ namespace UnityLauncherPro
             // launch empty project
             var proj = new Project();
             proj.Title = projectName;
-            proj.Path = Path.Combine(baseFolder, newPath);
+            proj.Path = Path.Combine(baseFolder, newPath).Replace("\\", "/");
             proj.Version = version;
             proj.TargetPlatforms = platformsForThisUnity;
             proj.TargetPlatform = platform;
             proj.Modified = DateTime.Now;
+            proj.folderExists = true; // have to set this value, so item is green on list
 
             var proc = LaunchProject(proj, null, useInitScript);
             ProcessHandler.Add(proj, proc);

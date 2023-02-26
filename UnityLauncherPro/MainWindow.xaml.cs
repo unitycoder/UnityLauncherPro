@@ -731,7 +731,7 @@ namespace UnityLauncherPro
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Settings.Default.projectPaths);
             gridRecent.ItemsSource = projectsSource;
 
             // fix sorting on refresh
@@ -787,9 +787,13 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(folder) == false)
             {
                 var proj = GetNewProjectData(folder);
-                AddNewProjectToList(proj);
+                //AddNewProjectToList(proj);
+                Tools.AddProjectToHistory(proj.Path);
                 // clear search, so can see added project
                 txtSearchBox.Text = "";
+                RefreshRecentProjects();
+                // NOTE 0 works for sort-by-date only
+                Tools.SetFocusToGrid(gridRecent, 0);
             }
         }
 
@@ -799,7 +803,7 @@ namespace UnityLauncherPro
             p.Path = folder;
             p.Title = Path.GetFileName(folder);
             p.Version = Tools.GetProjectVersion(folder);
-            p.Arguments = Tools.ReadCustomProjectData(folder, MainWindow.launcherArgumentsFile);
+            p.Arguments = Tools.ReadCustomProjectData(folder, launcherArgumentsFile);
             if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.GetTargetPlatform(folder);
             if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
             return p;
@@ -808,9 +812,11 @@ namespace UnityLauncherPro
         void AddNewProjectToList(Project proj)
         {
             projectsSource.Insert(0, proj);
-            gridRecent.Items.Refresh();
-            Tools.SetFocusToGrid(gridRecent); // force focus
             gridRecent.SelectedIndex = 0;
+            Tools.SetFocusToGrid(gridRecent);
+            // force refresh
+            txtSearchBox.Text = proj.Title;
+            txtSearchBox.Text = "";
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
