@@ -3021,6 +3021,9 @@ namespace UnityLauncherPro
         // https://stackoverflow.com/a/2130557/5452781
         void SortHandlerRecentProjects(object sender, DataGridSortingEventArgs e)
         {
+            // TESTing fix for null ref in commandline start
+            if (gridRecent.ItemsSource == null) return;
+
             DataGridColumn column = e.Column;
 
             // save current sort to prefs
