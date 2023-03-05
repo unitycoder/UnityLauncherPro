@@ -2096,6 +2096,7 @@ namespace UnityLauncherPro
                         bool collectedBuildTime = false;
 
                         bool gotProjectPath = false;
+                        bool hasTimeStamps = false;
 
                         // TODO cleanup here
                         while (!sr.EndOfStream)
@@ -2108,8 +2109,23 @@ namespace UnityLauncherPro
                                 currentBuildReportProjectPath = line;
                                 gotProjectPath = false;
                             }
-                            if (line == "-projectPath") gotProjectPath = true;
 
+                            // if have timestamps, trim until 2nd | char at start
+
+                            // check arguments
+                            if (line.IndexOf("-projectPath") > -1) gotProjectPath = true;
+                            if (hasTimeStamps == false && line.IndexOf("-timestamps") > -1)
+                            {
+                                hasTimeStamps = true;
+                                // need to fix projectpath then
+                                currentBuildReportProjectPath = currentBuildReportProjectPath.Substring(currentBuildReportProjectPath.IndexOf("|", currentBuildReportProjectPath.IndexOf("|") + 1) + 1);
+                            }
+
+                            // remove timestamp from line, NOTE if | character exists somewhere else than timestamp, causes issue
+                            if (hasTimeStamps && line.IndexOf("|") > -1)
+                            {
+                                line = line.Substring(line.IndexOf("|", line.IndexOf("|") + 1) + 1).Trim();
+                            }
 
                             // build report starts
                             if (collectRows == false && line.IndexOf("Used Assets and files from the Resources folder, sorted by uncompressed size:") == 0)
@@ -2151,14 +2167,19 @@ namespace UnityLauncherPro
                             {
                                 // it wasnt clean build, no report
                                 if (singleReport == null) continue;
+                                int start = line.IndexOf("(") + 1;
+                                int end = line.IndexOf(" ms)", start);
 
-                                var ms = line.Substring(line.IndexOf("(") + 1, line.IndexOf(")") - line.IndexOf("(") - 1).Trim().Replace(" ms", "");
-                                singleReport.ElapsedTimeMS = long.Parse(ms);
-                                collectedBuildTime = true;
+                                if (start > 0 && end > start)
+                                {
+                                    string numberString = line.Substring(start, end - start);
+                                    singleReport.ElapsedTimeMS = long.Parse(numberString);
+                                    collectedBuildTime = true;
+                                }
 
                                 if (string.IsNullOrEmpty(currentBuildReportProjectPath) == false)
                                 {
-                                    // get streamingassets folder size and add to report, NOTE need to recalculate sizes then?
+                                    // get streamingassets folder size and add as last item to report, NOTE need to recalculate sizes then?
                                     string streamingAssetPath = Path.Combine(currentBuildReportProjectPath, "Assets", "StreamingAssets");
                                     var streamingAssetFolderSize = Tools.GetFolderSizeInBytes(streamingAssetPath);
                                     singleReport.Stats.Insert(singleReport.Stats.Count - 1, new BuildReportItem() { Category = "StreamingAssets", Size = Tools.GetBytesReadable(streamingAssetFolderSize) });
@@ -2214,8 +2235,10 @@ namespace UnityLauncherPro
 
                             if (collectStats == true)
                             {
+
+                                //if (hasTimeStamps) 
                                 var line2 = line.Trim();
-                                // get 2xspace after category name
+                                // get 2x space after category name
                                 var space1 = line2.IndexOf("   ");
                                 // get tab after first size
                                 var space2 = line2.IndexOf('\t');
