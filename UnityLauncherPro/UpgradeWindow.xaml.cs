@@ -19,7 +19,13 @@ namespace UnityLauncherPro
         {
             InitializeComponent();
             txtCurrentVersion.Text = currentVersion;
-            gridAvailableVersions.ItemsSource = MainWindow.unityInstalledVersions;
+            txtCurrentPlatform.Text = Tools.GetTargetPlatform(projectPath);
+
+            if (gridAvailableVersions.ItemsSource == null)
+            {
+                gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
+            }
+
             gridAvailableVersions.SelectedItem = null;
 
             // we have current version info in project
@@ -40,17 +46,15 @@ namespace UnityLauncherPro
                 string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
                 if (nearestVersion != null)
                 {
-                    // get correct row for nearest version
-                    var obj = Tools.GetEntry(MainWindow.unityInstalledVersions, nearestVersion);
-                    int index = gridAvailableVersions.Items.IndexOf(obj);
-                    if (index > -1)
+                    // select nearest version
+                    for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
                     {
-                        gridAvailableVersions.SelectedIndex = index;
-                    }
-                    else
-                    {
-                        // just select first item then
-                        gridAvailableVersions.SelectedIndex = 0;
+                        if (MainWindow.unityInstallationsSource[i].Version == nearestVersion)
+                        {
+                            gridAvailableVersions.SelectedIndex = i;
+                            gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
+                            break;
+                        }
                     }
                 }
             }
@@ -83,7 +87,6 @@ namespace UnityLauncherPro
                 }
 
             }
-
             gridAvailableVersions.Focus();
         }
 
@@ -183,8 +186,8 @@ namespace UnityLauncherPro
 
         void Upgrade()
         {
-            var k = (gridAvailableVersions.SelectedItem) as KeyValuePair<string, string>?;
-            upgradeVersion = k.Value.Key;
+            var k = (UnityInstallation)gridAvailableVersions.SelectedItem;
+            upgradeVersion = k.Version;
             DialogResult = true;
         }
 

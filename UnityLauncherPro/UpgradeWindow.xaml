@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="Upgrade Project Version" Height="533.165" Width="419" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="319" MinHeight="555" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewKeyDown="Window_PreviewKeyDown" ShowInTaskbar="False">
+        Title="Upgrade Project Version" Height="533.165" Width="455" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="319" MinHeight="555" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewKeyDown="Window_PreviewKeyDown" ShowInTaskbar="False">
 
     <Grid>
         <StackPanel Orientation="Horizontal">
             <Label x:Name="lblCurrentVersion" Content="Project version:" HorizontalAlignment="Left" Margin="9,11,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ThemeButtonForeground}"/>
             <TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtCurrentVersion" Background="{DynamicResource ThemeDarkMenuBar}" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="0,16,0,0" UndoLimit="64" Text="Version" IsReadOnly="True" VerticalAlignment="Top" />
+            <Label x:Name="lblCurrentPlatform" Content="Platform:" HorizontalAlignment="Left" Margin="9,11,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ThemeButtonForeground}"/>
+            <TextBox MinWidth="100" CaretBrush="#FFE2E2E2" x:Name="txtCurrentPlatform" Background="{DynamicResource ThemeDarkMenuBar}" BorderBrush="{x:Null}" Foreground="#FFC7C7C7" SelectionBrush="#FF003966" BorderThickness="0" Margin="0,16,0,0" UndoLimit="64" Text="Platform" IsReadOnly="True" VerticalAlignment="Top" />
         </StackPanel>
         <Label x:Name="lblAvailableVersions" Content="Available Unity Versions" HorizontalAlignment="Left" Margin="9,94,0,0" VerticalAlignment="Top" Foreground="{DynamicResource ThemeButtonForeground}"/>
         
@@ -41,10 +43,13 @@
             </DataGrid.Columns>
         </DataGrid>-->
 
-        <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" Height="304" Margin="10,121,10,0" VerticalAlignment="Top" Width="383" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled"  ScrollViewer.VerticalScrollBarVisibility="Visible">
+        <DataGrid x:Name="gridAvailableVersions" SelectionMode="Single" Height="304" Margin="10,121,10,0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled"  ScrollViewer.VerticalScrollBarVisibility="Visible" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserResizeColumns="False" CanUserReorderColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
-                <DataGridTextColumn Header="Value" Binding="{Binding Value}" IsReadOnly="True" CanUserResize="False" />
+                <!--<DataGridTextColumn Header="Key" Binding="{Binding Key}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                <DataGridTextColumn Header="Value" Binding="{Binding Value}" IsReadOnly="True" CanUserResize="False" />-->
+                <DataGridTextColumn Header="Version" Binding="{Binding Version}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                <DataGridTextColumn Header="Platforms" Binding="{Binding PlatformsCombined}" IsReadOnly="True" CanUserResize="False" MinWidth="270" />
+                <DataGridTextColumn Header="Release" Binding="{Binding ReleaseType}" IsReadOnly="True" CanUserResize="False" MinWidth="70" />
             </DataGrid.Columns>
         </DataGrid>
 
