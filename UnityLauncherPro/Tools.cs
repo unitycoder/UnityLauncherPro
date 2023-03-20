@@ -580,35 +580,19 @@ namespace UnityLauncherPro
                 // TODO make async
                 if (DownloadFile(exeURL, tempFile) == true)
                 {
-                    // run installer, copy current existing version path to clipboard, NOTE this probably never happens? unless install same version again..
-                    if (MainWindow.unityInstalledVersions.ContainsKey(version) == true)
-                    {
-                        string path = MainWindow.unityInstalledVersions[version];
-                        if (string.IsNullOrEmpty(path) == false)
-                        {
-                            // copy to clipboard
-                            Clipboard.SetText(path);
-                        }
-                    }
-                    else // no same version, copy last item from root folders
-                    {
-                        if (Properties.Settings.Default.rootFolders.Count > 0)
-                        {
-                            string path = Properties.Settings.Default.rootFolders[Properties.Settings.Default.rootFolders.Count - 1];
-                            if (string.IsNullOrEmpty(path) == false)
-                            {
-                                Clipboard.SetText(path);
-                            }
-                        }
-                    }
+                    // get base version, to use for install path
+                    string outputVersionFolder = "\\" + version.Split('.')[0] + "_" + version.Split('.')[1];
+                    string targetPathArgs = " /D=" + Properties.Settings.Default.rootFolders[Properties.Settings.Default.rootFolders.Count - 1] + outputVersionFolder; ;
 
-                    Process process;
                     // if user clicks NO to UAC, this fails (so added try-catch)
                     try
                     {
-                        process = Process.Start(tempFile);
+                        Process process = new Process();
+                        process.StartInfo.FileName = tempFile;
+                        process.StartInfo.Arguments = targetPathArgs;
                         process.EnableRaisingEvents = true;
                         process.Exited += (sender, e) => DeleteTempFile(tempFile);
+                        process.Start();
                     }
                     catch (Exception)
                     {

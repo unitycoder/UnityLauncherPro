@@ -138,8 +138,8 @@ namespace UnityLauncherPro
             if (e.Key == Key.Return && e.KeyboardDevice.Modifiers == ModifierKeys.None)
             {
                 e.Handled = true;
-                var k = (gridAvailableVersions.SelectedItem) as KeyValuePair<string, string>?;
-                upgradeVersion = k.Value.Key;
+                var k = (UnityInstallation)gridAvailableVersions.SelectedItem;
+                upgradeVersion = k.Version;
                 DialogResult = true;
                 return;
             }
