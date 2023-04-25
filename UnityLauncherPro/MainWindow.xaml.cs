@@ -47,6 +47,9 @@ namespace UnityLauncherPro
         Updates[] updatesSource;
 
         string _filterString = null;
+        bool multiWordSearch = false;
+        string[] searchWords;
+
         int lastSelectedProjectIndex = 0;
         Mutex myMutex;
         ThemeEditor themeEditorWindow;
@@ -252,6 +255,18 @@ namespace UnityLauncherPro
         {
             // https://www.wpftutorial.net/DataViews.html
             _filterString = txtSearchBox.Text;
+
+            if (_filterString.IndexOf(' ') > -1)
+            {
+                multiWordSearch = true;
+                searchWords = _filterString.Split(' ');
+            }
+            else
+            {
+                multiWordSearch = false;
+            }
+
+
             ICollectionView collection = CollectionViewSource.GetDefaultView(projectsSource);
             collection.Filter = ProjectFilter;
             // set first row selected, if only 1 row
@@ -297,7 +312,26 @@ namespace UnityLauncherPro
         private bool ProjectFilter(object item)
         {
             Project proj = item as Project;
-            return (proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1) || (searchProjectPathAlso && (proj.Path.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1));
+
+            // split search string by space, if it contains space
+            if (multiWordSearch == true)
+            {
+                bool found = true;
+                foreach (var word in searchWords)
+                {
+                    bool titleMatched = proj.Title.IndexOf(word, 0, StringComparison.CurrentCultureIgnoreCase) != -1;
+                    bool pathMatched = searchProjectPathAlso && proj.Path.IndexOf(word, 0, StringComparison.CurrentCultureIgnoreCase) != -1;
+                    found = found && (titleMatched || pathMatched);
+                }
+                return found;
+            }
+            else // single word search
+            {
+                bool titleMatched = proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1;
+                bool pathMatched = searchProjectPathAlso && proj.Path.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1;
+
+                return titleMatched || pathMatched;
+            }
         }
 
         private bool UpdatesFilter(object item)
@@ -443,34 +477,34 @@ namespace UnityLauncherPro
                 }
 
                 // other setting vars
-                preferredVersion = Properties.Settings.Default.preferredVersion;
+                preferredVersion = Settings.Default.preferredVersion;
 
                 // get last modified date format
-                chkUseCustomLastModified.IsChecked = Properties.Settings.Default.useCustomLastModified;
-                txtCustomDateTimeFormat.Text = Properties.Settings.Default.customDateFormat;
+                chkUseCustomLastModified.IsChecked = Settings.Default.useCustomLastModified;
+                txtCustomDateTimeFormat.Text = Settings.Default.customDateFormat;
 
-                if (Properties.Settings.Default.useCustomLastModified)
+                if (Settings.Default.useCustomLastModified)
                 {
-                    currentDateFormat = Properties.Settings.Default.customDateFormat;
+                    currentDateFormat = Settings.Default.customDateFormat;
                 }
                 else // use default
                 {
                     currentDateFormat = defaultDateFormat;
                 }
 
-                chkHumanFriendlyDateTime.IsChecked = Properties.Settings.Default.useHumandFriendlyLastModified;
+                chkHumanFriendlyDateTime.IsChecked = Settings.Default.useHumandFriendlyLastModified;
                 // if both enabled, then disable custom
                 if (chkHumanFriendlyDateTime.IsChecked == true && chkUseCustomLastModified.IsChecked == true)
                 {
                     chkUseCustomLastModified.IsChecked = false;
                 }
 
-                useHumanFriendlyDateFormat = Properties.Settings.Default.useHumandFriendlyLastModified;
-                searchProjectPathAlso = Properties.Settings.Default.searchProjectPathAlso;
+                useHumanFriendlyDateFormat = Settings.Default.useHumandFriendlyLastModified;
+                searchProjectPathAlso = Settings.Default.searchProjectPathAlso;
                 chkSearchProjectPath.IsChecked = searchProjectPathAlso;
 
                 // recent grid column display index order
-                var order = Properties.Settings.Default.recentColumnsOrder;
+                var order = Settings.Default.recentColumnsOrder;
 
                 // if we dont have any values, get & set them now
                 // also, if user has disabled optional columns, saved order must be reset to default
@@ -849,6 +883,8 @@ namespace UnityLauncherPro
             // refresh installations, if already added some new ones
             UpdateUnityInstallationsList();
             txtSearchBoxUpdates.Text = "";
+            // clear filters, since right now they are not used after updates are loaded
+            rdoAll.IsChecked = true;
             CallGetUnityUpdates();
 
             button.IsEnabled = true;
