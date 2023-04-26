@@ -945,13 +945,14 @@ namespace UnityLauncherPro
                                 gridRecent.BeginEdit();
                             }
                             break;
-                        default: // any key
+                        default: // any key anykey
                             // cancel if editing cell
                             IEditableCollectionView itemsView = gridRecent.Items;
                             if (itemsView.IsAddingNew || itemsView.IsEditingItem) return;
 
                             // skip these keys
                             if (Keyboard.Modifiers == ModifierKeys.Alt) return;
+                            if (Keyboard.Modifiers == ModifierKeys.Control) return;
 
                             // activate searchbar if not active and we are in tab#1
                             if (txtSearchBox.IsFocused == false)
