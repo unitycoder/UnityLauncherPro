@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -62,6 +63,7 @@ namespace UnityLauncherPro
         Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
 
         string currentBuildReportProjectPath = null;
+        string currentBuildPluginsRelativePath = null;
         //List<List<string>> buildReports = new List<List<string>>();
         List<BuildReport> buildReports = new List<BuildReport>(); // multiple reports, each contains their own stats and items
         int currentBuildReport = 0;
@@ -2124,6 +2126,7 @@ namespace UnityLauncherPro
 
             try
             {
+                // read editor.log file
                 using (FileStream fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     using (StreamReader sr = new StreamReader(fs))
@@ -2134,6 +2137,7 @@ namespace UnityLauncherPro
 
                         bool gotProjectPath = false;
                         bool hasTimeStamps = false;
+                        bool gotOutputPluginsPath = false;
 
                         // TODO cleanup here
                         while (!sr.EndOfStream)
@@ -2147,10 +2151,31 @@ namespace UnityLauncherPro
                                 gotProjectPath = false;
                             }
 
+                            if (gotOutputPluginsPath == true)
+                            {
+                                // get output plugins folder relative path, this might not always work, if there is not copyfiles line in log
+                                string pattern = @"CopyFiles\s+(.+?)/\w+\.\w+$";
+                                Match match = Regex.Match(line, pattern);
+                                if (match.Success)
+                                {
+                                    string folder = match.Groups[1].Value;//.Replace("CopyFiles ", "");
+                                    if (folder.IndexOf("_Data/Plugins") > -1)
+                                    {
+                                        currentBuildPluginsRelativePath = folder;
+                                    }
+                                }
+
+                                gotOutputPluginsPath = false;
+                            }
+
                             // if have timestamps, trim until 2nd | char at start
 
                             // check arguments
                             if (line.IndexOf("-projectPath") > -1) gotProjectPath = true;
+
+                            // NOTE only works if your build path is inside Assets/Builds/ folder
+                            if (line.IndexOf("CopyFiles") > -1 && line.ToLower().IndexOf("builds/") > -1) gotOutputPluginsPath = true;
+
                             if (hasTimeStamps == false && line.IndexOf("-timestamps") > -1)
                             {
                                 hasTimeStamps = true;
@@ -2220,6 +2245,30 @@ namespace UnityLauncherPro
                                     string streamingAssetPath = Path.Combine(currentBuildReportProjectPath, "Assets", "StreamingAssets");
                                     var streamingAssetFolderSize = Tools.GetFolderSizeInBytes(streamingAssetPath);
                                     singleReport.Stats.Insert(singleReport.Stats.Count - 1, new BuildReportItem() { Category = "StreamingAssets", Size = Tools.GetBytesReadable(streamingAssetFolderSize) });
+
+
+                                    // get total Plugins/ folder size from build! (but how to get last build output folder, its not mentioned in editor log (except some lines for CopyFiles/ but are those always there?)
+                                    // Library\PlayerDataCache\Linux641\ScriptsOnlyCache.yaml also contains output path
+                                    if (string.IsNullOrEmpty(currentBuildPluginsRelativePath) == false)
+                                    {
+                                        //Console.WriteLine("Getting output plugins folder size: "+ currentBuildPluginsRelativePath);
+                                        string pluginFolder = Path.Combine(currentBuildReportProjectPath, currentBuildPluginsRelativePath);
+                                        long totalPluginFolderSize = Tools.GetFolderSizeInBytes(pluginFolder);
+                                        singleReport.Stats.Insert(singleReport.Stats.Count - 1, new BuildReportItem() { Category = "Plugins", Size = Tools.GetBytesReadable(totalPluginFolderSize) });
+                                    }
+                                    else // then show plugin folders from project (with * to mark this is not accurate)
+                                    {
+                                        // get plugin folder sizes (they are not included in build report!), NOTE need to iterate all subfolders, as they might contain Plugins/ folders
+                                        // find all plugin folders inside Assets/
+                                        var pluginFolders = Directory.GetDirectories(Path.Combine(currentBuildReportProjectPath, "Assets"), "Plugins", SearchOption.AllDirectories);
+                                        long totalPluginFolderSize = 0;
+                                        foreach (var pluginFolder in pluginFolders)
+                                        {
+                                            totalPluginFolderSize += Tools.GetFolderSizeInBytes(pluginFolder);
+                                        }
+                                        singleReport.Stats.Insert(singleReport.Stats.Count - 1, new BuildReportItem() { Category = "Plugins *in proj!", Size = Tools.GetBytesReadable(totalPluginFolderSize) });
+                                    }
+
                                 }
                                 else
                                 {
