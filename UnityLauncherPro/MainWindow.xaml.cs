@@ -152,15 +152,15 @@ namespace UnityLauncherPro
             ApplyTheme(txtCustomThemeFile.Text);
 
             // for autostart with minimized
-            if (Properties.Settings.Default.runAutomatically == true && Properties.Settings.Default.runAutomaticallyMinimized == true)
+            if (Settings.Default.runAutomatically == true && Settings.Default.runAutomaticallyMinimized == true)
             {
-                // if application got started by the system, then hide, otherwise dont hide (user started it)
+                // if application was system started, then hide, otherwise dont hide (when user started it)
                 if (Directory.GetCurrentDirectory().ToLower() == @"c:\windows\system32")
                 {
+                    this.ShowInTaskbar = false; // for some reason, otherwise it will show in taskbar only at start
                     notifyIcon.Visible = true;
                     this.Hide();
                 }
-
             }
 
             // TEST
@@ -749,11 +749,10 @@ namespace UnityLauncherPro
             var unity = GetSelectedUnity();
             if (unity == null) return;
 
-
-            // NOTE if updates are not loaded, should wait for that
             if (dataGridUpdates.ItemsSource != null)
             {
                 tabControl.SelectedIndex = 2;
+                txtSearchBoxUpdates.Text = ""; // need to clear old results first
 
                 // NOTE for now, just set filter to current version, minus patch version "2021.1.7f1" > "2021.1"
                 txtSearchBoxUpdates.Text = unity.Version.Substring(0, unity.Version.LastIndexOf('.'));
@@ -799,6 +798,7 @@ namespace UnityLauncherPro
         {
             this.Show();
             this.WindowState = WindowState.Normal;
+            this.ShowInTaskbar = true;
             notifyIcon.Visible = false;
             // NOTE workaround for grid not focused when coming back from minimized window
             Tools.SetFocusToGrid(gridRecent, gridRecent.SelectedIndex);
@@ -2314,10 +2314,8 @@ namespace UnityLauncherPro
                                 r.Percentage = line2.Substring(space1 + 2, space2 - space1 - 1);
                                 r.Path = line2.Substring(space2 + 2, line2.Length - space2 - 2);
                                 r.Format = Path.GetExtension(r.Path);
-
                                 singleReport.Items.Add(r);
                             }
-
 
                             if (collectStats == true)
                             {
@@ -2351,9 +2349,10 @@ namespace UnityLauncherPro
 
                                 singleReport.Stats.Add(r);
                             }
-                        }
-                    }
-                }
+
+                        } // while endofstream
+                    } // streamreader
+                } // filestream
             }
             catch (Exception e)
             {
@@ -2780,8 +2779,8 @@ namespace UnityLauncherPro
             if (this.IsActive == false) return; // dont run code on window init
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
-            Properties.Settings.Default.runAutomaticallyMinimized = isChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.runAutomaticallyMinimized = isChecked;
+            Settings.Default.Save();
         }
 
         private void MenuItemEditPackages_Click(object sender, RoutedEventArgs e)
