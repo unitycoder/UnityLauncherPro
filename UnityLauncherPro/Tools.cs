@@ -544,9 +544,9 @@ namespace UnityLauncherPro
             Process.Start(url);
         }
 
-        public static void DownloadInBrowser(string url, string version)
+        public static void DownloadInBrowser(string url, string version, bool preferFullInstaller = false)
         {
-            string exeURL = ParseDownloadURLFromWebpage(version);
+            string exeURL = ParseDownloadURLFromWebpage(version, preferFullInstaller);
 
             Console.WriteLine("download exeURL= (" + exeURL + ")");
 
@@ -711,7 +711,7 @@ namespace UnityLauncherPro
 
         // parse Unity installer exe from release page
         // thanks to https://github.com/softfruit
-        public static string ParseDownloadURLFromWebpage(string version)
+        public static string ParseDownloadURLFromWebpage(string version, bool preferFullInstaller = false)
         {
             string url = "";
 
@@ -744,7 +744,7 @@ namespace UnityLauncherPro
                 string[] lines = sourceHTML.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
                 // patch version download assistant finder
-                if (Tools.VersionIsPatch(version))
+                if (VersionIsPatch(version))
                 {
                     for (int i = 0; i < lines.Length; i++)
                     {
@@ -757,7 +757,7 @@ namespace UnityLauncherPro
                         }
                     }
                 }
-                else if (Tools.VersionIsArchived(version))
+                else if (VersionIsArchived(version))
                 {
                     // archived version download assistant finder
                     for (int i = 0; i < lines.Length; i++)
@@ -793,6 +793,12 @@ namespace UnityLauncherPro
                         }
                     }
                 }
+            }
+
+            // download full installer instead
+            if (preferFullInstaller)
+            {
+                url = url.Replace("UnityDownloadAssistant-" + version + ".exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
             }
 
             // didnt find installer

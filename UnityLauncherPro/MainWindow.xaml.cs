@@ -1489,6 +1489,21 @@ namespace UnityLauncherPro
             }
         }
 
+        private void BtnDownloadInBrowserFull_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            string url = Tools.GetUnityReleaseURL(unity?.Version);
+            if (string.IsNullOrEmpty(url) == false)
+            {
+                Tools.DownloadInBrowser(url, unity.Version,true);
+            }
+            else
+            {
+                Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
+                SetStatus("Failed getting Unity Installer URL for " + unity?.Version);
+            }
+        }
+
         private void btnDownloadInstallUpdate_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();

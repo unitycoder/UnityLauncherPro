@@ -50,7 +50,21 @@
                 <Grid>
                     <!-- search box -->
                     <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBox}" Height="24" />
+                        <!--<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBox}" Height="24" />-->
+                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Height="24">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=txtSearchBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+
                         <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBox" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" TextChanged="OnSearchTextChanged" PreviewKeyDown="TxtSearchBox_PreviewKeyDown" TabIndex="1" />
                         <Button x:Name="btnClearSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2"  BorderBrush="{x:Null}" Click="OnClearProjectSearchClick" IsTabStop="False">
                             <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
@@ -261,7 +275,18 @@
                 <Grid>
                     <!-- search box -->
                     <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUnity}" Height="24" />
+                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Height="24">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUnity}" Value="">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxUnity" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUnity_PreviewKeyDown" TextChanged="TxtSearchBoxUnity_TextChanged" />
                         <Button x:Name="btnClearUnitySearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUnitySearchClick">
                             <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchCaret}" Padding="5,3,4,4" HorizontalAlignment="Center">
@@ -377,7 +402,18 @@
                 <Grid>
                     <!-- search box -->
                     <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxUpdates}" Height="24" />
+                        <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Height="24">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxUpdates}" Value="">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxUpdates" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxUpdates_PreviewKeyDown" TextChanged="TxtSearchBoxUpdates_TextChanged" />
                         <Button x:Name="btnClearUpdatesSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="OnClearUpdateSearchClick">
                             <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
@@ -450,19 +486,23 @@
                     <Grid VerticalAlignment="Bottom" Margin="4,0,8,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="20*" />
-                            <ColumnDefinition Width="33*" />
-                            <ColumnDefinition Width="33*" />
+                            <ColumnDefinition Width="18*" />
+                            <ColumnDefinition Width="28*" />
+                            <ColumnDefinition Width="26*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="32" />
                         </Grid.RowDefinitions>
                         <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnDownloadInBrowser"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnDownloadInBrowser_Click">
-                            <Label Content="_Download in browser" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                            <Label Content="_Download installer in browser" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
-                        <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnDownloadInstallUpdate"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="btnDownloadInstallUpdate_Click">
+                        <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnDownloadInBrowserFull"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnDownloadInBrowserFull_Click">
+                            <Label Content="_Download editor in browser" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                        </Button>
+                        <Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnDownloadInstallUpdate"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="btnDownloadInstallUpdate_Click">
                             <Label Content="Download &amp; Install" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
-                        <Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
+                        <Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
                             <Label Content="Release _Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
                     </Grid>
@@ -537,10 +577,22 @@
                             <Button x:Name="btnRefreshBuildReport" Style="{StaticResource CustomButton}" ToolTip="Get latest Build Report from Editor.log" Content="⟳" Height="22" Width="22" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16"   Margin="0,4,10,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshBuildReport_Click"/>
                             <!--<CheckBox x:Name="chkAutoUpdateBuildReport" Content="AutoUpdate" Foreground="{DynamicResource ButtonForeground}" Margin="0,0,0,3" ToolTip="" HorizontalAlignment="Right" VerticalAlignment="Top" Height="26" VerticalContentAlignment="Center" IsEnabled="False"/>-->
 
-
                             <!-- search box -->
                             <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
-                                <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBoxBuildReport}" Height="24" IsEnabled="False" />
+                                <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Height="24">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, ElementName=txtSearchBoxBuildReport}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                                 <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtSearchBoxBuildReport" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64" PreviewKeyDown="TxtSearchBoxBuildReport_PreviewKeyDown" TextChanged="TxtSearchBoxBuildReport_TextChanged" />
                                 <Button x:Name="btnClearBuildReportSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" Click="BtnClearBuildReportSearch_Click">
                                     <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchCaret}" Padding="5,3,4,4" HorizontalAlignment="Center">
