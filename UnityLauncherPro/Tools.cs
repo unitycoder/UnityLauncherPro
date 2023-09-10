@@ -799,6 +799,8 @@ namespace UnityLauncherPro
             if (preferFullInstaller)
             {
                 url = url.Replace("UnityDownloadAssistant-" + version + ".exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
+                // handle alpha/beta
+                url = url.Replace("UnityDownloadAssistant.exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
             }
 
             // didnt find installer
