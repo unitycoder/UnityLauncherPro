@@ -65,17 +65,19 @@ namespace UnityLauncherPro
                     unity.IsPreferred = (version == MainWindow.preferredVersion);
                     unity.ProjectCount = GetProjectCountForUnityVersion(version);
 
-                    if (Tools.IsLTS(version))
-                    {
-                        unity.ReleaseType = "LTS";
-                    }
-                    else if (Tools.IsAlpha(version))
+                    if (Tools.IsAlpha(version))
                     {
                         unity.ReleaseType = "Alpha";
                     }
                     else if (Tools.IsBeta(version))
                     {
                         unity.ReleaseType = "Beta";
+                    }
+                    else
+                        if (Tools.IsLTS(version))
+
+                    {
+                        unity.ReleaseType = "LTS";
                     }
                     else
                     {
