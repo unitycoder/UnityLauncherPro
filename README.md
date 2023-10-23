@@ -56,7 +56,7 @@ Pre-releases are sometimes available from dev branch: https://github.com/unityco
 ![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/9b34f9ba-2c91-462c-be85-9c8aeefa63a0)
 
 ### Upgrade Project Version (automatically suggests next higher version)
-![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/862a5d6f-7441-4622-b068-78e577553555)
+![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/3cc8f8d0-861b-406a-be10-716d92b7f379)
 
 ### Explorer integration (1-click opening projects with correct unity version)
 ![image](https://user-images.githubusercontent.com/5438317/120883135-34900080-c5e4-11eb-80a5-ae78fe89260a.png)
