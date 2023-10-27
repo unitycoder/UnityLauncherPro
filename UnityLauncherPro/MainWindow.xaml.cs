@@ -3542,6 +3542,12 @@ namespace UnityLauncherPro
         {
             Tools.DownloadInitScript(initScriptFileFullPath, txtCustomInitFileURL.Text);
         }
+
+        private void btnHubLogs_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.OpenAppdataSpecialFolder("../Roaming/UnityHub/logs/");
+        }
+
     } // class
 } //namespace
 

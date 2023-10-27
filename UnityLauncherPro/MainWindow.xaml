@@ -548,6 +548,9 @@
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnGICache" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse Unity GI Cache folder" Click="BtnGICache_Click">
                                         <Label Content="_GI Cache" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnHubLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Browse Unity GI Cache folder" Click="btnHubLogs_Click">
+                                        <Label Content="Hub Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    </Button>
                                 </StackPanel>
                             </Border>
                             <!-- tools -->
