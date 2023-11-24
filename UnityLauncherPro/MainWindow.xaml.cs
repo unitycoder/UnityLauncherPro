@@ -1148,10 +1148,10 @@ namespace UnityLauncherPro
 
         private void GridRecent_Loaded(object sender, RoutedEventArgs e)
         {
-            Tools.SetFocusToGrid(gridRecent);
             // if coming from explorer launch, and missing unity version, projectsource is still null?
             if (projectsSource != null) SetStatus("Ready (" + projectsSource.Count + " projects)");
             RefreshSorting();
+            Tools.SetFocusToGrid(gridRecent);
         }
 
         void RefreshSorting()
