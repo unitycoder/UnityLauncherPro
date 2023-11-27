@@ -1495,7 +1495,7 @@ namespace UnityLauncherPro
             string url = Tools.GetUnityReleaseURL(unity?.Version);
             if (string.IsNullOrEmpty(url) == false)
             {
-                Tools.DownloadInBrowser(url, unity.Version,true);
+                Tools.DownloadInBrowser(url, unity.Version, true);
             }
             else
             {
@@ -2607,7 +2607,11 @@ namespace UnityLauncherPro
 
         private void BtnExploreFolder_Click(object sender, RoutedEventArgs e)
         {
-            Tools.LaunchExplorer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes"));
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes");
+            if (Tools.LaunchExplorer(path) == false)
+            {
+                Tools.LaunchExplorer(AppDomain.CurrentDomain.BaseDirectory);
+            }
         }
 
         private void ChkEnablePlatformSelection_Checked(object sender, RoutedEventArgs e)
@@ -3233,13 +3237,17 @@ namespace UnityLauncherPro
             }
         }
 
-
-
         private void btnExploreScriptsFolder_Click(object sender, RoutedEventArgs e)
         {
-            if (Tools.LaunchExplorer(initScriptFileFullPath) == false)
+            if (Tools.LaunchExplorer(Path.GetDirectoryName(initScriptFileFullPath)) == false)
             {
-                Tools.LaunchExplorer(Path.GetDirectoryName(initScriptFileFullPath));
+                // if failed, open parent folder (probably path was using URL or no scripts yet)
+                var parentPath = Directory.GetParent(Path.GetDirectoryName(initScriptFileFullPath)).FullName;
+                if (Tools.LaunchExplorer(parentPath) == false)
+                {
+                    // if still failed, open exe folder
+                    Tools.LaunchExplorer(AppDomain.CurrentDomain.BaseDirectory);
+                }
             }
         }
 
