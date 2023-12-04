@@ -1981,13 +1981,17 @@ public static class UnityLauncherProTools
             Console.WriteLine("Cleanup firewall: " + cmd);
             LaunchExe("cmd.exe", "/c " + cmd);
 
-            if (int.Parse(version.Substring(0, 4)) <= 2017)
+            int year;
+            string[] parts = version.Split('.');
+            // TODO handle unity 6.x
+            if (parts.Length >= 1 && int.TryParse(parts[0], out year) && year <= 2017)
             {
                 var nodeFolder = Path.Combine(installFolder, "Editor", "Data", "Tools", "nodejs", "node.exe");
                 cmd = "netsh advfirewall firewall delete rule name=all program=\"" + nodeFolder + "\"";
                 Console.WriteLine("Cleanup firewall <= 2017: " + cmd);
                 LaunchExe("cmd.exe", "/c " + cmd);
             }
+
             // remove registry entries
             var unityKeyName = "HKEY_CURRENT_USER\\Software\\Unity Technologies\\Installer\\Unity " + version;
             cmd = "reg delete " + unityKeyName + " /f";
