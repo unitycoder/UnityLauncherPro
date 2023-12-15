@@ -101,7 +101,6 @@ namespace UnityLauncherPro
             }
 
             // sometimes projects are in wrong order, seems to be related to messing up your unity registry, the keys are received in created order (so if you had removed/modified them manually, it might return wrong order instead of 0 - 40)
-            // thats why need to sort projects list by modified date
             // sort by modified date, projects without modified date are put to last, NOTE: this would remove projects without modified date (if they become last items, before trimming list on next step)
             projectsFound.Sort((x, y) =>
             {
@@ -112,7 +111,7 @@ namespace UnityLauncherPro
                 //return x.Modified.Value.CompareTo(y.Modified.Value); // BUG this breaks something, so that last item platform is wrong (for project that is missing from disk) ?
             });
 
-            // trim list to max amount
+            // trim list to max amount (older ones are dropped)
             if (projectsFound.Count > MainWindow.maxProjectCount)
             {
                 //Console.WriteLine("Trimming projects list to " + MainWindow.maxProjectCount + " projects");
@@ -146,8 +145,12 @@ namespace UnityLauncherPro
 
             //Console.WriteLine("valueName="+ valueName+"  , projectName =" + projectName);
 
-            // get last modified date from folder
-            DateTime? lastUpdated = folderExists ? Tools.GetLastModifiedTime(projectPath) : null;
+            // get last modified date from most recent date of solution or folder
+            string solutionPath = Path.Combine(projectPath, $"{projectName}.sln");
+            bool solutionExists = File.Exists(solutionPath);
+            DateTime? solutionLastUpdated = solutionExists ? Tools.GetLastModifiedTime(solutionPath) : null;
+            DateTime? folderLastUpdated = folderExists ? Tools.GetLastModifiedTime(projectPath) : null;
+            DateTime? lastUpdated = solutionLastUpdated > folderLastUpdated ? solutionLastUpdated : folderLastUpdated;
 
             // get project version
             string projectVersion = folderExists ? Tools.GetProjectVersion(projectPath) : null;

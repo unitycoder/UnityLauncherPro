@@ -7,6 +7,7 @@ Handle all your Unity versions and Projects easily!
 ## Features
 - Automagically Open Projects with Correct Unity Version
 - Display Recent Projects list with last modified date and project version info
+- List more than 40 recent projects!
 - Quickly Explore Project Folders
 - List installed Unity versions, can easily Run, Explore installation folder, View release notes
 - Download Missing Unity Versions in Browser
@@ -33,28 +34,29 @@ https://forum.unity.com/threads/unity-launcher-launch-correct-unity-versions-for
 https://github.com/unitycoder/UnityLauncherPro/wiki
 
 ### Development
-See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro/tree/dev
+See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro/tree/dev <br>
+Pre-releases are sometimes available from dev branch: https://github.com/unitycoder/UnityLauncherPro/releases
 
 ### Screenshots
 
 ![image](https://user-images.githubusercontent.com/5438317/71485879-184b3a00-281c-11ea-97db-73c5dfa9bb4e.png)
 
-![image](https://user-images.githubusercontent.com/5438317/120828332-146d2c80-c565-11eb-8a84-c3737c17025f.png)
+![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/21eb1fcd-3cb1-4dea-8133-9ce440de77d8)
 
-![image](https://user-images.githubusercontent.com/5438317/120828338-17681d00-c565-11eb-972a-49055070427a.png)
+![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/2942c1d7-2006-4dee-8b68-e1f6f2e0fbf4)
 
-![image](https://user-images.githubusercontent.com/5438317/154346224-8aa8d547-8495-47cf-baca-4cb31639344b.png)
+![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/6f8dce07-c640-42db-a1ef-d8bcc7a80cc2)
 
-![image](https://user-images.githubusercontent.com/5438317/154346049-4426f504-a437-4119-8d1c-f3d4d3fa434c.png)
+![image](https://user-images.githubusercontent.com/5438317/206923022-4b4bb8ed-0351-408f-b1d3-82bd6eefbc45.png)
 
 ### Perform tasks on selected project
-![image](https://user-images.githubusercontent.com/5438317/120828528-4da59c80-c565-11eb-8b11-9cf739cde306.png)
+![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/a0b468ba-e3a6-420b-8155-78bc32814752)
 
 ### Quick New Project Creation (with Unity version and Templates selection)
-![image](https://user-images.githubusercontent.com/5438317/120828565-58603180-c565-11eb-9cf3-0e3738a7dc95.png)
+![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/9b34f9ba-2c91-462c-be85-9c8aeefa63a0)
 
 ### Upgrade Project Version (automatically suggests next higher version)
-![image](https://user-images.githubusercontent.com/5438317/120828587-5e561280-c565-11eb-876d-54b72aed88c9.png)
+![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/3cc8f8d0-861b-406a-be10-716d92b7f379)
 
 ### Explorer integration (1-click opening projects with correct unity version)
 ![image](https://user-images.githubusercontent.com/5438317/120883135-34900080-c5e4-11eb-80a5-ae78fe89260a.png)
@@ -62,6 +64,8 @@ See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro
 ### View and Select current platform
 ![unitylauncherpro_platform](https://user-images.githubusercontent.com/5438317/132997691-5ed50f1d-e285-4c83-b356-46c1e3f431e4.gif)
 
+### Rename Project title
+![pro-rename](https://user-images.githubusercontent.com/5438317/193453048-aa5527c6-a345-4f93-b934-f68ac2524cac.gif)
 
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher

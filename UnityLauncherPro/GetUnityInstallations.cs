@@ -65,6 +65,25 @@ namespace UnityLauncherPro
                     unity.IsPreferred = (version == MainWindow.preferredVersion);
                     unity.ProjectCount = GetProjectCountForUnityVersion(version);
 
+                    if (Tools.IsAlpha(version))
+                    {
+                        unity.ReleaseType = "Alpha";
+                    }
+                    else if (Tools.IsBeta(version))
+                    {
+                        unity.ReleaseType = "Beta";
+                    }
+                    else
+                        if (Tools.IsLTS(version))
+
+                    {
+                        unity.ReleaseType = "LTS";
+                    }
+                    else
+                    {
+                        unity.ReleaseType = ""; // cannot be null for UnitysFilter to work properly
+                    }
+
                     // get platforms, NOTE if this is slow, do it later, or skip for commandline
                     var platforms = GetPlatforms(dataFolder);
                     // this is for editor tab, show list of all platforms in cell

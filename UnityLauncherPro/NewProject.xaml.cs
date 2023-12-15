@@ -38,29 +38,12 @@ namespace UnityLauncherPro
             txtNewProjectName.Text = newName;
             lblNewProjectFolder.Content = targetFolder;
 
-            // fill available versions
+            //// fill available versions
             if (gridAvailableVersions.ItemsSource == null)
             {
-                // get release type info (not done in mainwindow yet, to avoid doing extra stuff)
-                for (int i = 0, len = MainWindow.unityInstallationsSource.Count; i < len; i++)
-                {
-                    var ver = MainWindow.unityInstallationsSource[i].Version;
-                    if (Tools.IsLTS(ver))
-                    {
-                        MainWindow.unityInstallationsSource[i].ReleaseType = "LTS";
-                    }
-                    else if (Tools.IsAlpha(ver))
-                    {
-                        MainWindow.unityInstallationsSource[i].ReleaseType = "Alpha";
-                    }
-                    else if (Tools.IsBeta(ver))
-                    {
-                        MainWindow.unityInstallationsSource[i].ReleaseType = "Beta";
-                    }
-                }
-
                 gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
             }
+            
             // we have that version installed
             if (MainWindow.unityInstalledVersions.ContainsKey(unityVersion) == true)
             {

@@ -8,11 +8,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("UnityLauncherPro")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Unity Hub Alternative")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("UnityCoder.com")]
 [assembly: AssemblyProduct("UnityLauncherPro")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright © 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

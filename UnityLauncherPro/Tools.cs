@@ -544,9 +544,9 @@ namespace UnityLauncherPro
             Process.Start(url);
         }
 
-        public static void DownloadInBrowser(string url, string version)
+        public static void DownloadInBrowser(string url, string version, bool preferFullInstaller = false)
         {
-            string exeURL = ParseDownloadURLFromWebpage(version);
+            string exeURL = ParseDownloadURLFromWebpage(version, preferFullInstaller);
 
             Console.WriteLine("download exeURL= (" + exeURL + ")");
 
@@ -580,31 +580,25 @@ namespace UnityLauncherPro
                 // TODO make async
                 if (DownloadFile(exeURL, tempFile) == true)
                 {
-                    // run installer, copy current existing version path to clipboard, NOTE this probably never happens? unless install same version again..
-                    if (MainWindow.unityInstalledVersions.ContainsKey(version) == true)
-                    {
-                        string path = MainWindow.unityInstalledVersions[version];
-                        if (string.IsNullOrEmpty(path) == false)
-                        {
-                            // copy to clipboard
-                            Clipboard.SetText(path);
-                        }
-                    }
-                    else // no same version, copy last item from root folders
-                    {
-                        if (Properties.Settings.Default.rootFolders.Count > 0)
-                        {
-                            string path = Properties.Settings.Default.rootFolders[Properties.Settings.Default.rootFolders.Count - 1];
-                            if (string.IsNullOrEmpty(path) == false)
-                            {
-                                Clipboard.SetText(path);
-                            }
-                        }
-                    }
+                    // get base version, to use for install path
+                    string outputVersionFolder = "\\" + version.Split('.')[0] + "_" + version.Split('.')[1];
+                    string targetPathArgs = " /D=" + Properties.Settings.Default.rootFolders[Properties.Settings.Default.rootFolders.Count - 1] + outputVersionFolder; ;
 
-                    Process process = Process.Start(tempFile);
-                    process.EnableRaisingEvents = true;
-                    process.Exited += (sender, e) => DeleteTempFile(tempFile);
+                    // if user clicks NO to UAC, this fails (so added try-catch)
+                    try
+                    {
+                        Process process = new Process();
+                        process.StartInfo.FileName = tempFile;
+                        process.StartInfo.Arguments = targetPathArgs;
+                        process.EnableRaisingEvents = true;
+                        process.Exited += (sender, e) => DeleteTempFile(tempFile);
+                        process.Start();
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Failed to run exe: " + tempFile);
+                        DeleteTempFile(tempFile);
+                    }
                     // TODO refresh upgrade dialog after installer finished
                 }
             }
@@ -613,6 +607,77 @@ namespace UnityLauncherPro
                 //SetStatus("Error> Cannot find installer executable ... opening website instead");
                 url = "https://unity3d.com/get-unity/download/archive";
                 Process.Start(url + "#installer-not-found---version-" + version);
+            }
+        }
+
+        static readonly string initFileDefaultURL = "https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs";
+
+        public static void DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
+        {
+            string currentInitScriptFolder = Path.GetDirectoryName(currentInitScriptFullPath);
+            string currentInitScriptFile = Path.GetFileName(currentInitScriptFullPath);
+            string tempFile = Path.Combine(Path.GetTempPath(), currentInitScriptFile);
+            bool isLocalFile = false;
+
+            if (string.IsNullOrEmpty(currentInitScriptLocationOrURL) == true) currentInitScriptLocationOrURL = initFileDefaultURL;
+
+            // check if its URL or local file
+            if (currentInitScriptLocationOrURL.ToLower().StartsWith("http") == true)
+            {
+                // download into temp first
+                if (DownloadFile(currentInitScriptLocationOrURL, tempFile) == false) return;
+            }
+            else // file is in local folders/drives/projects
+            {
+                // check if file exists
+                if (File.Exists(currentInitScriptLocationOrURL) == false) return;
+                tempFile = currentInitScriptLocationOrURL;
+                isLocalFile = true;
+            }
+
+            // if got file
+            if (File.Exists(tempFile) == true)
+            {
+                // just in case file is locked
+                try
+                {
+                    // small validation to check if its valid editor script
+                    var tempContent = File.ReadAllText(tempFile);
+                    if (tempContent.IndexOf("public class InitializeProject") > 0 && tempContent.IndexOf("namespace UnityLauncherProTools") > 0 && tempContent.IndexOf("public static void Init()") > 0)
+                    {
+                        // move old file as backup
+                        if (File.Exists(currentInitScriptFullPath))
+                        {
+                            string oldScriptFullPath = Path.Combine(currentInitScriptFolder, currentInitScriptFile + ".bak");
+                            if (File.Exists(oldScriptFullPath)) File.Delete(oldScriptFullPath);
+                            File.Move(currentInitScriptFullPath, oldScriptFullPath);
+                        }
+                        // move new file here (need to delete old to overwrite)
+                        if (File.Exists(currentInitScriptFullPath)) File.Delete(currentInitScriptFullPath);
+
+                        // local file copy, not move
+                        if (isLocalFile == true)
+                        {
+                            File.Copy(tempFile, currentInitScriptFullPath);
+                        }
+                        else
+                        {
+                            File.Move(tempFile, currentInitScriptFullPath);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid c# init file..(missing correct Namespace, Class or Method)");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("File exception: " + e.Message);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Failed to download init script from: " + currentInitScriptLocationOrURL);
             }
         }
 
@@ -633,6 +698,7 @@ namespace UnityLauncherPro
                 using (WebClient client = new WebClient())
                 {
                     client.DownloadFile(url, tempFile);
+                    // TODO check if actually exists
                     result = true;
                 }
             }
@@ -645,7 +711,7 @@ namespace UnityLauncherPro
 
         // parse Unity installer exe from release page
         // thanks to https://github.com/softfruit
-        public static string ParseDownloadURLFromWebpage(string version)
+        public static string ParseDownloadURLFromWebpage(string version, bool preferFullInstaller = false)
         {
             string url = "";
 
@@ -678,7 +744,7 @@ namespace UnityLauncherPro
                 string[] lines = sourceHTML.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
                 // patch version download assistant finder
-                if (Tools.VersionIsPatch(version))
+                if (VersionIsPatch(version))
                 {
                     for (int i = 0; i < lines.Length; i++)
                     {
@@ -691,7 +757,7 @@ namespace UnityLauncherPro
                         }
                     }
                 }
-                else if (Tools.VersionIsArchived(version))
+                else if (VersionIsArchived(version))
                 {
                     // archived version download assistant finder
                     for (int i = 0; i < lines.Length; i++)
@@ -727,6 +793,14 @@ namespace UnityLauncherPro
                         }
                     }
                 }
+            }
+
+            // download full installer instead
+            if (preferFullInstaller)
+            {
+                url = url.Replace("UnityDownloadAssistant-" + version + ".exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
+                // handle alpha/beta
+                url = url.Replace("UnityDownloadAssistant.exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
             }
 
             // didnt find installer
@@ -807,7 +881,7 @@ namespace UnityLauncherPro
                         grid.SelectedIndex--;
                     }
                     // disable wrap around
-                    
+
                     //else
                     //{
                      //   grid.SelectedIndex = grid.Items.Count - 1;
@@ -1085,14 +1159,14 @@ namespace UnityLauncherPro
 
         public static bool HasFocus(DependencyObject obj, Control control, bool checkChildren)
         {
-            var oFocused = System.Windows.Input.FocusManager.GetFocusedElement(obj) as DependencyObject;
+            var oFocused = FocusManager.GetFocusedElement(obj) as DependencyObject;
             if (!checkChildren)
                 return oFocused == control;
             while (oFocused != null)
             {
                 if (oFocused == control)
                     return true;
-                oFocused = System.Windows.Media.VisualTreeHelper.GetParent(oFocused);
+                oFocused = VisualTreeHelper.GetParent(oFocused);
             }
             return false;
         }
@@ -1119,23 +1193,32 @@ namespace UnityLauncherPro
             if (row == null)
             {
                 targetGrid.UpdateLayout();
-                // scroll to view if outside
-                targetGrid.ScrollIntoView(targetGrid.Items[index]);
-                row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
+                if (index < targetGrid.Items.Count)
+                {
+                    // scroll selected into view
+                    targetGrid.ScrollIntoView(targetGrid.Items[index]);
+                    row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
+                }
+                else
+                {
+                    Console.WriteLine("selected row out of bounds: " + index);
+                }
             }
             // NOTE does this causes move below?
             //row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-            row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up)); // works better than Up
-
-            row.Focus();
-            Keyboard.Focus(row);
+            if (row != null)
+            {
+                row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up)); // works better than Up
+                row.Focus();
+                Keyboard.Focus(row);
+            }
         }
 
         public static string BrowseForOutputFolder(string title, string initialDirectory = null)
         {
             // https://stackoverflow.com/a/50261723/5452781
             // Create a "Save As" dialog for selecting a directory (HACK)
-            var dialog = new Microsoft.Win32.SaveFileDialog();
+            var dialog = new SaveFileDialog();
             if (initialDirectory != null) dialog.InitialDirectory = initialDirectory;
             dialog.Title = title;
             dialog.Filter = "Project Folder|*.Folder"; // Prevents displaying files
@@ -1202,26 +1285,25 @@ namespace UnityLauncherPro
             // copy init file into project
             if (useInitScript == true)
             {
-                var initScriptFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", initScriptPath);
-                Console.WriteLine("initScriptFile: " + initScriptFile);
-                if (File.Exists(initScriptFile) == true)
+                if (File.Exists(initScriptPath) == true)
                 {
                     var editorTargetFolder = Path.Combine(baseFolder, projectName, "Assets", "Editor");
-                    Console.WriteLine(editorTargetFolder);
                     if (Directory.Exists(editorTargetFolder) == false) Directory.CreateDirectory(editorTargetFolder);
-                    var targetScriptFile = Path.Combine(editorTargetFolder, initScriptPath);
-                    if (File.Exists(targetScriptFile) == false) File.Copy(initScriptFile, targetScriptFile);
+                    var targetScriptFile = Path.Combine(editorTargetFolder, Path.GetFileName(initScriptPath));
+                    // TODO overwrite old file, there shouldnt be anything here
+                    if (File.Exists(targetScriptFile) == false) File.Copy(initScriptPath, targetScriptFile);
                 }
             }
 
             // launch empty project
             var proj = new Project();
             proj.Title = projectName;
-            proj.Path = Path.Combine(baseFolder, newPath);
+            proj.Path = Path.Combine(baseFolder, newPath).Replace("\\", "/");
             proj.Version = version;
             proj.TargetPlatforms = platformsForThisUnity;
             proj.TargetPlatform = platform;
             proj.Modified = DateTime.Now;
+            proj.folderExists = true; // have to set this value, so item is green on list
 
             var proc = LaunchProject(proj, null, useInitScript);
             ProcessHandler.Add(proj, proc);
@@ -1543,6 +1625,7 @@ public static class UnityLauncherProTools
 
             // create commandline string for building and launch it
             //var buildcmd = $"\"{unityExePath}\" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"Builder.BuildAndroid\" -buildTarget android -logFile -";
+            // TODO test without nographics : https://forum.unity.com/threads/batch-build-one-scene-is-black-works-in-normal-file-build.1282823/#post-9456524
             var buildParams = $" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"UnityLauncherProTools.Build{platform}\" -buildTarget {platform} -logFile \"{outputFolder}/../build.log\"";
             Console.WriteLine("buildcmd= " + buildParams);
 
@@ -1898,13 +1981,17 @@ public static class UnityLauncherProTools
             Console.WriteLine("Cleanup firewall: " + cmd);
             LaunchExe("cmd.exe", "/c " + cmd);
 
-            if (int.Parse(version.Substring(0, 4)) <= 2017)
+            int year;
+            string[] parts = version.Split('.');
+            // TODO handle unity 6.x
+            if (parts.Length >= 1 && int.TryParse(parts[0], out year) && year <= 2017)
             {
                 var nodeFolder = Path.Combine(installFolder, "Editor", "Data", "Tools", "nodejs", "node.exe");
                 cmd = "netsh advfirewall firewall delete rule name=all program=\"" + nodeFolder + "\"";
                 Console.WriteLine("Cleanup firewall <= 2017: " + cmd);
                 LaunchExe("cmd.exe", "/c " + cmd);
             }
+
             // remove registry entries
             var unityKeyName = "HKEY_CURRENT_USER\\Software\\Unity Technologies\\Installer\\Unity " + version;
             cmd = "reg delete " + unityKeyName + " /f";

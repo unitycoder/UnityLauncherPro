@@ -47,10 +47,10 @@
                 <Setter Property="MinHeight" Value="20" />
 
                 <!--test fix for System.Windows.Data Error: 4-->
-                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                <Setter Property="VerticalAlignment" Value="Center" />
+                <!--<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />-->
+                <!--<Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Center" />-->
 
                 <Setter Property="Template">
                     <Setter.Value>
@@ -121,10 +121,10 @@
                 <Setter Property="SnapsToDevicePixels" Value="true" />
                 <!--<Setter Property="OverridesDefaultStyle" Value="true" />-->
                 <!-- test fix for error 4 https://gist.github.com/TobiasSekan/73a93c2dfea4a051ff72abb5218d6f8f-->
-                <!--<Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Center" />-->
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Center" />
 
                 <Setter Property="Template">
                     <Setter.Value>
