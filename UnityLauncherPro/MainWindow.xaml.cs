@@ -3087,7 +3087,6 @@ namespace UnityLauncherPro
         {
             DataGridColumn column = e.Column;
 
-
             IComparer comparer = null;
 
             // prevent the built-in sort from sorting
@@ -3179,6 +3178,14 @@ namespace UnityLauncherPro
 
             //apply the sort
             lcv.CustomSort = comparer;
+
+            if (gridRecent.SelectedItem != null)
+            {
+                // scroll view to selected, after sort
+                gridRecent.ScrollIntoView(gridRecent.SelectedItem);
+                // needed for keyboard to work in grid
+                gridRecent.Focus();
+            }
         }
 
         public class CustomProjectSort : IComparer
