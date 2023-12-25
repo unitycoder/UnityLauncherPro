@@ -1526,12 +1526,16 @@ namespace UnityLauncherPro
 
         private void ChkMinimizeToTaskbar_CheckedChanged(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             Settings.Default.minimizeToTaskbar = (bool)chkMinimizeToTaskbar.IsChecked;
             Settings.Default.Save();
         }
 
         private void ChkRegisterExplorerMenu_CheckedChanged(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             if ((bool)chkRegisterExplorerMenu.IsChecked)
             {
                 Tools.AddContextMenuRegistry(contextRegRoot);
@@ -1548,6 +1552,7 @@ namespace UnityLauncherPro
         private void ChkShowLauncherArgumentsColumn_CheckedChanged(object sender, RoutedEventArgs e)
         {
             if (this.IsActive == false) return; // dont run code on window init
+
             Settings.Default.showArgumentsColumn = (bool)chkShowLauncherArgumentsColumn.IsChecked;
             Settings.Default.Save();
             gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -1557,6 +1562,7 @@ namespace UnityLauncherPro
         private void ChkShowGitBranchColumn_CheckedChanged(object sender, RoutedEventArgs e)
         {
             if (this.IsActive == false) return; // dont run code on window init
+
             Settings.Default.showGitBranchColumn = (bool)chkShowGitBranchColumn.IsChecked;
             Settings.Default.Save();
             gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -1565,12 +1571,16 @@ namespace UnityLauncherPro
 
         private void ChkQuitAfterOpen_CheckedChanged(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             Settings.Default.closeAfterProject = (bool)chkQuitAfterOpen.IsChecked;
             Settings.Default.Save();
         }
 
         private void ChkQuitAfterCommandline_CheckedChanged(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             Settings.Default.closeAfterExplorer = (bool)chkQuitAfterCommandline.IsChecked;
             Settings.Default.Save();
         }
@@ -1793,12 +1803,16 @@ namespace UnityLauncherPro
 
         private void ChkShowMissingFolderProjects_CheckedChanged(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             Settings.Default.showProjectsMissingFolder = (bool)chkShowMissingFolderProjects.IsChecked;
             Settings.Default.Save();
         }
 
         private void ChkAllowSingleInstanceOnly_CheckedChanged(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             Settings.Default.AllowSingleInstanceOnly = (bool)chkAllowSingleInstanceOnly.IsChecked;
             Settings.Default.Save();
         }
@@ -1966,17 +1980,21 @@ namespace UnityLauncherPro
 
         private void ChkAskNameForQuickProject_Checked(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.askNameForQuickProject = (bool)chkAskNameForQuickProject.IsChecked;
-            Properties.Settings.Default.Save();
+            if (this.IsActive == false) return; // dont run code on window init
+
+            Settings.Default.askNameForQuickProject = (bool)chkAskNameForQuickProject.IsChecked;
+            Settings.Default.Save();
         }
 
         bool isInitializing = true; // used to avoid doing things while still starting up
         private void ChkStreamerMode_Checked(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
-            Properties.Settings.Default.streamerMode = isChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.streamerMode = isChecked;
+            Settings.Default.Save();
 
             // Create cellstyle and assign if streamermode is enabled
             Style cellStyle = new Style(typeof(DataGridCell));
@@ -1999,6 +2017,8 @@ namespace UnityLauncherPro
 
         private void ChkShowPlatform_Checked(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             Settings.Default.showTargetPlatform = isChecked;
@@ -2072,6 +2092,8 @@ namespace UnityLauncherPro
 
         private void ChkEnableProjectRename_Checked(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             Properties.Settings.Default.enableProjectRename = (bool)chkEnableProjectRename.IsChecked;
             Properties.Settings.Default.Save();
         }
@@ -2565,8 +2587,8 @@ namespace UnityLauncherPro
             if (this.IsActive == false) return; // dont run code on window init
 
             var isChecked = (bool)((CheckBox)sender).IsChecked;
-            Properties.Settings.Default.useCustomTheme = isChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.useCustomTheme = isChecked;
+            Settings.Default.Save();
 
             btnReloadTheme.IsEnabled = isChecked;
 
@@ -2616,9 +2638,11 @@ namespace UnityLauncherPro
 
         private void ChkEnablePlatformSelection_Checked(object sender, RoutedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             var isChecked = (bool)((CheckBox)sender).IsChecked;
-            Properties.Settings.Default.enablePlatformSelection = isChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.enablePlatformSelection = isChecked;
+            Settings.Default.Save();
             chkEnablePlatformSelection.IsChecked = isChecked;
         }
 
@@ -2642,9 +2666,10 @@ namespace UnityLauncherPro
         private void ChkRunAutomatically_Checked(object sender, RoutedEventArgs e)
         {
             if (this.IsActive == false) return; // dont run code on window init
+
             var isChecked = (bool)((CheckBox)sender).IsChecked;
-            Properties.Settings.Default.runAutomatically = isChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.runAutomatically = isChecked;
+            Settings.Default.Save();
             chkRunAutomatically.IsChecked = isChecked;
             // set or unset registry, NOTE should not do this on debug build.. (otherwise 2 builds try to run?)
             Tools.SetStartupRegistry(isChecked);
@@ -2741,6 +2766,7 @@ namespace UnityLauncherPro
         private void ChkHumanFriendlyDateTime_Checked(object sender, RoutedEventArgs e)
         {
             if (this.IsActive == false) return; // dont run code on window init
+
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             // cannot have both date formats
@@ -2796,6 +2822,7 @@ namespace UnityLauncherPro
         private void ChkRunAutomaticallyMinimized_Checked(object sender, RoutedEventArgs e)
         {
             if (this.IsActive == false) return; // dont run code on window init
+
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             Settings.Default.runAutomaticallyMinimized = isChecked;
@@ -2974,6 +3001,7 @@ namespace UnityLauncherPro
         private void ChkSearchProjectPath_Checked(object sender, RoutedEventArgs e)
         {
             if (this.IsActive == false) return; // dont run code on window init
+
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             searchProjectPathAlso = isChecked;
@@ -3011,6 +3039,7 @@ namespace UnityLauncherPro
         private void ChkCheckPlasticBranch_Checked(object sender, RoutedEventArgs e)
         {
             if (this.IsActive == false) return; // dont run code on window init
+
             Settings.Default.checkPlasticBranch = (bool)chkCheckPlasticBranch.IsChecked;
             Settings.Default.Save();
             RefreshRecentProjects();
@@ -3315,7 +3344,7 @@ namespace UnityLauncherPro
                     // replace the manual:true with manual:false using regex
                     json = json.Replace("\"manual\":true", "\"manual\":false");
 
-                    Console.WriteLine(json);
+                    //Console.WriteLine(json);
 
                     // write the config file
                     File.WriteAllText(configFile, json);
