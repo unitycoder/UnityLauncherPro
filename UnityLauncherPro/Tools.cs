@@ -1015,10 +1015,10 @@ namespace UnityLauncherPro
         public static string ReadGitBranchInfo(string projectPath)
         {
             string results = null;
-            DirectoryInfo dirName = FindDir(".git", projectPath);
-            if (dirName != null)
+            string dirName = Path.Combine(projectPath, ".git");
+            if (Directory.Exists(dirName))
             {
-                string branchFile = Path.Combine(dirName.FullName, "HEAD");
+                string branchFile = Path.Combine(dirName, "HEAD");
                 if (File.Exists(branchFile))
                 {
                     // removes extra end of line
@@ -1034,10 +1034,10 @@ namespace UnityLauncherPro
         public static string ReadPlasticBranchInfo(string projectPath)
         {
             string results = null;
-            DirectoryInfo dirName = FindDir(".plastic", projectPath);
-            if (dirName != null)
+            string dirName = Path.Combine(projectPath, ".plastic");
+            if (Directory.Exists(dirName))
             {
-                string branchFile = Path.Combine(dirName.FullName, "plastic.selector");
+                string branchFile = Path.Combine(dirName, "plastic.selector");
                 if (File.Exists(branchFile))
                 {
                     // removes extra end of line
@@ -1105,29 +1105,6 @@ namespace UnityLauncherPro
                 if (string.IsNullOrEmpty(rawPlatformName) == false) Console.WriteLine("Missing buildTarget remap name for: " + rawPlatformName);
                 return null;
             }
-        }
-
-        /// <summary>
-        /// Searches for a directory beginning with "startPath".
-        /// If the directory is not found, then parent folders are searched until
-        /// either it is found or the root folder has been reached.
-        /// Null is returned if the directory was not found.
-        /// </summary>
-        /// <param name="dirName"></param>
-        /// <param name="startPath"></param>
-        /// <returns></returns>
-        public static DirectoryInfo FindDir(string dirName, string startPath)
-        {
-            DirectoryInfo dirInfo = new DirectoryInfo(Path.Combine(startPath, dirName));
-            while (!dirInfo.Exists)
-            {
-                if (dirInfo.Parent.Parent == null)
-                {
-                    return null;
-                }
-                dirInfo = new DirectoryInfo(Path.Combine(dirInfo.Parent.Parent.FullName, dirName));
-            }
-            return dirInfo;
         }
 
         public static string ReadCustomProjectData(string projectPath, string customFile)
