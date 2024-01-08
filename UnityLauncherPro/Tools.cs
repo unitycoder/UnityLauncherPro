@@ -1397,44 +1397,42 @@ namespace UnityLauncherPro
             return items;
         }
 
-        // https://codereview.stackexchange.com/a/93247
+        // chatgpt
         public static string GetElapsedTime(DateTime datetime)
         {
-            TimeSpan ts = DateTime.Now.Subtract(datetime);
+            TimeSpan ts = DateTime.Now - datetime;
 
-            // The trick: make variable contain date and time representing the desired timespan,
-            // having +1 in each date component.
-            DateTime date = DateTime.MinValue + ts;
-
-            return ProcessPeriod(date.Year - 1, date.Month - 1, "year")
-                   ?? ProcessPeriod(date.Month - 1, date.Day - 1, "month")
-                   ?? ProcessPeriod(date.Day - 1, date.Hour, "day", "Yesterday")
-                   ?? ProcessPeriod(date.Hour, date.Minute, "hour")
-                   ?? ProcessPeriod(date.Minute, date.Second, "minute")
-                   ?? ProcessPeriod(date.Second, 0, "second")
-                   ?? "Right now";
-        }
-
-        private static string ProcessPeriod(int value, int subValue, string name, string singularName = null)
-        {
-            if (value == 0)
+            if (ts.TotalSeconds < 60)
             {
-                return null;
+                return ts.TotalSeconds < 2 ? "Right now" : $"{(int)ts.TotalSeconds} seconds ago";
             }
-            if (value == 1)
+            else if (ts.TotalMinutes < 60)
             {
-                if (!String.IsNullOrEmpty(singularName))
+                return ts.TotalMinutes < 2 ? "1 minute ago" : $"{(int)ts.TotalMinutes} minutes ago";
+            }
+            else if (ts.TotalHours < 24)
+            {
+                return ts.TotalHours < 2 ? "1 hour ago" : $"{(int)ts.TotalHours} hours ago";
+            }
+            else if (ts.TotalDays < 30)
+            {
+                return ts.TotalDays < 2 ? "1 day ago" : $"{(int)ts.TotalDays} days ago";
+            }
+            else if (ts.TotalDays < 365)
+            {
+                if (ts.TotalDays < 60)
                 {
-                    return singularName;
+                    return "1 month ago";
                 }
-                string articleSuffix = name[0] == 'h' ? "n" : String.Empty;
-                return subValue == 0
-                    ? String.Format("A{0} {1} ago", articleSuffix, name)
-                    : String.Format("a{0} {1} ago", articleSuffix, name);
+                else
+                {
+                    return $"{(int)(ts.TotalDays / 30)} months ago";
+                }
             }
-            return subValue == 0
-                ? String.Format("{0} {1}s ago", value, name)
-                : String.Format("{0} {1}s ago", value, name);
+            else
+            {
+                return ts.TotalDays < 730 ? "1 year ago" : $"{(int)(ts.TotalDays / 365)} years ago";
+            }
         }
 
         public static bool ValidateDateFormat(string format)
