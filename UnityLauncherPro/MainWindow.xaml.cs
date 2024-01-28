@@ -670,13 +670,13 @@ namespace UnityLauncherPro
 
         void UpdateUnityInstallationsList()
         {
-            // reset preferred string, if user changed it
+            // Reset preferred string, if user changed it
             //preferredVersion = "none";
 
             unityInstallationsSource = GetUnityInstallations.Scan();
             dataGridUnitys.ItemsSource = unityInstallationsSource;
 
-            // also make dictionary of installed unitys, to search faster
+            // Also make dictionary of installed unitys, to search faster
             unityInstalledVersions.Clear();
 
             for (int i = 0, len = unityInstallationsSource.Count; i < len; i++)
@@ -725,6 +725,7 @@ namespace UnityLauncherPro
                 lstRootFolders.Items.Refresh();
                 Properties.Settings.Default.Save();
                 UpdateUnityInstallationsList();
+                RefreshRecentProjects();
             }
         }
 
