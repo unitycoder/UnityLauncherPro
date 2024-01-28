@@ -1420,22 +1420,50 @@ namespace UnityLauncherPro
             return items;
         }
 
-        // https://codereview.stackexchange.com/a/93247
         public static string GetElapsedTime(DateTime datetime)
         {
-            TimeSpan ts = DateTime.Now.Subtract(datetime);
+            TimeSpan elapsed = DateTime.Now - datetime;
 
-            // The trick: make variable contain date and time representing the desired timespan,
-            // having +1 in each date component.
-            DateTime date = DateTime.MinValue + ts;
+            if (elapsed.TotalDays >= 365)
+            {
+                int years = (int)(elapsed.TotalDays / 365);
+                return ProcessPeriod(years, "year");
+            }
+            else if (elapsed.TotalDays >= 30)
+            {
+                int months = (int)(elapsed.TotalDays / 30);
+                return ProcessPeriod(months, "month");
+            }
+            else if (elapsed.TotalDays >= 1)
+            {
+                int days = (int)elapsed.TotalDays;
+                return ProcessPeriod(days, "day", "Yesterday");
+            }
+            else if (elapsed.TotalHours >= 1)
+            {
+                int hours = (int)elapsed.TotalHours;
+                return ProcessPeriod(hours, "hour");
+            }
+            else if (elapsed.TotalMinutes >= 1)
+            {
+                int minutes = (int)elapsed.TotalMinutes;
+                return ProcessPeriod(minutes, "minute");
+            }
+            else if (elapsed.TotalSeconds >= 1)
+            {
+                int seconds = (int)elapsed.TotalSeconds;
+                return ProcessPeriod(seconds, "second");
+            }
 
-            return ProcessPeriod(date.Year - 1, date.Month - 1, "year")
-                   ?? ProcessPeriod(date.Month - 1, date.Day - 1, "month")
-                   ?? ProcessPeriod(date.Day - 1, date.Hour, "day", "Yesterday")
-                   ?? ProcessPeriod(date.Hour, date.Minute, "hour")
-                   ?? ProcessPeriod(date.Minute, date.Second, "minute")
-                   ?? ProcessPeriod(date.Second, 0, "second")
-                   ?? "Right now";
+            return "Right now";
+        }
+
+        private static string ProcessPeriod(int value, string unit, string singular = null)
+        {
+            if (value == 1) return singular ?? $"{value} {unit} ago";
+            else if (value > 1) return $"{value} {unit}s ago";
+
+            return null;
         }
 
         private static string ProcessPeriod(int value, int subValue, string name, string singularName = null)
