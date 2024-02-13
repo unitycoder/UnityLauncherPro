@@ -670,13 +670,13 @@ namespace UnityLauncherPro
 
         void UpdateUnityInstallationsList()
         {
-            // reset preferred string, if user changed it
+            // Reset preferred string, if user changed it
             //preferredVersion = "none";
 
             unityInstallationsSource = GetUnityInstallations.Scan();
             dataGridUnitys.ItemsSource = unityInstallationsSource;
 
-            // also make dictionary of installed unitys, to search faster
+            // Also make dictionary of installed unitys, to search faster
             unityInstalledVersions.Clear();
 
             for (int i = 0, len = unityInstallationsSource.Count; i < len; i++)
@@ -725,6 +725,7 @@ namespace UnityLauncherPro
                 lstRootFolders.Items.Refresh();
                 Properties.Settings.Default.Save();
                 UpdateUnityInstallationsList();
+                RefreshRecentProjects();
             }
         }
 
@@ -3592,6 +3593,12 @@ namespace UnityLauncherPro
             Tools.OpenAppdataSpecialFolder("../Roaming/UnityHub/logs/");
         }
 
+        //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var proj = GetSelectedProject();
+        //    if (proj == null) return;
+        //    Tools.DisplayProjectProperties(proj, this);
+        //}
     } // class
 } //namespace
 

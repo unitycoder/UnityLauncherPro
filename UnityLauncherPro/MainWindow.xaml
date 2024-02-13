@@ -201,6 +201,7 @@
                                 </MenuItem>
                                 <Separator/>
                                 <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />
+                                <!--<MenuItem x:Name="menuProjectProperties" Header="Properties..." Click="menuProjectProperties_Click" />-->
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 

@@ -97,6 +97,9 @@
     <Compile Include="NewProject.xaml.cs">
       <DependentUpon>NewProject.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ProjectProperties.xaml.cs">
+      <DependentUpon>ProjectProperties.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ThemeEditor.xaml.cs">
       <DependentUpon>ThemeEditor.xaml</DependentUpon>
     </Compile>
@@ -107,6 +110,10 @@
       <DependentUpon>UpgradeWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="NewProject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProjectProperties.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

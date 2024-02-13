@@ -300,6 +300,66 @@ namespace UnityLauncherPro
 
                 Console.WriteLine("Start process: " + cmd + " " + unitycommandlineparameters);
 
+                // TODO load custom settings per project
+                //string userSettingsFolder = Path.Combine(proj.Path, "UserSettings");
+                //string userSettingsPath = Path.Combine(userSettingsFolder, "ULPSettings.txt");
+                //if (File.Exists(userSettingsPath))
+                //{
+                //    var rawSettings = File.ReadAllLines(userSettingsPath);
+                //    // needed for env vars.
+                //    newProcess.StartInfo.UseShellExecute = false;
+                //    foreach (var row in rawSettings)
+                //    {
+                //        var split = row.Split('=');
+                //        if (split.Length == 2)
+                //        {
+                //            var key = split[0].Trim();
+                //            var value = split[1].Trim();
+                //            if (string.IsNullOrEmpty(key) == false && string.IsNullOrEmpty(value) == false)
+                //            {
+                //                //Console.WriteLine("key: " + key + " value: " + value);
+                //                //newProcess.StartInfo.EnvironmentVariables[key] = value;
+                //                //System.Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Machine);
+                //                var dict = newProcess.StartInfo.EnvironmentVariables;
+                //                // print all
+                //                foreach (System.Collections.DictionaryEntry de in dict)
+                //                {
+                //                    Console.WriteLine("  {0} = {1}", de.Key, de.Value);
+                //                }
+                //                // check if key exists
+                //                if (dict.ContainsKey(key) == true)
+                //                {
+                //                    // modify existing
+                //                    //dict[key] = value;
+                //                    newProcess.StartInfo.EnvironmentVariables.Remove(key);
+                //                    newProcess.StartInfo.EnvironmentVariables.Add(key, value);
+                //                }
+                //                else
+                //                {
+                //                    // add new
+                //                    dict.Add(key, value);
+                //                }
+                //                //newProcess.StartInfo.EnvironmentVariables.
+                //                //if (newProcess.StartInfo.EnvironmentVariables.ContainsKey(key))
+                //                //{
+                //                //    Console.WriteLine("exists: "+key);
+                //                //    // Test Modify the existing environment variable
+                //                //    newProcess.StartInfo.EnvironmentVariables[key] = "...";
+                //                // this works, maybe because its not a system variable?
+                //                //newProcess.StartInfo.EnvironmentVariables["TESTTEST"] = "...";
+                //                //}
+                //                //else
+                //                //{
+                //                //    Console.WriteLine("add new: "+ value);
+                //                //    // Optionally, add the environment variable if it does not exist
+                //                //    newProcess.StartInfo.EnvironmentVariables.Add(key, value);
+                //                //}
+                //                Console.WriteLine("custom row: " + row + " key=" + key + " value:" + value);
+                //            }
+                //        }
+                //    }
+                //}
+
                 newProcess.StartInfo.Arguments = unitycommandlineparameters;
                 newProcess.EnableRaisingEvents = true;
                 //newProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden; // needed for unity 2023 for some reason? (otherwise console popups briefly), Cannot use this, whole Editor is invisible then
@@ -1990,8 +2050,45 @@ public static class UnityLauncherProTools
                 Console.WriteLine("Removing desktop icon: " + unityIcon);
                 File.Delete(unityIcon);
             }
+        } // UninstallEditor
 
+        public static void DisplayProjectProperties(Project proj, MainWindow owner)
+        {
+            var modalWindow = new ProjectProperties(proj);
+            modalWindow.ShowInTaskbar = owner == null;
+            modalWindow.WindowStartupLocation = owner == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
+            modalWindow.Topmost = owner == null;
+            modalWindow.ShowActivated = true;
+            modalWindow.Owner = owner;
+            modalWindow.ShowDialog();
+            var results = modalWindow.DialogResult.HasValue && modalWindow.DialogResult.Value;
 
+            if (results == true)
+            {
+            }
+            else
+            {
+            }
+        }
+
+        // TODO save custom env to proj settings?
+        internal static void SaveProjectSettings(Project proj, string customEnvVars)
+        {
+            string userSettingsFolder = Path.Combine(proj.Path, "UserSettings");
+
+            // save custom env file
+            if (string.IsNullOrEmpty(customEnvVars) == false)
+            {
+                // check if UserSettings exists
+
+                if (Directory.Exists(userSettingsFolder) == false) Directory.CreateDirectory(userSettingsFolder);
+
+                // TODO think about settings format (other values will be added later)
+
+                string fullPath = Path.Combine(userSettingsFolder, "ULPSettings.txt");
+                File.WriteAllText(fullPath, customEnvVars);
+                Console.WriteLine(fullPath);
+            }
         }
     } // class
 

@@ -1,0 +1,38 @@
+﻿<Window x:Class="UnityLauncherPro.ProjectProperties"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnityLauncherPro"
+        mc:Ignorable="d"
+        Title="Project Properties" Height="480" Width="450" Background="{DynamicResource ThemeDarkestBackground}"  ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True" PreviewKeyDown="Window_PreviewKeyDown">
+
+    <Grid>
+        <StackPanel Margin="10,3">
+            <Label Content="Custom environment variables:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
+            <TextBox x:Name="txtCustomEnvVariables" IsUndoEnabled="True" TextChanged="txtCustomEnvVariables_TextChanged" PreviewKeyDown="txtCustomEnvVariables_PreviewKeyDown" TabIndex="0" Width="320" Text="JAVA_HOME=C:\Program Files\Java\jdk1.8.0_202" />
+
+            <Grid HorizontalAlignment="Stretch" Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCloseProperties"  Margin="0,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" TabIndex="4" Click="btnCloseProperties_Click" >
+                    <Label  Content="Cancel" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
+                </Button>
+                <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnApplyProperties"  Margin="0,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" TabIndex="4" Click="btnApplyProperties_Click" >
+                    <Label  Content="Apply" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
+                </Button>
+            </Grid>
+
+            <!--<DataGrid x:Name="gridEnvVariables" SelectionMode="Single" Height="88" Margin="10,121,10,0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" PreviewKeyDown="GridAvailableVersions_PreviewKeyDown" Loaded="GridAvailableVersions_Loaded" PreviewMouseDoubleClick="GridAvailableVersions_PreviewMouseDoubleClick" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled"  ScrollViewer.VerticalScrollBarVisibility="Visible" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserResizeColumns="False" CanUserReorderColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Variable" Binding="{Binding Version}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
+                    <DataGridTextColumn Header="Value" Binding="{Binding PlatformsCombined}" IsReadOnly="True" CanUserResize="False" MinWidth="270" />
+                </DataGrid.Columns>
+            </DataGrid>-->
+
+
+        </StackPanel>
+    </Grid>
+</Window>
