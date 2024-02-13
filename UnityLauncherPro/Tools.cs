@@ -300,6 +300,66 @@ namespace UnityLauncherPro
 
                 Console.WriteLine("Start process: " + cmd + " " + unitycommandlineparameters);
 
+                // TODO load custom settings per project
+                //string userSettingsFolder = Path.Combine(proj.Path, "UserSettings");
+                //string userSettingsPath = Path.Combine(userSettingsFolder, "ULPSettings.txt");
+                //if (File.Exists(userSettingsPath))
+                //{
+                //    var rawSettings = File.ReadAllLines(userSettingsPath);
+                //    // needed for env vars.
+                //    newProcess.StartInfo.UseShellExecute = false;
+                //    foreach (var row in rawSettings)
+                //    {
+                //        var split = row.Split('=');
+                //        if (split.Length == 2)
+                //        {
+                //            var key = split[0].Trim();
+                //            var value = split[1].Trim();
+                //            if (string.IsNullOrEmpty(key) == false && string.IsNullOrEmpty(value) == false)
+                //            {
+                //                //Console.WriteLine("key: " + key + " value: " + value);
+                //                //newProcess.StartInfo.EnvironmentVariables[key] = value;
+                //                //System.Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Machine);
+                //                var dict = newProcess.StartInfo.EnvironmentVariables;
+                //                // print all
+                //                foreach (System.Collections.DictionaryEntry de in dict)
+                //                {
+                //                    Console.WriteLine("  {0} = {1}", de.Key, de.Value);
+                //                }
+                //                // check if key exists
+                //                if (dict.ContainsKey(key) == true)
+                //                {
+                //                    // modify existing
+                //                    //dict[key] = value;
+                //                    newProcess.StartInfo.EnvironmentVariables.Remove(key);
+                //                    newProcess.StartInfo.EnvironmentVariables.Add(key, value);
+                //                }
+                //                else
+                //                {
+                //                    // add new
+                //                    dict.Add(key, value);
+                //                }
+                //                //newProcess.StartInfo.EnvironmentVariables.
+                //                //if (newProcess.StartInfo.EnvironmentVariables.ContainsKey(key))
+                //                //{
+                //                //    Console.WriteLine("exists: "+key);
+                //                //    // Test Modify the existing environment variable
+                //                //    newProcess.StartInfo.EnvironmentVariables[key] = "...";
+                //                // this works, maybe because its not a system variable?
+                //                //newProcess.StartInfo.EnvironmentVariables["TESTTEST"] = "...";
+                //                //}
+                //                //else
+                //                //{
+                //                //    Console.WriteLine("add new: "+ value);
+                //                //    // Optionally, add the environment variable if it does not exist
+                //                //    newProcess.StartInfo.EnvironmentVariables.Add(key, value);
+                //                //}
+                //                Console.WriteLine("custom row: " + row + " key=" + key + " value:" + value);
+                //            }
+                //        }
+                //    }
+                //}
+
                 newProcess.StartInfo.Arguments = unitycommandlineparameters;
                 newProcess.EnableRaisingEvents = true;
                 //newProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden; // needed for unity 2023 for some reason? (otherwise console popups briefly), Cannot use this, whole Editor is invisible then
@@ -1015,10 +1075,10 @@ namespace UnityLauncherPro
         public static string ReadGitBranchInfo(string projectPath)
         {
             string results = null;
-            DirectoryInfo dirName = FindDir(".git", projectPath);
-            if (dirName != null)
+            string dirName = Path.Combine(projectPath, ".git");
+            if (Directory.Exists(dirName))
             {
-                string branchFile = Path.Combine(dirName.FullName, "HEAD");
+                string branchFile = Path.Combine(dirName, "HEAD");
                 if (File.Exists(branchFile))
                 {
                     // removes extra end of line
@@ -1034,10 +1094,10 @@ namespace UnityLauncherPro
         public static string ReadPlasticBranchInfo(string projectPath)
         {
             string results = null;
-            DirectoryInfo dirName = FindDir(".plastic", projectPath);
-            if (dirName != null)
+            string dirName = Path.Combine(projectPath, ".plastic");
+            if (Directory.Exists(dirName))
             {
-                string branchFile = Path.Combine(dirName.FullName, "plastic.selector");
+                string branchFile = Path.Combine(dirName, "plastic.selector");
                 if (File.Exists(branchFile))
                 {
                     // removes extra end of line
@@ -1105,29 +1165,6 @@ namespace UnityLauncherPro
                 if (string.IsNullOrEmpty(rawPlatformName) == false) Console.WriteLine("Missing buildTarget remap name for: " + rawPlatformName);
                 return null;
             }
-        }
-
-        /// <summary>
-        /// Searches for a directory beginning with "startPath".
-        /// If the directory is not found, then parent folders are searched until
-        /// either it is found or the root folder has been reached.
-        /// Null is returned if the directory was not found.
-        /// </summary>
-        /// <param name="dirName"></param>
-        /// <param name="startPath"></param>
-        /// <returns></returns>
-        public static DirectoryInfo FindDir(string dirName, string startPath)
-        {
-            DirectoryInfo dirInfo = new DirectoryInfo(Path.Combine(startPath, dirName));
-            while (!dirInfo.Exists)
-            {
-                if (dirInfo.Parent.Parent == null)
-                {
-                    return null;
-                }
-                dirInfo = new DirectoryInfo(Path.Combine(dirInfo.Parent.Parent.FullName, dirName));
-            }
-            return dirInfo;
         }
 
         public static string ReadCustomProjectData(string projectPath, string customFile)
@@ -1420,44 +1457,42 @@ namespace UnityLauncherPro
             return items;
         }
 
-        // https://codereview.stackexchange.com/a/93247
+        // chatgpt
         public static string GetElapsedTime(DateTime datetime)
         {
-            TimeSpan ts = DateTime.Now.Subtract(datetime);
+            TimeSpan ts = DateTime.Now - datetime;
 
-            // The trick: make variable contain date and time representing the desired timespan,
-            // having +1 in each date component.
-            DateTime date = DateTime.MinValue + ts;
-
-            return ProcessPeriod(date.Year - 1, date.Month - 1, "year")
-                   ?? ProcessPeriod(date.Month - 1, date.Day - 1, "month")
-                   ?? ProcessPeriod(date.Day - 1, date.Hour, "day", "Yesterday")
-                   ?? ProcessPeriod(date.Hour, date.Minute, "hour")
-                   ?? ProcessPeriod(date.Minute, date.Second, "minute")
-                   ?? ProcessPeriod(date.Second, 0, "second")
-                   ?? "Right now";
-        }
-
-        private static string ProcessPeriod(int value, int subValue, string name, string singularName = null)
-        {
-            if (value == 0)
+            if (ts.TotalSeconds < 60)
             {
-                return null;
+                return ts.TotalSeconds < 2 ? "Right now" : $"{(int)ts.TotalSeconds} seconds ago";
             }
-            if (value == 1)
+            else if (ts.TotalMinutes < 60)
             {
-                if (!String.IsNullOrEmpty(singularName))
+                return ts.TotalMinutes < 2 ? "1 minute ago" : $"{(int)ts.TotalMinutes} minutes ago";
+            }
+            else if (ts.TotalHours < 24)
+            {
+                return ts.TotalHours < 2 ? "1 hour ago" : $"{(int)ts.TotalHours} hours ago";
+            }
+            else if (ts.TotalDays < 30)
+            {
+                return ts.TotalDays < 2 ? "1 day ago" : $"{(int)ts.TotalDays} days ago";
+            }
+            else if (ts.TotalDays < 365)
+            {
+                if (ts.TotalDays < 60)
                 {
-                    return singularName;
+                    return "1 month ago";
                 }
-                string articleSuffix = name[0] == 'h' ? "n" : String.Empty;
-                return subValue == 0
-                    ? String.Format("A{0} {1} ago", articleSuffix, name)
-                    : String.Format("a{0} {1} ago", articleSuffix, name);
+                else
+                {
+                    return $"{(int)(ts.TotalDays / 30)} months ago";
+                }
             }
-            return subValue == 0
-                ? String.Format("{0} {1}s ago", value, name)
-                : String.Format("{0} {1}s ago", value, name);
+            else
+            {
+                return ts.TotalDays < 730 ? "1 year ago" : $"{(int)(ts.TotalDays / 365)} years ago";
+            }
         }
 
         public static bool ValidateDateFormat(string format)
@@ -2015,8 +2050,45 @@ public static class UnityLauncherProTools
                 Console.WriteLine("Removing desktop icon: " + unityIcon);
                 File.Delete(unityIcon);
             }
+        } // UninstallEditor
 
+        public static void DisplayProjectProperties(Project proj, MainWindow owner)
+        {
+            var modalWindow = new ProjectProperties(proj);
+            modalWindow.ShowInTaskbar = owner == null;
+            modalWindow.WindowStartupLocation = owner == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
+            modalWindow.Topmost = owner == null;
+            modalWindow.ShowActivated = true;
+            modalWindow.Owner = owner;
+            modalWindow.ShowDialog();
+            var results = modalWindow.DialogResult.HasValue && modalWindow.DialogResult.Value;
 
+            if (results == true)
+            {
+            }
+            else
+            {
+            }
+        }
+
+        // TODO save custom env to proj settings?
+        internal static void SaveProjectSettings(Project proj, string customEnvVars)
+        {
+            string userSettingsFolder = Path.Combine(proj.Path, "UserSettings");
+
+            // save custom env file
+            if (string.IsNullOrEmpty(customEnvVars) == false)
+            {
+                // check if UserSettings exists
+
+                if (Directory.Exists(userSettingsFolder) == false) Directory.CreateDirectory(userSettingsFolder);
+
+                // TODO think about settings format (other values will be added later)
+
+                string fullPath = Path.Combine(userSettingsFolder, "ULPSettings.txt");
+                File.WriteAllText(fullPath, customEnvVars);
+                Console.WriteLine(fullPath);
+            }
         }
     } // class
 

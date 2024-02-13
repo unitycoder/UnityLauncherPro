@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -216,6 +217,22 @@ namespace UnityLauncherPro
         private void TxtNewProjectName_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (isInitializing == true) return;
+
+            // warning yellow if contains space at start or end
+            if (txtNewProjectName.Text.StartsWith(" ") || txtNewProjectName.Text.EndsWith(" "))
+            {
+                // NOTE txtbox outline didnt work
+                txtNewProjectName.Background = Brushes.Yellow;
+                txtNewProjectStatus.Text = "Warning: Project name starts or ends with SPACE character";
+                txtNewProjectStatus.Foreground = Brushes.Orange;
+            }
+            else
+            {
+                // NOTE this element is not using themes yet, so can set white
+                txtNewProjectName.Background = Brushes.White;
+                txtNewProjectStatus.Foreground = Brushes.White;
+                txtNewProjectStatus.Text = "";
+            }
 
             // validate new projectname that it doesnt exists already
             var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="Create New Project" Height="460" Width="450" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
+        Title="Create New Project" Height="480" Width="450" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
 
     <Grid>
         <StackPanel Margin="10,3">
@@ -24,7 +24,7 @@
                     <ColumnDefinition Width="20*"/>
                     <ColumnDefinition Width="40*"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Project Name:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,5,0" />
+                <Label x:Name="lblNewProjectNameLabel" Grid.Column="0" Content="Project Name:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,5,0" />
                 <Label Grid.Column="1" Content="Platform:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,0,0" />
                 <Label x:Name="lblTemplateTitleAndCount" Grid.Column="2" Content="Templates:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="5,5,5,0" />
             </Grid>
@@ -53,6 +53,15 @@
                     <Label Content="_Create" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                 </Button>
             </Grid>
+
+            <Grid Grid.Row="2" UseLayoutRounding="False">
+                <StatusBar VerticalAlignment="Center" Background="{x:Null}" Foreground="{DynamicResource ThemeStatusText}">
+                    <StatusBarItem>
+                        <TextBlock x:Name="txtNewProjectStatus"  VerticalAlignment="Center" Text=""/>
+                    </StatusBarItem>
+                </StatusBar>
+            </Grid>
+
         </StackPanel>
     </Grid>
 </Window>

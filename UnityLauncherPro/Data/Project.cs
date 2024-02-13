@@ -17,10 +17,17 @@ namespace UnityLauncherPro
         public string[] TargetPlatforms { set; get; }
         public bool folderExists { set; get; }
 
+        // WPF keeps calling this method from AppendFormatHelper, GetNameCore..? not sure if need to return something else or default would be faster?
         public override string ToString()
         {
-            return $"{Title} {Version} {Path} {Modified} {Arguments} {GITBranch} {TargetPlatform}";
+            return Path;
         }
+
+        // for debugging
+        //public override string ToString()
+        //{
+        //    return $"{Title} {Version} {Path} {Modified} {Arguments} {GITBranch} {TargetPlatform}";
+        //}
 
         // change datagrid colors based on value using converter https://stackoverflow.com/a/5551986/5452781
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
