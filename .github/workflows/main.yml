@@ -69,3 +69,4 @@ jobs:
           asset_path: ./UnityLauncherPro.ZIP
           asset_name: UnityLauncherPro.ZIP
           asset_content_type: application/zip
+
