@@ -691,6 +691,7 @@ namespace UnityLauncherPro
             {
                 // check if file exists
                 if (File.Exists(currentInitScriptLocationOrURL) == false) return;
+
                 tempFile = currentInitScriptLocationOrURL;
                 isLocalFile = true;
             }
@@ -705,6 +706,9 @@ namespace UnityLauncherPro
                     var tempContent = File.ReadAllText(tempFile);
                     if (tempContent.IndexOf("public class InitializeProject") > 0 && tempContent.IndexOf("namespace UnityLauncherProTools") > 0 && tempContent.IndexOf("public static void Init()") > 0)
                     {
+                        // create scripts folder if missing
+                        if (Directory.Exists(currentInitScriptFolder) == false) Directory.CreateDirectory(currentInitScriptFolder);
+
                         // move old file as backup
                         if (File.Exists(currentInitScriptFullPath))
                         {
