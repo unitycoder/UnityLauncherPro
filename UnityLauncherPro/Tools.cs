@@ -641,8 +641,12 @@ namespace UnityLauncherPro
                 if (DownloadFile(exeURL, tempFile) == true)
                 {
                     // get base version, to use for install path
-                    string outputVersionFolder = "\\" + version.Split('.')[0] + "_" + version.Split('.')[1];
-                    string targetPathArgs = " /D=" + Properties.Settings.Default.rootFolders[Properties.Settings.Default.rootFolders.Count - 1] + outputVersionFolder; ;
+                    // FIXME check if have any paths?
+                    string lastRootFolder = Properties.Settings.Default.rootFolders[Properties.Settings.Default.rootFolders.Count - 1];
+                    // check if ends with / or \
+                    if (lastRootFolder.EndsWith("/") == false && lastRootFolder.EndsWith("\\") == false) lastRootFolder += "/";
+                    string outputVersionFolder = version.Split('.')[0] + "_" + version.Split('.')[1];
+                    string targetPathArgs = " /D=" + lastRootFolder + outputVersionFolder; ;
 
                     // if user clicks NO to UAC, this fails (so added try-catch)
                     try
