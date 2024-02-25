@@ -19,7 +19,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Install 7Zip PowerShell Module
+      - name: Check Commit and Install 7Zip PowerShell Module
         shell: powershell
         
         run: |
@@ -45,6 +45,10 @@ jobs:
       - name: Build Artifact
         shell: cmd
         run: call .\ArtifactBuild.cmd
+
+      - name: Get current date and time
+        id: datetime
+        run: echo "CURRENT_DATETIME=$(date +'%d/%m/%Y %H:%M')" >> $GITHUB_ENV
         
       - name: Create Release
         id: create_release
@@ -53,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{github.run_number}}
-          release_name: Release ${{github.run_number}}
+          release_name: ${{ env.CURRENT_DATETIME }} (${{ github.run_number }})
           body: |
             Automated Release by GitHub Action CI
           draft: false
