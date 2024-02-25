@@ -1990,8 +1990,6 @@ namespace UnityLauncherPro
         bool isInitializing = true; // used to avoid doing things while still starting up
         private void ChkStreamerMode_Checked(object sender, RoutedEventArgs e)
         {
-            if (this.IsActive == false) return; // dont run code on window init
-
             var isChecked = (bool)((CheckBox)sender).IsChecked;
 
             Settings.Default.streamerMode = isChecked;
