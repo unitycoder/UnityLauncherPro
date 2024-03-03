@@ -98,6 +98,12 @@ namespace UnityLauncherPro
 
             // need to load here to get correct window size early
             LoadSettings();
+
+            // set version number
+            if (string.IsNullOrEmpty(Version.Stamp) == false)
+            {
+                lblVersion.Content = "Build: " + Version.Stamp;
+            }
         }
 
         void Start()
