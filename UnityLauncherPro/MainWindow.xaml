@@ -528,7 +528,7 @@
                                 <!-- folders -->
                                 <StackPanel Orientation="Horizontal" Margin="0,4,10,4" VerticalAlignment="Top">
                                     <Label Content="Folders" Foreground="{DynamicResource ThemeButtonForeground}" />
-                                    <Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Browse Editor logs folder">
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Browse Editor logs folder or Right click to open editor.log" MouseRightButtonUp="btnOpenEditorLogsFolder_MouseRightButtonUp">
                                         <Label Content="_Editor Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenPlayerLogs" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenPlayerLogs_Click" ToolTip="Browse Player logs folder">
