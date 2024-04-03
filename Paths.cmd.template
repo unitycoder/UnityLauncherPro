@@ -1,12 +1,4 @@
 @echo off
-:: Set your Visual Studio path here.
-:: TODO: Make visual studio path auto detection.
-
-:: Enterprise path
-SET VISUAL_STUDIO_PATH=%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\msbuild.exe
-
-:: Community path
-::SET VISUAL_STUDIO_PATH=%programfiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe
-
-echo Using Visual Studio path:%VISUAL_STUDIO_PATH%
+REM Set your Visual Studio path here.
+SET VISUAL_STUDIO_PATH="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe"
 @echo on
