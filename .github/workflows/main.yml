@@ -25,7 +25,9 @@ jobs:
         run: |
           # cancel early, if not build commit
           $strVal ='${{ github.event.commits[0].message }}'
-          if($strVal -clike '*#GITBUILD*') 
+          # Convert commit message to a single line if multiline
+          $singleLineStrVal = $strVal -replace "`r`n", " " -replace "`n", " "
+          if($singleLineStrVal -match '#GITBUILD') 
           {
                 Write-Host 'True'
           } else {
