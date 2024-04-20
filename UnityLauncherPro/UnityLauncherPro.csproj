@@ -190,7 +190,13 @@
     <Resource Include="Images\icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+      <!-- PowerShell command to feed current timestamp into version.cs (it is displayed in the app -->
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$pattern = 'public static string Stamp = \&quot;.*?\&quot;;'; $date = Get-Date -Format 'dd-MM-yyyy HH:mm:ss'; $replacement = 'public static string Stamp = \&quot;' + $date + '\&quot;;'; $path = '$(ProjectDir)Version.cs'; $content = Get-Content $path -Raw; $newContent = $content -replace $pattern, $replacement; [System.IO.File]::WriteAllText($path, $newContent, [System.Text.Encoding]::UTF8)&quot;" />
   </Target>
+      <!-- PowerShell command to restore the Stamp string to its initial state -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$pattern = 'public static string Stamp = \&quot;.*?\&quot;;'; $replacement = 'public static string Stamp = \&quot;\&quot;;'; $path = '$(ProjectDir)Version.cs'; $content = Get-Content $path -Raw; $newContent = $content -replace $pattern, $replacement; [System.IO.File]::WriteAllText($path, $newContent, [System.Text.Encoding]::UTF8)&quot;" />
+</Target>
+
 </Project>

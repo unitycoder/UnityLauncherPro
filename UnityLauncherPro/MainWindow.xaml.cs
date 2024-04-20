@@ -416,6 +416,7 @@ namespace UnityLauncherPro
                 txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
                 txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
                 txtCustomThemeFile.Text = Properties.Settings.Default.themeFile;
+                useAlphaReleaseNotesSite.IsChecked = Properties.Settings.Default.useAlphaReleaseNotes;
 
                 chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
                 chkRunAutomatically.IsChecked = Properties.Settings.Default.runAutomatically;
@@ -3621,6 +3622,14 @@ namespace UnityLauncherPro
                 var logFile = Path.Combine(logfolder, "Editor.log");
                 if (File.Exists(logFile) == true) Tools.LaunchExe(logFile);
             }
+        }
+
+        private void UseAlphaReleaseNotes_Checked(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+
+            Settings.Default.useAlphaReleaseNotes = isChecked;
+            Settings.Default.Save();
         }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)

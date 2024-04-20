@@ -591,7 +591,19 @@ namespace UnityLauncherPro
             bool result = false;
             if (string.IsNullOrEmpty(version)) return false;
 
-            var url = Tools.GetUnityReleaseURL(version);
+            //var url = Tools.GetUnityReleaseURL(version);
+            string url = null;
+            if (Properties.Settings.Default.useAlphaReleaseNotes && !version.Contains("6000"))
+            {
+                var closestVersion = Tools.FindNearestVersion(version, MainWindow.unityInstalledVersions.Keys.ToList(), true);
+                if (closestVersion == null) closestVersion = version;
+
+                url = "https://alpha.release-notes.ds.unity3d.com/search?fromVersion=" + closestVersion + "&toVersion=" + version;
+            }
+            else
+            {
+                url = Tools.GetUnityReleaseURL(version);
+            }
             if (string.IsNullOrEmpty(url)) return false;
 
             OpenURL(url);
@@ -981,7 +993,7 @@ namespace UnityLauncherPro
             return version;
         }
 
-        public static string FindNearestVersion(string currentVersion, List<string> allAvailable)
+        public static string FindNearestVersion(string currentVersion, List<string> allAvailable, bool checkBelow = false)
         {
             string result = null;
 
@@ -989,7 +1001,14 @@ namespace UnityLauncherPro
             allAvailable.Add(currentVersion);
 
             // sort list
-            allAvailable.Sort((s1, s2) => VersionAsLong(s2).CompareTo(VersionAsLong(s1)));
+            if (checkBelow)
+            {
+                allAvailable.Sort((s1, s2) => VersionAsLong(s1).CompareTo(VersionAsLong(s2)));
+            }
+            else
+            {
+                allAvailable.Sort((s1, s2) => VersionAsLong(s2).CompareTo(VersionAsLong(s1)));
+            }
 
             // check version above our current version
             int currentIndex = allAvailable.IndexOf(currentVersion);
