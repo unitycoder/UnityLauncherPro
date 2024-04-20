@@ -3597,11 +3597,30 @@ namespace UnityLauncherPro
             Tools.OpenAppdataSpecialFolder("../Roaming/UnityHub/logs/");
         }
 
-        private void btnOpenEditorLogsFolder_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private void txtDownloadFromHash_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            var logfolder = Tools.GetEditorLogsFolder();
-            var logFile = Path.Combine(logfolder, "Editor.log");
-            if (File.Exists(logFile) == true) Tools.LaunchExe(logFile);
+            if (e.Key == Key.Return)
+            {
+                var hash = (((TextBox)sender).Text).Trim();
+                if (string.IsNullOrEmpty(hash) == false)
+                {
+                    var url = Tools.ParseDownloadURLFromWebpage(hash, false, true);
+                    if (string.IsNullOrEmpty(url) == false)
+                    {
+                        Tools.DownloadInBrowser(url, hash, false, true);
+                    }
+                }
+            }
+        }
+
+        private void btnOpenEditorLogsFolder_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Middle)
+            {
+                var logfolder = Tools.GetEditorLogsFolder();
+                var logFile = Path.Combine(logfolder, "Editor.log");
+                if (File.Exists(logFile) == true) Tools.LaunchExe(logFile);
+            }
         }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
