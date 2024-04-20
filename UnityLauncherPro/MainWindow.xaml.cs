@@ -1827,6 +1827,7 @@ namespace UnityLauncherPro
 
         private void BtnAssetPackages_Click(object sender, RoutedEventArgs e)
         {
+            Tools.OpenCustomAssetPath();
             Tools.OpenAppdataSpecialFolder("../Roaming/Unity/Asset Store-5.x");
         }
 

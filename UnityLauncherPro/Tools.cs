@@ -829,7 +829,8 @@ namespace UnityLauncherPro
             else
             {
                 // TODO version here is actually HASH
-                url = $"https://beta.unity3d.com/download/{version}/download.html";
+                string hash = version;
+                url = $"https://beta.unity3d.com/download/{hash}/download.html";
 
                 //Console.WriteLine(url);
 
@@ -838,7 +839,7 @@ namespace UnityLauncherPro
                 //Console.WriteLine(version);
                 if (string.IsNullOrEmpty(version))
                 {
-                    Console.WriteLine("Failed to get version number from hash: " + version);
+                    SetStatus("Failed to get version (" + version + ") number from hash: " + hash);
                     return null;
                 }
             }
@@ -2216,6 +2217,40 @@ public static class UnityLauncherProTools
                 string fullPath = Path.Combine(userSettingsFolder, "ULPSettings.txt");
                 File.WriteAllText(fullPath, customEnvVars);
                 Console.WriteLine(fullPath);
+            }
+        }
+
+        internal static void OpenCustomAssetPath()
+        {
+            // check if custom asset folder is used, then open both *since older versions might have assets in old folder
+            string keyPath = @"SOFTWARE\Unity Technologies\Unity Editor 5.x";
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(keyPath))
+            {
+                if (key == null) return;
+                // Enumerate subkeys
+                foreach (string valueName in key.GetValueNames())
+                {
+                    // Check if the subkey matches the desired pattern
+                    if (Regex.IsMatch(valueName, @"AssetStoreCacheRootPath_h\d+") == false) continue;
+
+                    string customAssetPath = "";
+                    var valueKind = key.GetValueKind(valueName);
+
+                    if (valueKind == RegistryValueKind.Binary)
+                    {
+                        byte[] bytes = (byte[])key.GetValue(valueName);
+                        customAssetPath = Encoding.UTF8.GetString(bytes, 0, bytes.Length - 1);
+                    }
+                    else // should be string then
+                    {
+                        customAssetPath = (string)key.GetValue(valueName);
+                    }
+
+                    if (string.IsNullOrEmpty(customAssetPath) == false && Directory.Exists(customAssetPath))
+                    {
+                        Tools.LaunchExplorer(Path.Combine(customAssetPath, "Asset Store-5.x"));
+                    }
+                }
             }
         }
     } // class
