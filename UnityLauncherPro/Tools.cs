@@ -620,7 +620,7 @@ namespace UnityLauncherPro
         {
             string exeURL = ParseDownloadURLFromWebpage(version, preferFullInstaller, useHash);
 
-            Console.WriteLine("download exeURL= (" + exeURL + ")");
+            //Console.WriteLine("DownloadInBrowser exeURL= '" + exeURL + "'");
 
             if (string.IsNullOrEmpty(exeURL) == false && exeURL.StartsWith("https") == true)
             {
@@ -834,9 +834,10 @@ namespace UnityLauncherPro
 
                 //Console.WriteLine(url);
 
+
                 version = FetchUnityVersionNumberFromHTML(url);
                 //Console.WriteLine(url);
-                //Console.WriteLine(version);
+                //Console.WriteLine("got "+version);
                 if (string.IsNullOrEmpty(version))
                 {
                     SetStatus("Failed to get version (" + version + ") number from hash: " + hash);
@@ -849,7 +850,7 @@ namespace UnityLauncherPro
             string[] lines = sourceHTML.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
             // patch version download assistant finder
-            if (VersionIsPatch(version))
+            if (useHash==false && VersionIsPatch(version))
             {
                 for (int i = 0; i < lines.Length; i++)
                 {
@@ -862,7 +863,7 @@ namespace UnityLauncherPro
                     }
                 }
             }
-            else if (VersionIsArchived(version))
+            else if (useHash == false && VersionIsArchived(version))
             {
                 // archived version download assistant finder
                 for (int i = 0; i < lines.Length; i++)
@@ -911,7 +912,7 @@ namespace UnityLauncherPro
                         }
                         else // hidden download page
                         {
-                            string pattern = @"UnityDownloadAssistant(?:-\d+\.\d+\.\d+b\d+)?\.exe";
+                            string pattern = @"UnityDownloadAssistant(?:-\d+\.\d+\.\d+[bf]\d*)?\.exe";
                             Match match = Regex.Match(lines[i], pattern);
                             if (match.Success)
                             {
@@ -919,7 +920,7 @@ namespace UnityLauncherPro
                                 Regex regex = new Regex(@"(https://beta\.unity3d\.com/download/[a-zA-Z0-9]+/)");
                                 Match match2 = regex.Match(url);
 
-                                Console.WriteLine("source urö: " + url);
+                                //Console.WriteLine("source url: " + url);
 
                                 if (match2.Success)
                                 {
@@ -938,7 +939,7 @@ namespace UnityLauncherPro
             } // alpha or beta
 
             // download full installer instead
-            if (preferFullInstaller)
+            if (useHash == false && preferFullInstaller)
             {
                 exeURL = exeURL.Replace("UnityDownloadAssistant-" + version + ".exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
                 // handle alpha/beta
@@ -962,8 +963,7 @@ namespace UnityLauncherPro
 
             if (string.IsNullOrEmpty(sourceHTML)) return null;
 
-            string pattern = @"\d+\.\d+\.\d+b\d+";
-
+            string pattern = @"\d+\.\d+\.\d+[bf]\d+";
             MatchCollection matches = Regex.Matches(sourceHTML, pattern);
             if (matches.Count > 0)
             {
