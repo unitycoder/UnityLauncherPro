@@ -44,8 +44,12 @@ namespace UnityLauncherPro
             return result;
         }
 
-        public static Updates[] Parse(string items)
+        public static Updates[] Parse(string items, ref List<string> updatesAsString)
         {
+            if (updatesAsString == null)
+                updatesAsString = new List<string>();
+            updatesAsString.Clear();
+
             isDownloadingUnityList = false;
             //SetStatus("Downloading list of Unity versions ... done");
             var receivedList = items.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -68,6 +72,7 @@ namespace UnityLauncherPro
                     u.ReleaseDate = DateTime.ParseExact(row[3], "MM/dd/yyyy", CultureInfo.InvariantCulture);
                     u.Version = versionTemp;
                     releases.Add(versionTemp, u);
+                    updatesAsString.Add(versionTemp);
                 }
 
                 prevVersion = versionTemp;

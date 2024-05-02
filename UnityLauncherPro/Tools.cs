@@ -593,12 +593,17 @@ namespace UnityLauncherPro
 
             //var url = Tools.GetUnityReleaseURL(version);
             string url = null;
-            if (Properties.Settings.Default.useAlphaReleaseNotes && !version.Contains("6000"))
+            bool noAlphaReleaseNotesPage = version.Contains("6000") && !version.Contains("f");
+            if (Properties.Settings.Default.useAlphaReleaseNotes && !noAlphaReleaseNotesPage)
             {
+                //with the alpha release notes, we want a diff between the 2 versions, but the site just shows all the changes inclusive of from
+                // so we need to compare the currently selected version to the one right after it that is available (installed or not)
+                
                 var closestVersion = Tools.FindNearestVersion(version, MainWindow.unityInstalledVersions.Keys.ToList(), true);
-                if (closestVersion == null) closestVersion = version;
+                var getNextVersionToClosest = closestVersion == null ? null : Tools.FindNearestVersion(version, MainWindow.updatesAsStrings);
+                if (getNextVersionToClosest == null) getNextVersionToClosest = version;
 
-                url = "https://alpha.release-notes.ds.unity3d.com/search?fromVersion=" + closestVersion + "&toVersion=" + version;
+                url = "https://alpha.release-notes.ds.unity3d.com/search?fromVersion=" + getNextVersionToClosest + "&toVersion=" + version;
             }
             else
             {
