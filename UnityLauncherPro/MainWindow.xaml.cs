@@ -46,6 +46,7 @@ namespace UnityLauncherPro
         System.Windows.Forms.NotifyIcon notifyIcon;
 
         Updates[] updatesSource;
+        public static List<string> updatesAsStrings;
 
         string _filterString = null;
         bool multiWordSearch = false;
@@ -744,7 +745,7 @@ namespace UnityLauncherPro
             var items = await task;
             //Console.WriteLine("CallGetUnityUpdates=" + items == null);
             if (items == null) return;
-            updatesSource = GetUnityUpdates.Parse(items);
+            updatesSource = GetUnityUpdates.Parse(items, ref updatesAsStrings);
             if (updatesSource == null) return;
             dataGridUpdates.ItemsSource = updatesSource;
         }
@@ -1034,7 +1035,7 @@ namespace UnityLauncherPro
                     var items = await task;
                     if (task.IsCompleted == false || task.IsFaulted == true) return;
                     if (items == null) return;
-                    updatesSource = GetUnityUpdates.Parse(items);
+                    updatesSource = GetUnityUpdates.Parse(items, ref updatesAsStrings);
                     if (updatesSource == null) return;
                     dataGridUpdates.ItemsSource = updatesSource;
                 }
