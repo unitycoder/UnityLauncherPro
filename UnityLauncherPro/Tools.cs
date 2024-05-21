@@ -585,26 +585,34 @@ namespace UnityLauncherPro
             return version.Contains("c1");  
         }
 
+
+        //as of 21 May 2021, only final 'f' versions are now available on the alpha release notes for Unity 2018 and newer. 2017 and 5 still have patch 'p' versions as well.
+        public static bool HasAlphaReleaseNotes(string version) => version.Contains("f") || version.Contains("p");
+
         // open release notes page in browser
         public static bool OpenReleaseNotes(string version)
         {
             bool result = false;
             if (string.IsNullOrEmpty(version)) return false;
 
-            //var url = Tools.GetUnityReleaseURL(version);
             string url = null;
-            bool noAlphaReleaseNotesPage = version.Contains("6000") && !version.Contains("f");
-            if (Properties.Settings.Default.useAlphaReleaseNotes && !noAlphaReleaseNotesPage)
+            if (Properties.Settings.Default.useAlphaReleaseNotes && HasAlphaReleaseNotes(version))
             {
                 //with the alpha release notes, we want a diff between an installed version and the one selected, but the site just shows all the changes inclusive of "fromVersion=vers"
-                //so if we find a good installed candidate, we need the version just above it (installed or not)
+                //so if we find a good installed candidate, we need the version just above it (installed or not) that has release notes page
                 var comparisonVersion = version;
                 var closestInstalledVersion = Tools.FindNearestVersion(version, MainWindow.unityInstalledVersions.Keys.ToList(), true);
                 if (closestInstalledVersion != null)
                 {
                     comparisonVersion = closestInstalledVersion;
-                    var nextVersionAfterInstalled = Tools.FindNearestVersion(closestInstalledVersion, MainWindow.updatesAsStrings);
-                    if (nextVersionAfterInstalled != null) comparisonVersion = nextVersionAfterInstalled;
+                    string nextFinalVersionAfterInstalled = closestInstalledVersion;
+                    
+                    //wwe need a loop here, to find the nearest final version. It might be better to warn the user about this before opening the page.
+                    do
+                        nextFinalVersionAfterInstalled = Tools.FindNearestVersion(nextFinalVersionAfterInstalled, MainWindow.updatesAsStrings);
+                    while (nextFinalVersionAfterInstalled != null && !HasAlphaReleaseNotes(nextFinalVersionAfterInstalled));
+
+                    if (nextFinalVersionAfterInstalled != null) comparisonVersion = nextFinalVersionAfterInstalled;
 
                 }
 
