@@ -582,7 +582,7 @@ namespace UnityLauncherPro
 
         public static bool VersionIsChinese(string version)
         {
-            return version.Contains("c1");
+            return version.Contains("c1");  
         }
 
         // open release notes page in browser
@@ -596,14 +596,19 @@ namespace UnityLauncherPro
             bool noAlphaReleaseNotesPage = version.Contains("6000") && !version.Contains("f");
             if (Properties.Settings.Default.useAlphaReleaseNotes && !noAlphaReleaseNotesPage)
             {
-                //with the alpha release notes, we want a diff between the 2 versions, but the site just shows all the changes inclusive of from
-                // so we need to compare the currently selected version to the one right after it that is available (installed or not)
-                
-                var closestVersion = Tools.FindNearestVersion(version, MainWindow.unityInstalledVersions.Keys.ToList(), true);
-                var getNextVersionToClosest = closestVersion == null ? null : Tools.FindNearestVersion(version, MainWindow.updatesAsStrings);
-                if (getNextVersionToClosest == null) getNextVersionToClosest = version;
+                //with the alpha release notes, we want a diff between an installed version and the one selected, but the site just shows all the changes inclusive of "fromVersion=vers"
+                //so if we find a good installed candidate, we need the version just above it (installed or not)
+                var comparisonVersion = version;
+                var closestInstalledVersion = Tools.FindNearestVersion(version, MainWindow.unityInstalledVersions.Keys.ToList(), true);
+                if (closestInstalledVersion != null)
+                {
+                    comparisonVersion = closestInstalledVersion;
+                    var nextVersionAfterInstalled = Tools.FindNearestVersion(closestInstalledVersion, MainWindow.updatesAsStrings);
+                    if (nextVersionAfterInstalled != null) comparisonVersion = nextVersionAfterInstalled;
 
-                url = "https://alpha.release-notes.ds.unity3d.com/search?fromVersion=" + getNextVersionToClosest + "&toVersion=" + version;
+                }
+
+                url = "https://alpha.release-notes.ds.unity3d.com/search?fromVersion=" + comparisonVersion + "&toVersion=" + version;
             }
             else
             {
@@ -1004,7 +1009,8 @@ namespace UnityLauncherPro
             string result = null;
 
             // add current version to list, to sort it with others
-            allAvailable.Add(currentVersion);
+            if (!allAvailable.Contains(currentVersion))
+                allAvailable.Add(currentVersion);
 
             // sort list
             if (checkBelow)
