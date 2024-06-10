@@ -1014,6 +1014,9 @@ namespace UnityLauncherPro
 
         public static string FindNearestVersion(string currentVersion, List<string> allAvailable, bool checkBelow = false)
         {
+            if (allAvailable == null)
+                return null;
+
             string result = null;
 
             // add current version to list, to sort it with others

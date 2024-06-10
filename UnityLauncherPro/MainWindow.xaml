@@ -48,8 +48,12 @@
             <!-- Tab: Projects-->
             <TabItem Header="Projects" Style="{DynamicResource TabItemStyle1}" Padding="0,0,0,0" Margin="-1,1,1,-1" BorderBrush="{x:Null}">
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="185*"/>
+                        <ColumnDefinition Width="693*"/>
+                    </Grid.ColumnDefinitions>
                     <!-- search box -->
-                    <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20"  >
+                    <Grid Background="{DynamicResource ThemeTextBoxBackground}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Margin="6,5,0,0" Height="20" Grid.ColumnSpan="2"  >
                         <!--<TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Visibility="{Binding Text.IsEmpty, Converter={StaticResource MyBoolToVisibilityConverter}, ElementName=txtSearchBox}" Height="24" />-->
                         <TextBlock Margin="3,2" MinWidth="100" Text="Search" Foreground="{DynamicResource ThemeSearchPlaceholder}" Height="24">
                             <TextBlock.Style>
@@ -84,10 +88,10 @@
                         </Button>
                     </Grid>
 
-                    <Button Style="{StaticResource CustomButton}" ToolTip="Browse and add existing project to list" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="0,4,38,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" TabIndex="10" />
-                    <Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="26" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshProjectList_Click" TabIndex="11"/>
+                    <Button Style="{StaticResource CustomButton}" ToolTip="Browse and add existing project to list" x:Name="btnAddProjectFolder" Content="Add Project.." Height="22" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="0,4,38,0" Click="BtnAddProjectFolder_Click" BorderBrush="{x:Null}" TabIndex="10" Grid.Column="1" />
+                    <Button Style="{StaticResource CustomButton}" ToolTip="Refresh list (F5)" x:Name="btnRefreshProjectList" Content="⟳" Height="22" Width="26" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="BtnRefreshProjectList_Click" TabIndex="11" Grid.Column="1"/>
 
-                    <DataGrid x:Name="gridRecent" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" ContextMenuOpening="GridRecent_ContextMenuOpening" BeginningEdit="GridRecent_BeginningEdit" RowHeight="21" ColumnReordered="GridRecent_ColumnReordered" Sorting="gridRecent_Sorting" >
+                    <DataGrid x:Name="gridRecent" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" SelectionMode="Single" Margin="4,30,2,42" CanUserAddRows="False" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" AutoGenerateColumns="False" PreviewKeyDown="GridRecent_PreviewKeyDown" Loaded="GridRecent_Loaded" TabIndex="2" CellEditEnding="GridRecent_CellEditEnding" PreviewMouseDoubleClick="GridRecent_PreviewMouseDoubleClick" ContextMenuOpening="GridRecent_ContextMenuOpening" BeginningEdit="GridRecent_BeginningEdit" RowHeight="21" ColumnReordered="GridRecent_ColumnReordered" Sorting="gridRecent_Sorting" Grid.ColumnSpan="2" >
 
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
@@ -241,7 +245,7 @@
                     </DataGrid>
 
                     <!-- bottom buttoms row -->
-                    <Grid VerticalAlignment="Bottom" Margin="4,0,8,5">
+                    <Grid VerticalAlignment="Bottom" Margin="4,0,8,5" Grid.ColumnSpan="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="14*" />
                             <ColumnDefinition Width="17*" />
@@ -492,7 +496,8 @@
                             <ColumnDefinition Width="20*" />
                             <ColumnDefinition Width="18*" />
                             <ColumnDefinition Width="28*" />
-                            <ColumnDefinition Width="26*" />
+                            <ColumnDefinition Width="14*" />
+                            <ColumnDefinition Width="18*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="32" />
@@ -507,7 +512,12 @@
                             <Label Content="Download &amp; Install" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
                         <Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
-                            <Label Content="Release _Notes" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                        </Button>
+                        <Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite_Copy"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
+                            <Label Content="Release Notes" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Control}, Mode=FindAncestor}}" />
+                        </Button>
+                        <Button Grid.Column="4" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite_Copy2"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" ToolTip="Show All Release notes between this version on the older, closest one installed.&lt;br&gt;Only works for final versions." >
+                            <Label Content="Cumulated Release Notes" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Control}, Mode=FindAncestor}}" />
                         </Button>
                     </Grid>
                 </Grid>

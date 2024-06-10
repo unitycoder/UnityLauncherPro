@@ -46,7 +46,7 @@ namespace UnityLauncherPro
         System.Windows.Forms.NotifyIcon notifyIcon;
 
         Updates[] updatesSource;
-        public static List<string> updatesAsStrings;
+        public static List<string> updatesAsStrings = new List<string>();
 
         string _filterString = null;
         bool multiWordSearch = false;
