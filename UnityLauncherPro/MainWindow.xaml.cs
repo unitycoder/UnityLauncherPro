@@ -289,6 +289,8 @@ namespace UnityLauncherPro
         {
             _filterString = txtSearchBoxUpdates.Text;
             ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUpdates.ItemsSource);
+            if (collection == null) return;
+
             collection.Filter = UpdatesFilter;
             if (dataGridUpdates.Items.Count > 0)
             {
@@ -360,7 +362,7 @@ namespace UnityLauncherPro
             bool matchBetas = checkedBetas && Tools.IsBeta(unity.Version);
 
             // match search string and some radiobutton
-            if (haveSearchString)
+            if (haveSearchString == true)
             {
                 if (checkedAlls) return matchString;
                 if (checkedLTSs) return matchString && matchLTS;
@@ -1297,6 +1299,13 @@ namespace UnityLauncherPro
                 case Key.End: // override end
                     // if edit mode, dont override keys
                     if (IsEditingCell(gridRecent) == true) return;
+                    // if in args column, dont jump to end of list, but end of this field
+                    if (gridRecent.CurrentCell.Column.DisplayIndex == 4)
+                    {
+                        // start editing this cell
+                        gridRecent.BeginEdit();
+                        return;
+                    }
                     gridRecent.SelectedIndex = gridRecent.Items.Count - 1;
                     gridRecent.ScrollIntoView(gridRecent.SelectedItem);
                     e.Handled = true;
