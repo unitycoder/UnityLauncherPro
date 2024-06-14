@@ -140,6 +140,7 @@ namespace UnityLauncherPro
 
             // clear updates grid
             dataGridUpdates.Items.Clear();
+            dataGridUpdates.SelectionChanged += DataGridUpdates_SelectionChanged;
 
             // clear buildreport grids
             gridBuildReport.Items.Clear();
@@ -175,6 +176,18 @@ namespace UnityLauncherPro
             //themeEditorWindow.Show();
 
             isInitializing = false;
+        }
+
+        private void DataGridUpdates_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedUp = GetSelectedUpdate();
+            bool showCumulative = false;
+            if (selectedUp != null)
+            {
+                var unityVer = GetSelectedUpdate().Version;
+                showCumulative = Tools.HasAlphaReleaseNotes(unityVer);
+            }
+            btnShowCumulatedReleaseNotes.IsEnabled = showCumulative;
         }
 
         // bring old window to front, but needs matching appname.. https://stackoverflow.com/a/36804161/5452781
@@ -1540,6 +1553,12 @@ namespace UnityLauncherPro
         {
             var unity = GetSelectedUpdate();
             Tools.OpenReleaseNotes(unity?.Version);
+        }
+
+        private void BtnShowCumulatedReleaseNotes_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            Tools.OpenReleaseNotes_Cumulative(unity?.Version);
         }
 
         private void ChkMinimizeToTaskbar_CheckedChanged(object sender, RoutedEventArgs e)

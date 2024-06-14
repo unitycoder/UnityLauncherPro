@@ -512,12 +512,10 @@
                             <Label Content="Download &amp; Install" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                         </Button>
                         <Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
-                        </Button>
-                        <Button Grid.Column="3" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite_Copy"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" >
                             <Label Content="Release Notes" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Control}, Mode=FindAncestor}}" />
                         </Button>
-                        <Button Grid.Column="4" Style="{StaticResource CustomButton}" x:Name="btnOpenWebsite_Copy2"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnOpenWebsite_Click" ToolTip="Show All Release notes between this version on the older, closest one installed.&lt;br&gt;Only works for final versions." >
-                            <Label Content="Cumulated Release Notes" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Control}, Mode=FindAncestor}}" />
+                        <Button Grid.Column="4" Style="{StaticResource CustomButton}" x:Name="btnShowCumulatedReleaseNotes"  Margin="5,0,0,0" BorderBrush="{x:Null}" Click="BtnShowCumulatedReleaseNotes_Click" ToolTip="Show all Release Notes between the selected version and the older, closest one installed. Only works for final and patch versions." >
+                            <Label Content="Cumulative Release Notes" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Control}, Mode=FindAncestor}}" />
                         </Button>
                     </Grid>
                 </Grid>
