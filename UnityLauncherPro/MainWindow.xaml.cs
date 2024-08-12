@@ -131,7 +131,7 @@ namespace UnityLauncherPro
             //Properties.Settings.Default.projectPaths = null;
             //Properties.Settings.Default.Save();
 
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked);
 
             Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
 
@@ -408,6 +408,7 @@ namespace UnityLauncherPro
                 chkQuitAfterOpen.IsChecked = Properties.Settings.Default.closeAfterProject;
                 chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
                 chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
+                chkGetGitBranchRecursively.IsChecked = Properties.Settings.Default.searchGitFolderRecursivly;
                 chkCheckPlasticBranch.IsChecked = Properties.Settings.Default.checkPlasticBranch;
                 chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
                 chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
@@ -777,7 +778,7 @@ namespace UnityLauncherPro
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Settings.Default.projectPaths);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked);
             gridRecent.ItemsSource = projectsSource;
 
             // fix sorting on refresh
@@ -852,7 +853,7 @@ namespace UnityLauncherPro
             p.Version = Tools.GetProjectVersion(folder);
             p.Arguments = Tools.ReadCustomProjectData(folder, launcherArgumentsFile);
             if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.GetTargetPlatform(folder);
-            if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
+            if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder, (bool)chkGetGitBranchRecursively.IsChecked);
             return p;
         }
 
@@ -1586,6 +1587,17 @@ namespace UnityLauncherPro
             gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
             RefreshRecentProjects();
         }
+
+        private void ChkGetGitBranchRecursively_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false)
+                return; // dont run code on window init
+
+            Settings.Default.searchGitFolderRecursivly = (bool)chkGetGitBranchRecursively.IsChecked;
+            Settings.Default.Save();           
+            RefreshRecentProjects();
+        }
+
 
         private void ChkQuitAfterOpen_CheckedChanged(object sender, RoutedEventArgs e)
         {
@@ -2930,7 +2942,7 @@ namespace UnityLauncherPro
                     var tempProj = projectsSource[i];
                     tempProj.Modified = Tools.GetLastModifiedTime(proj.Path);
                     tempProj.Version = Tools.GetProjectVersion(proj.Path);
-                    tempProj.GITBranch = Tools.ReadGitBranchInfo(proj.Path);
+                    tempProj.GITBranch = Tools.ReadGitBranchInfo(proj.Path, false);
                     tempProj.TargetPlatform = Tools.GetTargetPlatform(proj.Path);
                     projectsSource[i] = tempProj;
                     gridRecent.Items.Refresh();
