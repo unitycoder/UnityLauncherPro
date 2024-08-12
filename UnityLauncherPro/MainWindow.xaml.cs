@@ -2525,9 +2525,20 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(projPath) == true) return;
 
             var psPath = Path.Combine(projPath, "ProjectSettings", "ProjectSettings.asset");
-            if (File.Exists(psPath) == false) return;
+            if (File.Exists(psPath) == false)
+            {
+                Console.WriteLine("Project settings not found: " + psPath);
+                return;
+            }
             // read project settings
             var rows = File.ReadAllLines(psPath);
+
+            // NOTE old projects have binary version of this file, so cannot parse it, check if first line contains YAML
+            if (rows[0].IndexOf("YAML") == -1)
+            {
+                Console.WriteLine("Project settings file is binary, cannot parse: " + psPath);
+                return;
+            }
 
             // search company and product name rows
             for (int i = 0, len = rows.Length; i < len; i++)
