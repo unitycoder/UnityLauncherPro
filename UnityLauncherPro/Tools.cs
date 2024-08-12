@@ -172,7 +172,14 @@ namespace UnityLauncherPro
         public static string GetFileVersionData(string path)
         {
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(path);
-            var res = fvi.ProductName.Replace("(64-bit)", "").Replace("(32-bit)", "").Replace("Unity", "").Trim();
+            var ver = fvi.ProductName;
+            if (string.IsNullOrEmpty(ver) == true)
+            {
+                ver = fvi.FileDescription;
+                if (string.IsNullOrEmpty(ver) == true) return null;
+                ver = ver.Replace("Installer", "").Trim();
+            }
+            var res = ver.Replace("(64-bit)", "").Replace("(32-bit)", "").Replace("Unity", "").Trim();
             return res;
         }
 

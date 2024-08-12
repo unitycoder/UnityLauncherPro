@@ -287,7 +287,7 @@ namespace UnityLauncherPro
 
         void FilterUpdates()
         {
-            _filterString = txtSearchBoxUpdates.Text;
+            _filterString = txtSearchBoxUpdates.Text.Trim();
             ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUpdates.ItemsSource);
             if (collection == null) return;
 
