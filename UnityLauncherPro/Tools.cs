@@ -1252,20 +1252,53 @@ namespace UnityLauncherPro
         /// </summary>
         /// <param name="projectPath"></param>
         /// <returns></returns>
-        public static string ReadGitBranchInfo(string projectPath)
+        public static string ReadGitBranchInfo(string projectPath, bool searchParentFolders)
         {
             string results = null;
-            string dirName = Path.Combine(projectPath, ".git");
-            if (Directory.Exists(dirName))
+
+            if (searchParentFolders)
             {
-                string branchFile = Path.Combine(dirName, "HEAD");
-                if (File.Exists(branchFile))
+                DirectoryInfo directoryInfo = new DirectoryInfo(projectPath);
+
+                while (directoryInfo != null)
                 {
-                    // removes extra end of line
-                    results = string.Join(" ", File.ReadAllLines(branchFile));
-                    // get branch only
-                    int pos = results.LastIndexOf("/") + 1;
-                    results = results.Substring(pos, results.Length - pos);
+                    string dirName = Path.Combine(directoryInfo.FullName, ".git");
+
+                    if (Directory.Exists(dirName))
+                    {
+                        string branchFile = Path.Combine(dirName, "HEAD");
+                        if (File.Exists(branchFile))
+                        {
+                            // removes extra end of line
+                            results = string.Join(" ", File.ReadAllLines(branchFile));
+                            // get branch only
+                            int pos = results.LastIndexOf("/") + 1;
+                            results = results.Substring(pos, results.Length - pos);
+                            return results;
+                        }
+                    }
+                    directoryInfo = directoryInfo.Parent;
+                }
+            }
+            else
+            {
+                string dirName = Path.Combine(projectPath, ".git");
+                if (Directory.Exists(dirName))
+
+
+                {
+                    string branchFile = Path.Combine(dirName, "HEAD");
+                    if (File.Exists(branchFile))
+
+                    {
+                        // removes extra end of line
+                        results = string.Join(" ", File.ReadAllLines(branchFile));
+                        // get branch only
+                        int pos = results.LastIndexOf("/") + 1;
+                        results = results.Substring(pos, results.Length - pos);
+
+                    }
+
                 }
             }
             return results;

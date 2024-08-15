@@ -8,697 +8,570 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace UnityLauncherPro.Properties
-{
-
-
+namespace UnityLauncherPro.Properties {
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
-
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
-        public static Settings Default
-        {
-            get
-            {
+        
+        public static Settings Default {
+            get {
                 return defaultInstance;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("880")]
-        public int windowWidth
-        {
-            get
-            {
+        public int windowWidth {
+            get {
                 return ((int)(this["windowWidth"]));
             }
-            set
-            {
+            set {
                 this["windowWidth"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("650")]
-        public int windowHeight
-        {
-            get
-            {
+        public int windowHeight {
+            get {
                 return ((int)(this["windowHeight"]));
             }
-            set
-            {
+            set {
                 this["windowHeight"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool minimizeToTaskbar
-        {
-            get
-            {
+        public bool minimizeToTaskbar {
+            get {
                 return ((bool)(this["minimizeToTaskbar"]));
             }
-            set
-            {
+            set {
                 this["minimizeToTaskbar"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool registerExplorerMenu
-        {
-            get
-            {
+        public bool registerExplorerMenu {
+            get {
                 return ((bool)(this["registerExplorerMenu"]));
             }
-            set
-            {
+            set {
                 this["registerExplorerMenu"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool closeAfterProject
-        {
-            get
-            {
+        public bool closeAfterProject {
+            get {
                 return ((bool)(this["closeAfterProject"]));
             }
-            set
-            {
+            set {
                 this["closeAfterProject"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool closeAfterExplorer
-        {
-            get
-            {
+        public bool closeAfterExplorer {
+            get {
                 return ((bool)(this["closeAfterExplorer"]));
             }
-            set
-            {
+            set {
                 this["closeAfterExplorer"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool showArgumentsColumn
-        {
-            get
-            {
+        public bool showArgumentsColumn {
+            get {
                 return ((bool)(this["showArgumentsColumn"]));
             }
-            set
-            {
+            set {
                 this["showArgumentsColumn"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool showGitBranchColumn
-        {
-            get
-            {
+        public bool showGitBranchColumn {
+            get {
                 return ((bool)(this["showGitBranchColumn"]));
             }
-            set
-            {
+            set {
                 this["showGitBranchColumn"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public int[] gridColumnWidths
-        {
-            get
-            {
+        public int[] gridColumnWidths {
+            get {
                 return ((int[])(this["gridColumnWidths"]));
             }
-            set
-            {
+            set {
                 this["gridColumnWidths"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool showProjectsMissingFolder
-        {
-            get
-            {
+        public bool showProjectsMissingFolder {
+            get {
                 return ((bool)(this["showProjectsMissingFolder"]));
             }
-            set
-            {
+            set {
                 this["showProjectsMissingFolder"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool AllowSingleInstanceOnly
-        {
-            get
-            {
+        public bool AllowSingleInstanceOnly {
+            get {
                 return ((bool)(this["AllowSingleInstanceOnly"]));
             }
-            set
-            {
+            set {
                 this["AllowSingleInstanceOnly"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string preferredVersion
-        {
-            get
-            {
+        public string preferredVersion {
+            get {
                 return ((string)(this["preferredVersion"]));
             }
-            set
-            {
+            set {
                 this["preferredVersion"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string newProjectsRoot
-        {
-            get
-            {
+        public string newProjectsRoot {
+            get {
                 return ((string)(this["newProjectsRoot"]));
             }
-            set
-            {
+            set {
                 this["newProjectsRoot"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool askNameForQuickProject
-        {
-            get
-            {
+        public bool askNameForQuickProject {
+            get {
                 return ((bool)(this["askNameForQuickProject"]));
             }
-            set
-            {
+            set {
                 this["askNameForQuickProject"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool enableProjectRename
-        {
-            get
-            {
+        public bool enableProjectRename {
+            get {
                 return ((bool)(this["enableProjectRename"]));
             }
-            set
-            {
+            set {
                 this["enableProjectRename"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool streamerMode
-        {
-            get
-            {
+        public bool streamerMode {
+            get {
                 return ((bool)(this["streamerMode"]));
             }
-            set
-            {
+            set {
                 this["streamerMode"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool showTargetPlatform
-        {
-            get
-            {
+        public bool showTargetPlatform {
+            get {
                 return ((bool)(this["showTargetPlatform"]));
             }
-            set
-            {
+            set {
                 this["showTargetPlatform"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string webglBuildPath
-        {
-            get
-            {
+        public string webglBuildPath {
+            get {
                 return ((string)(this["webglBuildPath"]));
             }
-            set
-            {
+            set {
                 this["webglBuildPath"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool useCustomTheme
-        {
-            get
-            {
+        public bool useCustomTheme {
+            get {
                 return ((bool)(this["useCustomTheme"]));
             }
-            set
-            {
+            set {
                 this["useCustomTheme"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("theme.ini")]
-        public string themeFile
-        {
-            get
-            {
+        public string themeFile {
+            get {
                 return ((string)(this["themeFile"]));
             }
-            set
-            {
+            set {
                 this["themeFile"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool enablePlatformSelection
-        {
-            get
-            {
+        public bool enablePlatformSelection {
+            get {
                 return ((bool)(this["enablePlatformSelection"]));
             }
-            set
-            {
+            set {
                 this["enablePlatformSelection"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool runAutomatically
-        {
-            get
-            {
+        public bool runAutomatically {
+            get {
                 return ((bool)(this["runAutomatically"]));
             }
-            set
-            {
+            set {
                 this["runAutomatically"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool useCustomLastModified
-        {
-            get
-            {
+        public bool useCustomLastModified {
+            get {
                 return ((bool)(this["useCustomLastModified"]));
             }
-            set
-            {
+            set {
                 this["useCustomLastModified"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("dd/MM/yyyy HH:mm:ss")]
-        public string customDateFormat
-        {
-            get
-            {
+        public string customDateFormat {
+            get {
                 return ((string)(this["customDateFormat"]));
             }
-            set
-            {
+            set {
                 this["customDateFormat"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool useHumandFriendlyLastModified
-        {
-            get
-            {
+        public bool useHumandFriendlyLastModified {
+            get {
                 return ((bool)(this["useHumandFriendlyLastModified"]));
             }
-            set
-            {
+            set {
                 this["useHumandFriendlyLastModified"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public int[] recentColumnsOrder
-        {
-            get
-            {
+        public int[] recentColumnsOrder {
+            get {
                 return ((int[])(this["recentColumnsOrder"]));
             }
-            set
-            {
+            set {
                 this["recentColumnsOrder"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public int[] gridColumnWidthsBuildReport
-        {
-            get
-            {
+        public int[] gridColumnWidthsBuildReport {
+            get {
                 return ((int[])(this["gridColumnWidthsBuildReport"]));
             }
-            set
-            {
+            set {
                 this["gridColumnWidthsBuildReport"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool runAutomaticallyMinimized
-        {
-            get
-            {
+        public bool runAutomaticallyMinimized {
+            get {
                 return ((bool)(this["runAutomaticallyMinimized"]));
             }
-            set
-            {
+            set {
                 this["runAutomaticallyMinimized"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color")]
-        public string adbLogCatArgs
-        {
-            get
-            {
+        public string adbLogCatArgs {
+            get {
                 return ((string)(this["adbLogCatArgs"]));
             }
-            set
-            {
+            set {
                 this["adbLogCatArgs"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int projectName
-        {
-            get
-            {
+        public int projectName {
+            get {
                 return ((int)(this["projectName"]));
             }
-            set
-            {
+            set {
                 this["projectName"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string templatePackagesFolder
-        {
-            get
-            {
+        public string templatePackagesFolder {
+            get {
                 return ((string)(this["templatePackagesFolder"]));
             }
-            set
-            {
+            set {
                 this["templatePackagesFolder"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("win64")]
-        public string newProjectPlatform
-        {
-            get
-            {
+        public string newProjectPlatform {
+            get {
                 return ((string)(this["newProjectPlatform"]));
             }
-            set
-            {
+            set {
                 this["newProjectPlatform"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool searchProjectPathAlso
-        {
-            get
-            {
+        public bool searchProjectPathAlso {
+            get {
                 return ((bool)(this["searchProjectPathAlso"]));
             }
-            set
-            {
+            set {
                 this["searchProjectPathAlso"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool checkPlasticBranch
-        {
-            get
-            {
+        public bool checkPlasticBranch {
+            get {
                 return ((bool)(this["checkPlasticBranch"]));
             }
-            set
-            {
+            set {
                 this["checkPlasticBranch"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string shortcutBatchFileFolder
-        {
-            get
-            {
+        public string shortcutBatchFileFolder {
+            get {
                 return ((string)(this["shortcutBatchFileFolder"]));
             }
-            set
-            {
+            set {
                 this["shortcutBatchFileFolder"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
             "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
             "tring>C:\\Program Files\\</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection rootFolders
-        {
-            get
-            {
+        public global::System.Collections.Specialized.StringCollection rootFolders {
+            get {
                 return ((global::System.Collections.Specialized.StringCollection)(this["rootFolders"]));
             }
-            set
-            {
+            set {
                 this["rootFolders"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool useInitScript
-        {
-            get
-            {
+        public bool useInitScript {
+            get {
                 return ((bool)(this["useInitScript"]));
             }
-            set
-            {
+            set {
                 this["useInitScript"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("50000")]
-        public int webglPort
-        {
-            get
-            {
+        public int webglPort {
+            get {
                 return ((int)(this["webglPort"]));
             }
-            set
-            {
+            set {
                 this["webglPort"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
             "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" />")]
-        public global::System.Collections.Specialized.StringCollection projectPaths
-        {
-            get
-            {
+        public global::System.Collections.Specialized.StringCollection projectPaths {
+            get {
                 return ((global::System.Collections.Specialized.StringCollection)(this["projectPaths"]));
             }
-            set
-            {
+            set {
                 this["projectPaths"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool override40ProjectCount
-        {
-            get
-            {
+        public bool override40ProjectCount {
+            get {
                 return ((bool)(this["override40ProjectCount"]));
             }
-            set
-            {
+            set {
                 this["override40ProjectCount"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("50")]
-        public int maxProjectCount
-        {
-            get
-            {
+        public int maxProjectCount {
+            get {
                 return ((int)(this["maxProjectCount"]));
             }
-            set
-            {
+            set {
                 this["maxProjectCount"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/E" +
             "ditor/InitializeProject.cs")]
-        public string customInitFileURL
-        {
-            get
-            {
+        public string customInitFileURL {
+            get {
                 return ((string)(this["customInitFileURL"]));
             }
-            set
-            {
+            set {
                 this["customInitFileURL"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string currentSortColumn
-        {
-            get
-            {
+        public string currentSortColumn {
+            get {
                 return ((string)(this["currentSortColumn"]));
             }
-            set
-            {
+            set {
                 this["currentSortColumn"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool currentSortDirectionAscending
-        {
-            get
-            {
+        public bool currentSortDirectionAscending {
+            get {
                 return ((bool)(this["currentSortDirectionAscending"]));
             }
-            set
-            {
+            set {
                 this["currentSortDirectionAscending"] = value;
             }
         }
-
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool searchGitFolderRecursivly {
+            get {
+                return ((bool)(this["searchGitFolderRecursivly"]));
+            }
+            set {
+                this["searchGitFolderRecursivly"] = value;
+            }
+        }
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool useAlphaReleaseNotes
-        {
-            get
-            {
+        public bool useAlphaReleaseNotes {
+            get {
                 return ((bool)(this["useAlphaReleaseNotes"]));
             }
-            set
-            {
+            set {
                 this["useAlphaReleaseNotes"] = value;
             }
         }
