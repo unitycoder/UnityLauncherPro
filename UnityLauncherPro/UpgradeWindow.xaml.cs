@@ -106,6 +106,20 @@ namespace UnityLauncherPro
             Tools.OpenReleaseNotes(txtCurrentVersion.Text);
         }
 
+        
+        private void BtnDownloadEditor_Click(object sender, RoutedEventArgs e)
+        {
+            string url = Tools.GetUnityReleaseURL(txtCurrentVersion.Text);
+            if (string.IsNullOrEmpty(url) == false)
+            {
+                Tools.DownloadInBrowser(url, txtCurrentVersion.Text, true);
+            }
+            else
+            {
+                Console.WriteLine("Failed getting Unity Installer URL for " + txtCurrentVersion.Text);
+            }
+        }
+
         private void BtnDownload_Click(object sender, RoutedEventArgs e)
         {
             string url = Tools.GetUnityReleaseURL(txtCurrentVersion.Text);
