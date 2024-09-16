@@ -590,14 +590,14 @@ namespace UnityLauncherPro
 
         public static bool VersionIsChinese(string version)
         {
-            return version.Contains("c1");  
+            return version.Contains("c1");
         }
 
 
         //as of 21 May 2021, only final 'f' versions are now available on the alpha release notes for Unity 2018 and newer. 2017 and 5 still have patch 'p' versions as well.
         public static bool HasAlphaReleaseNotes(string version) => VersionIsArchived(version) || VersionIsPatch(version);
 
-        public static string GetAlphaReleaseNotesURL(string fromVersion, string toVersion = null) 
+        public static string GetAlphaReleaseNotesURL(string fromVersion, string toVersion = null)
             => "https://alpha.release-notes.ds.unity3d.com/search?fromVersion=" + fromVersion + "&toVersion=" + (toVersion != null ? toVersion : fromVersion);
 
         // open release notes page in browser
@@ -606,7 +606,7 @@ namespace UnityLauncherPro
             bool result = false;
             if (string.IsNullOrEmpty(version)) return false;
             string url = null;
-            if(Properties.Settings.Default.useAlphaReleaseNotes && HasAlphaReleaseNotes(version))
+            if (Properties.Settings.Default.useAlphaReleaseNotes && HasAlphaReleaseNotes(version))
             {
                 url = GetAlphaReleaseNotesURL(version);
             }
@@ -644,8 +644,8 @@ namespace UnityLauncherPro
                 if (nextFinalVersionAfterInstalled != null) comparisonVersion = nextFinalVersionAfterInstalled;
 
             }
-            url = GetAlphaReleaseNotesURL(comparisonVersion,version);
-            
+            url = GetAlphaReleaseNotesURL(comparisonVersion, version);
+
             OpenURL(url);
             result = true;
             return result;
@@ -695,8 +695,10 @@ namespace UnityLauncherPro
                     // get base version, to use for install path
                     // FIXME check if have any paths?
                     string lastRootFolder = Properties.Settings.Default.rootFolders[Properties.Settings.Default.rootFolders.Count - 1];
+
                     // check if ends with / or \
-                    if (lastRootFolder.EndsWith("/") == false && lastRootFolder.EndsWith("\\") == false) lastRootFolder += "/";
+                    if (lastRootFolder.EndsWith("/") == false && lastRootFolder.EndsWith("\\") == false) lastRootFolder += "\\";
+
                     string outputVersionFolder = version.Split('.')[0] + "_" + version.Split('.')[1];
                     string targetPathArgs = " /D=" + lastRootFolder + outputVersionFolder; ;
 
