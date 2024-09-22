@@ -2008,7 +2008,21 @@ public static class UnityLauncherProTools
                         // take process id from unity, if have it (then webserver closes automatically when unity is closed)
                         var proc = ProcessHandler.Get(proj.Path);
                         int pid = proc == null ? -1 : proc.Id;
-                        var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+                        string param = null;
+
+                        // parse proj version year as number 2019.4.1f1 -> 2019
+                        int year = 0;
+                        var versionParts = proj.Version.Split('.');
+                        bool parsedYear = int.TryParse(versionParts[0], out year);
+
+                        if (parsedYear && year >= 6000)
+                        {
+                            param = "\"" + webExe + "\" \"" + buildPath + "\" " + "http://localhost:" + port + "/" + (pid == -1 ? "" : " " + pid);
+                        }
+                        else // older versions or failed to parse
+                        {
+                            param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+                        }
 
                         var webglServerProcess = Tools.LaunchExe(monoExe, param);
 
@@ -2068,7 +2082,23 @@ public static class UnityLauncherProTools
                     // take process id from unity, if have it(then webserver closes automatically when unity is closed)
                     var proc = ProcessHandler.Get(proj.Path);
                     int pid = proc == null ? -1 : proc.Id;
-                    var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+
+                    // parse proj version year as number 2019.4.1f1 -> 2019
+                    string param = null;
+                    int year = 0;
+                    var versionParts = proj.Version.Split('.');
+                    bool parsedYear = int.TryParse(versionParts[0], out year);
+
+                    if (parsedYear && year >= 6000)
+                    {
+                        param = "\"" + webExe + "\" \"" + buildPath + "\" " + "\"http://localhost:" + port + "/\"" + (pid == -1 ? "" : " " + pid);
+                    }
+                    else // older versions or failed to parse
+                    {
+                        param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+                    }
+
+                    //var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
 
                     var webglServerProcess = Tools.LaunchExe(monoExe, param);
 
