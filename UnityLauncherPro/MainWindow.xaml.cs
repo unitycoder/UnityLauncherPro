@@ -45,7 +45,7 @@ namespace UnityLauncherPro
         const string defaultAdbLogCatArgs = "-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
         System.Windows.Forms.NotifyIcon notifyIcon;
 
-        Updates[] updatesSource;
+        UnityVersion[] updatesSource;
         public static List<string> updatesAsStrings = new List<string>();
 
         string _filterString = null;
@@ -360,31 +360,37 @@ namespace UnityLauncherPro
 
         private bool UpdatesFilter(object item)
         {
-            Updates unity = item as Updates;
+            if (!(item is UnityVersion unityVersion))
+            {
+                return false;
+            }
 
             bool haveSearchString = string.IsNullOrEmpty(_filterString) == false;
-            bool matchString = haveSearchString && unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+            bool matchString = haveSearchString && unityVersion.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) > -1;
 
             bool checkedAlls = (bool)rdoAll.IsChecked;
             bool checkedLTSs = (bool)rdoLTS.IsChecked;
+            bool checkedTechs = (bool)rdoTech.IsChecked;
             bool checkedAlphas = (bool)rdoAlphas.IsChecked;
             bool checkedBetas = (bool)rdoBetas.IsChecked;
 
-            bool matchLTS = checkedLTSs && Tools.IsLTS(unity.Version);
-            bool matchAlphas = checkedAlphas && Tools.IsAlpha(unity.Version);
-            bool matchBetas = checkedBetas && Tools.IsBeta(unity.Version);
+            bool matchLTS = checkedLTSs && unityVersion.Stream == UnityVersionStream.LTS;
+            bool matchTech = checkedTechs && unityVersion.Stream == UnityVersionStream.Tech;
+            bool matchAlphas = checkedAlphas && unityVersion.Stream == UnityVersionStream.Alpha;
+            bool matchBetas = checkedBetas && unityVersion.Stream == UnityVersionStream.Beta;
 
             // match search string and some radiobutton
             if (haveSearchString == true)
             {
                 if (checkedAlls) return matchString;
                 if (checkedLTSs) return matchString && matchLTS;
+                if (checkedTechs) return matchString && matchTech;
                 if (checkedAlphas) return matchString && matchAlphas;
                 if (checkedBetas) return matchString && matchBetas;
             }
             else // no search text, filter by radiobuttons
             {
-                if (checkedAlls || matchLTS || matchAlphas || matchBetas) return true;
+                if (checkedAlls || matchLTS || matchTech || matchAlphas || matchBetas) return true;
             }
 
             // fallback
@@ -726,9 +732,9 @@ namespace UnityLauncherPro
             return (UnityInstallation)dataGridUnitys.SelectedItem;
         }
 
-        Updates GetSelectedUpdate()
+        UnityVersion GetSelectedUpdate()
         {
-            return (Updates)dataGridUpdates.SelectedItem;
+            return (UnityVersion)dataGridUpdates.SelectedItem;
         }
 
         BuildReportItem GetSelectedBuildItem()
@@ -757,11 +763,9 @@ namespace UnityLauncherPro
         async Task CallGetUnityUpdates()
         {
             dataGridUpdates.ItemsSource = null;
-            var task = GetUnityUpdates.Scan();
+            var task = GetUnityUpdates.FetchAll();
             var items = await task;
-            //Console.WriteLine("CallGetUnityUpdates=" + items == null);
-            if (items == null) return;
-            updatesSource = GetUnityUpdates.Parse(items, ref updatesAsStrings);
+            updatesSource = items.ToArray();
             if (updatesSource == null) return;
             dataGridUpdates.ItemsSource = updatesSource;
         }
@@ -1047,11 +1051,11 @@ namespace UnityLauncherPro
                 // if we dont have previous results yet, TODO scan again if previous was 24hrs ago
                 if (updatesSource == null)
                 {
-                    var task = GetUnityUpdates.Scan();
+                    var task = GetUnityUpdates.FetchAll();
                     var items = await task;
                     if (task.IsCompleted == false || task.IsFaulted == true) return;
                     if (items == null) return;
-                    updatesSource = GetUnityUpdates.Parse(items, ref updatesAsStrings);
+                    updatesSource = items.ToArray();
                     if (updatesSource == null) return;
                     dataGridUpdates.ItemsSource = updatesSource;
                 }
@@ -1139,12 +1143,10 @@ namespace UnityLauncherPro
         }
 
         // get download url for selected update version
-        private void MenuItemCopyUpdateDownloadURL_Click(object sender, RoutedEventArgs e)
+        private async void MenuItemCopyUpdateDownloadURL_Click(object sender, RoutedEventArgs e)
         {
-            string copy = null;
             var unity = GetSelectedUpdate();
-            copy = unity?.Version; //https://unity3d.com/get-unity/download?thank-you=update&download_nid=65083&os=Win
-            string exeURL = Tools.ParseDownloadURLFromWebpage(copy);
+            string exeURL = await GetUnityUpdates.FetchDownloadUrl(unity?.Version);
             if (exeURL != null) Clipboard.SetText(exeURL);
         }
 
@@ -1509,45 +1511,19 @@ namespace UnityLauncherPro
         private void BtnDownloadInBrowser_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
-            string url = Tools.GetUnityReleaseURL(unity?.Version);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Tools.DownloadInBrowser(url, unity.Version);
-            }
-            else
-            {
-                Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
-                SetStatus("Failed getting Unity Installer URL for " + unity?.Version);
-            }
+            Tools.DownloadInBrowser(unity?.Version);
         }
 
         private void BtnDownloadInBrowserFull_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
-            string url = Tools.GetUnityReleaseURL(unity?.Version);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Tools.DownloadInBrowser(url, unity.Version, true);
-            }
-            else
-            {
-                Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
-                SetStatus("Failed getting Unity Installer URL for " + unity?.Version);
-            }
+            Tools.DownloadInBrowser(unity?.Version, true);
         }
 
         private void btnDownloadInstallUpdate_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
-            string url = Tools.GetUnityReleaseURL(unity?.Version);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Tools.DownloadAndInstall(url, unity?.Version);
-            }
-            else
-            {
-                Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
-            }
+            Tools.DownloadAndInstall(unity?.Version);
         }
 
         private void BtnOpenWebsite_Click(object sender, RoutedEventArgs e)
@@ -2973,8 +2949,7 @@ namespace UnityLauncherPro
         private void MenuItemDownloadInBrowser_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
-            string exeURL = Tools.ParseDownloadURLFromWebpage(unity?.Version);
-            if (exeURL != null) Tools.DownloadInBrowser(exeURL, unity?.Version);
+            Tools.DownloadInBrowser(unity?.Version);
         }
 
         private void MenuItemDownloadLinuxModule_Click(object sender, RoutedEventArgs e)
@@ -3211,16 +3186,16 @@ namespace UnityLauncherPro
                 {
                     case "Version":
                         // handle null values
-                        if (((Updates)a).Version == null && ((Updates)b).Version == null) return 0;
-                        if (((Updates)a).Version == null) return direction == ListSortDirection.Ascending ? -1 : 1;
-                        if (((Updates)b).Version == null) return direction == ListSortDirection.Ascending ? 1 : -1;
-                        return direction == ListSortDirection.Ascending ? Tools.VersionAsLong(((Updates)a).Version).CompareTo(Tools.VersionAsLong(((Updates)b).Version)) : Tools.VersionAsLong(((Updates)b).Version).CompareTo(Tools.VersionAsLong(((Updates)a).Version));
+                        if (((UnityVersion)a)?.Version == null && ((UnityVersion)b)?.Version == null) return 0;
+                        if (((UnityVersion)a)?.Version == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((UnityVersion)b)?.Version == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? Tools.VersionAsLong(((UnityVersion)a).Version).CompareTo(Tools.VersionAsLong(((UnityVersion)b).Version)) : Tools.VersionAsLong(((UnityVersion)b).Version).CompareTo(Tools.VersionAsLong(((UnityVersion)a).Version));
                     case "Released":
                         // handle null values
-                        if (((Updates)a).ReleaseDate == null && ((Updates)b).ReleaseDate == null) return 0;
-                        if (((Updates)a).ReleaseDate == null) return direction == ListSortDirection.Ascending ? -1 : 1;
-                        if (((Updates)b).ReleaseDate == null) return direction == ListSortDirection.Ascending ? 1 : -1;
-                        return direction == ListSortDirection.Ascending ? ((DateTime)((Updates)a).ReleaseDate).CompareTo(((Updates)b).ReleaseDate) : ((DateTime)((Updates)b).ReleaseDate).CompareTo(((Updates)a).ReleaseDate);
+                        if (((UnityVersion)a)?.ReleaseDate == null && ((UnityVersion)b)?.ReleaseDate == null) return 0;
+                        if (((UnityVersion)a)?.ReleaseDate == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((UnityVersion)b)?.ReleaseDate == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? ((UnityVersion)a).ReleaseDate.CompareTo(((UnityVersion)b).ReleaseDate) : ((DateTime)((UnityVersion)b).ReleaseDate).CompareTo(((UnityVersion)a).ReleaseDate);
                     default:
                         return 0;
                 }
@@ -3649,22 +3624,6 @@ namespace UnityLauncherPro
         private void btnHubLogs_Click(object sender, RoutedEventArgs e)
         {
             Tools.OpenAppdataSpecialFolder("../Roaming/UnityHub/logs/");
-        }
-
-        private void txtDownloadFromHash_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Return)
-            {
-                var hash = (((TextBox)sender).Text).Trim();
-                if (string.IsNullOrEmpty(hash) == false)
-                {
-                    var url = Tools.ParseDownloadURLFromWebpage(hash, false, true);
-                    if (string.IsNullOrEmpty(url) == false)
-                    {
-                        Tools.DownloadInBrowser(url, hash, false, true);
-                    }
-                }
-            }
         }
 
         private void btnOpenEditorLogsFolder_PreviewMouseDown(object sender, MouseButtonEventArgs e)

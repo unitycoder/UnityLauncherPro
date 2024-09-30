@@ -29,64 +29,33 @@ namespace UnityLauncherPro
             gridAvailableVersions.SelectedItem = null;
 
             // we have current version info in project
-            if (string.IsNullOrEmpty(currentVersion) == false)
+            // enable release and dl buttons
+            btnOpenReleasePage.IsEnabled = true;
+            btnDownload.IsEnabled = true;
+
+            // if dont have exact version, show red outline
+            if (MainWindow.unityInstalledVersions.ContainsKey(currentVersion) == false)
             {
-                // enable release and dl buttons
-                btnOpenReleasePage.IsEnabled = true;
-                btnDownload.IsEnabled = true;
+                txtCurrentVersion.BorderBrush = Brushes.Red;
+                txtCurrentVersion.BorderThickness = new Thickness(1);
+            }
 
-                // if dont have exact version, show red outline
-                if (MainWindow.unityInstalledVersions.ContainsKey(currentVersion) == false)
+            // find nearest version
+            string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
+            if (nearestVersion != null)
+            {
+                // select nearest version
+                for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
                 {
-                    txtCurrentVersion.BorderBrush = Brushes.Red;
-                    txtCurrentVersion.BorderThickness = new Thickness(1);
-                }
-
-                // find nearest version
-                string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
-                if (nearestVersion != null)
-                {
-                    // select nearest version
-                    for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
+                    if (MainWindow.unityInstallationsSource[i].Version == nearestVersion)
                     {
-                        if (MainWindow.unityInstallationsSource[i].Version == nearestVersion)
-                        {
-                            gridAvailableVersions.SelectedIndex = i;
-                            gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
-                            break;
-                        }
+                        gridAvailableVersions.SelectedIndex = i;
+                        gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
+                        break;
                     }
                 }
             }
-            else // we dont have current version info in project
-            {
-                btnOpenReleasePage.IsEnabled = false;
-                btnDownload.IsEnabled = false;
-                currentVersion = "None";
 
-                // if we have preferred version, and current is null
-                if (string.IsNullOrEmpty(MainWindow.preferredVersion) == false)
-                {
-                    // get correct row for preferred version
-                    var obj = Tools.GetEntry(MainWindow.unityInstalledVersions, MainWindow.preferredVersion);
-                    int index = gridAvailableVersions.Items.IndexOf(obj);
-                    if (index > -1)
-                    {
-                        gridAvailableVersions.SelectedIndex = index;
-                    }
-                    else
-                    {
-                        // just select first item then
-                        gridAvailableVersions.SelectedIndex = 0;
-                    }
-                }
-                else
-                {
-                    // just select first item then
-                    if (gridAvailableVersions != null && gridAvailableVersions.Items.Count > 0) gridAvailableVersions.SelectedIndex = 0;
-                }
-
-            }
             gridAvailableVersions.Focus();
         }
 
@@ -109,41 +78,17 @@ namespace UnityLauncherPro
         
         private void BtnDownloadEditor_Click(object sender, RoutedEventArgs e)
         {
-            string url = Tools.GetUnityReleaseURL(txtCurrentVersion.Text);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Tools.DownloadInBrowser(url, txtCurrentVersion.Text, true);
-            }
-            else
-            {
-                Console.WriteLine("Failed getting Unity Installer URL for " + txtCurrentVersion.Text);
-            }
+            Tools.DownloadInBrowser(txtCurrentVersion.Text, true);
         }
 
         private void BtnDownload_Click(object sender, RoutedEventArgs e)
         {
-            string url = Tools.GetUnityReleaseURL(txtCurrentVersion.Text);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Tools.DownloadInBrowser(url, txtCurrentVersion.Text);
-            }
-            else
-            {
-                Console.WriteLine("Failed getting Unity Installer URL for " + txtCurrentVersion.Text);
-            }
+            Tools.DownloadInBrowser(txtCurrentVersion.Text);
         }
 
         private void btnInstall_Click(object sender, RoutedEventArgs e)
         {
-            string url = Tools.GetUnityReleaseURL(txtCurrentVersion.Text);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Tools.DownloadAndInstall(url, txtCurrentVersion.Text);
-            }
-            else
-            {
-                Console.WriteLine("Failed getting Unity Installer URL for " + txtCurrentVersion.Text);
-            }
+            Tools.DownloadAndInstall(txtCurrentVersion.Text);
         }
 
         private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
