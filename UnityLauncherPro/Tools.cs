@@ -5,10 +5,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -656,13 +659,14 @@ namespace UnityLauncherPro
             Process.Start(url);
         }
 
-        public static void DownloadInBrowser(string url, string version, bool preferFullInstaller = false, bool useHash = false)
+        public static async void DownloadInBrowser(string version)
         {
-            string exeURL = ParseDownloadURLFromWebpage(version, preferFullInstaller, useHash);
+            if (version == null) return;
+            string exeURL = await GetUnityUpdates.FetchDownloadUrl(version);
 
             Console.WriteLine("DownloadInBrowser exeURL= '" + exeURL + "'");
 
-            if (string.IsNullOrEmpty(exeURL) == false && exeURL.StartsWith("https") == true)
+            if (string.IsNullOrEmpty(exeURL) == false && exeURL.StartsWith("https"))
             {
                 //SetStatus("Download installer in browser: " + exeURL);
                 Process.Start(exeURL);
@@ -670,14 +674,19 @@ namespace UnityLauncherPro
             else // not found
             {
                 //SetStatus("Error> Cannot find installer executable ... opening website instead");
-                url = "https://unity3d.com/get-unity/download/archive";
+                const string url = "https://unity3d.com/get-unity/download/archive";
                 Process.Start(url + "#installer-not-found-for-version-" + version);
             }
         }
 
-        public static void DownloadAndInstall(string url, string version)
+        public static async void DownloadAndInstall(string version)
         {
-            string exeURL = ParseDownloadURLFromWebpage(version);
+            if (version == null)
+            {
+                Console.WriteLine("Error> Cannot download and install null version");
+                return;
+            }
+            string exeURL = await GetUnityUpdates.FetchDownloadUrl(version);
 
             Console.WriteLine("download exeURL= (" + exeURL + ")");
 
@@ -690,7 +699,7 @@ namespace UnityLauncherPro
                 if (File.Exists(tempFile) == true) File.Delete(tempFile);
 
                 // TODO make async
-                if (DownloadFile(exeURL, tempFile) == true)
+                if (await DownloadFileAsync(exeURL, tempFile))
                 {
                     // get base version, to use for install path
                     // FIXME check if have any paths?
@@ -723,14 +732,14 @@ namespace UnityLauncherPro
             else // not found
             {
                 //SetStatus("Error> Cannot find installer executable ... opening website instead");
-                url = "https://unity3d.com/get-unity/download/archive";
+                var url = "https://unity3d.com/get-unity/download/archive";
                 Process.Start(url + "#installer-not-found---version-" + version);
             }
         }
 
         static readonly string initFileDefaultURL = "https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs";
 
-        public static void DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
+        public static async Task DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
         {
             string currentInitScriptFolder = Path.GetDirectoryName(currentInitScriptFullPath);
             string currentInitScriptFile = Path.GetFileName(currentInitScriptFullPath);
@@ -743,7 +752,7 @@ namespace UnityLauncherPro
             if (currentInitScriptLocationOrURL.ToLower().StartsWith("http") == true)
             {
                 // download into temp first
-                if (DownloadFile(currentInitScriptLocationOrURL, tempFile) == false) return;
+                if (await DownloadFileAsync(currentInitScriptLocationOrURL, tempFile) == false) return;
             }
             else // file is in local folders/drives/projects
             {
@@ -812,25 +821,6 @@ namespace UnityLauncherPro
             }
         }
 
-        static bool DownloadFile(string url, string tempFile)
-        {
-            bool result = false;
-            try
-            {
-                using (WebClient client = new WebClient())
-                {
-                    client.DownloadFile(url, tempFile);
-                    // TODO check if actually exists
-                    result = true;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error> DownloadFile: " + e);
-            }
-            return result;
-        }
-
         public static string DownloadHTML(string url)
         {
             if (string.IsNullOrEmpty(url) == true) return null;
@@ -854,185 +844,6 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(version)) return null;
             // note old patch versions still contains p## in the end
             return Regex.Replace(version, @"[f|a|b][0-9]{1,2}", "", RegexOptions.IgnoreCase);
-        }
-
-        // parse Unity installer exe from release page thanks to https://github.com/softfruit
-        public static string ParseDownloadURLFromWebpage(string version, bool preferFullInstaller = false, bool useHash = false)
-        {
-            string exeURL = "";
-
-            if (string.IsNullOrEmpty(version)) return null;
-
-            // NOTE now longer uses f# in the end
-            var cleanVersion = CleanVersionNumber(version);
-
-            string url = null;
-            if (useHash == false)
-            {
-                // NOTE 2024 June, installs are now located on separate pages, like https://unity.com/releases/editor/whats-new/6000.0.5#installs
-
-                // get correct page url
-                //url = "https://unity3d.com/get-unity/download/archive";
-                // fix unity server problem, some pages says 404 found if no url params
-                url = "https://unity.com/releases/editor/whats-new/" + cleanVersion + "?unitylauncherpro#installs";
-                //if (VersionIsPatch(version)) url = "https://unity3d.com/unity/qa/patch-releases";
-                if (VersionIsBeta(version)) url = "https://unity.com/releases/editor/beta/" + version;
-                if (VersionIsAlpha(version)) url = "https://unity.com/releases/editor/alpha/" + version;
-                //url += "?unitylauncherpro";
-            }
-            else
-            {
-                // TODO version here is actually HASH
-                string hash = version;
-                url = $"https://beta.unity3d.com/download/{hash}/download.html";
-
-                //Console.WriteLine(url);
-
-                version = FetchUnityVersionNumberFromHTML(url);
-                //Console.WriteLine(url);
-                //Console.WriteLine("got "+version);
-                if (string.IsNullOrEmpty(version))
-                {
-                    SetStatus("Failed to get version (" + version + ") number from hash: " + hash);
-                    return null;
-                }
-            }
-
-            //Console.WriteLine("scanning installers from url: " + url);
-
-            string sourceHTML = DownloadHTML(url);
-
-            if (string.IsNullOrEmpty(sourceHTML) == true)
-            {
-                Console.WriteLine("Failed to download html from: " + url);
-                return null;
-            }
-
-            // parse changeset hash from html
-            string pattern = $@"href=""unityhub://{version}/([^""]+)""";
-            Regex regex = new Regex(pattern);
-            Match match = regex.Match(sourceHTML);
-
-            if (match.Success == true)
-            {
-                string changeSet = match.Groups[1].Value;
-                Console.WriteLine("changeSet: " + changeSet);
-                exeURL = $"https://beta.unity3d.com/download/{changeSet}/UnityDownloadAssistant-{version}.exe";
-            }
-
-            //string[] lines = sourceHTML.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-
-            // patch version download assistant finder
-            //if (useHash == false && VersionIsPatch(version))
-            //{
-            //    for (int i = 0; i < lines.Length; i++)
-            //    {
-            //        //if (lines[i].Contains("UnityDownloadAssistant-" + version + ".exe"))
-            //        if (lines[i].Contains("UnitySetup64-" + version + ".exe"))
-            //        {
-            //            int start = lines[i].IndexOf('"') + 1;
-            //            int end = lines[i].IndexOf('"', start);
-            //            exeURL = lines[i].Substring(start, end - start);
-            //            break;
-            //        }
-            //    }
-            //}
-            //else if (useHash == false && VersionIsArchived(version))
-            //{
-            //    // archived version download assistant finder
-            //    for (int i = 0; i < lines.Length; i++)
-            //    {
-            //        // find line where full installer is (from archive page)
-            //        if (lines[i].Contains("UnitySetup64-" + version))
-            //        {
-
-            //            Console.WriteLine(lines[i]);
-
-            //            // take full exe installer line, to have changeset hash, then replace with download assistant filepath
-            //            string line = lines[i];
-            //            int start = line.IndexOf('"') + 1;
-            //            int end = line.IndexOf('"', start);
-            //            exeURL = line.Substring(start, end - start);
-            //            exeURL = exeURL.Replace("Windows64EditorInstaller/UnitySetup64-", "UnityDownloadAssistant-");
-            //            break;
-            //        }
-            //    }
-            //}
-            //else // alpha or beta version download assistant finder
-            //{
-            //    // regular beta
-            //    // <a href="https://beta.unity3d.com/download/21aeb48b6ed2/UnityDownloadAssistant.exe">
-            //    // https://beta.unity3d.com/download/21aeb48b6ed2/UnityDownloadAssistant.exe
-
-            //    // hidden beta
-            //    // <a href='UnityDownloadAssistant-6000.0.0b15.exe'>
-            //    // https://beta.unity3d.com/download/8008bc0c1b74/UnityDownloadAssistant-6000.0.0b15.exe
-
-            //    // new 10.06.2024, no more downloadassistant.exe in html
-
-            //    // check html lines
-            //    for (int i = 0; i < lines.Length; i++)
-            //    {
-            //        //Console.WriteLine(lines[i]);
-            //        //if (lines[i].Contains("UnityDownloadAssistant"))
-            //        if (lines[i].Contains("UnityDownloadAssistant"))
-            //        {
-            //            if (useHash == false)
-            //            {
-            //                string pattern = @"https://beta\.unity3d\.com/download/[a-zA-Z0-9]+/UnityDownloadAssistant\.exe";
-            //                Match match = Regex.Match(lines[i], pattern);
-            //                if (match.Success)
-            //                {
-            //                    exeURL = match.Value;
-            //                }
-            //                else
-            //                {
-            //                    Console.WriteLine("No match found for download base url..");
-            //                }
-            //            }
-            //            else // hidden download page
-            //            {
-            //                string pattern = @"UnityDownloadAssistant(?:-\d+\.\d+\.\d+[bf]\d*)?\.exe";
-            //                Match match = Regex.Match(lines[i], pattern);
-            //                if (match.Success)
-            //                {
-            //                    // append base url
-            //                    Regex regex = new Regex(@"(https://beta\.unity3d\.com/download/[a-zA-Z0-9]+/)");
-            //                    Match match2 = regex.Match(url);
-
-            //                    //Console.WriteLine("source url: " + url);
-
-            //                    if (match2.Success)
-            //                    {
-            //                        string capturedUrl = match2.Groups[1].Value;
-            //                        exeURL = capturedUrl + match.Value;
-            //                    }
-            //                    else
-            //                    {
-            //                        Console.WriteLine("No match found for download base url..");
-            //                    }
-            //                }
-            //                break;
-            //            }
-            //        }
-            //    } // for lines
-            //} // alpha or beta
-
-            // download full installer instead, TODO probably not needed anymore?
-            if (useHash == false && preferFullInstaller == true)
-            {
-                exeURL = exeURL.Replace("UnityDownloadAssistant-" + version + ".exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
-                // handle alpha/beta
-                exeURL = exeURL.Replace("UnityDownloadAssistant.exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
-            }
-
-            // didnt find installer
-            if (string.IsNullOrEmpty(exeURL))
-            {
-                //SetStatus("Cannot find UnityDownloadAssistant.exe for this version.");
-                Console.WriteLine("Installer not found from URL: " + url);
-            }
-            return exeURL;
         }
 
         private static string FetchUnityVersionNumberFromHTML(string url)
@@ -2399,6 +2210,58 @@ public static class UnityLauncherProTools
                     }
                 }
             }
+        }
+        
+        private static async Task<bool> DownloadFileAsync(string fileUrl, string destinationPath)
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var fileName = Path.GetFileName(fileUrl);
+            var progressWindow = new DownloadProgressWindow(fileName, () => cancellationTokenSource.Cancel());
+            progressWindow.Show();
+            var result = false;
+            try
+            {
+                using (var client = new HttpClient())
+                using (var response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead, cancellationTokenSource.Token))
+                {
+                        response.EnsureSuccessStatusCode();
+
+                        var totalBytes = response.Content.Headers.ContentLength ?? 1;
+                        var buffer = new byte[8192];
+                        var totalRead = 0;
+
+                        using (var contentStream = await response.Content.ReadAsStreamAsync())
+                        using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write,
+                                   FileShare.None, buffer.Length, true))
+                        {
+                            int bytesRead;
+                            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationTokenSource.Token)) > 0)
+                            {
+                                await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationTokenSource.Token);
+                                totalRead += bytesRead;
+                                progressWindow.UpdateProgress(new DownloadProgress(totalRead, totalBytes));
+                            }
+                            result = true;
+                        }
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("Download cancelled");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                if (!result)
+                {
+                    DeleteTempFile(destinationPath);
+                }
+                progressWindow.Close();
+            }
+            return result;
         }
     } // class
 
