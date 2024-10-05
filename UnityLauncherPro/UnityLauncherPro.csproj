@@ -114,12 +114,16 @@
     <Compile Include="Converters\LastModifiedConverter.cs" />
     <Compile Include="Data\BuildReport.cs" />
     <Compile Include="Data\BuildReportItem.cs" />
+    <Compile Include="Data\DownloadProgress.cs" />
     <Compile Include="Data\Platform.cs" />
     <Compile Include="Data\Tabs.cs" />
     <Compile Include="Data\ThemeColor.cs" />
     <Compile Include="Data\UnityVersion.cs" />
     <Compile Include="Data\UnityVersionResponse.cs" />
     <Compile Include="Data\UnityVersionStream.cs" />
+    <Compile Include="DownloadProgressWindow.xaml.cs">
+      <DependentUpon>DownloadProgressWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GetProjects.cs" />
     <Compile Include="GetUnityInstallations.cs" />
     <Compile Include="GetUnityUpdates.cs" />
@@ -141,6 +145,7 @@
       <DependentUpon>UpgradeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Version.cs" />
+    <Page Include="DownloadProgressWindow.xaml" />
     <Page Include="NewProject.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

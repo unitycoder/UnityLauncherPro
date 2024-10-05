@@ -5,10 +5,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -697,7 +699,7 @@ namespace UnityLauncherPro
                 if (File.Exists(tempFile) == true) File.Delete(tempFile);
 
                 // TODO make async
-                if (DownloadFile(exeURL, tempFile) == true)
+                if (await DownloadFileAsync(exeURL, tempFile))
                 {
                     // get base version, to use for install path
                     // FIXME check if have any paths?
@@ -737,7 +739,7 @@ namespace UnityLauncherPro
 
         static readonly string initFileDefaultURL = "https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs";
 
-        public static void DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
+        public static async Task DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
         {
             string currentInitScriptFolder = Path.GetDirectoryName(currentInitScriptFullPath);
             string currentInitScriptFile = Path.GetFileName(currentInitScriptFullPath);
@@ -750,7 +752,7 @@ namespace UnityLauncherPro
             if (currentInitScriptLocationOrURL.ToLower().StartsWith("http") == true)
             {
                 // download into temp first
-                if (DownloadFile(currentInitScriptLocationOrURL, tempFile) == false) return;
+                if (await DownloadFileAsync(currentInitScriptLocationOrURL, tempFile) == false) return;
             }
             else // file is in local folders/drives/projects
             {
@@ -817,25 +819,6 @@ namespace UnityLauncherPro
                 Console.WriteLine("DeleteTempFile: " + path);
                 File.Delete(path);
             }
-        }
-
-        static bool DownloadFile(string url, string tempFile)
-        {
-            bool result = false;
-            try
-            {
-                using (WebClient client = new WebClient())
-                {
-                    client.DownloadFile(url, tempFile);
-                    // TODO check if actually exists
-                    result = true;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error> DownloadFile: " + e);
-            }
-            return result;
         }
 
         public static string DownloadHTML(string url)
@@ -2227,6 +2210,55 @@ public static class UnityLauncherProTools
                     }
                 }
             }
+        }
+        
+        private static async Task<bool> DownloadFileAsync(string fileUrl, string destinationPath)
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var fileName = Path.GetFileName(fileUrl);
+            var progressWindow = new DownloadProgressWindow(fileName, () => cancellationTokenSource.Cancel());
+            progressWindow.Show();
+            var result = false;
+            try
+            {
+                using (var client = new HttpClient())
+                using (var response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead, cancellationTokenSource.Token))
+                {
+                        response.EnsureSuccessStatusCode();
+
+                        var totalBytes = response.Content.Headers.ContentLength ?? 1;
+                        var buffer = new byte[8192];
+                        var totalRead = 0;
+
+                        using (var contentStream = await response.Content.ReadAsStreamAsync())
+                        using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write,
+                                   FileShare.None, buffer.Length, true))
+                        {
+                            int bytesRead;
+                            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationTokenSource.Token)) > 0)
+                            {
+                                await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationTokenSource.Token);
+                                totalRead += bytesRead;
+                                progressWindow.UpdateProgress(new DownloadProgress(totalRead, totalBytes));
+                            }
+                            result = true;
+                        }
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("Download cancelled");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                DeleteTempFile(destinationPath);
+                progressWindow.Close();
+            }
+            return result;
         }
     } // class
 
