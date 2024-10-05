@@ -659,14 +659,14 @@ namespace UnityLauncherPro
             Process.Start(url);
         }
 
-        public static async void DownloadInBrowser(string version, bool preferFullInstaller = false)
+        public static async void DownloadInBrowser(string version)
         {
             if (version == null) return;
-            string exeURL = await GetUnityUpdates.FetchDownloadUrl(version, preferFullInstaller);
+            string exeURL = await GetUnityUpdates.FetchDownloadUrl(version);
 
             Console.WriteLine("DownloadInBrowser exeURL= '" + exeURL + "'");
 
-            if (string.IsNullOrEmpty(exeURL) == false && exeURL.StartsWith("https") == true)
+            if (string.IsNullOrEmpty(exeURL) == false && exeURL.StartsWith("https"))
             {
                 //SetStatus("Download installer in browser: " + exeURL);
                 Process.Start(exeURL);
@@ -2255,7 +2255,10 @@ public static class UnityLauncherProTools
             }
             finally
             {
-                DeleteTempFile(destinationPath);
+                if (!result)
+                {
+                    DeleteTempFile(destinationPath);
+                }
                 progressWindow.Close();
             }
             return result;

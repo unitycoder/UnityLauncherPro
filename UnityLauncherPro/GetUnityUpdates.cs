@@ -18,7 +18,7 @@ namespace UnityLauncherPro
         private const int DelayBetweenBatches = 1000; // 1 second in milliseconds
         private const string CacheFileName = "UnityVersionCache.json";
 
-        private static readonly HttpClient httpClient = new HttpClient();
+        private static readonly HttpClient Client = new HttpClient();
 
         public static async Task<List<UnityVersion>> FetchAll()
         {
@@ -37,7 +37,7 @@ namespace UnityLauncherPro
             return allVersions;
         }
         
-        public static async Task<string> FetchDownloadUrl(string unityVersion, bool assistantUrl = false)
+        public static async Task<string> FetchDownloadUrl(string unityVersion)
     {
         if (string.IsNullOrEmpty(unityVersion))
         {
@@ -48,7 +48,7 @@ namespace UnityLauncherPro
 
         try
         {
-            string responseString = await httpClient.GetStringAsync(apiUrl);
+            string responseString = await Client.GetStringAsync(apiUrl);
             JsonDocument doc = JsonDocument.Parse(responseString);
             try
             {
@@ -75,20 +75,36 @@ namespace UnityLauncherPro
 
                     if (!string.IsNullOrEmpty(downloadUrl))
                     {
-                        if (!assistantUrl) return downloadUrl;
-
                         if (!string.IsNullOrEmpty(shortRevision))
                         {
                             var startIndex = downloadUrl.LastIndexOf(shortRevision, StringComparison.Ordinal) + shortRevision.Length + 1;
                             var endIndex = downloadUrl.Length - startIndex;
-                            return downloadUrl.Replace(downloadUrl.Substring(startIndex, endIndex), 
+                            var assistantUrl = downloadUrl.Replace(downloadUrl.Substring(startIndex, endIndex), 
                                 $"UnityDownloadAssistant-{unityVersion}.exe");
+                            using (var assistantResponse = await Client.GetAsync(assistantUrl))
+                            {
+                                if (assistantResponse.IsSuccessStatusCode)
+                                {
+                                    Console.WriteLine("Assistant download URL found.");
+                                    return assistantUrl;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Assistant download URL not found, returning original download URL.");
+                                    return downloadUrl;
+                                }
+                            }
                         }
                         else
                         {
                             Console.WriteLine("ShortRevision not found, returning original download URL.");
                             return downloadUrl;
                         }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No download URL found.");
+                        return downloadUrl;
                     }
                 }
 
@@ -145,7 +161,7 @@ namespace UnityLauncherPro
 
             try
             {
-                var response = await httpClient.GetStringAsync(url);
+                var response = await Client.GetStringAsync(url);
                 return JsonSerializer.Deserialize<UnityVersionResponse>(response);
             }
             catch (Exception e)

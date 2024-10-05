@@ -78,7 +78,7 @@ namespace UnityLauncherPro
         
         private void BtnDownloadEditor_Click(object sender, RoutedEventArgs e)
         {
-            Tools.DownloadInBrowser(txtCurrentVersion.Text, true);
+            Tools.DownloadInBrowser(txtCurrentVersion.Text);
         }
 
         private void BtnDownload_Click(object sender, RoutedEventArgs e)
