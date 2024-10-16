@@ -438,11 +438,13 @@
                         </Button>
                     </Grid>
 
-                    <RadioButton x:Name="rdoAll" Content="All" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,2,0,0" Checked="rdoAll_Checked" IsChecked="True" GroupName="groupUpdateFilter" />
-                    <RadioButton x:Name="rdoLTS" Content="LTS" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="287,2,0,0" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
-                    <RadioButton x:Name="rdoAlphas" Content="Alpha" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="340,2,0,0" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
-                    <RadioButton x:Name="rdoBetas" Content="Beta" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="400,2,0,0" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
-
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="240,2,0,0" >
+                        <RadioButton x:Name="rdoAll" Content="All" IsChecked="True" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" Margin="0,0,10,0" />
+                        <RadioButton x:Name="rdoLTS" Content="LTS" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" Margin="0,0,10,0" />
+                        <RadioButton x:Name="rdoTech" Content="Tech" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" Margin="0,0,10,0" />
+                        <RadioButton x:Name="rdoAlphas" Content="Alpha" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" Margin="0,0,10,0" />
+                        <RadioButton x:Name="rdoBetas" Content="Beta" Checked="rdoAll_Checked" GroupName="groupUpdateFilter" />
+                    </StackPanel>
                     <!-- hash build downloader, hidden for now, until have some UI ideas -->
                     <!--<TextBox x:Name="txtDownloadFromHash" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}"  MinWidth="80" ToolTip="Try to download hidden release using this ChangeSet Hash" Padding="0,3,0,0" Margin="730,4,48,0" VerticalAlignment="Top" Width="100" PreviewKeyDown="txtDownloadFromHash_PreviewKeyDown" />-->
 
@@ -485,7 +487,7 @@
                                 <MenuItem x:Name="menuItemUpdatesReleaseNotes" Header="Open Release Notes" Click="MenuItemUpdatesReleaseNotes_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
-                        <local:Updates ReleaseDate="2020-10-10" Version="5000.1.2.3"/>
+                        <local:UnityVersion ReleaseDate="2020-10-10" Version="5000.1.2.3"/>
 
                         <!-- sample data for testing -->
                     </DataGrid>
