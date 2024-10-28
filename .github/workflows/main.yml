@@ -58,12 +58,16 @@ jobs:
         id: get_commits
         shell: bash
         run: |
-          # Get the most recent tag (assuming releases are tagged)
-          PREV_TAG=$(git describe --tags --abbrev=0)
-          echo "Previous tag: $PREV_TAG"
-          
-          # List commits since last tag
-          COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"* %s" --no-merges)
+          # Get the most recent tag
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
+          if [ "$PREV_TAG" = "none" ]; then
+            echo "No previous tag found, listing all commits"
+            COMMITS=$(git log --pretty=format:"* %s" --no-merges)
+          else
+            echo "Previous tag: $PREV_TAG"
+            # List commits since last tag
+            COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"* %s" --no-merges)
+          fi
           echo "Commits since last release: $COMMITS"
           
           # Save commits to environment file for later use
