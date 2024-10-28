@@ -36,7 +36,7 @@ jobs:
           Install-Module 7Zip4PowerShell -Force -Verbose 
 
       - uses: actions/checkout@v2
-      
+
       - name: Restore NuGet packages
         run: nuget restore UnityLauncherPro.sln
       
@@ -50,23 +50,24 @@ jobs:
 
       - name: Get current date and time
         id: datetime
-        run: echo "::set-output name=current_datetime::$(date +'%d/%m/%Y %H:%M')"
+        run: |
+          echo "current_datetime=$(date +'%d/%m/%Y %H:%M')" >> $GITHUB_ENV
 
       # Step to get previous tag and commits
       - name: Get commits since last release
         id: get_commits
-        shell: powershell
+        shell: bash
         run: |
           # Get the most recent tag (assuming releases are tagged)
-          $prevTag = git describe --tags --abbrev=0
-          Write-Host "Previous tag: $prevTag"
+          PREV_TAG=$(git describe --tags --abbrev=0)
+          echo "Previous tag: $PREV_TAG"
           
           # List commits since last tag
-          $commits = git log $prevTag..HEAD --pretty=format:"* %s"
-          Write-Host "Commits since last release: $commits"
+          COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"* %s" --no-merges)
+          echo "Commits since last release: $COMMITS"
           
-          # Save commits to an environment file to use later
-          echo "commits=$commits" >> $env:GITHUB_ENV
+          # Save commits to environment file for later use
+          echo "commits=$COMMITS" >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
@@ -75,7 +76,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{github.run_number}}
-          release_name: ${{ steps.datetime.outputs.current_datetime }} (${{ github.run_number }})
+          release_name: ${{ env.current_datetime }} (${{ github.run_number }})
           body: |
             Automated Release by GitHub Action CI
 
