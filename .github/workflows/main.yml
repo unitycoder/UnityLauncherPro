@@ -21,7 +21,6 @@ jobs:
     steps:
       - name: Check Commit and Install 7Zip PowerShell Module
         shell: powershell
-        
         run: |
           # cancel early, if not build commit
           $strVal ='${{ github.event.commits[0].message }}'
@@ -35,6 +34,7 @@ jobs:
                 exit(1)
           }
           Install-Module 7Zip4PowerShell -Force -Verbose 
+
       - uses: actions/checkout@v2
       
       - name: Restore NuGet packages
@@ -51,7 +51,22 @@ jobs:
       - name: Get current date and time
         id: datetime
         run: echo "::set-output name=current_datetime::$(date +'%d/%m/%Y %H:%M')"
-        
+
+      # New step to get previous tag and commits
+      - name: Get commits since last release
+        id: get_commits
+        run: |
+          # Get the most recent tag (assuming releases are tagged)
+          PREV_TAG=$(git describe --tags --abbrev=0)
+          echo "Previous tag: $PREV_TAG"
+          
+          # List commits since last tag
+          COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"* %s")
+          echo "Commits since last release: $COMMITS"
+          
+          # Save commits to output for use in the release body
+          echo "::set-output name=commits::${COMMITS}"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
@@ -62,6 +77,9 @@ jobs:
           release_name: ${{ steps.datetime.outputs.current_datetime }} (${{ github.run_number }})
           body: |
             Automated Release by GitHub Action CI
+
+            ### Commits in this release:
+            ${{ steps.get_commits.outputs.commits }}
           draft: false
           prerelease: false      
         
@@ -75,4 +93,3 @@ jobs:
           asset_path: ./UnityLauncherPro.zip
           asset_name: UnityLauncherPro.zip
           asset_content_type: application/zip
-
