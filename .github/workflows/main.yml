@@ -52,20 +52,21 @@ jobs:
         id: datetime
         run: echo "::set-output name=current_datetime::$(date +'%d/%m/%Y %H:%M')"
 
-      # New step to get previous tag and commits
+      # Step to get previous tag and commits
       - name: Get commits since last release
         id: get_commits
+        shell: powershell
         run: |
           # Get the most recent tag (assuming releases are tagged)
-          PREV_TAG=$(git describe --tags --abbrev=0)
-          echo "Previous tag: $PREV_TAG"
+          $prevTag = git describe --tags --abbrev=0
+          Write-Host "Previous tag: $prevTag"
           
           # List commits since last tag
-          COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"* %s")
-          echo "Commits since last release: $COMMITS"
+          $commits = git log $prevTag..HEAD --pretty=format:"* %s"
+          Write-Host "Commits since last release: $commits"
           
-          # Save commits to output for use in the release body
-          echo "::set-output name=commits::${COMMITS}"
+          # Save commits to an environment file to use later
+          echo "commits=$commits" >> $env:GITHUB_ENV
 
       - name: Create Release
         id: create_release
@@ -79,7 +80,7 @@ jobs:
             Automated Release by GitHub Action CI
 
             ### Commits in this release:
-            ${{ steps.get_commits.outputs.commits }}
+            ${{ env.commits }}
           draft: false
           prerelease: false      
         
