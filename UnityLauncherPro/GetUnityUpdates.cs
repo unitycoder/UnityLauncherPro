@@ -4,8 +4,6 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace UnityLauncherPro
@@ -17,15 +15,17 @@ namespace UnityLauncherPro
         private const int RequestsPerBatch = 10;
         private const int DelayBetweenBatches = 1000; // 1 second in milliseconds
         private const string CacheFileName = "UnityVersionCache.json";
-
         private static readonly HttpClient Client = new HttpClient();
 
         public static async Task<List<UnityVersion>> FetchAll()
         {
             var cachedVersions = LoadCachedVersions();
+            Console.WriteLine("cachedVersions: "+ cachedVersions);
             var latestCachedVersion = cachedVersions.FirstOrDefault();
 
+            Console.WriteLine("FetchAll "+ latestCachedVersion);
             var newVersions = await FetchNewVersions(latestCachedVersion);
+            Console.WriteLine("newVersions " + newVersions);
 
             var allVersions = newVersions.Concat(cachedVersions).ToList();
 
@@ -34,94 +34,92 @@ namespace UnityLauncherPro
                 SaveCachedVersions(allVersions);
             }
 
+            Console.WriteLine("all "+ allVersions);
+
             return allVersions;
         }
-        
+
         public static async Task<string> FetchDownloadUrl(string unityVersion)
-    {
-        if (string.IsNullOrEmpty(unityVersion))
         {
-            return null;
-        }
-
-        string apiUrl = $"{BaseApiUrl}?limit=1&version={unityVersion}&architecture=X86_64&platform=WINDOWS";
-
-        try
-        {
-            string responseString = await Client.GetStringAsync(apiUrl);
-            JsonDocument doc = JsonDocument.Parse(responseString);
-            try
+            if (string.IsNullOrEmpty(unityVersion))
             {
-                var root = doc.RootElement;
-                var results = root.GetProperty("results");
-
-                if (results.GetArrayLength() > 0)
-                {
-                    var entry = results[0];
-                    string downloadUrl = null;
-                    string shortRevision = null;
-
-                    if (entry.TryGetProperty("downloads", out var downloads) && 
-                        downloads.GetArrayLength() > 0 &&
-                        downloads[0].TryGetProperty("url", out var urlProperty))
-                    {
-                        downloadUrl = urlProperty.GetString();
-                    }
-
-                    if (entry.TryGetProperty("shortRevision", out var revisionProperty))
-                    {
-                        shortRevision = revisionProperty.GetString();
-                    }
-
-                    if (!string.IsNullOrEmpty(downloadUrl))
-                    {
-                        if (!string.IsNullOrEmpty(shortRevision))
-                        {
-                            var startIndex = downloadUrl.LastIndexOf(shortRevision, StringComparison.Ordinal) + shortRevision.Length + 1;
-                            var endIndex = downloadUrl.Length - startIndex;
-                            var assistantUrl = downloadUrl.Replace(downloadUrl.Substring(startIndex, endIndex), 
-                                $"UnityDownloadAssistant-{unityVersion}.exe");
-                            using (var assistantResponse = await Client.GetAsync(assistantUrl))
-                            {
-                                if (assistantResponse.IsSuccessStatusCode)
-                                {
-                                    Console.WriteLine("Assistant download URL found.");
-                                    return assistantUrl;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Assistant download URL not found, returning original download URL.");
-                                    return downloadUrl;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("ShortRevision not found, returning original download URL.");
-                            return downloadUrl;
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No download URL found.");
-                        return downloadUrl;
-                    }
-                }
-
-                Console.WriteLine($"No download URL found for version {unityVersion}");
                 return null;
             }
-            finally
+
+            string apiUrl = $"{BaseApiUrl}?limit=1&version={unityVersion}&architecture=X86_64&platform=WINDOWS";
+
+            try
             {
-                doc.Dispose();
+                string responseString = await Client.GetStringAsync(apiUrl);
+                return ExtractDownloadUrl(responseString, unityVersion);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error fetching download URL: {e.Message}");
+                return null;
             }
         }
-        catch (Exception e)
+
+        private static string ExtractDownloadUrl(string json, string unityVersion)
         {
-            Console.WriteLine($"Error fetching download URL: {e.Message}");
-            return null;
+            int resultsIndex = json.IndexOf("\"results\":");
+            if (resultsIndex == -1) return null;
+
+            int downloadsIndex = json.IndexOf("\"downloads\":", resultsIndex);
+            if (downloadsIndex == -1) return null;
+
+            int urlIndex = json.IndexOf("\"url\":", downloadsIndex);
+            if (urlIndex == -1) return null;
+
+            int urlStart = json.IndexOf('"', urlIndex + 6) + 1;
+            int urlEnd = json.IndexOf('"', urlStart);
+            string downloadUrl = json.Substring(urlStart, urlEnd - urlStart);
+
+            int revisionIndex = json.IndexOf("\"shortRevision\":", resultsIndex);
+            string shortRevision = null;
+            if (revisionIndex != -1)
+            {
+                int revisionStart = json.IndexOf('"', revisionIndex + 16) + 1;
+                int revisionEnd = json.IndexOf('"', revisionStart);
+                shortRevision = json.Substring(revisionStart, revisionEnd - revisionStart);
+            }
+
+            if (!string.IsNullOrEmpty(downloadUrl) && !string.IsNullOrEmpty(shortRevision))
+            {
+                int revisionPosition = downloadUrl.LastIndexOf(shortRevision, StringComparison.Ordinal) + shortRevision.Length + 1;
+                string assistantUrl = downloadUrl.Substring(0, revisionPosition) +
+                    $"UnityDownloadAssistant-{unityVersion}.exe";
+
+                if (CheckAssistantUrl(assistantUrl).Result)
+                {
+                    Console.WriteLine("Assistant download URL found.");
+                    return assistantUrl;
+                }
+                else
+                {
+                    Console.WriteLine("Assistant download URL not found, returning original download URL.");
+                    return downloadUrl;
+                }
+            }
+
+            Console.WriteLine("Returning original download URL.");
+            return downloadUrl;
         }
-    }
+
+        private static async Task<bool> CheckAssistantUrl(string assistantUrl)
+        {
+            try
+            {
+                using (HttpResponseMessage response = await Client.GetAsync(assistantUrl))
+                {
+                    return response.IsSuccessStatusCode;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         private static async Task<List<UnityVersion>> FetchNewVersions(UnityVersion latestCachedVersion)
         {
@@ -132,10 +130,10 @@ namespace UnityLauncherPro
             while (offset < total)
             {
                 var batchUpdates = await FetchBatch(offset);
-                if (batchUpdates?.Results == null || batchUpdates.Results.Count == 0)
+                if (batchUpdates == null || batchUpdates.Count == 0)
                     break;
 
-                foreach (var version in batchUpdates.Results)
+                foreach (var version in batchUpdates)
                 {
                     if (version.Version == latestCachedVersion?.Version)
                         return newVersions;
@@ -143,8 +141,7 @@ namespace UnityLauncherPro
                     newVersions.Add(version);
                 }
 
-                total = batchUpdates.Total;
-                offset += batchUpdates.Results.Count;
+                offset += batchUpdates.Count;
 
                 if (offset % (BatchSize * RequestsPerBatch) == 0)
                 {
@@ -155,14 +152,14 @@ namespace UnityLauncherPro
             return newVersions;
         }
 
-        private static async Task<UnityVersionResponse> FetchBatch(int offset)
+        private static async Task<List<UnityVersion>> FetchBatch(int offset)
         {
             string url = $"{BaseApiUrl}?limit={BatchSize}&offset={offset}&architecture=X86_64&platform=WINDOWS";
 
             try
             {
-                var response = await Client.GetStringAsync(url);
-                return JsonSerializer.Deserialize<UnityVersionResponse>(response);
+                string response = await Client.GetStringAsync(url);
+                return ParseUnityVersions(response);
             }
             catch (Exception e)
             {
@@ -171,52 +168,111 @@ namespace UnityLauncherPro
             }
         }
 
+        private static List<UnityVersion> ParseUnityVersions(string json)
+        {
+            var versions = new List<UnityVersion>();
+            int resultsIndex = json.IndexOf("\"results\":");
+            if (resultsIndex == -1) return versions;
+
+            string[] items = json.Substring(resultsIndex).Split(new[] { "{" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string item in items)
+            {
+                if (item.Contains("\"version\""))
+                {
+                    var version = new UnityVersion
+                    {
+                        Version = GetStringValue(item, "version"),
+                        ReleaseDate = DateTime.TryParse(GetStringValue(item, "releaseDate"), out var date) ? date : default,
+                        Stream = Enum.TryParse<UnityVersionStream>(GetStringValue(item, "stream"), true, out var stream) ? stream : UnityVersionStream.Tech
+                    };
+                    versions.Add(version);
+                }
+            }
+
+            return versions;
+        }
+
+        private static List<UnityVersion> ParseCachedUnityVersions(string json)
+        {
+            var versions = new List<UnityVersion>();
+
+            // Remove square brackets at the beginning and end of the array
+            json = json.Trim(new[] { '[', ']' });
+
+            // Split each item based on the closing bracket and opening bracket of consecutive objects
+            string[] items = json.Split(new[] { "},{" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string item in items)
+            {
+                // Ensure each item is properly enclosed in braces to handle edge cases
+                string cleanItem = "{" + item.Trim(new[] { '{', '}' }) + "}";
+
+                // Parse each UnityVersion object
+                if (cleanItem.Contains("\"version\""))
+                {
+                    var version = new UnityVersion
+                    {
+                        Version = GetStringValue(cleanItem, "version"),
+                        ReleaseDate = DateTime.TryParse(GetStringValue(cleanItem, "releaseDate"), out var date) ? date : default,
+                        Stream = Enum.TryParse<UnityVersionStream>(GetStringValue(cleanItem, "stream"), true, out var stream) ? stream : UnityVersionStream.Tech
+                    };
+                    versions.Add(version);
+                }
+            }
+
+            return versions;
+        }
+
+        //private static string GetStringValue(string source, string propertyName)
+        //{
+        //    int propertyIndex = source.IndexOf($"\"{propertyName}\":");
+        //    if (propertyIndex == -1) return null;
+
+        //    int valueStart = source.IndexOf('"', propertyIndex + propertyName.Length + 2) + 1;
+        //    int valueEnd = source.IndexOf('"', valueStart);
+        //    return source.Substring(valueStart, valueEnd - valueStart);
+        //}
+
+
+        private static string GetStringValue(string source, string propertyName)
+        {
+            int propertyIndex = source.IndexOf($"\"{propertyName}\":");
+            if (propertyIndex == -1) return null;
+
+            int valueStart = source.IndexOf('"', propertyIndex + propertyName.Length + 2) + 1;
+            int valueEnd = source.IndexOf('"', valueStart);
+            return source.Substring(valueStart, valueEnd - valueStart);
+        }
+
         private static List<UnityVersion> LoadCachedVersions()
         {
-            // Check if the file is locally saved
             string configFilePath = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
             string configDirectory = Path.GetDirectoryName(configFilePath);
-            
-            if (configDirectory != null && Path.Combine(configDirectory, CacheFileName) is string cacheFilePath)
-            {
-                if (File.Exists(cacheFilePath))
-                {
-                    var json = File.ReadAllText(cacheFilePath);
-                    return JsonSerializer.Deserialize<List<UnityVersion>>(json) ?? new List<UnityVersion>();
-                }
-            }
-            else
-            {
-                return new List<UnityVersion>();
-            }
-            
-            // Take the embedded file and save it locally, then rerun this method when that is successful
-            var assembly = Assembly.GetExecutingAssembly();
-            using (var stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.Resources.{CacheFileName}"))
-            {
-                if (stream == null)
-                    return new List<UnityVersion>();
+            if (configDirectory == null) return new List<UnityVersion>();
 
-                using (var reader = new StreamReader(stream))
-                {
-                    var json = reader.ReadToEnd();
-                    File.WriteAllText(cacheFilePath, json);
-                    return JsonSerializer.Deserialize<List<UnityVersion>>(json) ?? new List<UnityVersion>();
-                }
-            }
+            string cacheFilePath = Path.Combine(configDirectory, CacheFileName);
+            if (!File.Exists(cacheFilePath)) return new List<UnityVersion>();
+
+            string json = File.ReadAllText(cacheFilePath);
+            return ParseCachedUnityVersions(json);
         }
-        
+
         private static void SaveCachedVersions(List<UnityVersion> versions)
         {
-            var json = JsonSerializer.Serialize(versions);
-            
+            string json = "[";
+            foreach (var version in versions)
+            {
+                json += $"{{\"version\":\"{version.Version}\",\"releaseDate\":\"{version.ReleaseDate:O}\",\"stream\":\"{version.Stream}\"}},";
+            }
+            json = json.TrimEnd(',') + "]";
+
             string configFilePath = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
             string configDirectory = Path.GetDirectoryName(configFilePath);
+            if (configDirectory == null) return;
 
-            if (configDirectory != null && Path.Combine(configDirectory, CacheFileName) is string cacheFilePath)
-            {
-                File.WriteAllText(cacheFilePath, json);
-            }
+            string cacheFilePath = Path.Combine(configDirectory, CacheFileName);
+            File.WriteAllText(cacheFilePath, json);
         }
     }
 }
