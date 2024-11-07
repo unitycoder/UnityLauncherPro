@@ -487,9 +487,8 @@
                                 <MenuItem x:Name="menuItemUpdatesReleaseNotes" Header="Open Release Notes" Click="MenuItemUpdatesReleaseNotes_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
-                        <local:UnityVersion ReleaseDate="2020-10-10" Version="5000.1.2.3"/>
-
                         <!-- sample data for testing -->
+                        <local:UnityVersion ReleaseDate="2020-10-10" Version="5000.1.2.3"/>
                     </DataGrid>
 
                     <!-- bottom buttoms row -->
