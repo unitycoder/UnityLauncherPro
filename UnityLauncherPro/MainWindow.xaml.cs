@@ -1517,7 +1517,7 @@ namespace UnityLauncherPro
         private void BtnDownloadInBrowserFull_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
-            Tools.DownloadInBrowser(unity?.Version);
+            Tools.DownloadInBrowser(unity?.Version, true);
         }
 
         private void btnDownloadInstallUpdate_Click(object sender, RoutedEventArgs e)

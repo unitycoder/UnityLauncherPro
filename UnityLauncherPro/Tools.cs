@@ -659,10 +659,15 @@ namespace UnityLauncherPro
             Process.Start(url);
         }
 
-        public static async void DownloadInBrowser(string version)
+        public static async void DownloadInBrowser(string version, bool preferFullInstaller = false)
         {
             if (version == null) return;
             string exeURL = await GetUnityUpdates.FetchDownloadUrl(version);
+
+            if (preferFullInstaller == true)
+            {
+                exeURL = exeURL.Replace("UnityDownloadAssistant-" + version + ".exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
+            }
 
             Console.WriteLine("DownloadInBrowser exeURL= '" + exeURL + "'");
 

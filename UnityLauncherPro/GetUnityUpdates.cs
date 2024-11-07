@@ -51,7 +51,7 @@ namespace UnityLauncherPro
             try
             {
                 string responseString = await Client.GetStringAsync(apiUrl);
-                return ExtractDownloadUrl(responseString, unityVersion);
+                return await ExtractDownloadUrlAsync(responseString, unityVersion);
             }
             catch (Exception e)
             {
@@ -60,8 +60,9 @@ namespace UnityLauncherPro
             }
         }
 
-        private static string ExtractDownloadUrl(string json, string unityVersion)
+        private static async Task<string> ExtractDownloadUrlAsync(string json, string unityVersion)
         {
+
             int resultsIndex = json.IndexOf("\"results\":");
             if (resultsIndex == -1) return null;
 
@@ -87,10 +88,9 @@ namespace UnityLauncherPro
             if (!string.IsNullOrEmpty(downloadUrl) && !string.IsNullOrEmpty(shortRevision))
             {
                 int revisionPosition = downloadUrl.LastIndexOf(shortRevision, StringComparison.Ordinal) + shortRevision.Length + 1;
-                string assistantUrl = downloadUrl.Substring(0, revisionPosition) +
-                    $"UnityDownloadAssistant-{unityVersion}.exe";
+                string assistantUrl = downloadUrl.Substring(0, revisionPosition) + $"UnityDownloadAssistant-{unityVersion}.exe";
 
-                if (CheckAssistantUrl(assistantUrl).Result)
+                if (await CheckAssistantUrl(assistantUrl))
                 {
                     Console.WriteLine("Assistant download URL found.");
                     return assistantUrl;
@@ -115,8 +115,9 @@ namespace UnityLauncherPro
                     return response.IsSuccessStatusCode;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Request failed: {ex.Message}");
                 return false;
             }
         }
