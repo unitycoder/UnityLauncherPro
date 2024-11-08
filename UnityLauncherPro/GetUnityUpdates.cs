@@ -20,12 +20,12 @@ namespace UnityLauncherPro
         public static async Task<List<UnityVersion>> FetchAll()
         {
             var cachedVersions = LoadCachedVersions();
-            Console.WriteLine("cachedVersions: "+ cachedVersions);
+            //Console.WriteLine("cachedVersions: "+ cachedVersions);
             var latestCachedVersion = cachedVersions.FirstOrDefault();
 
-            Console.WriteLine("FetchAll "+ latestCachedVersion);
+            //Console.WriteLine("FetchAll "+ latestCachedVersion);
             var newVersions = await FetchNewVersions(latestCachedVersion);
-            Console.WriteLine("newVersions " + newVersions);
+            //Console.WriteLine("newVersions " + newVersions);
 
             var allVersions = newVersions.Concat(cachedVersions).ToList();
 
@@ -34,7 +34,7 @@ namespace UnityLauncherPro
                 SaveCachedVersions(allVersions);
             }
 
-            Console.WriteLine("all "+ allVersions);
+            //Console.WriteLine("all "+ allVersions);
 
             return allVersions;
         }
