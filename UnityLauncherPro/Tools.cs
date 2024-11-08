@@ -520,8 +520,8 @@ namespace UnityLauncherPro
                 }
                 return newProcess;
             }
-            Console.WriteLine("Failed to run exe: " + path + " " + param);
-            return null;
+           // Console.WriteLine("Failed to run exe: " + path + " " + param);
+           // return null;
         }
 
 
@@ -868,8 +868,6 @@ namespace UnityLauncherPro
 
         private static string FetchUnityVersionNumberFromHTML(string url)
         {
-            string version = null;
-
             string sourceHTML = DownloadHTML(url);
 
             if (string.IsNullOrEmpty(sourceHTML)) return null;
@@ -882,7 +880,7 @@ namespace UnityLauncherPro
                 {
                     Console.WriteLine("Extracted number: " + match.Value);
                     return match.Value;
-                    break;
+                    //break;
                 }
             }
             else
@@ -902,7 +900,7 @@ namespace UnityLauncherPro
             //        version = match.Value.Replace("UnityDownloadAssistant-", "").Replace(".exe", "");
             //    }
             //}
-            return version;
+            //return version;
         }
 
         public static string FindNearestVersion(string currentVersion, List<string> allAvailable, bool checkBelow = false)

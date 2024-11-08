@@ -20,12 +20,7 @@ namespace UnityLauncherPro
         public static async Task<List<UnityVersion>> FetchAll()
         {
             var cachedVersions = LoadCachedVersions();
-            //Console.WriteLine("cachedVersions: "+ cachedVersions);
-            var latestCachedVersion = cachedVersions.FirstOrDefault();
-
-            //Console.WriteLine("FetchAll "+ latestCachedVersion);
-            var newVersions = await FetchNewVersions(latestCachedVersion);
-            //Console.WriteLine("newVersions " + newVersions);
+            var newVersions = await FetchNewVersions(cachedVersions);
 
             var allVersions = newVersions.Concat(cachedVersions).ToList();
 
@@ -33,8 +28,6 @@ namespace UnityLauncherPro
             {
                 SaveCachedVersions(allVersions);
             }
-
-            //Console.WriteLine("all "+ allVersions);
 
             return allVersions;
         }
@@ -62,7 +55,6 @@ namespace UnityLauncherPro
 
         private static async Task<string> ExtractDownloadUrlAsync(string json, string unityVersion)
         {
-
             int resultsIndex = json.IndexOf("\"results\":");
             if (resultsIndex == -1) return null;
 
@@ -122,28 +114,39 @@ namespace UnityLauncherPro
             }
         }
 
-        private static async Task<List<UnityVersion>> FetchNewVersions(UnityVersion latestCachedVersion)
+        private static async Task<List<UnityVersion>> FetchNewVersions(List<UnityVersion> cachedVersions)
         {
             var newVersions = new List<UnityVersion>();
+            var cachedVersionSet = new HashSet<string>(cachedVersions.Select(v => v.Version));
             int offset = 0;
             int total = int.MaxValue;
+            bool foundNewVersionInBatch;
 
             while (offset < total)
             {
                 var batchUpdates = await FetchBatch(offset);
-                if (batchUpdates == null || batchUpdates.Count == 0)
-                    break;
+                if (batchUpdates == null || batchUpdates.Count == 0) break;
+
+                foundNewVersionInBatch = false;
 
                 foreach (var version in batchUpdates)
                 {
-                    if (version.Version == latestCachedVersion?.Version)
-                        return newVersions;
+                    if (!cachedVersionSet.Contains(version.Version))
+                    {
+                        newVersions.Add(version);
+                        foundNewVersionInBatch = true;
+                    }
+                }
 
-                    newVersions.Add(version);
+                if (!foundNewVersionInBatch)
+                {
+                    // Exit if no new versions are found in the current batch
+                    break;
                 }
 
                 offset += batchUpdates.Count;
 
+                // Apply delay if reaching batch limit
                 if (offset % (BatchSize * RequestsPerBatch) == 0)
                 {
                     await Task.Delay(DelayBetweenBatches);
@@ -152,6 +155,8 @@ namespace UnityLauncherPro
 
             return newVersions;
         }
+
+
 
         private static async Task<List<UnityVersion>> FetchBatch(int offset)
         {
@@ -187,6 +192,7 @@ namespace UnityLauncherPro
                         ReleaseDate = DateTime.TryParse(GetStringValue(item, "releaseDate"), out var date) ? date : default,
                         Stream = Enum.TryParse<UnityVersionStream>(GetStringValue(item, "stream"), true, out var stream) ? stream : UnityVersionStream.Tech
                     };
+                    //Console.WriteLine(version.Version);
                     versions.Add(version);
                 }
             }
