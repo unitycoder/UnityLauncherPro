@@ -520,8 +520,8 @@ namespace UnityLauncherPro
                 }
                 return newProcess;
             }
-            Console.WriteLine("Failed to run exe: " + path + " " + param);
-            return null;
+           // Console.WriteLine("Failed to run exe: " + path + " " + param);
+           // return null;
         }
 
 
@@ -531,6 +531,7 @@ namespace UnityLauncherPro
 
             var cleanVersion = CleanVersionNumber(version);
             string url = $"https://unity.com/releases/editor/whats-new/{cleanVersion}#notes";
+
             //if (VersionIsArchived(version) == true)
             //{
             //    // remove f#, TODO should remove c# from china version ?
@@ -608,6 +609,7 @@ namespace UnityLauncherPro
         {
             bool result = false;
             if (string.IsNullOrEmpty(version)) return false;
+
             string url = null;
             if (Properties.Settings.Default.useAlphaReleaseNotes && HasAlphaReleaseNotes(version))
             {
@@ -615,8 +617,9 @@ namespace UnityLauncherPro
             }
             else
             {
-                url = Tools.GetUnityReleaseURL(version);
+                url = GetUnityReleaseURL(version);
             }
+
             if (string.IsNullOrEmpty(url)) return false;
 
             OpenURL(url);
@@ -659,10 +662,15 @@ namespace UnityLauncherPro
             Process.Start(url);
         }
 
-        public static async void DownloadInBrowser(string version)
+        public static async void DownloadInBrowser(string version, bool preferFullInstaller = false)
         {
             if (version == null) return;
             string exeURL = await GetUnityUpdates.FetchDownloadUrl(version);
+
+            if (preferFullInstaller == true)
+            {
+                exeURL = exeURL.Replace("UnityDownloadAssistant-" + version + ".exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
+            }
 
             Console.WriteLine("DownloadInBrowser exeURL= '" + exeURL + "'");
 
@@ -842,14 +850,24 @@ namespace UnityLauncherPro
         public static string CleanVersionNumber(string version)
         {
             if (string.IsNullOrEmpty(version)) return null;
-            // note old patch versions still contains p## in the end
-            return Regex.Replace(version, @"[f|a|b][0-9]{1,2}", "", RegexOptions.IgnoreCase);
+
+            var split = version.Split('.');
+            float parsedVersion = float.Parse($"{split[0]}.{split[1]}");
+            // 2023.3 and newer Alpha releases, no replace
+            if (IsAlpha(version) && parsedVersion >= 2023.3)
+            {
+                // do nothing
+            }
+            else
+            {
+                // note old patch versions still contains p## in the end
+                version = Regex.Replace(version, @"[f|a|b][0-9]{1,2}", "", RegexOptions.IgnoreCase);
+            }
+            return version;
         }
 
         private static string FetchUnityVersionNumberFromHTML(string url)
         {
-            string version = null;
-
             string sourceHTML = DownloadHTML(url);
 
             if (string.IsNullOrEmpty(sourceHTML)) return null;
@@ -862,7 +880,7 @@ namespace UnityLauncherPro
                 {
                     Console.WriteLine("Extracted number: " + match.Value);
                     return match.Value;
-                    break;
+                    //break;
                 }
             }
             else
@@ -882,7 +900,7 @@ namespace UnityLauncherPro
             //        version = match.Value.Replace("UnityDownloadAssistant-", "").Replace(".exe", "");
             //    }
             //}
-            return version;
+            //return version;
         }
 
         public static string FindNearestVersion(string currentVersion, List<string> allAvailable, bool checkBelow = false)
@@ -2211,7 +2229,7 @@ public static class UnityLauncherProTools
                 }
             }
         }
-        
+
         private static async Task<bool> DownloadFileAsync(string fileUrl, string destinationPath)
         {
             var cancellationTokenSource = new CancellationTokenSource();
@@ -2224,25 +2242,25 @@ public static class UnityLauncherProTools
                 using (var client = new HttpClient())
                 using (var response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead, cancellationTokenSource.Token))
                 {
-                        response.EnsureSuccessStatusCode();
+                    response.EnsureSuccessStatusCode();
 
-                        var totalBytes = response.Content.Headers.ContentLength ?? 1;
-                        var buffer = new byte[8192];
-                        var totalRead = 0;
+                    var totalBytes = response.Content.Headers.ContentLength ?? 1;
+                    var buffer = new byte[8192];
+                    var totalRead = 0;
 
-                        using (var contentStream = await response.Content.ReadAsStreamAsync())
-                        using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write,
-                                   FileShare.None, buffer.Length, true))
+                    using (var contentStream = await response.Content.ReadAsStreamAsync())
+                    using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write,
+                               FileShare.None, buffer.Length, true))
+                    {
+                        int bytesRead;
+                        while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationTokenSource.Token)) > 0)
                         {
-                            int bytesRead;
-                            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationTokenSource.Token)) > 0)
-                            {
-                                await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationTokenSource.Token);
-                                totalRead += bytesRead;
-                                progressWindow.UpdateProgress(new DownloadProgress(totalRead, totalBytes));
-                            }
-                            result = true;
+                            await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationTokenSource.Token);
+                            totalRead += bytesRead;
+                            progressWindow.UpdateProgress(new DownloadProgress(totalRead, totalBytes));
                         }
+                        result = true;
+                    }
                 }
             }
             catch (TaskCanceledException)

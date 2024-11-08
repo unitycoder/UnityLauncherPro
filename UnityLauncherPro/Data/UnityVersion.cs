@@ -1,35 +1,56 @@
 using System;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Collections.Generic;
 
 namespace UnityLauncherPro
 {
     public class UnityVersion
     {
-        [JsonPropertyName("version")]
         public string Version { get; set; }
-        [JsonPropertyName("stream")]
-        [JsonConverter(typeof(UnityVersionStreamConverter))]
         public UnityVersionStream Stream { get; set; }
-        [JsonPropertyName("releaseDate")]
         public DateTime ReleaseDate { get; set; }
-    }
-    
-    public class UnityVersionStreamConverter : JsonConverter<UnityVersionStream>
-    {
-        public override UnityVersionStream Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+
+        public static UnityVersion FromJson(string json)
         {
-            string streamString = reader.GetString();
-            if (Enum.TryParse<UnityVersionStream>(streamString, true, out var result))
+            var values = ParseJsonToDictionary(json);
+
+            return new UnityVersion
             {
-                return result;
-            }
-            throw new JsonException($"Unable to convert \"{streamString}\" to UnityVersionStream");
+                Version = values.ContainsKey("version") ? values["version"] : null,
+                Stream = ParseStream(values.ContainsKey("stream") ? values["stream"] : null),
+                ReleaseDate = DateTime.TryParse(values.ContainsKey("releaseDate") ? values["releaseDate"] : null, out var date)
+                    ? date
+                    : default
+            };
         }
 
-        public override void Write(Utf8JsonWriter writer, UnityVersionStream value, JsonSerializerOptions options)
+        public string ToJson()
         {
-            writer.WriteStringValue(value.ToString().ToUpper());
+            return $"{{ \"version\": \"{Version}\", \"stream\": \"{Stream}\", \"releaseDate\": \"{ReleaseDate:yyyy-MM-ddTHH:mm:ss}\" }}";
+        }
+
+        private static Dictionary<string, string> ParseJsonToDictionary(string json)
+        {
+            var result = new Dictionary<string, string>();
+            json = json.Trim(new char[] { '{', '}', ' ' });
+            var keyValuePairs = json.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var pair in keyValuePairs)
+            {
+                var keyValue = pair.Split(new[] { ':' }, 2);
+                if (keyValue.Length == 2)
+                {
+                    var key = keyValue[0].Trim(new char[] { ' ', '"' });
+                    var value = keyValue[1].Trim(new char[] { ' ', '"' });
+                    result[key] = value;
+                }
+            }
+
+            return result;
+        }
+
+        private static UnityVersionStream ParseStream(string stream)
+        {
+            return Enum.TryParse(stream, true, out UnityVersionStream result) ? result : UnityVersionStream.Tech;
         }
     }
 }
