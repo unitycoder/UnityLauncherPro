@@ -488,7 +488,7 @@ namespace UnityLauncherPro
         }
 
         // run any exe, return process
-        public static Process LaunchExe(string path, string param = null)
+        public static Process LaunchExe(string path, string param = null, bool captureOutput=false)
         {
             if (string.IsNullOrEmpty(path)) return null;
 
@@ -510,6 +510,12 @@ namespace UnityLauncherPro
                         newProcess = new Process();
                         newProcess.StartInfo.FileName = "\"" + path + "\"";
                         newProcess.StartInfo.Arguments = param;
+                        if (captureOutput)
+                        {
+                            newProcess.StartInfo.RedirectStandardError = true;
+                            newProcess.StartInfo.RedirectStandardOutput = true;
+                            newProcess.StartInfo.UseShellExecute = false;
+                        }
                         newProcess.EnableRaisingEvents = true; // needed to get Exited event
                         newProcess.Start();
                     }

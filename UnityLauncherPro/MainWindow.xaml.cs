@@ -1589,7 +1589,7 @@ namespace UnityLauncherPro
                 return; // dont run code on window init
 
             Settings.Default.searchGitFolderRecursivly = (bool)chkGetGitBranchRecursively.IsChecked;
-            Settings.Default.Save();           
+            Settings.Default.Save();
             RefreshRecentProjects();
         }
 
@@ -3460,12 +3460,25 @@ namespace UnityLauncherPro
                 pars += $" && adb shell monkey -p {packageName} 1";
             }
 
-            // TODO start cmd minimized
-            Tools.LaunchExe(cmd, pars);
-            // get apk name from path
-            var apkName = Path.GetFileName(playerPath);
-            if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
-            SetStatus("Installed APK:" + apkName);
+            //Tools.LaunchExe(cmd, pars);
+            var process = Tools.LaunchExe(cmd, pars, captureOutput: true);
+            var output = process.StandardOutput.ReadToEnd();
+            var errorOutput = process.StandardError.ReadToEnd().Replace("\r", "").Replace("\n", "");
+
+            process.WaitForExit();
+
+            // Console.WriteLine(output);
+            if (!string.IsNullOrEmpty(errorOutput))
+            {
+                SetStatus("Error installing APK: " + errorOutput);
+            }
+            else
+            {
+                // get apk name from path
+                var apkName = Path.GetFileName(playerPath);
+                if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
+                SetStatus("Installed APK:" + apkName);
+            }
         }
 
         private void txtWebglPort_TextChanged(object sender, TextChangedEventArgs e)
