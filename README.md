@@ -69,3 +69,4 @@ Pre-releases are sometimes available from dev branch: https://github.com/unityco
 
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
+
