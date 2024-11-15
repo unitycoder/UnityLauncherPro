@@ -19,6 +19,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
+using UnityLauncherPro.Data;
 using UnityLauncherPro.Helpers;
 using UnityLauncherPro.Properties;
 
@@ -1930,6 +1931,7 @@ namespace UnityLauncherPro
                     tabControl.SelectedIndex = 4;
                     this.UpdateLayout();
                     txtRootFolderForNewProjects.Focus();
+                    SetStatus("Root folder for new projects is missing or doesn't exist: " + rootFolder, MessageType.Error);
                     return;
                 }
             }
@@ -3353,8 +3355,22 @@ namespace UnityLauncherPro
             gridSettingsBg.Focus();
         }
 
-        public void SetStatus(string msg)
+        public void SetStatus(string msg, MessageType messageType = MessageType.Info)
         {
+            Console.WriteLine(messageType);
+            switch (messageType)
+            {
+                case MessageType.Info:
+                    txtStatus.Foreground = (SolidColorBrush)Application.Current.Resources["ThemeStatusText"];
+                    break;
+                case MessageType.Warning:
+                    txtStatus.Foreground = (SolidColorBrush)Application.Current.Resources["ThemeMessageWarning"];
+                    break;
+                case MessageType.Error:
+                    txtStatus.Foreground = (SolidColorBrush)Application.Current.Resources["ThemeMessageError"];
+                    break;
+            }
+
             txtStatus.Text = msg;
         }
 
