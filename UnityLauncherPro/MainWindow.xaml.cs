@@ -2931,6 +2931,13 @@ namespace UnityLauncherPro
             //Console.WriteLine("Process Exited: " + proj.Path);
             //var index = projectsSource.IndexOf(proj); // this fails since proj has changed after refresh (timestamp or other data)
 
+            // if currently editing field, cancel it (otherwise crash)
+            IEditableCollectionView itemsView = gridRecent.Items;
+            if (itemsView.IsAddingNew || itemsView.IsEditingItem)
+            {
+                gridRecent.CancelEdit(DataGridEditingUnit.Cell);
+            }
+
             // FIXME nobody likes extra loops.. but only 40 items to find correct project? but still..
             for (int i = 0, len = projectsSource.Count; i < len; i++)
             {
