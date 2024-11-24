@@ -9,6 +9,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
+using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -70,6 +71,9 @@ namespace UnityLauncherPro
         List<BuildReport> buildReports = new List<BuildReport>(); // multiple reports, each contains their own stats and items
         int currentBuildReport = 0;
 
+        private NamedPipeServerStream pipeServer;
+        private const string PipeName = appName;
+
         [DllImport("user32", CharSet = CharSet.Unicode)]
         static extern IntPtr FindWindow(string cls, string win);
         [DllImport("user32")]
@@ -118,13 +122,21 @@ namespace UnityLauncherPro
             // check for duplicate instance, and activate that instead
             if (chkAllowSingleInstanceOnly.IsChecked == true)
             {
-                bool aIsNewInstance = false;
-                myMutex = new Mutex(true, appName, out aIsNewInstance);
-                if (!aIsNewInstance)
+                bool isNewInstance;
+                myMutex = new Mutex(true, appName, out isNewInstance);
+
+                if (!isNewInstance)
                 {
-                    // NOTE doesnt work if its minized to tray
-                    ActivateOtherWindow();
+                    // Send a wake-up message to the running instance
+                    ActivateRunningInstance();
+
+                    // Exit the current instance
                     App.Current.Shutdown();
+                }
+                else
+                {
+                    // Start pipe server in the first instance
+                    StartPipeServer();
                 }
             }
 
@@ -134,7 +146,7 @@ namespace UnityLauncherPro
 
             projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked);
 
-            Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
+            //Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
 
             gridRecent.Items.Clear();
             gridRecent.ItemsSource = projectsSource;
@@ -825,6 +837,11 @@ namespace UnityLauncherPro
 
         // maximize window
         void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            RestoreFromTray();
+        }
+
+        void RestoreFromTray()
         {
             this.Show();
             this.WindowState = WindowState.Normal;
@@ -2938,7 +2955,7 @@ namespace UnityLauncherPro
                 gridRecent.CancelEdit(DataGridEditingUnit.Cell);
             }
 
-            // FIXME nobody likes extra loops.. but only 40 items to find correct project? but still..
+            // FIXME nobody likes extra loops.. but only # items to find correct project? but still..
             for (int i = 0, len = projectsSource.Count; i < len; i++)
             {
                 if (projectsSource[i].Path == proj.Path)
@@ -3679,6 +3696,66 @@ namespace UnityLauncherPro
             Settings.Default.useAlphaReleaseNotes = isChecked;
             Settings.Default.Save();
         }
+
+        private void ActivateRunningInstance()
+        {
+            try
+            {
+                using (var pipeClient = new NamedPipeClientStream(".", PipeName, PipeDirection.Out))
+                {
+                    pipeClient.Connect(1000); // Wait for 1 second to connect
+                    using (var writer = new StreamWriter(pipeClient))
+                    {
+                        writer.WriteLine("WakeUp");
+                        writer.Flush();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle connection failure (e.g., pipe not available)
+                Console.WriteLine("Could not connect to the running instance: " + ex.Message);
+            }
+        }
+
+        private void StartPipeServer()
+        {
+            pipeServer = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            pipeServer.BeginWaitForConnection(OnPipeConnection, null);
+        }
+
+        private void OnPipeConnection(IAsyncResult result)
+        {
+            try
+            {
+                pipeServer.EndWaitForConnection(result);
+
+                // Read the message
+                using (var reader = new StreamReader(pipeServer))
+                {
+                    string message = reader.ReadLine();
+                    if (message == "WakeUp")
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            // Bring the app to the foreground
+                            RestoreFromTray();
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                Console.WriteLine(ex);
+            }
+            finally
+            {
+                // Restart pipe server to listen for new messages
+                StartPipeServer();
+            }
+        }
+
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
