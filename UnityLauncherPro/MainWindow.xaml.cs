@@ -18,7 +18,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 using UnityLauncherPro.Data;
 using UnityLauncherPro.Helpers;
@@ -45,7 +47,7 @@ namespace UnityLauncherPro
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
         const string resourcesURL = "https://github.com/unitycoder/UnityResources";
         const string defaultAdbLogCatArgs = "-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
-        System.Windows.Forms.NotifyIcon notifyIcon;
+        System.Windows.Forms.NotifyIcon notifyIcon = new System.Windows.Forms.NotifyIcon();
 
         UnityVersion[] updatesSource;
         public static List<string> updatesAsStrings = new List<string>();
@@ -110,6 +112,8 @@ namespace UnityLauncherPro
             {
                 lblVersion.Content = "Build: " + Version.Stamp;
             }
+
+            CheckCustomIcon();
         }
 
         void Start()
@@ -160,8 +164,6 @@ namespace UnityLauncherPro
             gridBuildReportData.Items.Clear();
 
             // build notifyicon (using windows.forms)
-            notifyIcon = new System.Windows.Forms.NotifyIcon();
-            notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
 
             // get original colors
@@ -3756,7 +3758,43 @@ namespace UnityLauncherPro
             }
         }
 
+        private void CheckCustomIcon()
+        {
+            string customIconPath = Path.Combine(Environment.CurrentDirectory, "icon.ico");
+            Console.WriteLine(customIconPath);
 
+            if (File.Exists(customIconPath))
+            {
+                try
+                {
+                    // Load the custom icon using System.Drawing.Icon
+                    using (var icon = new System.Drawing.Icon(customIconPath))
+                    {
+                        // Convert the icon to a BitmapSource and assign it to the WPF window's Icon property
+                        this.Icon = Imaging.CreateBitmapSourceFromHIcon(
+                            icon.Handle,
+                            Int32Rect.Empty,
+                            BitmapSizeOptions.FromEmptyOptions() // Use BitmapSizeOptions here
+                        );
+
+                        // window icon
+                        IconImage.Source = this.Icon;
+                        // tray icon
+                        notifyIcon.Icon = new Icon(customIconPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SetStatus("Failed to load custom icon: " + ex.Message, MessageType.Warning);
+                    Debug.WriteLine($"Failed to load custom icon: {ex.Message}");
+                }
+            }
+            else // no custom icon found
+            {
+                notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
+                //Debug.WriteLine("Custom icon not found. Using default.");
+            }
+        }
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
         //    var proj = GetSelectedProject();
