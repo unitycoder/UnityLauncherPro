@@ -426,39 +426,42 @@ namespace UnityLauncherPro
 
         void LoadSettings()
         {
+            // debug, print filename
+            //Console.WriteLine(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath);
+
             // catch corrupted config file
             try
             {
                 Settings.Default.Reload();
                 // form size
-                this.Width = Properties.Settings.Default.windowWidth;
-                this.Height = Properties.Settings.Default.windowHeight;
+                this.Width = Settings.Default.windowWidth;
+                this.Height = Settings.Default.windowHeight;
 
-                chkMinimizeToTaskbar.IsChecked = Properties.Settings.Default.minimizeToTaskbar;
-                chkRegisterExplorerMenu.IsChecked = Properties.Settings.Default.registerExplorerMenu;
+                chkMinimizeToTaskbar.IsChecked = Settings.Default.minimizeToTaskbar;
+                chkRegisterExplorerMenu.IsChecked = Settings.Default.registerExplorerMenu;
 
                 // update settings window
-                chkQuitAfterCommandline.IsChecked = Properties.Settings.Default.closeAfterExplorer;
-                chkQuitAfterOpen.IsChecked = Properties.Settings.Default.closeAfterProject;
-                chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
-                chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
-                chkGetGitBranchRecursively.IsChecked = Properties.Settings.Default.searchGitFolderRecursivly;
-                chkCheckPlasticBranch.IsChecked = Properties.Settings.Default.checkPlasticBranch;
-                chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
-                chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
-                chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
-                chkEnableProjectRename.IsChecked = Properties.Settings.Default.enableProjectRename;
-                chkStreamerMode.IsChecked = Properties.Settings.Default.streamerMode;
-                chkShowPlatform.IsChecked = Properties.Settings.Default.showTargetPlatform;
-                chkUseCustomTheme.IsChecked = Properties.Settings.Default.useCustomTheme;
-                txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
-                txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
-                txtCustomThemeFile.Text = Properties.Settings.Default.themeFile;
-                useAlphaReleaseNotesSite.IsChecked = Properties.Settings.Default.useAlphaReleaseNotes;
+                chkQuitAfterCommandline.IsChecked = Settings.Default.closeAfterExplorer;
+                chkQuitAfterOpen.IsChecked = Settings.Default.closeAfterProject;
+                chkShowLauncherArgumentsColumn.IsChecked = Settings.Default.showArgumentsColumn;
+                chkShowGitBranchColumn.IsChecked = Settings.Default.showGitBranchColumn;
+                chkGetGitBranchRecursively.IsChecked = Settings.Default.searchGitFolderRecursivly; // FIXME typo
+                chkCheckPlasticBranch.IsChecked = Settings.Default.checkPlasticBranch;
+                chkShowMissingFolderProjects.IsChecked = Settings.Default.showProjectsMissingFolder;
+                chkAllowSingleInstanceOnly.IsChecked = Settings.Default.AllowSingleInstanceOnly;
+                chkAskNameForQuickProject.IsChecked = Settings.Default.askNameForQuickProject;
+                chkEnableProjectRename.IsChecked = Settings.Default.enableProjectRename;
+                chkStreamerMode.IsChecked = Settings.Default.streamerMode;
+                chkShowPlatform.IsChecked = Settings.Default.showTargetPlatform;
+                chkUseCustomTheme.IsChecked = Settings.Default.useCustomTheme;
+                txtRootFolderForNewProjects.Text = Settings.Default.newProjectsRoot;
+                txtWebglRelativePath.Text = Settings.Default.webglBuildPath;
+                txtCustomThemeFile.Text = Settings.Default.themeFile;
+                useAlphaReleaseNotesSite.IsChecked = Settings.Default.useAlphaReleaseNotes;
 
-                chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
-                chkRunAutomatically.IsChecked = Properties.Settings.Default.runAutomatically;
-                chkRunAutomaticallyMinimized.IsChecked = Properties.Settings.Default.runAutomaticallyMinimized;
+                chkEnablePlatformSelection.IsChecked = Settings.Default.enablePlatformSelection;
+                chkRunAutomatically.IsChecked = Settings.Default.runAutomatically;
+                chkRunAutomaticallyMinimized.IsChecked = Settings.Default.runAutomaticallyMinimized;
 
                 // update optional grid columns, hidden or visible
                 gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -469,7 +472,7 @@ namespace UnityLauncherPro
                 lstRootFolders.Items.Clear();
 
                 // check if no installation root folders are added, then add default folder(s), this usually happens only on first run (or if user has not added any folders)
-                if (Properties.Settings.Default.rootFolders.Count == 0)
+                if (Settings.Default.rootFolders.Count == 0)
                 {
                     // default hub installation folder
                     string baseFolder = "\\Program Files\\Unity\\Hub\\Editor";

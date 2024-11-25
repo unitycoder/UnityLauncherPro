@@ -709,7 +709,8 @@
                     <Label x:Name="lblFoundXInstallations" Grid.Row="0" Content="Found .. Installations" Foreground="{DynamicResource ThemeButtonForeground}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                     <!-- locations list -->
                     <ListBox x:Name="lstRootFolders" Grid.Row="1" Background="{DynamicResource ThemeButtonBackground}" Margin="4,0,2,0" Foreground="{DynamicResource ThemeButtonForeground}" VerticalAlignment="Top" MinHeight="65" >
-                        <System:String>c:\Program Files</System:String>
+                        <System:String>C:\Program Files\Unity\Hub\Editor</System:String>
+                        <System:String>C:\Program Files</System:String>
                     </ListBox>
                     <!-- locations add/remove -->
                     <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0" VerticalAlignment="Top" >
