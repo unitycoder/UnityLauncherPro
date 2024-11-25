@@ -58,10 +58,12 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -85,9 +87,17 @@
     <Compile Include="Converters\LastModifiedConverter.cs" />
     <Compile Include="Data\BuildReport.cs" />
     <Compile Include="Data\BuildReportItem.cs" />
+    <Compile Include="Data\DownloadProgress.cs" />
+    <Compile Include="Data\MessageType.cs" />
     <Compile Include="Data\Platform.cs" />
     <Compile Include="Data\Tabs.cs" />
     <Compile Include="Data\ThemeColor.cs" />
+    <Compile Include="Data\UnityVersion.cs" />
+    <Compile Include="Data\UnityVersionResponse.cs" />
+    <Compile Include="Data\UnityVersionStream.cs" />
+    <Compile Include="DownloadProgressWindow.xaml.cs">
+      <DependentUpon>DownloadProgressWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GetProjects.cs" />
     <Compile Include="GetUnityInstallations.cs" />
     <Compile Include="GetUnityUpdates.cs" />
@@ -105,10 +115,11 @@
     </Compile>
     <Compile Include="Tools.cs" />
     <Compile Include="Data\UnityInstallation.cs" />
-    <Compile Include="Data\Updates.cs" />
     <Compile Include="UpgradeWindow.xaml.cs">
       <DependentUpon>UpgradeWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Version.cs" />
+    <Page Include="DownloadProgressWindow.xaml" />
     <Page Include="NewProject.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -188,5 +199,16 @@
   <ItemGroup>
     <Resource Include="Images\icon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\UnityVersionCache.json" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- PowerShell command to feed current timestamp into version.cs (it is displayed in the app -->
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$pattern = 'public static string Stamp = \&quot;.*?\&quot;;'; $date = Get-Date -Format 'dd-MM-yyyy HH:mm:ss'; $replacement = 'public static string Stamp = \&quot;' + $date + '\&quot;;'; $path = '$(ProjectDir)Version.cs'; $content = Get-Content $path -Raw; $newContent = $content -replace $pattern, $replacement; [System.IO.File]::WriteAllText($path, $newContent, [System.Text.Encoding]::UTF8)&quot;" />
+  </Target>
+  <!-- PowerShell command to restore the Stamp string to its initial state -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$pattern = 'public static string Stamp = \&quot;.*?\&quot;;'; $replacement = 'public static string Stamp = \&quot;\&quot;;'; $path = '$(ProjectDir)Version.cs'; $content = Get-Content $path -Raw; $newContent = $content -replace $pattern, $replacement; [System.IO.File]::WriteAllText($path, $newContent, [System.Text.Encoding]::UTF8)&quot;" />
+  </Target>
 </Project>

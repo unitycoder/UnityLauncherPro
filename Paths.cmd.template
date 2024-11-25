@@ -1,0 +1,4 @@
+@echo off
+REM Set your Visual Studio path here.
+SET VISUAL_STUDIO_PATH="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe"
+@echo on

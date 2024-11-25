@@ -9,6 +9,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
+using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -17,8 +18,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shell;
+using UnityLauncherPro.Data;
 using UnityLauncherPro.Helpers;
 using UnityLauncherPro.Properties;
 
@@ -43,9 +47,10 @@ namespace UnityLauncherPro
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
         const string resourcesURL = "https://github.com/unitycoder/UnityResources";
         const string defaultAdbLogCatArgs = "-s Unity ActivityManager PackageManager dalvikvm DEBUG -v color";
-        System.Windows.Forms.NotifyIcon notifyIcon;
+        System.Windows.Forms.NotifyIcon notifyIcon = new System.Windows.Forms.NotifyIcon();
 
-        Updates[] updatesSource;
+        UnityVersion[] updatesSource;
+        public static List<string> updatesAsStrings = new List<string>();
 
         string _filterString = null;
         bool multiWordSearch = false;
@@ -67,6 +72,9 @@ namespace UnityLauncherPro
         //List<List<string>> buildReports = new List<List<string>>();
         List<BuildReport> buildReports = new List<BuildReport>(); // multiple reports, each contains their own stats and items
         int currentBuildReport = 0;
+
+        private NamedPipeServerStream pipeServer;
+        private const string PipeName = appName;
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
         static extern IntPtr FindWindow(string cls, string win);
@@ -98,6 +106,14 @@ namespace UnityLauncherPro
 
             // need to load here to get correct window size early
             LoadSettings();
+
+            // set version number
+            if (string.IsNullOrEmpty(Version.Stamp) == false)
+            {
+                lblVersion.Content = "Build: " + Version.Stamp;
+            }
+
+            CheckCustomIcon();
         }
 
         void Start()
@@ -110,13 +126,21 @@ namespace UnityLauncherPro
             // check for duplicate instance, and activate that instead
             if (chkAllowSingleInstanceOnly.IsChecked == true)
             {
-                bool aIsNewInstance = false;
-                myMutex = new Mutex(true, appName, out aIsNewInstance);
-                if (!aIsNewInstance)
+                bool isNewInstance;
+                myMutex = new Mutex(true, appName, out isNewInstance);
+
+                if (!isNewInstance)
                 {
-                    // NOTE doesnt work if its minized to tray
-                    ActivateOtherWindow();
+                    // Send a wake-up message to the running instance
+                    ActivateRunningInstance();
+
+                    // Exit the current instance
                     App.Current.Shutdown();
+                }
+                else
+                {
+                    // Start pipe server in the first instance
+                    StartPipeServer();
                 }
             }
 
@@ -124,23 +148,22 @@ namespace UnityLauncherPro
             //Properties.Settings.Default.projectPaths = null;
             //Properties.Settings.Default.Save();
 
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked);
 
-            Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
+            //Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
 
             gridRecent.Items.Clear();
             gridRecent.ItemsSource = projectsSource;
 
             // clear updates grid
             dataGridUpdates.Items.Clear();
+            dataGridUpdates.SelectionChanged += DataGridUpdates_SelectionChanged;
 
             // clear buildreport grids
             gridBuildReport.Items.Clear();
             gridBuildReportData.Items.Clear();
 
             // build notifyicon (using windows.forms)
-            notifyIcon = new System.Windows.Forms.NotifyIcon();
-            notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
 
             // get original colors
@@ -168,6 +191,18 @@ namespace UnityLauncherPro
             //themeEditorWindow.Show();
 
             isInitializing = false;
+        }
+
+        private void DataGridUpdates_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedUp = GetSelectedUpdate();
+            bool showCumulative = false;
+            if (selectedUp != null)
+            {
+                var unityVer = GetSelectedUpdate().Version;
+                showCumulative = Tools.HasAlphaReleaseNotes(unityVer);
+            }
+            btnShowCumulatedReleaseNotes.IsEnabled = showCumulative;
         }
 
         // bring old window to front, but needs matching appname.. https://stackoverflow.com/a/36804161/5452781
@@ -280,8 +315,10 @@ namespace UnityLauncherPro
 
         void FilterUpdates()
         {
-            _filterString = txtSearchBoxUpdates.Text;
+            _filterString = txtSearchBoxUpdates.Text.Trim();
             ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUpdates.ItemsSource);
+            if (collection == null) return;
+
             collection.Filter = UpdatesFilter;
             if (dataGridUpdates.Items.Count > 0)
             {
@@ -338,31 +375,37 @@ namespace UnityLauncherPro
 
         private bool UpdatesFilter(object item)
         {
-            Updates unity = item as Updates;
+            if (!(item is UnityVersion unityVersion))
+            {
+                return false;
+            }
 
             bool haveSearchString = string.IsNullOrEmpty(_filterString) == false;
-            bool matchString = haveSearchString && unity.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+            bool matchString = haveSearchString && unityVersion.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) > -1;
 
             bool checkedAlls = (bool)rdoAll.IsChecked;
             bool checkedLTSs = (bool)rdoLTS.IsChecked;
+            bool checkedTechs = (bool)rdoTech.IsChecked;
             bool checkedAlphas = (bool)rdoAlphas.IsChecked;
             bool checkedBetas = (bool)rdoBetas.IsChecked;
 
-            bool matchLTS = checkedLTSs && Tools.IsLTS(unity.Version);
-            bool matchAlphas = checkedAlphas && Tools.IsAlpha(unity.Version);
-            bool matchBetas = checkedBetas && Tools.IsBeta(unity.Version);
+            bool matchLTS = checkedLTSs && unityVersion.Stream == UnityVersionStream.LTS;
+            bool matchTech = checkedTechs && unityVersion.Stream == UnityVersionStream.Tech;
+            bool matchAlphas = checkedAlphas && unityVersion.Stream == UnityVersionStream.Alpha;
+            bool matchBetas = checkedBetas && unityVersion.Stream == UnityVersionStream.Beta;
 
             // match search string and some radiobutton
-            if (haveSearchString)
+            if (haveSearchString == true)
             {
                 if (checkedAlls) return matchString;
                 if (checkedLTSs) return matchString && matchLTS;
+                if (checkedTechs) return matchString && matchTech;
                 if (checkedAlphas) return matchString && matchAlphas;
                 if (checkedBetas) return matchString && matchBetas;
             }
             else // no search text, filter by radiobuttons
             {
-                if (checkedAlls || matchLTS || matchAlphas || matchBetas) return true;
+                if (checkedAlls || matchLTS || matchTech || matchAlphas || matchBetas) return true;
             }
 
             // fallback
@@ -383,37 +426,42 @@ namespace UnityLauncherPro
 
         void LoadSettings()
         {
+            // debug, print filename
+            //Console.WriteLine(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath);
+
             // catch corrupted config file
             try
             {
                 Settings.Default.Reload();
                 // form size
-                this.Width = Properties.Settings.Default.windowWidth;
-                this.Height = Properties.Settings.Default.windowHeight;
+                this.Width = Settings.Default.windowWidth;
+                this.Height = Settings.Default.windowHeight;
 
-                chkMinimizeToTaskbar.IsChecked = Properties.Settings.Default.minimizeToTaskbar;
-                chkRegisterExplorerMenu.IsChecked = Properties.Settings.Default.registerExplorerMenu;
+                chkMinimizeToTaskbar.IsChecked = Settings.Default.minimizeToTaskbar;
+                chkRegisterExplorerMenu.IsChecked = Settings.Default.registerExplorerMenu;
 
                 // update settings window
-                chkQuitAfterCommandline.IsChecked = Properties.Settings.Default.closeAfterExplorer;
-                chkQuitAfterOpen.IsChecked = Properties.Settings.Default.closeAfterProject;
-                chkShowLauncherArgumentsColumn.IsChecked = Properties.Settings.Default.showArgumentsColumn;
-                chkShowGitBranchColumn.IsChecked = Properties.Settings.Default.showGitBranchColumn;
-                chkCheckPlasticBranch.IsChecked = Properties.Settings.Default.checkPlasticBranch;
-                chkShowMissingFolderProjects.IsChecked = Properties.Settings.Default.showProjectsMissingFolder;
-                chkAllowSingleInstanceOnly.IsChecked = Properties.Settings.Default.AllowSingleInstanceOnly;
-                chkAskNameForQuickProject.IsChecked = Properties.Settings.Default.askNameForQuickProject;
-                chkEnableProjectRename.IsChecked = Properties.Settings.Default.enableProjectRename;
-                chkStreamerMode.IsChecked = Properties.Settings.Default.streamerMode;
-                chkShowPlatform.IsChecked = Properties.Settings.Default.showTargetPlatform;
-                chkUseCustomTheme.IsChecked = Properties.Settings.Default.useCustomTheme;
-                txtRootFolderForNewProjects.Text = Properties.Settings.Default.newProjectsRoot;
-                txtWebglRelativePath.Text = Properties.Settings.Default.webglBuildPath;
-                txtCustomThemeFile.Text = Properties.Settings.Default.themeFile;
+                chkQuitAfterCommandline.IsChecked = Settings.Default.closeAfterExplorer;
+                chkQuitAfterOpen.IsChecked = Settings.Default.closeAfterProject;
+                chkShowLauncherArgumentsColumn.IsChecked = Settings.Default.showArgumentsColumn;
+                chkShowGitBranchColumn.IsChecked = Settings.Default.showGitBranchColumn;
+                chkGetGitBranchRecursively.IsChecked = Settings.Default.searchGitFolderRecursivly; // FIXME typo
+                chkCheckPlasticBranch.IsChecked = Settings.Default.checkPlasticBranch;
+                chkShowMissingFolderProjects.IsChecked = Settings.Default.showProjectsMissingFolder;
+                chkAllowSingleInstanceOnly.IsChecked = Settings.Default.AllowSingleInstanceOnly;
+                chkAskNameForQuickProject.IsChecked = Settings.Default.askNameForQuickProject;
+                chkEnableProjectRename.IsChecked = Settings.Default.enableProjectRename;
+                chkStreamerMode.IsChecked = Settings.Default.streamerMode;
+                chkShowPlatform.IsChecked = Settings.Default.showTargetPlatform;
+                chkUseCustomTheme.IsChecked = Settings.Default.useCustomTheme;
+                txtRootFolderForNewProjects.Text = Settings.Default.newProjectsRoot;
+                txtWebglRelativePath.Text = Settings.Default.webglBuildPath;
+                txtCustomThemeFile.Text = Settings.Default.themeFile;
+                useAlphaReleaseNotesSite.IsChecked = Settings.Default.useAlphaReleaseNotes;
 
-                chkEnablePlatformSelection.IsChecked = Properties.Settings.Default.enablePlatformSelection;
-                chkRunAutomatically.IsChecked = Properties.Settings.Default.runAutomatically;
-                chkRunAutomaticallyMinimized.IsChecked = Properties.Settings.Default.runAutomaticallyMinimized;
+                chkEnablePlatformSelection.IsChecked = Settings.Default.enablePlatformSelection;
+                chkRunAutomatically.IsChecked = Settings.Default.runAutomatically;
+                chkRunAutomaticallyMinimized.IsChecked = Settings.Default.runAutomaticallyMinimized;
 
                 // update optional grid columns, hidden or visible
                 gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -424,7 +472,7 @@ namespace UnityLauncherPro
                 lstRootFolders.Items.Clear();
 
                 // check if no installation root folders are added, then add default folder(s), this usually happens only on first run (or if user has not added any folders)
-                if (Properties.Settings.Default.rootFolders.Count == 0)
+                if (Settings.Default.rootFolders.Count == 0)
                 {
                     // default hub installation folder
                     string baseFolder = "\\Program Files\\Unity\\Hub\\Editor";
@@ -702,9 +750,9 @@ namespace UnityLauncherPro
             return (UnityInstallation)dataGridUnitys.SelectedItem;
         }
 
-        Updates GetSelectedUpdate()
+        UnityVersion GetSelectedUpdate()
         {
-            return (Updates)dataGridUpdates.SelectedItem;
+            return (UnityVersion)dataGridUpdates.SelectedItem;
         }
 
         BuildReportItem GetSelectedBuildItem()
@@ -733,11 +781,9 @@ namespace UnityLauncherPro
         async Task CallGetUnityUpdates()
         {
             dataGridUpdates.ItemsSource = null;
-            var task = GetUnityUpdates.Scan();
+            var task = GetUnityUpdates.FetchAll();
             var items = await task;
-            //Console.WriteLine("CallGetUnityUpdates=" + items == null);
-            if (items == null) return;
-            updatesSource = GetUnityUpdates.Parse(items);
+            updatesSource = items.ToArray();
             if (updatesSource == null) return;
             dataGridUpdates.ItemsSource = updatesSource;
         }
@@ -767,7 +813,7 @@ namespace UnityLauncherPro
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Settings.Default.projectPaths);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked);
             gridRecent.ItemsSource = projectsSource;
 
             // fix sorting on refresh
@@ -796,6 +842,11 @@ namespace UnityLauncherPro
 
         // maximize window
         void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            RestoreFromTray();
+        }
+
+        void RestoreFromTray()
         {
             this.Show();
             this.WindowState = WindowState.Normal;
@@ -842,7 +893,7 @@ namespace UnityLauncherPro
             p.Version = Tools.GetProjectVersion(folder);
             p.Arguments = Tools.ReadCustomProjectData(folder, launcherArgumentsFile);
             if ((bool)chkShowPlatform.IsChecked == true) p.TargetPlatform = Tools.GetTargetPlatform(folder);
-            if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder);
+            if ((bool)chkShowGitBranchColumn.IsChecked == true) p.GITBranch = Tools.ReadGitBranchInfo(folder, (bool)chkGetGitBranchRecursively.IsChecked);
             return p;
         }
 
@@ -1023,11 +1074,11 @@ namespace UnityLauncherPro
                 // if we dont have previous results yet, TODO scan again if previous was 24hrs ago
                 if (updatesSource == null)
                 {
-                    var task = GetUnityUpdates.Scan();
+                    var task = GetUnityUpdates.FetchAll();
                     var items = await task;
                     if (task.IsCompleted == false || task.IsFaulted == true) return;
                     if (items == null) return;
-                    updatesSource = GetUnityUpdates.Parse(items);
+                    updatesSource = items.ToArray();
                     if (updatesSource == null) return;
                     dataGridUpdates.ItemsSource = updatesSource;
                 }
@@ -1115,12 +1166,10 @@ namespace UnityLauncherPro
         }
 
         // get download url for selected update version
-        private void MenuItemCopyUpdateDownloadURL_Click(object sender, RoutedEventArgs e)
+        private async void MenuItemCopyUpdateDownloadURL_Click(object sender, RoutedEventArgs e)
         {
-            string copy = null;
             var unity = GetSelectedUpdate();
-            copy = unity?.Version; //https://unity3d.com/get-unity/download?thank-you=update&download_nid=65083&os=Win
-            string exeURL = Tools.ParseDownloadURLFromWebpage(copy);
+            string exeURL = await GetUnityUpdates.FetchDownloadUrl(unity?.Version);
             if (exeURL != null) Clipboard.SetText(exeURL);
         }
 
@@ -1289,6 +1338,13 @@ namespace UnityLauncherPro
                 case Key.End: // override end
                     // if edit mode, dont override keys
                     if (IsEditingCell(gridRecent) == true) return;
+                    // if in args column, dont jump to end of list, but end of this field
+                    if (gridRecent.CurrentCell.Column.DisplayIndex == 4)
+                    {
+                        // start editing this cell
+                        gridRecent.BeginEdit();
+                        return;
+                    }
                     gridRecent.SelectedIndex = gridRecent.Items.Count - 1;
                     gridRecent.ScrollIntoView(gridRecent.SelectedItem);
                     e.Handled = true;
@@ -1478,51 +1534,31 @@ namespace UnityLauncherPro
         private void BtnDownloadInBrowser_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
-            string url = Tools.GetUnityReleaseURL(unity?.Version);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Tools.DownloadInBrowser(url, unity.Version);
-            }
-            else
-            {
-                Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
-                SetStatus("Failed getting Unity Installer URL for " + unity?.Version);
-            }
+            Tools.DownloadInBrowser(unity?.Version);
         }
 
         private void BtnDownloadInBrowserFull_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
-            string url = Tools.GetUnityReleaseURL(unity?.Version);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Tools.DownloadInBrowser(url, unity.Version, true);
-            }
-            else
-            {
-                Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
-                SetStatus("Failed getting Unity Installer URL for " + unity?.Version);
-            }
+            Tools.DownloadInBrowser(unity?.Version, true);
         }
 
         private void btnDownloadInstallUpdate_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
-            string url = Tools.GetUnityReleaseURL(unity?.Version);
-            if (string.IsNullOrEmpty(url) == false)
-            {
-                Tools.DownloadAndInstall(url, unity?.Version);
-            }
-            else
-            {
-                Console.WriteLine("Failed getting Unity Installer URL for " + unity?.Version);
-            }
+            Tools.DownloadAndInstall(unity?.Version);
         }
 
         private void BtnOpenWebsite_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
             Tools.OpenReleaseNotes(unity?.Version);
+        }
+
+        private void BtnShowCumulatedReleaseNotes_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUpdate();
+            Tools.OpenReleaseNotes_Cumulative(unity?.Version);
         }
 
         private void ChkMinimizeToTaskbar_CheckedChanged(object sender, RoutedEventArgs e)
@@ -1569,6 +1605,17 @@ namespace UnityLauncherPro
             gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
             RefreshRecentProjects();
         }
+
+        private void ChkGetGitBranchRecursively_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false)
+                return; // dont run code on window init
+
+            Settings.Default.searchGitFolderRecursivly = (bool)chkGetGitBranchRecursively.IsChecked;
+            Settings.Default.Save();
+            RefreshRecentProjects();
+        }
+
 
         private void ChkQuitAfterOpen_CheckedChanged(object sender, RoutedEventArgs e)
         {
@@ -1820,6 +1867,7 @@ namespace UnityLauncherPro
 
         private void BtnAssetPackages_Click(object sender, RoutedEventArgs e)
         {
+            Tools.OpenCustomAssetPath();
             Tools.OpenAppdataSpecialFolder("../Roaming/Unity/Asset Store-5.x");
         }
 
@@ -1905,6 +1953,7 @@ namespace UnityLauncherPro
                     tabControl.SelectedIndex = 4;
                     this.UpdateLayout();
                     txtRootFolderForNewProjects.Focus();
+                    SetStatus("Root folder for new projects is missing or doesn't exist: " + rootFolder, MessageType.Error);
                     return;
                 }
             }
@@ -2507,9 +2556,20 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(projPath) == true) return;
 
             var psPath = Path.Combine(projPath, "ProjectSettings", "ProjectSettings.asset");
-            if (File.Exists(psPath) == false) return;
+            if (File.Exists(psPath) == false)
+            {
+                Console.WriteLine("Project settings not found: " + psPath);
+                return;
+            }
             // read project settings
             var rows = File.ReadAllLines(psPath);
+
+            // NOTE old projects have binary version of this file, so cannot parse it, check if first line contains YAML
+            if (rows[0].IndexOf("YAML") == -1)
+            {
+                Console.WriteLine("Project settings file is binary, cannot parse: " + psPath);
+                return;
+            }
 
             // search company and product name rows
             for (int i = 0, len = rows.Length; i < len; i++)
@@ -2893,7 +2953,14 @@ namespace UnityLauncherPro
             //Console.WriteLine("Process Exited: " + proj.Path);
             //var index = projectsSource.IndexOf(proj); // this fails since proj has changed after refresh (timestamp or other data)
 
-            // FIXME nobody likes extra loops.. but only 40 items to find correct project? but still..
+            // if currently editing field, cancel it (otherwise crash)
+            IEditableCollectionView itemsView = gridRecent.Items;
+            if (itemsView.IsAddingNew || itemsView.IsEditingItem)
+            {
+                gridRecent.CancelEdit(DataGridEditingUnit.Cell);
+            }
+
+            // FIXME nobody likes extra loops.. but only # items to find correct project? but still..
             for (int i = 0, len = projectsSource.Count; i < len; i++)
             {
                 if (projectsSource[i].Path == proj.Path)
@@ -2901,7 +2968,7 @@ namespace UnityLauncherPro
                     var tempProj = projectsSource[i];
                     tempProj.Modified = Tools.GetLastModifiedTime(proj.Path);
                     tempProj.Version = Tools.GetProjectVersion(proj.Path);
-                    tempProj.GITBranch = Tools.ReadGitBranchInfo(proj.Path);
+                    tempProj.GITBranch = Tools.ReadGitBranchInfo(proj.Path, false);
                     tempProj.TargetPlatform = Tools.GetTargetPlatform(proj.Path);
                     projectsSource[i] = tempProj;
                     gridRecent.Items.Refresh();
@@ -2913,8 +2980,7 @@ namespace UnityLauncherPro
         private void MenuItemDownloadInBrowser_Click(object sender, RoutedEventArgs e)
         {
             var unity = GetSelectedUpdate();
-            string exeURL = Tools.ParseDownloadURLFromWebpage(unity?.Version);
-            if (exeURL != null) Tools.DownloadInBrowser(exeURL, unity?.Version);
+            Tools.DownloadInBrowser(unity?.Version);
         }
 
         private void MenuItemDownloadLinuxModule_Click(object sender, RoutedEventArgs e)
@@ -3151,16 +3217,16 @@ namespace UnityLauncherPro
                 {
                     case "Version":
                         // handle null values
-                        if (((Updates)a).Version == null && ((Updates)b).Version == null) return 0;
-                        if (((Updates)a).Version == null) return direction == ListSortDirection.Ascending ? -1 : 1;
-                        if (((Updates)b).Version == null) return direction == ListSortDirection.Ascending ? 1 : -1;
-                        return direction == ListSortDirection.Ascending ? Tools.VersionAsLong(((Updates)a).Version).CompareTo(Tools.VersionAsLong(((Updates)b).Version)) : Tools.VersionAsLong(((Updates)b).Version).CompareTo(Tools.VersionAsLong(((Updates)a).Version));
+                        if (((UnityVersion)a)?.Version == null && ((UnityVersion)b)?.Version == null) return 0;
+                        if (((UnityVersion)a)?.Version == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((UnityVersion)b)?.Version == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? Tools.VersionAsLong(((UnityVersion)a).Version).CompareTo(Tools.VersionAsLong(((UnityVersion)b).Version)) : Tools.VersionAsLong(((UnityVersion)b).Version).CompareTo(Tools.VersionAsLong(((UnityVersion)a).Version));
                     case "Released":
                         // handle null values
-                        if (((Updates)a).ReleaseDate == null && ((Updates)b).ReleaseDate == null) return 0;
-                        if (((Updates)a).ReleaseDate == null) return direction == ListSortDirection.Ascending ? -1 : 1;
-                        if (((Updates)b).ReleaseDate == null) return direction == ListSortDirection.Ascending ? 1 : -1;
-                        return direction == ListSortDirection.Ascending ? ((DateTime)((Updates)a).ReleaseDate).CompareTo(((Updates)b).ReleaseDate) : ((DateTime)((Updates)b).ReleaseDate).CompareTo(((Updates)a).ReleaseDate);
+                        if (((UnityVersion)a)?.ReleaseDate == null && ((UnityVersion)b)?.ReleaseDate == null) return 0;
+                        if (((UnityVersion)a)?.ReleaseDate == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((UnityVersion)b)?.ReleaseDate == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? ((UnityVersion)a).ReleaseDate.CompareTo(((UnityVersion)b).ReleaseDate) : ((DateTime)((UnityVersion)b).ReleaseDate).CompareTo(((UnityVersion)a).ReleaseDate);
                     default:
                         return 0;
                 }
@@ -3318,8 +3384,22 @@ namespace UnityLauncherPro
             gridSettingsBg.Focus();
         }
 
-        public void SetStatus(string msg)
+        public void SetStatus(string msg, MessageType messageType = MessageType.Info)
         {
+            Console.WriteLine(messageType);
+            switch (messageType)
+            {
+                case MessageType.Info:
+                    txtStatus.Foreground = (SolidColorBrush)Application.Current.Resources["ThemeStatusText"];
+                    break;
+                case MessageType.Warning:
+                    txtStatus.Foreground = (SolidColorBrush)Application.Current.Resources["ThemeMessageWarning"];
+                    break;
+                case MessageType.Error:
+                    txtStatus.Foreground = (SolidColorBrush)Application.Current.Resources["ThemeMessageError"];
+                    break;
+            }
+
             txtStatus.Text = msg;
         }
 
@@ -3425,12 +3505,25 @@ namespace UnityLauncherPro
                 pars += $" && adb shell monkey -p {packageName} 1";
             }
 
-            // TODO start cmd minimized
-            Tools.LaunchExe(cmd, pars);
-            // get apk name from path
-            var apkName = Path.GetFileName(playerPath);
-            if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
-            SetStatus("Installed APK:" + apkName);
+            //Tools.LaunchExe(cmd, pars);
+            var process = Tools.LaunchExe(cmd, pars, captureOutput: true);
+            var output = process.StandardOutput.ReadToEnd();
+            var errorOutput = process.StandardError.ReadToEnd().Replace("\r", "").Replace("\n", "");
+
+            process.WaitForExit();
+
+            // Console.WriteLine(output);
+            if (!string.IsNullOrEmpty(errorOutput))
+            {
+                SetStatus("Error installing APK: " + errorOutput);
+            }
+            else
+            {
+                // get apk name from path
+                var apkName = Path.GetFileName(playerPath);
+                if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
+                SetStatus("Installed APK:" + apkName);
+            }
         }
 
         private void txtWebglPort_TextChanged(object sender, TextChangedEventArgs e)
@@ -3591,6 +3684,120 @@ namespace UnityLauncherPro
             Tools.OpenAppdataSpecialFolder("../Roaming/UnityHub/logs/");
         }
 
+        private void btnOpenEditorLogsFolder_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Middle)
+            {
+                var logfolder = Tools.GetEditorLogsFolder();
+                var logFile = Path.Combine(logfolder, "Editor.log");
+                if (File.Exists(logFile) == true) Tools.LaunchExe(logFile);
+            }
+        }
+
+        private void UseAlphaReleaseNotes_Checked(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+
+            Settings.Default.useAlphaReleaseNotes = isChecked;
+            Settings.Default.Save();
+        }
+
+        private void ActivateRunningInstance()
+        {
+            try
+            {
+                using (var pipeClient = new NamedPipeClientStream(".", PipeName, PipeDirection.Out))
+                {
+                    pipeClient.Connect(1000); // Wait for 1 second to connect
+                    using (var writer = new StreamWriter(pipeClient))
+                    {
+                        writer.WriteLine("WakeUp");
+                        writer.Flush();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle connection failure (e.g., pipe not available)
+                Console.WriteLine("Could not connect to the running instance: " + ex.Message);
+            }
+        }
+
+        private void StartPipeServer()
+        {
+            pipeServer = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            pipeServer.BeginWaitForConnection(OnPipeConnection, null);
+        }
+
+        private void OnPipeConnection(IAsyncResult result)
+        {
+            try
+            {
+                pipeServer.EndWaitForConnection(result);
+
+                // Read the message
+                using (var reader = new StreamReader(pipeServer))
+                {
+                    string message = reader.ReadLine();
+                    if (message == "WakeUp")
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            // Bring the app to the foreground
+                            RestoreFromTray();
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                Console.WriteLine(ex);
+            }
+            finally
+            {
+                // Restart pipe server to listen for new messages
+                StartPipeServer();
+            }
+        }
+
+        private void CheckCustomIcon()
+        {
+            string customIconPath = Path.Combine(Environment.CurrentDirectory, "icon.ico");
+            Console.WriteLine(customIconPath);
+
+            if (File.Exists(customIconPath))
+            {
+                try
+                {
+                    // Load the custom icon using System.Drawing.Icon
+                    using (var icon = new System.Drawing.Icon(customIconPath))
+                    {
+                        // Convert the icon to a BitmapSource and assign it to the WPF window's Icon property
+                        this.Icon = Imaging.CreateBitmapSourceFromHIcon(
+                            icon.Handle,
+                            Int32Rect.Empty,
+                            BitmapSizeOptions.FromEmptyOptions() // Use BitmapSizeOptions here
+                        );
+
+                        // window icon
+                        IconImage.Source = this.Icon;
+                        // tray icon
+                        notifyIcon.Icon = new Icon(customIconPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SetStatus("Failed to load custom icon: " + ex.Message, MessageType.Warning);
+                    Debug.WriteLine($"Failed to load custom icon: {ex.Message}");
+                }
+            }
+            else // no custom icon found
+            {
+                notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
+                //Debug.WriteLine("Custom icon not found. Using default.");
+            }
+        }
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
         //    var proj = GetSelectedProject();

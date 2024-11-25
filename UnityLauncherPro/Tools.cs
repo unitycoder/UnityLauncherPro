@@ -5,10 +5,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -172,7 +175,14 @@ namespace UnityLauncherPro
         public static string GetFileVersionData(string path)
         {
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(path);
-            var res = fvi.ProductName.Replace("(64-bit)", "").Replace("(32-bit)", "").Replace("Unity", "").Trim();
+            var ver = fvi.ProductName;
+            if (string.IsNullOrEmpty(ver) == true)
+            {
+                ver = fvi.FileDescription;
+                if (string.IsNullOrEmpty(ver) == true) return null;
+                ver = ver.Replace("Installer", "").Trim();
+            }
+            var res = ver.Replace("(64-bit)", "").Replace("(32-bit)", "").Replace("Unity", "").Trim();
             return res;
         }
 
@@ -478,7 +488,7 @@ namespace UnityLauncherPro
         }
 
         // run any exe, return process
-        public static Process LaunchExe(string path, string param = null)
+        public static Process LaunchExe(string path, string param = null, bool captureOutput=false)
         {
             if (string.IsNullOrEmpty(path)) return null;
 
@@ -500,6 +510,12 @@ namespace UnityLauncherPro
                         newProcess = new Process();
                         newProcess.StartInfo.FileName = "\"" + path + "\"";
                         newProcess.StartInfo.Arguments = param;
+                        if (captureOutput)
+                        {
+                            newProcess.StartInfo.RedirectStandardError = true;
+                            newProcess.StartInfo.RedirectStandardOutput = true;
+                            newProcess.StartInfo.UseShellExecute = false;
+                        }
                         newProcess.EnableRaisingEvents = true; // needed to get Exited event
                         newProcess.Start();
                     }
@@ -510,8 +526,8 @@ namespace UnityLauncherPro
                 }
                 return newProcess;
             }
-            Console.WriteLine("Failed to run exe: " + path + " " + param);
-            return null;
+           // Console.WriteLine("Failed to run exe: " + path + " " + param);
+           // return null;
         }
 
 
@@ -519,43 +535,45 @@ namespace UnityLauncherPro
         {
             if (string.IsNullOrEmpty(version)) return null;
 
-            string url = "";
-            if (VersionIsArchived(version) == true)
-            {
-                // remove f#, TODO should remove c# from china version ?
-                version = Regex.Replace(version, @"f[0-9]{1,2}", "", RegexOptions.IgnoreCase);
+            var cleanVersion = CleanVersionNumber(version);
+            string url = $"https://unity.com/releases/editor/whats-new/{cleanVersion}#notes";
 
-                string padding = "unity-";
-                string whatsnew = "whats-new";
+            //if (VersionIsArchived(version) == true)
+            //{
+            //    // remove f#, TODO should remove c# from china version ?
+            //    version = Regex.Replace(version, @"f[0-9]{1,2}", "", RegexOptions.IgnoreCase);
 
-                if (version.Contains("5.6")) padding = "";
-                if (version.Contains("2018.2")) whatsnew = "whatsnew";
-                if (version.Contains("2018.3")) padding = "";
-                if (version.Contains("2018.1")) whatsnew = "whatsnew";
-                if (version.Contains("2017.4.")) padding = "";
-                if (version.Contains("2018.4.")) padding = "";
+            //    string padding = "unity-";
+            //    string whatsnew = "whats-new";
 
-                // later versions seem to follow this
-                var year = int.Parse(version.Split('.')[0]);
-                if (year >= 2019) padding = "";
+            //    if (version.Contains("5.6")) padding = "";
+            //    if (version.Contains("2018.2")) whatsnew = "whatsnew";
+            //    if (version.Contains("2018.3")) padding = "";
+            //    if (version.Contains("2018.1")) whatsnew = "whatsnew";
+            //    if (version.Contains("2017.4.")) padding = "";
+            //    if (version.Contains("2018.4.")) padding = "";
 
-                url = "https://unity3d.com/unity/" + whatsnew + "/" + padding + version;
-            }
-            else
-            if (VersionIsPatch(version) == true)
-            {
-                url = "https://unity3d.com/unity/qa/patch-releases/" + version;
-            }
-            else
-            if (VersionIsBeta(version) == true)
-            {
-                url = "https://unity3d.com/unity/beta/" + version;
-            }
-            else
-            if (VersionIsAlpha(version) == true)
-            {
-                url = "https://unity3d.com/unity/alpha/" + version;
-            }
+            //    // later versions seem to follow this
+            //    var year = int.Parse(version.Split('.')[0]);
+            //    if (year >= 2019) padding = "";
+
+            //    url = "https://unity3d.com/unity/" + whatsnew + "/" + padding + version;
+            //}
+            //else
+            //if (VersionIsPatch(version) == true)
+            //{
+            //    url = "https://unity3d.com/unity/qa/patch-releases/" + version;
+            //}
+            //else
+            //if (VersionIsBeta(version) == true)
+            //{
+            //    url = "https://unity3d.com/unity/beta/" + version;
+            //}
+            //else
+            //if (VersionIsAlpha(version) == true)
+            //{
+            //    url = "https://unity3d.com/unity/alpha/" + version;
+            //}
             return url;
         }
 
@@ -585,14 +603,60 @@ namespace UnityLauncherPro
             return version.Contains("c1");
         }
 
+
+        //as of 21 May 2021, only final 'f' versions are now available on the alpha release notes for Unity 2018 and newer. 2017 and 5 still have patch 'p' versions as well.
+        public static bool HasAlphaReleaseNotes(string version) => VersionIsArchived(version) || VersionIsPatch(version);
+
+        public static string GetAlphaReleaseNotesURL(string fromVersion, string toVersion = null)
+            => "https://alpha.release-notes.ds.unity3d.com/search?fromVersion=" + fromVersion + "&toVersion=" + (toVersion != null ? toVersion : fromVersion);
+
         // open release notes page in browser
         public static bool OpenReleaseNotes(string version)
         {
             bool result = false;
             if (string.IsNullOrEmpty(version)) return false;
 
-            var url = Tools.GetUnityReleaseURL(version);
+            string url = null;
+            if (Properties.Settings.Default.useAlphaReleaseNotes && HasAlphaReleaseNotes(version))
+            {
+                url = GetAlphaReleaseNotesURL(version);
+            }
+            else
+            {
+                url = GetUnityReleaseURL(version);
+            }
+
             if (string.IsNullOrEmpty(url)) return false;
+
+            OpenURL(url);
+            result = true;
+            return result;
+        }
+
+        public static bool OpenReleaseNotes_Cumulative(string version)
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(version)) return false;
+
+            string url = null;
+            var comparisonVersion = version;
+            //with the alpha release notes, we want a diff between an installed version and the one selected, but the site just shows all the changes inclusive of "fromVersion=vers"
+            //so if we find a good installed candidate, we need the version just above it (installed or not) that has release notes page
+            var closestInstalledVersion = Tools.FindNearestVersion(version, MainWindow.unityInstalledVersions.Keys.ToList(), true);
+            if (closestInstalledVersion != null)
+            {
+                comparisonVersion = closestInstalledVersion;
+                string nextFinalVersionAfterInstalled = closestInstalledVersion;
+
+                //wwe need a loop here, to find the nearest final version. It might be better to warn the user about this before opening the page.
+                do
+                    nextFinalVersionAfterInstalled = Tools.FindNearestVersion(nextFinalVersionAfterInstalled, MainWindow.updatesAsStrings);
+                while (nextFinalVersionAfterInstalled != null && !HasAlphaReleaseNotes(nextFinalVersionAfterInstalled));
+
+                if (nextFinalVersionAfterInstalled != null) comparisonVersion = nextFinalVersionAfterInstalled;
+
+            }
+            url = GetAlphaReleaseNotesURL(comparisonVersion, version);
 
             OpenURL(url);
             result = true;
@@ -604,13 +668,19 @@ namespace UnityLauncherPro
             Process.Start(url);
         }
 
-        public static void DownloadInBrowser(string url, string version, bool preferFullInstaller = false)
+        public static async void DownloadInBrowser(string version, bool preferFullInstaller = false)
         {
-            string exeURL = ParseDownloadURLFromWebpage(version, preferFullInstaller);
+            if (version == null) return;
+            string exeURL = await GetUnityUpdates.FetchDownloadUrl(version);
 
-            Console.WriteLine("download exeURL= (" + exeURL + ")");
+            if (preferFullInstaller == true)
+            {
+                exeURL = exeURL.Replace("UnityDownloadAssistant-" + version + ".exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
+            }
 
-            if (string.IsNullOrEmpty(exeURL) == false && exeURL.StartsWith("https") == true)
+            Console.WriteLine("DownloadInBrowser exeURL= '" + exeURL + "'");
+
+            if (string.IsNullOrEmpty(exeURL) == false && exeURL.StartsWith("https"))
             {
                 //SetStatus("Download installer in browser: " + exeURL);
                 Process.Start(exeURL);
@@ -618,14 +688,19 @@ namespace UnityLauncherPro
             else // not found
             {
                 //SetStatus("Error> Cannot find installer executable ... opening website instead");
-                url = "https://unity3d.com/get-unity/download/archive";
-                Process.Start(url + "#installer-not-found---version-" + version);
+                const string url = "https://unity3d.com/get-unity/download/archive";
+                Process.Start(url + "#installer-not-found-for-version-" + version);
             }
         }
 
-        public static void DownloadAndInstall(string url, string version)
+        public static async void DownloadAndInstall(string version)
         {
-            string exeURL = ParseDownloadURLFromWebpage(version);
+            if (version == null)
+            {
+                Console.WriteLine("Error> Cannot download and install null version");
+                return;
+            }
+            string exeURL = await GetUnityUpdates.FetchDownloadUrl(version);
 
             Console.WriteLine("download exeURL= (" + exeURL + ")");
 
@@ -638,13 +713,15 @@ namespace UnityLauncherPro
                 if (File.Exists(tempFile) == true) File.Delete(tempFile);
 
                 // TODO make async
-                if (DownloadFile(exeURL, tempFile) == true)
+                if (await DownloadFileAsync(exeURL, tempFile))
                 {
                     // get base version, to use for install path
                     // FIXME check if have any paths?
                     string lastRootFolder = Properties.Settings.Default.rootFolders[Properties.Settings.Default.rootFolders.Count - 1];
+
                     // check if ends with / or \
-                    if (lastRootFolder.EndsWith("/") == false && lastRootFolder.EndsWith("\\") == false) lastRootFolder += "/";
+                    if (lastRootFolder.EndsWith("/") == false && lastRootFolder.EndsWith("\\") == false) lastRootFolder += "\\";
+
                     string outputVersionFolder = version.Split('.')[0] + "_" + version.Split('.')[1];
                     string targetPathArgs = " /D=" + lastRootFolder + outputVersionFolder; ;
 
@@ -669,14 +746,14 @@ namespace UnityLauncherPro
             else // not found
             {
                 //SetStatus("Error> Cannot find installer executable ... opening website instead");
-                url = "https://unity3d.com/get-unity/download/archive";
+                var url = "https://unity3d.com/get-unity/download/archive";
                 Process.Start(url + "#installer-not-found---version-" + version);
             }
         }
 
         static readonly string initFileDefaultURL = "https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs";
 
-        public static void DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
+        public static async Task DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
         {
             string currentInitScriptFolder = Path.GetDirectoryName(currentInitScriptFullPath);
             string currentInitScriptFile = Path.GetFileName(currentInitScriptFullPath);
@@ -689,7 +766,7 @@ namespace UnityLauncherPro
             if (currentInitScriptLocationOrURL.ToLower().StartsWith("http") == true)
             {
                 // download into temp first
-                if (DownloadFile(currentInitScriptLocationOrURL, tempFile) == false) return;
+                if (await DownloadFileAsync(currentInitScriptLocationOrURL, tempFile) == false) return;
             }
             else // file is in local folders/drives/projects
             {
@@ -758,137 +835,100 @@ namespace UnityLauncherPro
             }
         }
 
-        static bool DownloadFile(string url, string tempFile)
+        public static string DownloadHTML(string url)
         {
-            bool result = false;
-            try
-            {
-                using (WebClient client = new WebClient())
-                {
-                    client.DownloadFile(url, tempFile);
-                    // TODO check if actually exists
-                    result = true;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error> DownloadFile: " + e);
-            }
-            return result;
-        }
-
-        // parse Unity installer exe from release page
-        // thanks to https://github.com/softfruit
-        public static string ParseDownloadURLFromWebpage(string version, bool preferFullInstaller = false)
-        {
-            string url = "";
-
-            if (string.IsNullOrEmpty(version)) return null;
-
+            if (string.IsNullOrEmpty(url) == true) return null;
             using (WebClient client = new WebClient())
             {
-                // get correct page url
-                string website = "https://unity3d.com/get-unity/download/archive";
-                if (VersionIsPatch(version)) website = "https://unity3d.com/unity/qa/patch-releases";
-                if (VersionIsBeta(version)) website = "https://unity.com/releases/editor/beta/" + version;
-                if (VersionIsAlpha(version)) website = "https://unity.com/releases/editor/alpha/" + version;
-
-                // fix unity server problem, some pages says 404 found if no url params
-                website += "?unitylauncherpro";
-
-                string sourceHTML = null;
-                // need to catch 404 error
                 try
                 {
                     // download page html
-                    sourceHTML = client.DownloadString(website);
+                    return client.DownloadString(url);
                 }
                 catch (WebException e)
                 {
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine("DownloadHTML: " + e.Message);
                     return null;
                 }
-
-                string[] lines = sourceHTML.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-
-                // patch version download assistant finder
-                if (VersionIsPatch(version))
-                {
-                    for (int i = 0; i < lines.Length; i++)
-                    {
-                        if (lines[i].Contains("UnityDownloadAssistant-" + version + ".exe"))
-                        {
-                            int start = lines[i].IndexOf('"') + 1;
-                            int end = lines[i].IndexOf('"', start);
-                            url = lines[i].Substring(start, end - start);
-                            break;
-                        }
-                    }
-                }
-                else if (VersionIsArchived(version))
-                {
-                    // archived version download assistant finder
-                    for (int i = 0; i < lines.Length; i++)
-                    {
-                        // find line where full installer is (from archive page)
-                        if (lines[i].Contains("UnitySetup64-" + version))
-                        {
-                            // take full exe installer line, to have changeset hash, then replace with download assistant filepath
-                            string line = lines[i];
-                            int start = line.IndexOf('"') + 1;
-                            int end = line.IndexOf('"', start);
-                            url = line.Substring(start, end - start);
-                            url = url.Replace("Windows64EditorInstaller/UnitySetup64-", "UnityDownloadAssistant-");
-                            break;
-                        }
-                    }
-                }
-                else // alpha or beta version download assistant finder
-                {
-                    for (int i = 0; i < lines.Length; i++)
-                    {
-                        if (lines[i].Contains("UnityDownloadAssistant.exe"))
-                        {
-                            // parse download url from this html line
-                            string pattern = @"https://beta\.unity3d\.com/download/[a-zA-Z0-9]+/UnityDownloadAssistant\.exe";
-                            Match match = Regex.Match(lines[i], pattern);
-                            if (match.Success)
-                            {
-                                url = match.Value;
-                                //Console.WriteLine("url= " + url);
-                            }
-                            break;
-                        }
-                    }
-                }
             }
-
-            // download full installer instead
-            if (preferFullInstaller)
-            {
-                url = url.Replace("UnityDownloadAssistant-" + version + ".exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
-                // handle alpha/beta
-                url = url.Replace("UnityDownloadAssistant.exe", "Windows64EditorInstaller/UnitySetup64-" + version + ".exe");
-            }
-
-            // didnt find installer
-            if (string.IsNullOrEmpty(url))
-            {
-                //SetStatus("Cannot find UnityDownloadAssistant.exe for this version.");
-                Console.WriteLine("Installer not found from URL..");
-            }
-            return url;
         }
 
-        public static string FindNearestVersion(string currentVersion, List<string> allAvailable)
+        public static string CleanVersionNumber(string version)
         {
+            if (string.IsNullOrEmpty(version)) return null;
+
+            var split = version.Split('.');
+            float parsedVersion = float.Parse($"{split[0]}.{split[1]}");
+            // 2023.3 and newer Alpha releases, no replace
+            if (IsAlpha(version) && parsedVersion >= 2023.3)
+            {
+                // do nothing
+            }
+            else
+            {
+                // note old patch versions still contains p## in the end
+                version = Regex.Replace(version, @"[f|a|b][0-9]{1,2}", "", RegexOptions.IgnoreCase);
+            }
+            return version;
+        }
+
+        private static string FetchUnityVersionNumberFromHTML(string url)
+        {
+            string sourceHTML = DownloadHTML(url);
+
+            if (string.IsNullOrEmpty(sourceHTML)) return null;
+
+            string pattern = @"\d+\.\d+\.\d+[bf]\d+";
+            MatchCollection matches = Regex.Matches(sourceHTML, pattern);
+            if (matches.Count > 0)
+            {
+                foreach (Match match in matches)
+                {
+                    Console.WriteLine("Extracted number: " + match.Value);
+                    return match.Value;
+                    //break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("No match found.");
+            }
+
+            return null;
+
+            //if (string.IsNullOrEmpty(sourceHTML) == false)
+            //{
+            //    // find version number from html
+            //    string pattern = @"UnityDownloadAssistant-[0-9]+\.[0-9]+\.[0-9]+[a-z]?\.exe";
+            //    Match match = Regex.Match(sourceHTML, pattern);
+            //    if (match.Success)
+            //    {
+            //        version = match.Value.Replace("UnityDownloadAssistant-", "").Replace(".exe", "");
+            //    }
+            //}
+            //return version;
+        }
+
+        public static string FindNearestVersion(string currentVersion, List<string> allAvailable, bool checkBelow = false)
+        {
+            if (allAvailable == null)
+                return null;
+
             string result = null;
 
             // add current version to list, to sort it with others
-            allAvailable.Add(currentVersion);
+            if (!allAvailable.Contains(currentVersion))
+                allAvailable.Add(currentVersion);
 
             // sort list
-            allAvailable.Sort((s1, s2) => VersionAsLong(s2).CompareTo(VersionAsLong(s1)));
+            if (checkBelow)
+            {
+                allAvailable.Sort((s1, s2) => VersionAsLong(s1).CompareTo(VersionAsLong(s2)));
+            }
+            else
+            {
+                allAvailable.Sort((s1, s2) => VersionAsLong(s2).CompareTo(VersionAsLong(s1)));
+            }
 
             // check version above our current version
             int currentIndex = allAvailable.IndexOf(currentVersion);
@@ -1080,20 +1120,53 @@ namespace UnityLauncherPro
         /// </summary>
         /// <param name="projectPath"></param>
         /// <returns></returns>
-        public static string ReadGitBranchInfo(string projectPath)
+        public static string ReadGitBranchInfo(string projectPath, bool searchParentFolders)
         {
             string results = null;
-            string dirName = Path.Combine(projectPath, ".git");
-            if (Directory.Exists(dirName))
+
+            if (searchParentFolders)
             {
-                string branchFile = Path.Combine(dirName, "HEAD");
-                if (File.Exists(branchFile))
+                DirectoryInfo directoryInfo = new DirectoryInfo(projectPath);
+
+                while (directoryInfo != null)
                 {
-                    // removes extra end of line
-                    results = string.Join(" ", File.ReadAllLines(branchFile));
-                    // get branch only
-                    int pos = results.LastIndexOf("/") + 1;
-                    results = results.Substring(pos, results.Length - pos);
+                    string dirName = Path.Combine(directoryInfo.FullName, ".git");
+
+                    if (Directory.Exists(dirName))
+                    {
+                        string branchFile = Path.Combine(dirName, "HEAD");
+                        if (File.Exists(branchFile))
+                        {
+                            // removes extra end of line
+                            results = string.Join(" ", File.ReadAllLines(branchFile));
+                            // get branch only
+                            int pos = results.LastIndexOf("/") + 1;
+                            results = results.Substring(pos, results.Length - pos);
+                            return results;
+                        }
+                    }
+                    directoryInfo = directoryInfo.Parent;
+                }
+            }
+            else
+            {
+                string dirName = Path.Combine(projectPath, ".git");
+                if (Directory.Exists(dirName))
+
+
+                {
+                    string branchFile = Path.Combine(dirName, "HEAD");
+                    if (File.Exists(branchFile))
+
+                    {
+                        // removes extra end of line
+                        results = string.Join(" ", File.ReadAllLines(branchFile));
+                        // get branch only
+                        int pos = results.LastIndexOf("/") + 1;
+                        results = results.Substring(pos, results.Length - pos);
+
+                    }
+
                 }
             }
             return results;
@@ -1770,7 +1843,21 @@ public static class UnityLauncherProTools
                         // take process id from unity, if have it (then webserver closes automatically when unity is closed)
                         var proc = ProcessHandler.Get(proj.Path);
                         int pid = proc == null ? -1 : proc.Id;
-                        var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+                        string param = null;
+
+                        // parse proj version year as number 2019.4.1f1 -> 2019
+                        int year = 0;
+                        var versionParts = proj.Version.Split('.');
+                        bool parsedYear = int.TryParse(versionParts[0], out year);
+
+                        if (parsedYear && year >= 6000)
+                        {
+                            param = "\"" + webExe + "\" \"" + buildPath + "\" " + "http://localhost:" + port + "/" + (pid == -1 ? "" : " " + pid);
+                        }
+                        else // older versions or failed to parse
+                        {
+                            param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+                        }
 
                         var webglServerProcess = Tools.LaunchExe(monoExe, param);
 
@@ -1830,7 +1917,23 @@ public static class UnityLauncherProTools
                     // take process id from unity, if have it(then webserver closes automatically when unity is closed)
                     var proc = ProcessHandler.Get(proj.Path);
                     int pid = proc == null ? -1 : proc.Id;
-                    var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+
+                    // parse proj version year as number 2019.4.1f1 -> 2019
+                    string param = null;
+                    int year = 0;
+                    var versionParts = proj.Version.Split('.');
+                    bool parsedYear = int.TryParse(versionParts[0], out year);
+
+                    if (parsedYear && year >= 6000)
+                    {
+                        param = "\"" + webExe + "\" \"" + buildPath + "\" " + "\"http://localhost:" + port + "/\"" + (pid == -1 ? "" : " " + pid);
+                    }
+                    else // older versions or failed to parse
+                    {
+                        param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
+                    }
+
+                    //var param = "\"" + webExe + "\" \"" + buildPath + "\" " + port + (pid == -1 ? "" : " " + pid); // server exe path, build folder and port
 
                     var webglServerProcess = Tools.LaunchExe(monoExe, param);
 
@@ -2097,6 +2200,92 @@ public static class UnityLauncherProTools
                 File.WriteAllText(fullPath, customEnvVars);
                 Console.WriteLine(fullPath);
             }
+        }
+
+        internal static void OpenCustomAssetPath()
+        {
+            // check if custom asset folder is used, then open both *since older versions might have assets in old folder
+            string keyPath = @"SOFTWARE\Unity Technologies\Unity Editor 5.x";
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(keyPath))
+            {
+                if (key == null) return;
+                // Enumerate subkeys
+                foreach (string valueName in key.GetValueNames())
+                {
+                    // Check if the subkey matches the desired pattern
+                    if (Regex.IsMatch(valueName, @"AssetStoreCacheRootPath_h\d+") == false) continue;
+
+                    string customAssetPath = "";
+                    var valueKind = key.GetValueKind(valueName);
+
+                    if (valueKind == RegistryValueKind.Binary)
+                    {
+                        byte[] bytes = (byte[])key.GetValue(valueName);
+                        customAssetPath = Encoding.UTF8.GetString(bytes, 0, bytes.Length - 1);
+                    }
+                    else // should be string then
+                    {
+                        customAssetPath = (string)key.GetValue(valueName);
+                    }
+
+                    if (string.IsNullOrEmpty(customAssetPath) == false && Directory.Exists(customAssetPath))
+                    {
+                        Tools.LaunchExplorer(Path.Combine(customAssetPath, "Asset Store-5.x"));
+                    }
+                }
+            }
+        }
+
+        private static async Task<bool> DownloadFileAsync(string fileUrl, string destinationPath)
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var fileName = Path.GetFileName(fileUrl);
+            var progressWindow = new DownloadProgressWindow(fileName, () => cancellationTokenSource.Cancel());
+            progressWindow.Show();
+            var result = false;
+            try
+            {
+                using (var client = new HttpClient())
+                using (var response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead, cancellationTokenSource.Token))
+                {
+                    response.EnsureSuccessStatusCode();
+
+                    var totalBytes = response.Content.Headers.ContentLength ?? 1;
+                    var buffer = new byte[8192];
+                    var totalRead = 0;
+
+                    using (var contentStream = await response.Content.ReadAsStreamAsync())
+                    using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write,
+                               FileShare.None, buffer.Length, true))
+                    {
+                        int bytesRead;
+                        while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationTokenSource.Token)) > 0)
+                        {
+                            await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationTokenSource.Token);
+                            totalRead += bytesRead;
+                            progressWindow.UpdateProgress(new DownloadProgress(totalRead, totalBytes));
+                        }
+                        result = true;
+                    }
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("Download cancelled");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                if (!result)
+                {
+                    DeleteTempFile(destinationPath);
+                }
+                progressWindow.Close();
+            }
+            return result;
         }
     } // class
 
