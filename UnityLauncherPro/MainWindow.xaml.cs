@@ -148,7 +148,7 @@ namespace UnityLauncherPro
             //Properties.Settings.Default.projectPaths = null;
             //Properties.Settings.Default.Save();
 
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
 
             //Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
 
@@ -453,6 +453,7 @@ namespace UnityLauncherPro
                 chkEnableProjectRename.IsChecked = Settings.Default.enableProjectRename;
                 chkStreamerMode.IsChecked = Settings.Default.streamerMode;
                 chkShowPlatform.IsChecked = Settings.Default.showTargetPlatform;
+                chkCheckSRP.IsChecked = Settings.Default.checkSRP;
                 chkUseCustomTheme.IsChecked = Settings.Default.useCustomTheme;
                 txtRootFolderForNewProjects.Text = Settings.Default.newProjectsRoot;
                 txtWebglRelativePath.Text = Settings.Default.webglBuildPath;
@@ -467,6 +468,7 @@ namespace UnityLauncherPro
                 gridRecent.Columns[4].Visibility = (bool)chkShowLauncherArgumentsColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
                 gridRecent.Columns[5].Visibility = (bool)chkShowGitBranchColumn.IsChecked ? Visibility.Visible : Visibility.Collapsed;
                 gridRecent.Columns[6].Visibility = (bool)chkShowPlatform.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+                gridRecent.Columns[7].Visibility = (bool)chkCheckSRP.IsChecked ? Visibility.Visible : Visibility.Collapsed;
 
                 // update installations folder listbox
                 lstRootFolders.Items.Clear();
@@ -654,9 +656,9 @@ namespace UnityLauncherPro
             List<int> gridWidths;
 
             // if we dont have any settings yet
-            if (Properties.Settings.Default.gridColumnWidths != null)
+            if (Settings.Default.gridColumnWidths != null)
             {
-                gridWidths = new List<int>(Properties.Settings.Default.gridColumnWidths);
+                gridWidths = new List<int>(Settings.Default.gridColumnWidths);
             }
             else
             {
@@ -667,7 +669,7 @@ namespace UnityLauncherPro
             var column = gridRecent.Columns[0];
             for (int i = 0; i < gridRecent.Columns.Count; ++i)
             {
-                if (Properties.Settings.Default.gridColumnWidths != null && Properties.Settings.Default.gridColumnWidths.Length > i)
+                if (Settings.Default.gridColumnWidths != null && Settings.Default.gridColumnWidths.Length > i)
                 {
                     gridWidths[i] = (int)gridRecent.Columns[i].Width.Value;
                 }
@@ -676,17 +678,17 @@ namespace UnityLauncherPro
                     gridWidths.Add((int)gridRecent.Columns[i].Width.Value);
                 }
             }
-            Properties.Settings.Default.gridColumnWidths = gridWidths.ToArray();
-            Properties.Settings.Default.Save();
+            Settings.Default.gridColumnWidths = gridWidths.ToArray();
+            Settings.Default.Save();
 
 
             // save buildrepot column widths
             gridWidths.Clear();
 
             // if we dont have any settings yet
-            if (Properties.Settings.Default.gridColumnWidthsBuildReport != null)
+            if (Settings.Default.gridColumnWidthsBuildReport != null)
             {
-                gridWidths = new List<int>(Properties.Settings.Default.gridColumnWidthsBuildReport);
+                gridWidths = new List<int>(Settings.Default.gridColumnWidthsBuildReport);
             }
             else
             {
@@ -697,7 +699,7 @@ namespace UnityLauncherPro
             column = gridBuildReport.Columns[0];
             for (int i = 0; i < gridBuildReport.Columns.Count; ++i)
             {
-                if (Properties.Settings.Default.gridColumnWidthsBuildReport != null && Properties.Settings.Default.gridColumnWidthsBuildReport.Length > i)
+                if (Settings.Default.gridColumnWidthsBuildReport != null && Settings.Default.gridColumnWidthsBuildReport.Length > i)
                 {
                     gridWidths[i] = (int)gridBuildReport.Columns[i].Width.Value;
                 }
@@ -706,9 +708,9 @@ namespace UnityLauncherPro
                     gridWidths.Add((int)gridBuildReport.Columns[i].Width.Value);
                 }
             }
-            Properties.Settings.Default.gridColumnWidthsBuildReport = gridWidths.ToArray();
-            Properties.Settings.Default.projectName = projectNameSetting;
-            Properties.Settings.Default.Save();
+            Settings.Default.gridColumnWidthsBuildReport = gridWidths.ToArray();
+            Settings.Default.projectName = projectNameSetting;
+            Settings.Default.Save();
 
             // make backup
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
@@ -813,7 +815,7 @@ namespace UnityLauncherPro
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
             gridRecent.ItemsSource = projectsSource;
 
             // fix sorting on refresh
@@ -3797,6 +3799,17 @@ namespace UnityLauncherPro
                 notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
                 //Debug.WriteLine("Custom icon not found. Using default.");
             }
+        }
+
+        private void chkCheckSRP_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            gridRecent.Columns[7].Visibility = (bool)chkCheckSRP.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+
+            Settings.Default.checkSRP = (bool)chkCheckSRP.IsChecked;
+            Settings.Default.Save();
+            RefreshRecentProjects();
         }
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
