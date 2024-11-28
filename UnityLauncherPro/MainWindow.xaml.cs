@@ -3334,6 +3334,12 @@ namespace UnityLauncherPro
                         if (((Project)a).TargetPlatform == null) return direction == ListSortDirection.Ascending ? -1 : 1;
                         if (((Project)b).TargetPlatform == null) return direction == ListSortDirection.Ascending ? 1 : -1;
                         return direction == ListSortDirection.Ascending ? ((Project)a).TargetPlatform.CompareTo(((Project)b).TargetPlatform) : ((Project)b).TargetPlatform.CompareTo(((Project)a).TargetPlatform);
+                    case "SRP":
+                        // handle null values
+                        if (((Project)a).SRP == null && ((Project)b).SRP == null) return 0;
+                        if (((Project)a).SRP == null) return direction == ListSortDirection.Ascending ? -1 : 1;
+                        if (((Project)b).SRP == null) return direction == ListSortDirection.Ascending ? 1 : -1;
+                        return direction == ListSortDirection.Ascending ? ((Project)a).SRP.CompareTo(((Project)b).SRP) : ((Project)b).SRP.CompareTo(((Project)a).SRP);
                     default:
                         return 0;
                 }

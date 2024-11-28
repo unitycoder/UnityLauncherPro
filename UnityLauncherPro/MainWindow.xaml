@@ -183,7 +183,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Header="Branch" x:Name="txtColumnRenderPipeline" Binding="{Binding SRP}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="60">
+                            <DataGridTextColumn Header="SRP" x:Name="txtColumnRenderPipeline" Binding="{Binding SRP}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="50">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="SRP" IsHitTestVisible="False" />
