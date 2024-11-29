@@ -16,6 +16,7 @@ namespace UnityLauncherPro
         public string TargetPlatform { set; get; } // TODO rename to Platform
         public string[] TargetPlatforms { set; get; }
         public bool folderExists { set; get; }
+        public string SRP { set; get; } // Scriptable Render Pipeline, TODO add version info?
 
         // WPF keeps calling this method from AppendFormatHelper, GetNameCore..? not sure if need to return something else or default would be faster?
         public override string ToString()

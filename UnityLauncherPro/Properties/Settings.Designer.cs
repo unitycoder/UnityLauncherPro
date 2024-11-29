@@ -577,5 +577,17 @@ namespace UnityLauncherPro.Properties {
                 this["useAlphaReleaseNotes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool checkSRP {
+            get {
+                return ((bool)(this["checkSRP"]));
+            }
+            set {
+                this["checkSRP"] = value;
+            }
+        }
     }
 }

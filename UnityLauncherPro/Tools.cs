@@ -2287,6 +2287,34 @@ public static class UnityLauncherProTools
             }
             return result;
         }
+
+        internal static string GetSRP(string projectPath)
+        {
+            // read projectsettings/graphicsettings file, look for m_SRPDefaultSettings: value
+            var settingsFile = Path.Combine(projectPath, "ProjectSettings", "GraphicsSettings.asset");
+            if (File.Exists(settingsFile) == false) return null;
+
+            var allText = File.ReadAllText(settingsFile);
+            var srpIndex = allText.IndexOf("m_SRPDefaultSettings:");
+            if (srpIndex == -1) return null; // BIRP
+
+            // urp = UnityEngine.Rendering.Universal.UniversalRenderPipeline
+            // hdrp = UnityEngine.Rendering.HighDefinition.HDRenderPipeline
+
+            if (allText.IndexOf("UnityEngine.Rendering.Universal.UniversalRenderPipeline", srpIndex) > -1)
+            {
+                return "URP";
+            }
+            else if (allText.IndexOf("UnityEngine.Rendering.HighDefinition.HDRenderPipeline", srpIndex) > -1)
+            {
+                return "HDRP";
+            }
+            else
+            {
+                return null; // BIRP
+            }
+
+        }
     } // class
 
 } // namespace

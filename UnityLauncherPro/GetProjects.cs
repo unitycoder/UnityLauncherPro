@@ -15,7 +15,7 @@ namespace UnityLauncherPro
         // convert target platform name into valid buildtarget platform name, NOTE this depends on unity version, now only 2019 and later are supported
         public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Win64" }, { "StandaloneWindows", "Win" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
 
-        public static List<Project> Scan(bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, StringCollection AllProjectPaths = null, bool searchGitbranchRecursivly = false)
+        public static List<Project> Scan(bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, StringCollection AllProjectPaths = null, bool searchGitbranchRecursivly = false, bool showSRP = false)
         {
             List<Project> projectsFound = new List<Project>();
 
@@ -53,7 +53,7 @@ namespace UnityLauncherPro
                             projectPath = (string)key.GetValue(valueName);
                         }
 
-                        var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursivly);
+                        var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursivly, showSRP);
                         //Console.WriteLine(projectPath+" "+p.TargetPlatform);
 
                         // if want to hide project and folder path for screenshot
@@ -94,7 +94,7 @@ namespace UnityLauncherPro
                     // if not found from registry, add to recent projects list
                     if (found == false)
                     {
-                        var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursivly);
+                        var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursivly, showSRP);
                         if (p != null) projectsFound.Add(p);
                     }
                 }
@@ -121,7 +121,7 @@ namespace UnityLauncherPro
             return projectsFound;
         } // Scan()
 
-        static Project GetProjectInfo(string projectPath, bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, bool searchGitbranchRecursivly = false)
+        static Project GetProjectInfo(string projectPath, bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, bool searchGitbranchRecursivly = false, bool showSRP = false)
         {
             bool folderExists = Directory.Exists(projectPath);
 
@@ -209,6 +209,9 @@ namespace UnityLauncherPro
             // bubblegum(TM) solution, fill available platforms for this unity version, for this project
             p.TargetPlatforms = Tools.GetPlatformsForUnityVersion(projectVersion);
             p.folderExists = folderExists;
+
+            if (showSRP == true) p.SRP = Tools.GetSRP(projectPath);
+
             return p;
         }
 

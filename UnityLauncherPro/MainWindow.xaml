@@ -183,6 +183,13 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
+                            <DataGridTextColumn Header="SRP" x:Name="txtColumnRenderPipeline" Binding="{Binding SRP}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="50">
+                                <DataGridTextColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="SRP" IsHitTestVisible="False" />
+                                    </DataTemplate>
+                                </DataGridTextColumn.HeaderTemplate>
+                            </DataGridTextColumn>
                         </DataGrid.Columns>
 
                         <!-- right click context menu -->
@@ -739,6 +746,7 @@
                                         <CheckBox   x:Name="chkCheckPlasticBranch" Content="Check Plastic branch" ToolTip="Checks for plastic branch, if .git doesnt exists" HorizontalAlignment="Left" Margin="14,0,0,3" Checked="ChkCheckPlasticBranch_Checked" Unchecked="ChkCheckPlasticBranch_Checked"/>
                                     </StackPanel>
                                     <CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project"  Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" ToolTip="If disabled, uses automatic quick project naming (Should be enabled, unless you want instant project creation)" HorizontalAlignment="Left"/>
+                                    <CheckBox x:Name="chkCheckSRP" Content="Show SRP column" ToolTip="If disabled, uses automatic quick project naming (Should be enabled, unless you want instant project creation)" HorizontalAlignment="Left" Checked="chkCheckSRP_Checked" Unchecked="chkCheckSRP_Checked"/>
                                     <CheckBox  x:Name="chkShowMissingFolderProjects" Content="Show projects that don't exist on disk"  Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" ToolTip="List in recent projects, even if the project folder is missing" HorizontalAlignment="Left"/>
                                     <CheckBox  x:Name="chkShowLauncherArgumentsColumn" Content="Show commandline arguments column"  Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" ToolTip="Shows column for custom project commandline params" HorizontalAlignment="Left"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
