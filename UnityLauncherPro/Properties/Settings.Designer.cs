@@ -589,5 +589,17 @@ namespace UnityLauncherPro.Properties {
                 this["checkSRP"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useUnofficialReleaseList {
+            get {
+                return ((bool)(this["useUnofficialReleaseList"]));
+            }
+            set {
+                this["useUnofficialReleaseList"] = value;
+            }
+        }
     }
 }

@@ -459,6 +459,7 @@ namespace UnityLauncherPro
                 txtWebglRelativePath.Text = Settings.Default.webglBuildPath;
                 txtCustomThemeFile.Text = Settings.Default.themeFile;
                 useAlphaReleaseNotesSite.IsChecked = Settings.Default.useAlphaReleaseNotes;
+                useUnofficialReleaseList.IsChecked = Settings.Default.useUnofficialReleaseList;
 
                 chkEnablePlatformSelection.IsChecked = Settings.Default.enablePlatformSelection;
                 chkRunAutomatically.IsChecked = Settings.Default.runAutomatically;
@@ -783,7 +784,7 @@ namespace UnityLauncherPro
         async Task CallGetUnityUpdates()
         {
             dataGridUpdates.ItemsSource = null;
-            var task = GetUnityUpdates.FetchAll();
+            var task = GetUnityUpdates.FetchAll((bool)useUnofficialReleaseList.IsChecked);
             var items = await task;
             updatesSource = items.ToArray();
             if (updatesSource == null) return;
@@ -1105,7 +1106,7 @@ namespace UnityLauncherPro
                 // if we dont have previous results yet, TODO scan again if previous was 24hrs ago
                 if (updatesSource == null)
                 {
-                    var task = GetUnityUpdates.FetchAll();
+                    var task = GetUnityUpdates.FetchAll((bool)useUnofficialReleaseList.IsChecked);
                     var items = await task;
                     if (task.IsCompleted == false || task.IsFaulted == true) return;
                     if (items == null) return;
@@ -3831,6 +3832,14 @@ namespace UnityLauncherPro
             Settings.Default.checkSRP = (bool)chkCheckSRP.IsChecked;
             Settings.Default.Save();
             RefreshRecentProjects();
+        }
+
+        private void useUnofficialReleaseList_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            Settings.Default.useUnofficialReleaseList = (bool)useUnofficialReleaseList.IsChecked;
+            Settings.Default.Save();
         }
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{

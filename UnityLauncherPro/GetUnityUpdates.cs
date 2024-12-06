@@ -19,28 +19,29 @@ namespace UnityLauncherPro
 
         static Dictionary<string, string> unofficialReleaseURLs = new Dictionary<string, string>();
 
-        public static async Task<List<UnityVersion>> FetchAll()
+        public static async Task<List<UnityVersion>> FetchAll(bool useUnofficialList = false)
         {
             var cachedVersions = LoadCachedVersions();
             var newVersions = await FetchNewVersions(cachedVersions);
 
-            var unofficialVersions = await FetchUnofficialVersions(cachedVersions);
+            var allVersions = newVersions.Concat(cachedVersions).ToList();
 
-            unofficialReleaseURLs.Clear();
-            // TODO modify FetchUnofficialVersions to put items in this dictionary directly
-            foreach (var version in unofficialVersions)
+            if (useUnofficialList == true)
             {
-                //Console.WriteLine("unofficial: " + version.Version + " , " + version.directURL);
-                if (unofficialReleaseURLs.ContainsKey(version.Version) == false)
+                var unofficialVersions = await FetchUnofficialVersions(cachedVersions);
+                unofficialReleaseURLs.Clear();
+                // TODO modify FetchUnofficialVersions to put items in this dictionary directlys
+                foreach (var version in unofficialVersions)
                 {
-                    unofficialReleaseURLs.Add(version.Version, version.directURL);
+                    //Console.WriteLine("unofficial: " + version.Version + " , " + version.directURL);
+                    if (unofficialReleaseURLs.ContainsKey(version.Version) == false)
+                    {
+                        unofficialReleaseURLs.Add(version.Version, version.directURL);
+                    }
                 }
+                allVersions = unofficialVersions.Concat(allVersions).ToList();
             }
 
-            var allVersions = newVersions.Concat(unofficialVersions).Concat(cachedVersions).ToList();
-            //var allVersions = newVersions.Concat(cachedVersions).ToList();
-
-            // TODO save unofficial versions to cache also? or maybe not, they will appear in official list later
             if (newVersions.Count > 0)
             {
                 SaveCachedVersions(allVersions);
@@ -168,9 +169,9 @@ namespace UnityLauncherPro
                     Console.WriteLine("Unofficial release found in the list.");
 
                     string unityHash = ParseHashCodeFromURL(unofficialReleaseURLs[unityVersion]);
-                   // Console.WriteLine(unityHash);
+                    // Console.WriteLine(unityHash);
                     string downloadURL = Tools.ParseDownloadURLFromWebpage(unityVersion, unityHash, false, true);
-                   // Console.WriteLine("direct download url: "+downloadURL);
+                    // Console.WriteLine("direct download url: "+downloadURL);
                     return downloadURL;
                 }
 
