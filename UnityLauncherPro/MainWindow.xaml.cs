@@ -796,7 +796,7 @@ namespace UnityLauncherPro
             await CallGetUnityUpdates();
 
             var unity = GetSelectedUnity();
-            if (unity == null) return;
+            if (unity == null || string.IsNullOrEmpty(unity.Version) == true) return;
 
             if (dataGridUpdates.ItemsSource != null)
             {
