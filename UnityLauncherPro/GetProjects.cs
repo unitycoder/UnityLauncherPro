@@ -117,7 +117,6 @@ namespace UnityLauncherPro
                 //Console.WriteLine("Trimming projects list to " + MainWindow.maxProjectCount + " projects");
                 projectsFound.RemoveRange(MainWindow.maxProjectCount, projectsFound.Count - MainWindow.maxProjectCount);
             }
-
             return projectsFound;
         } // Scan()
 
