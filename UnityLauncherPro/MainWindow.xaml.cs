@@ -1068,6 +1068,35 @@ namespace UnityLauncherPro
 
         }
 
+        private void RemoveProjectFromList(bool confirm = false)
+        {
+            var proj = GetSelectedProject();
+            if (proj == null) return;
+
+            if (confirm == true)
+            {
+                // streamer mode, show first char and last 3 chars, rest as *
+                var cleantitle = proj.Title[0] + new string('*', proj.Title.Length - 1);
+                var title = chkStreamerMode.IsChecked == true ? cleantitle : proj.Title;
+                var result = MessageBox.Show("Are you sure you want to remove project from list?\n\n" + title, "Remove project", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.No) return;
+            }
+
+            if (GetProjects.RemoveRecentProject(proj.Path))
+            {
+                RefreshRecentProjects();
+            }
+            else
+            {
+                // we had added this project manually, without opening yet, just remove item
+                projectsSource.Remove(proj);
+                gridRecent.Items.Refresh();
+                Tools.SetFocusToGrid(gridRecent);
+                gridRecent.SelectedIndex = 0;
+            }
+
+        }
+
         private async void OnTabSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // if going into updates tab, fetch list (first time only)
@@ -1378,6 +1407,7 @@ namespace UnityLauncherPro
                     //    // if edit mode, dont override keys
                     if (IsEditingCell(gridRecent) == true) return;
                     e.Handled = true;
+                    RemoveProjectFromList(confirm: true);
                     //    MenuRemoveProject_Click(null, null);
                     break;
                 default:
@@ -3020,22 +3050,7 @@ namespace UnityLauncherPro
 
         private void MenuRemoveProject_Click(object sender, RoutedEventArgs e)
         {
-            // delete if enabled in settings
-            var proj = GetSelectedProject();
-            if (proj == null) return;
-
-            if (GetProjects.RemoveRecentProject(proj.Path))
-            {
-                RefreshRecentProjects();
-            }
-            else
-            {
-                // we had added this project manually, without opening yet, just remove item
-                projectsSource.Remove(proj);
-                gridRecent.Items.Refresh();
-                Tools.SetFocusToGrid(gridRecent);
-                gridRecent.SelectedIndex = 0;
-            }
+            RemoveProjectFromList();
         }
 
         private void MenuItemDownloadAndroidModule_Click(object sender, RoutedEventArgs e)
@@ -3394,7 +3409,7 @@ namespace UnityLauncherPro
 
         public void SetStatus(string msg, MessageType messageType = MessageType.Info)
         {
-            Console.WriteLine(messageType);
+            //Console.WriteLine(messageType);
             switch (messageType)
             {
                 case MessageType.Info:
@@ -3772,7 +3787,7 @@ namespace UnityLauncherPro
         private void CheckCustomIcon()
         {
             string customIconPath = Path.Combine(Environment.CurrentDirectory, "icon.ico");
-            Console.WriteLine(customIconPath);
+            //Console.WriteLine(customIconPath);
 
             if (File.Exists(customIconPath))
             {
