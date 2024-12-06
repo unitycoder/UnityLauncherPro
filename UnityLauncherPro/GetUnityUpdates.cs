@@ -17,19 +17,111 @@ namespace UnityLauncherPro
         private const string CacheFileName = "UnityVersionCache.json";
         private static readonly HttpClient Client = new HttpClient();
 
+        static Dictionary<string, string> unofficialReleaseURLs = new Dictionary<string, string>();
+
         public static async Task<List<UnityVersion>> FetchAll()
         {
             var cachedVersions = LoadCachedVersions();
             var newVersions = await FetchNewVersions(cachedVersions);
 
-            var allVersions = newVersions.Concat(cachedVersions).ToList();
+            var unofficialVersions = await FetchUnofficialVersions(cachedVersions);
 
+            unofficialReleaseURLs.Clear();
+            // TODO modify FetchUnofficialVersions to put items in this dictionary directly
+            foreach (var version in unofficialVersions)
+            {
+                //Console.WriteLine("unofficial: " + version.Version + " , " + version.directURL);
+                if (unofficialReleaseURLs.ContainsKey(version.Version) == false)
+                {
+                    unofficialReleaseURLs.Add(version.Version, version.directURL);
+                }
+            }
+
+            var allVersions = newVersions.Concat(unofficialVersions).Concat(cachedVersions).ToList();
+            //var allVersions = newVersions.Concat(cachedVersions).ToList();
+
+            // TODO save unofficial versions to cache also? or maybe not, they will appear in official list later
             if (newVersions.Count > 0)
             {
                 SaveCachedVersions(allVersions);
             }
 
             return allVersions;
+        }
+
+        public static async Task<List<UnityVersion>> FetchUnofficialVersions(List<UnityVersion> cachedVersions)
+        {
+            var unofficialVersions = new List<UnityVersion>();
+            var existingVersions = new HashSet<string>(cachedVersions.Select(v => v.Version));
+
+            try
+            {
+                string url = "https://raw.githubusercontent.com/unitycoder/UnofficialUnityReleasesWatcher/refs/heads/main/unity-releases.md";
+
+                var content = await Client.GetStringAsync(url);
+
+                // Parse the Markdown content
+                var lines = content.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith("- ")) // Identify Markdown list items
+                    {
+                        var urlPart = line.Substring(2).Trim();
+                        var version = ExtractVersionFromUrl(urlPart);
+
+                        if (!string.IsNullOrEmpty(version) && !existingVersions.Contains(version))
+                        {
+                            var stream = InferStreamFromVersion(version);
+
+                            unofficialVersions.Add(new UnityVersion
+                            {
+                                Version = version,
+                                Stream = stream,
+                                ReleaseDate = DateTime.Now, // NOTE not correct, but we don't have known release date for unofficial versions (its only when they are found..)
+                                //ReleaseDate = DateTime.MinValue // Release date is unavailable in the MD format, TODO add to md as #2021-01-01 ?
+                                directURL = urlPart, // this is available only for unofficial releases
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching unofficial versions: {ex.Message}");
+            }
+
+            return unofficialVersions;
+        }
+
+        // TODO fixme, f is not always LTS
+        private static UnityVersionStream InferStreamFromVersion(string version)
+        {
+            if (Tools.IsAlpha(version)) return UnityVersionStream.Alpha;
+            if (Tools.IsBeta(version)) return UnityVersionStream.Beta;
+            if (Tools.IsLTS(version)) return UnityVersionStream.LTS;
+
+            //if (version.Contains("a")) return UnityVersionStream.Alpha;
+            //if (version.Contains("b")) return UnityVersionStream.Beta;
+            //if (version.Contains("f")) return UnityVersionStream.LTS;
+            return UnityVersionStream.Tech; // Default to Tech if no identifier is found
+        }
+
+        /// <summary>
+        /// Extracts the Unity version from the given URL.
+        /// </summary>
+        /// <param name="url">The URL to parse.</param>
+        /// <returns>The Unity version string.</returns>
+        private static string ExtractVersionFromUrl(string url)
+        {
+            try
+            {
+                var versionStart = url.LastIndexOf('#') + 1;
+                return versionStart > 0 && versionStart < url.Length ? url.Substring(versionStart) : null;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public static async Task<string> FetchDownloadUrl(string unityVersion)
@@ -39,6 +131,7 @@ namespace UnityLauncherPro
                 return null;
             }
 
+            // unity release api
             string apiUrl = $"{BaseApiUrl}?limit=1&version={unityVersion}&architecture=X86_64&platform=WINDOWS";
 
             try
@@ -53,8 +146,37 @@ namespace UnityLauncherPro
             }
         }
 
+        static string ParseHashCodeFromURL(string url)
+        {
+            // https://beta.unity3d.com/download/330fbefc18b7/download.html#6000.1.0a8 > 330fbefc18b7
+
+            int hashStart = url.IndexOf("download/") + 9;
+            int hashEnd = url.IndexOf("/download.html", hashStart);
+            return url.Substring(hashStart, hashEnd - hashStart);
+        }
+
         private static async Task<string> ExtractDownloadUrlAsync(string json, string unityVersion)
         {
+            //Console.WriteLine("json: " + json + " vers: " + unityVersion);
+
+            if (json.Contains("\"results\":[]"))
+            {
+                Console.WriteLine("No results found from releases API, checking unofficial list (if enabled)");
+
+                if (unofficialReleaseURLs.ContainsKey(unityVersion))
+                {
+                    Console.WriteLine("Unofficial release found in the list.");
+
+                    string unityHash = ParseHashCodeFromURL(unofficialReleaseURLs[unityVersion]);
+                   // Console.WriteLine(unityHash);
+                    string downloadURL = Tools.ParseDownloadURLFromWebpage(unityVersion, unityHash, false, true);
+                   // Console.WriteLine("direct download url: "+downloadURL);
+                    return downloadURL;
+                }
+
+                return null;
+            }
+
             int resultsIndex = json.IndexOf("\"results\":");
             if (resultsIndex == -1) return null;
 
@@ -84,7 +206,7 @@ namespace UnityLauncherPro
 
                 if (await CheckAssistantUrl(assistantUrl))
                 {
-                    Console.WriteLine("Assistant download URL found.");
+                    //Console.WriteLine("ExtractDownloadUrlAsync: Assistant download URL found.");
                     return assistantUrl;
                 }
                 else
@@ -279,6 +401,7 @@ namespace UnityLauncherPro
             if (configDirectory == null) return;
 
             string cacheFilePath = Path.Combine(configDirectory, CacheFileName);
+            //Console.WriteLine("Saving cachedrelease: " + cacheFilePath);
             File.WriteAllText(cacheFilePath, json);
         }
     }
