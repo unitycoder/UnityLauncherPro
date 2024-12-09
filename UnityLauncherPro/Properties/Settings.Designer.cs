@@ -601,5 +601,17 @@ namespace UnityLauncherPro.Properties {
                 this["useUnofficialReleaseList"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool disableUnityHubLaunch {
+            get {
+                return ((bool)(this["disableUnityHubLaunch"]));
+            }
+            set {
+                this["disableUnityHubLaunch"] = value;
+            }
+        }
     }
 }
