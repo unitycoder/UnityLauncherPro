@@ -1196,7 +1196,7 @@ namespace UnityLauncherPro
             CloseHubPipeAsync();
         }
 
-       private void CloseThemeEditor()
+        private void CloseThemeEditor()
         {
             if (themeEditorWindow != null) themeEditorWindow.Close();
         }
@@ -3583,24 +3583,38 @@ namespace UnityLauncherPro
                 pars += $" && adb shell monkey -p {packageName} 1";
             }
 
-            //Tools.LaunchExe(cmd, pars);
-            var process = Tools.LaunchExe(cmd, pars, captureOutput: true);
-            var output = process.StandardOutput.ReadToEnd();
-            var errorOutput = process.StandardError.ReadToEnd().Replace("\r", "").Replace("\n", "");
-
-            process.WaitForExit();
-
-            // Console.WriteLine(output);
-            if (!string.IsNullOrEmpty(errorOutput))
+            try
             {
-                SetStatus("Error installing APK: " + errorOutput);
+                //Tools.LaunchExe(cmd, pars);
+                var process = Tools.LaunchExe(cmd, pars, captureOutput: true);
+                var output = process.StandardOutput.ReadToEnd();
+                var errorOutput = process.StandardError.ReadToEnd().Replace("\r", "").Replace("\n", "");
+
+                process.WaitForExit();
+
+                // Console.WriteLine(output);
+                if (!string.IsNullOrEmpty(errorOutput))
+                {
+                    SetStatus("Error installing APK: " + errorOutput);
+                }
+                else
+                {
+                    // get apk name from path
+                    var apkName = Path.GetFileName(playerPath);
+                    if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
+                    SetStatus("Installed APK:" + apkName);
+                }
+
             }
-            else
+            catch (Win32Exception ex)
             {
-                // get apk name from path
-                var apkName = Path.GetFileName(playerPath);
-                if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
-                SetStatus("Installed APK:" + apkName);
+                // Handle case where 'adb' is not found
+                SetStatus($"Error: 'adb' not found. Ensure it's installed and added to PATH. Details: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Handle other unexpected exceptions
+                SetStatus($"An unexpected error occurred: {ex.Message}");
             }
         }
 
