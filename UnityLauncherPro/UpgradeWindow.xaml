@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="Upgrade Project Version" Height="533.165" Width="552" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="319" MinHeight="555" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewKeyDown="Window_PreviewKeyDown" ShowInTaskbar="False">
+        Title="Upgrade Project Version" Height="540" Width="580" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="319" MinHeight="555" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewKeyDown="Window_PreviewKeyDown" ShowInTaskbar="False">
 
     <Grid>
         <StackPanel Orientation="Horizontal">
