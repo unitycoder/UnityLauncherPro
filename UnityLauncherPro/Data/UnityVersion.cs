@@ -8,6 +8,7 @@ namespace UnityLauncherPro
         public string Version { get; set; }
         public UnityVersionStream Stream { get; set; }
         public DateTime ReleaseDate { get; set; }
+        public string directURL { get; set; } = null; // if found from unofficial releases list
 
         public static UnityVersion FromJson(string json)
         {

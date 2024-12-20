@@ -55,6 +55,7 @@ namespace UnityLauncherPro
         string _filterString = null;
         bool multiWordSearch = false;
         string[] searchWords;
+        bool isDirtyCell = false;
 
         int lastSelectedProjectIndex = 0;
         Mutex myMutex;
@@ -73,8 +74,9 @@ namespace UnityLauncherPro
         List<BuildReport> buildReports = new List<BuildReport>(); // multiple reports, each contains their own stats and items
         int currentBuildReport = 0;
 
-        private NamedPipeServerStream pipeServer;
-        private const string PipeName = appName;
+        private NamedPipeServerStream launcherPipeServer;
+        private const string launcherPipeName = appName;
+        readonly string unityHubPipeName = "Unity-hubIPCService";
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
         static extern IntPtr FindWindow(string cls, string win);
@@ -190,7 +192,59 @@ namespace UnityLauncherPro
             //themeEditorWindow = new ThemeEditor();
             //themeEditorWindow.Show();
 
+            // test override IPC so that unityhub doesnt start
+            // open "Unity-hubIPCService" pipe, if not already open
+
+            if (Settings.Default.disableUnityHubLaunch == true) StartHubPipe();
+
             isInitializing = false;
+        }
+
+        private static NamedPipeServerStream hubPipeServer;
+        private CancellationTokenSource _hubCancellationTokenSource;
+
+        private async Task StartPipeServerAsync(string pipeName, Action<string> onMessageReceived, CancellationToken cancellationToken)
+        {
+            try
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    using (var pipeServer = new NamedPipeServerStream(pipeName, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte, PipeOptions.Asynchronous))
+                    {
+                        await pipeServer.WaitForConnectionAsync(cancellationToken);
+                        Console.WriteLine($"Client connected to pipe '{pipeName}'!");
+
+                        using (var reader = new StreamReader(pipeServer))
+                        {
+                            while (!cancellationToken.IsCancellationRequested)
+                            {
+                                string message = await reader.ReadLineAsync();
+                                if (message == null) break; // End of stream
+                                onMessageReceived(message);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected when the cancellation token is triggered
+                Console.WriteLine("Pipe server operation canceled.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in pipe server: {ex.Message}");
+            }
+            finally
+            {
+                Console.WriteLine("Named pipe server stopped.");
+            }
+        }
+
+
+        private void OnHubMessageReceived(string message)
+        {
+            //Console.WriteLine(message);
         }
 
         private void DataGridUpdates_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -459,6 +513,8 @@ namespace UnityLauncherPro
                 txtWebglRelativePath.Text = Settings.Default.webglBuildPath;
                 txtCustomThemeFile.Text = Settings.Default.themeFile;
                 useAlphaReleaseNotesSite.IsChecked = Settings.Default.useAlphaReleaseNotes;
+                useUnofficialReleaseList.IsChecked = Settings.Default.useUnofficialReleaseList;
+                chkDisableUnityHubLaunch.IsChecked = Settings.Default.disableUnityHubLaunch;
 
                 chkEnablePlatformSelection.IsChecked = Settings.Default.enablePlatformSelection;
                 chkRunAutomatically.IsChecked = Settings.Default.runAutomatically;
@@ -783,7 +839,7 @@ namespace UnityLauncherPro
         async Task CallGetUnityUpdates()
         {
             dataGridUpdates.ItemsSource = null;
-            var task = GetUnityUpdates.FetchAll();
+            var task = GetUnityUpdates.FetchAll((bool)useUnofficialReleaseList.IsChecked);
             var items = await task;
             updatesSource = items.ToArray();
             if (updatesSource == null) return;
@@ -1105,7 +1161,7 @@ namespace UnityLauncherPro
                 // if we dont have previous results yet, TODO scan again if previous was 24hrs ago
                 if (updatesSource == null)
                 {
-                    var task = GetUnityUpdates.FetchAll();
+                    var task = GetUnityUpdates.FetchAll((bool)useUnofficialReleaseList.IsChecked);
                     var items = await task;
                     if (task.IsCompleted == false || task.IsFaulted == true) return;
                     if (items == null) return;
@@ -1136,8 +1192,8 @@ namespace UnityLauncherPro
         {
             // (TODO force) close theme editor, if still open, TODO NEED to cancel all changes
             CloseThemeEditor();
-
             SaveSettingsOnExit();
+            CloseHubPipeAsync();
         }
 
         private void CloseThemeEditor()
@@ -2149,7 +2205,6 @@ namespace UnityLauncherPro
             e.CanExecute = true;
         }
 
-        bool isDirtyCell = false;
         private void GridRecent_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             isDirtyCell = true;
@@ -3528,24 +3583,38 @@ namespace UnityLauncherPro
                 pars += $" && adb shell monkey -p {packageName} 1";
             }
 
-            //Tools.LaunchExe(cmd, pars);
-            var process = Tools.LaunchExe(cmd, pars, captureOutput: true);
-            var output = process.StandardOutput.ReadToEnd();
-            var errorOutput = process.StandardError.ReadToEnd().Replace("\r", "").Replace("\n", "");
-
-            process.WaitForExit();
-
-            // Console.WriteLine(output);
-            if (!string.IsNullOrEmpty(errorOutput))
+            try
             {
-                SetStatus("Error installing APK: " + errorOutput);
+                //Tools.LaunchExe(cmd, pars);
+                var process = Tools.LaunchExe(cmd, pars, captureOutput: true);
+                var output = process.StandardOutput.ReadToEnd();
+                var errorOutput = process.StandardError.ReadToEnd().Replace("\r", "").Replace("\n", "");
+
+                process.WaitForExit();
+
+                // Console.WriteLine(output);
+                if (!string.IsNullOrEmpty(errorOutput))
+                {
+                    SetStatus("Error installing APK: " + errorOutput);
+                }
+                else
+                {
+                    // get apk name from path
+                    var apkName = Path.GetFileName(playerPath);
+                    if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
+                    SetStatus("Installed APK:" + apkName);
+                }
+
             }
-            else
+            catch (Win32Exception ex)
             {
-                // get apk name from path
-                var apkName = Path.GetFileName(playerPath);
-                if (chkStreamerMode.IsChecked == true) apkName = " (hidden in streamermode)";
-                SetStatus("Installed APK:" + apkName);
+                // Handle case where 'adb' is not found
+                SetStatus($"Error: 'adb' not found. Ensure it's installed and added to PATH. Details: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Handle other unexpected exceptions
+                SetStatus($"An unexpected error occurred: {ex.Message}");
             }
         }
 
@@ -3729,7 +3798,7 @@ namespace UnityLauncherPro
         {
             try
             {
-                using (var pipeClient = new NamedPipeClientStream(".", PipeName, PipeDirection.Out))
+                using (var pipeClient = new NamedPipeClientStream(".", launcherPipeName, PipeDirection.Out))
                 {
                     pipeClient.Connect(1000); // Wait for 1 second to connect
                     using (var writer = new StreamWriter(pipeClient))
@@ -3748,18 +3817,18 @@ namespace UnityLauncherPro
 
         private void StartPipeServer()
         {
-            pipeServer = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
-            pipeServer.BeginWaitForConnection(OnPipeConnection, null);
+            launcherPipeServer = new NamedPipeServerStream(launcherPipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            launcherPipeServer.BeginWaitForConnection(OnPipeConnection, null);
         }
 
         private void OnPipeConnection(IAsyncResult result)
         {
             try
             {
-                pipeServer.EndWaitForConnection(result);
+                launcherPipeServer.EndWaitForConnection(result);
 
                 // Read the message
-                using (var reader = new StreamReader(pipeServer))
+                using (var reader = new StreamReader(launcherPipeServer))
                 {
                     string message = reader.ReadLine();
                     if (message == "WakeUp")
@@ -3832,6 +3901,80 @@ namespace UnityLauncherPro
             Settings.Default.Save();
             RefreshRecentProjects();
         }
+
+        private void useUnofficialReleaseList_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            Settings.Default.useUnofficialReleaseList = (bool)useUnofficialReleaseList.IsChecked;
+            Settings.Default.Save();
+        }
+
+        private async void chkDisableUnityHubLaunch_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsActive) return; // Don't run code during window initialization
+
+            Console.WriteLine((bool)chkDisableUnityHubLaunch.IsChecked);
+
+            if ((bool)chkDisableUnityHubLaunch.IsChecked)
+            {
+                await CloseHubPipeAsync(); // Ensure old task is closed before starting a new one
+                StartHubPipe();
+            }
+            else
+            {
+                await CloseHubPipeAsync();
+            }
+
+            Settings.Default.disableUnityHubLaunch = (bool)chkDisableUnityHubLaunch.IsChecked;
+            Settings.Default.Save();
+        }
+
+        private void StartHubPipe()
+        {
+            if (_hubCancellationTokenSource != null && !_hubCancellationTokenSource.IsCancellationRequested)
+            {
+                Console.WriteLine("Pipe server already running.");
+                return; // Avoid starting multiple instances
+            }
+
+            _hubCancellationTokenSource = new CancellationTokenSource();
+            Task.Run(() => StartPipeServerAsync("Unity-hubIPCService", OnHubMessageReceived, _hubCancellationTokenSource.Token));
+            Console.WriteLine("StartHubPipe");
+        }
+
+        private async Task CloseHubPipeAsync()
+        {
+            if (_hubCancellationTokenSource == null || _hubCancellationTokenSource.IsCancellationRequested)
+            {
+                Console.WriteLine("Pipe server already stopped.");
+                return;
+            }
+
+            Console.WriteLine("CloseHubPipe..");
+
+            // Cancel the token to stop the server task
+            _hubCancellationTokenSource.Cancel();
+
+            try
+            {
+                // Allow the server to shut down gracefully
+                await Task.Delay(100); // Optional: Give some time for clean-up
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during pipe server shutdown: {ex.Message}");
+            }
+            finally
+            {
+                _hubCancellationTokenSource.Dispose();
+                _hubCancellationTokenSource = null;
+                Console.WriteLine("Pipe server stopped.");
+            }
+        }
+
+
+
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
         //    var proj = GetSelectedProject();
