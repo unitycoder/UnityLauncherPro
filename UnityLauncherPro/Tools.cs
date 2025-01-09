@@ -256,13 +256,6 @@ namespace UnityLauncherPro
                 Directory.CreateDirectory(assetsFolder);
             }
 
-            // when opening project, check for crashed backup scene first
-            var cancelLaunch = CheckCrashBackupScene(proj.Path);
-            if (cancelLaunch == true)
-            {
-                return null;
-            }
-
             // if its upgrade, we dont want to check current version
             if (upgrade == false)
             {
@@ -280,6 +273,13 @@ namespace UnityLauncherPro
             if (unityExePath == null)
             {
                 DisplayUpgradeDialog(proj, null, useInitScript);
+                return null;
+            }
+
+            // when opening project, check for crashed backup scene first
+            var cancelLaunch = CheckCrashBackupScene(proj.Path);
+            if (cancelLaunch == true)
+            {
                 return null;
             }
 
