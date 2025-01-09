@@ -844,6 +844,11 @@ namespace UnityLauncherPro
             updatesSource = items.ToArray();
             if (updatesSource == null) return;
             dataGridUpdates.ItemsSource = updatesSource;
+            // if search string is set, then filter it (after data is loaded)
+            if (string.IsNullOrEmpty(txtSearchBoxUpdates.Text) == false)
+            {
+                FilterUpdates();
+            }
         }
 
         async void GoLookForUpdatesForThisUnity()
@@ -857,7 +862,10 @@ namespace UnityLauncherPro
             if (dataGridUpdates.ItemsSource != null)
             {
                 tabControl.SelectedIndex = 2;
-                txtSearchBoxUpdates.Text = ""; // need to clear old results first
+                // need to clear old results first
+                txtSearchBoxUpdates.Text = "";
+                // reset filter
+                rdoAll.IsChecked = true;
 
                 // NOTE for now, just set filter to current version, minus patch version "2021.1.7f1" > "2021.1"
                 txtSearchBoxUpdates.Text = unity.Version.Substring(0, unity.Version.LastIndexOf('.'));
@@ -1168,6 +1176,11 @@ namespace UnityLauncherPro
                     updatesSource = items.ToArray();
                     if (updatesSource == null) return;
                     dataGridUpdates.ItemsSource = updatesSource;
+                    // if search string is set, then filter it (after data is loaded)
+                    if (string.IsNullOrEmpty(txtSearchBoxUpdates.Text) == false)
+                    {
+                        FilterUpdates();
+                    }
                 }
             }
         }
