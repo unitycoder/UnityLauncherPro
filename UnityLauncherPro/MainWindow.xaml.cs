@@ -3479,6 +3479,7 @@ namespace UnityLauncherPro
             }
 
             txtStatus.Text = msg;
+            txtStatus.ToolTip = msg;
         }
 
         public void SetBuildStatus(System.Windows.Media.Color color)
