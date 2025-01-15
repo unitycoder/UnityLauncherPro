@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -1278,6 +1279,56 @@ namespace UnityLauncherPro
             }
         }
 
+        public static void AddContextMenuRegistryAPKInstall(string contextRegRoot)
+        {
+            // Define the registry key path for .apk file association
+            string apkFileTypeRegPath = @"Software\Classes\.apk";
+
+            // Open or create the registry key for .apk files
+            RegistryKey apkKey = Registry.CurrentUser.OpenSubKey(apkFileTypeRegPath, true);
+
+            if (apkKey == null)
+            {
+                apkKey = Registry.CurrentUser.CreateSubKey(apkFileTypeRegPath);
+            }
+
+            if (apkKey != null)
+            {
+                // Create or open the Shell subkey for context menu options
+                RegistryKey shellKey = apkKey.CreateSubKey("shell", true);
+
+                if (shellKey != null)
+                {
+                    var appName = "UnityLauncherPro";
+                    // Create a subkey for the app's context menu item
+                    RegistryKey appKey = shellKey.CreateSubKey(appName, true);
+
+                    if (appKey != null)
+                    {
+                        appKey.SetValue("", "Install with " + appName); // Display name in context menu
+                        appKey.SetValue("Icon", "\"" + Process.GetCurrentProcess().MainModule.FileName + "\"");
+                        appKey.SetValue("Position", "Bottom"); // Set position to adjust order
+
+                        // Create the command subkey to specify the action
+                        RegistryKey commandKey = appKey.CreateSubKey("command", true);
+
+                        if (commandKey != null)
+                        {
+                            // Build the command string to launch with -install argument
+                            var executeString = "\"" + Process.GetCurrentProcess().MainModule.FileName + "\" -install \"%1\"";
+                            commandKey.SetValue("", executeString);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Error> Cannot create or access registry key for .apk file association: " + apkFileTypeRegPath);
+            }
+        }
+
+
+
         /// <summary>
         /// uninstall context menu item from registry
         /// </summary>
@@ -1302,6 +1353,37 @@ namespace UnityLauncherPro
             else
             {
                 //SetStatus("Error> Cannot find registry key: " + contextRegRoot);
+            }
+        }
+
+        public static void RemoveContextMenuRegistryAPKInstall(string contextRegRoot)
+        {
+            // Define the registry key path for .apk file association
+            string apkFileTypeRegPath = @"Software\Classes\.apk\shell";
+
+            // Open the registry key for the shell context menu
+            RegistryKey shellKey = Registry.CurrentUser.OpenSubKey(apkFileTypeRegPath, true);
+
+            if (shellKey != null)
+            {
+                var appName = "UnityLauncherPro";
+
+                // Check if the app's context menu key exists
+                RegistryKey appKey = shellKey.OpenSubKey(appName, false);
+                if (appKey != null)
+                {
+                    // Delete the app's context menu key
+                    shellKey.DeleteSubKeyTree(appName);
+                    Console.WriteLine("Removed context menu for .apk files.");
+                }
+                else
+                {
+                    Console.WriteLine("No context menu found for .apk files.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Error> Cannot find registry key for .apk shell context: " + apkFileTypeRegPath);
             }
         }
 
@@ -2505,6 +2587,99 @@ public static class UnityLauncherProTools
             }
 
         }
+
+        internal static void InstallAPK(string ApkPath)
+        {
+            try
+            {
+                var cmd = "cmd.exe";
+                var pars = $"/C adb install -r \"{ApkPath}\""; // Use /C to execute and close the window after finishing
+
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = cmd,
+                    Arguments = pars,
+                    RedirectStandardOutput = true, // Capture output to wait for completion
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = false
+                };
+
+                string installOutput = null;
+                string installError = null;
+
+                using (var installProcess = Process.Start(processStartInfo))
+                {
+                    installOutput = installProcess.StandardOutput.ReadToEnd();
+                    installError = installProcess.StandardError.ReadToEnd();
+                    installProcess.WaitForExit();
+
+                    if (installProcess.ExitCode != 0 || !string.IsNullOrEmpty(installError))
+                    {
+                        SetStatus($"Error installing APK: {installError.Trim()}\n{installOutput.Trim()}");
+                        return;
+                    }
+                }
+
+                // Attempt to extract package name using aapt
+                var aaptCmd = $"aapt dump badging \"{ApkPath}\" | findstr package:";
+                var aaptProcessStartInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/C {aaptCmd}",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                string packageName = null;
+                using (var process = Process.Start(aaptProcessStartInfo))
+                {
+                    var output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+
+                    var match = System.Text.RegularExpressions.Regex.Match(output, "package: name='(.*?)'");
+                    if (match.Success)
+                    {
+                        packageName = match.Groups[1].Value;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(packageName))
+                {
+                    // Run the application using adb
+                    var runPars = $"/C adb shell monkey -p {packageName} 1";
+                    var runProcessStartInfo = new ProcessStartInfo
+                    {
+                        FileName = cmd,
+                        Arguments = runPars,
+                        UseShellExecute = true,
+                        CreateNoWindow = false,
+                        WindowStyle = ProcessWindowStyle.Normal
+                    };
+                    Process.Start(runProcessStartInfo);
+
+                    SetStatus($"Installed and launched APK with package name: {packageName}");
+                }
+                else
+                {
+                    SetStatus("ADB install completed, but failed to extract package name. Application not launched.");
+                }
+            }
+            catch (Win32Exception ex)
+            {
+                // Handle case where adb or aapt is not found
+                SetStatus($"Error: Required tool not found. Ensure adb and aapt are installed and added to PATH. Details: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Handle other unexpected exceptions
+                SetStatus($"An unexpected error occurred: {ex.Message}");
+            }
+        }
+
+
+
     } // class
 
 } // namespace

@@ -276,8 +276,32 @@ namespace UnityLauncherPro
             string[] args = Environment.GetCommandLineArgs();
             if (args != null && args.Length > 2)
             {
+
+
                 // first argument needs to be -projectPath
                 var commandLineArgs = args[1];
+
+                // if install argument, then just try to install this file (APK)
+                if (commandLineArgs == "-install")
+                {
+                    Console.WriteLine("Launching from commandline...");
+
+                    // path
+                    var apkPath = args[2];
+
+                    // resolve full path if path parameter isn't a rooted path
+                    //if (!Path.IsPathRooted(apkPath))
+                    //{
+                    //    apkPath = Directory.GetCurrentDirectory() + apkPath;
+                    //}
+                    //MessageBox.Show("APK install not implemented yet: " + apkPath);
+                    // try installing it
+                    Tools.InstallAPK(apkPath);
+                    Environment.Exit(0);
+                }
+                else
+
+
                 if (commandLineArgs == "-projectPath")
                 {
                     Console.WriteLine("Launching from commandline...");
@@ -328,7 +352,7 @@ namespace UnityLauncherPro
                     }
 
                     // quit after launch if enabled in settings
-                    if (Properties.Settings.Default.closeAfterExplorer == true)
+                    if (Settings.Default.closeAfterExplorer == true)
                     {
                         Environment.Exit(0);
                     }
@@ -493,6 +517,7 @@ namespace UnityLauncherPro
 
                 chkMinimizeToTaskbar.IsChecked = Settings.Default.minimizeToTaskbar;
                 chkRegisterExplorerMenu.IsChecked = Settings.Default.registerExplorerMenu;
+                chkRegisterInstallAPKMenu.IsChecked = Settings.Default.registerExplorerMenuAPK;
 
                 // update settings window
                 chkQuitAfterCommandline.IsChecked = Settings.Default.closeAfterExplorer;
@@ -3562,7 +3587,7 @@ namespace UnityLauncherPro
             }
 
             // install the apk using ADB using cmd (-r = replace app)
-            var cmd = "cmd.exe";// /C adb install -r \"{playerPath}\"";
+            var cmd = "cmd.exe";
             var pars = $"/C adb install -r \"{playerPath}\"";
 
             string packageName = null;
@@ -3928,7 +3953,7 @@ namespace UnityLauncherPro
         {
             if (!this.IsActive) return; // Don't run code during window initialization
 
-            Console.WriteLine((bool)chkDisableUnityHubLaunch.IsChecked);
+            //Console.WriteLine((bool)chkDisableUnityHubLaunch.IsChecked);
 
             if ((bool)chkDisableUnityHubLaunch.IsChecked)
             {
@@ -3985,6 +4010,24 @@ namespace UnityLauncherPro
                 _hubCancellationTokenSource = null;
                 Console.WriteLine("Pipe server stopped.");
             }
+        }
+
+        private void chkRegisterInstallAPKMenu_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            if ((bool)chkRegisterInstallAPKMenu.IsChecked)
+            {
+                Tools.AddContextMenuRegistryAPKInstall(contextRegRoot);
+            }
+            else // remove
+            {
+                Tools.RemoveContextMenuRegistryAPKInstall(contextRegRoot);
+            }
+
+            Settings.Default.registerExplorerMenuAPK = (bool)chkRegisterInstallAPKMenu.IsChecked;
+            Settings.Default.Save();
+
         }
 
 

@@ -7,7 +7,7 @@
 		xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:converters="clr-namespace:UnityLauncherPro.Converters" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
-        Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="780" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized" MouseDown="Window_MouseDown">
+        Title="UnityLauncherPro" Height="670" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="780" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized" MouseDown="Window_MouseDown">
     <Window.Resources>
         <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>
         <converters:LastModifiedConverterTooltip x:Key="LastModifiedConverterTooltip"/>
@@ -842,7 +842,8 @@
 
                             <GroupBox Grid.Row="3" Header="System" VerticalAlignment="Top" Margin="0,0,3,0">
                                 <StackPanel Grid.Row="3" Orientation="Vertical" Margin="3,5,0,0" >
-                                    <CheckBox  x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu"  Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" ToolTip="Install registry entry for Explorer context menu" HorizontalAlignment="Left"/>
+                                    <CheckBox  x:Name="chkRegisterExplorerMenu" Content="Register Explorer context menu"  Unchecked="ChkRegisterExplorerMenu_CheckedChanged" Checked="ChkRegisterExplorerMenu_CheckedChanged" ToolTip="Add registry entry for Explorer context menu" HorizontalAlignment="Left"/>
+                                    <CheckBox  x:Name="chkRegisterInstallAPKMenu" Content="Register 'Install APK' Explorer context menu" ToolTip="Add registry entry for Explorer 'Install APK' context menu" HorizontalAlignment="Left" Checked="chkRegisterInstallAPKMenu_Checked" Unchecked="chkRegisterInstallAPKMenu_Checked"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                         <CheckBox   x:Name="chkRunAutomatically" Content="Run automatically on startup"  ToolTip="Run automatically using startup registry key" HorizontalAlignment="Left" Checked="ChkRunAutomatically_Checked" Unchecked="ChkRunAutomatically_Checked"/>
                                         <CheckBox   x:Name="chkRunAutomaticallyMinimized" Content="as minimized"  ToolTip="Minimize to tray when started automatically" HorizontalAlignment="Left" Checked="ChkRunAutomaticallyMinimized_Checked" Unchecked="ChkRunAutomaticallyMinimized_Checked" Margin="5,0,0,3"/>

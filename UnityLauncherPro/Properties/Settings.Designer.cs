@@ -613,5 +613,17 @@ namespace UnityLauncherPro.Properties {
                 this["disableUnityHubLaunch"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool registerExplorerMenuAPK {
+            get {
+                return ((bool)(this["registerExplorerMenuAPK"]));
+            }
+            set {
+                this["registerExplorerMenuAPK"] = value;
+            }
+        }
     }
 }
