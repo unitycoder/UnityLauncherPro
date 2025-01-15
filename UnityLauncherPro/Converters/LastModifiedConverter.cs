@@ -23,5 +23,23 @@ namespace UnityLauncherPro.Converters
             return DateTime.ParseExact((string)value, MainWindow.currentDateFormat, culture);
         }
 
+    }    
+    
+    // just for tooltip
+    [ValueConversion(typeof(DateTime), typeof(String))]
+    public class LastModifiedConverterTooltip : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null) return null;
+            DateTime date = (DateTime)value;
+            return date.ToString(MainWindow.currentDateFormat);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return DateTime.ParseExact((string)value, MainWindow.currentDateFormat, culture);
+        }
+
     }
 }

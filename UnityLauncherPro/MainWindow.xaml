@@ -10,6 +10,7 @@
         Title="UnityLauncherPro" Height="650" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="780" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized" MouseDown="Window_MouseDown">
     <Window.Resources>
         <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>
+        <converters:LastModifiedConverterTooltip x:Key="LastModifiedConverterTooltip"/>
         <converters:ReleaseDateConverter x:Key="releaseDateConverter"/>
     </Window.Resources>
 
@@ -142,13 +143,30 @@
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
                             <!--<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Modified, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Modified" IsReadOnly="True" Width="120"/>-->
-                            <DataGridTextColumn Header="Modified" Binding="{Binding Modified, Converter={StaticResource lastModifiedConverter}}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="120">
+                            <DataGridTextColumn Header="Modified"
+                    Binding="{Binding Modified, Converter={StaticResource lastModifiedConverter}}"
+                    ClipboardContentBinding="{x:Null}" 
+                    IsReadOnly="True" 
+                    Width="120">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="Modified" IsHitTestVisible="False" />
                                     </DataTemplate>
                                 </DataGridTextColumn.HeaderTemplate>
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip>
+                                                    <TextBlock Text="{Binding Modified, Converter={StaticResource LastModifiedConverterTooltip}}" />
+                                                </ToolTip>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
+
                             <DataGridTextColumn Header="Arguments" Binding="{Binding Arguments}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}"  IsReadOnly="False" Width="100">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
