@@ -80,11 +80,12 @@ jobs:
           if [ "$PREV_TAG" = "none" ]; then
             echo "No previous tag found, listing all commits"
             COMMITS=$(git log --pretty=format:"* %s" --no-merges)
-          else:
+          else
             echo "Previous tag: $PREV_TAG"
             # List commits since last tag
             COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"* %s" --no-merges)
           fi
+          # Save commits to the environment
           echo "commits=$COMMITS" >> $GITHUB_ENV
 
       # Create a release
