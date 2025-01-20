@@ -94,6 +94,7 @@ jobs:
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
+        if: env.build_trigger == 'true' # Execute only if build was triggered
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -111,6 +112,7 @@ jobs:
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
+        if: env.build_trigger == 'true' # Execute only if build was triggered
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
