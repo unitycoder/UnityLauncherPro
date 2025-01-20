@@ -1,64 +1,92 @@
 name: CI
 
 on:
+  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
+  # This workflow contains a single job called "build"
   build:
+    # The type of runner that the job will run on
     runs-on: windows-2019
 
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      # Step to check if the commit message contains #GITBUILD
       - name: Check Commit Message
         shell: powershell
         run: |
-          $strVal ='${{ github.event.commits[0].message }}'
+          # Get the commit message
+          $strVal = '${{ github.event.commits[0].message }}'
+          # Convert commit message to a single line if multiline
           $singleLineStrVal = $strVal -replace "`r`n", " " -replace "`n", " "
-          if($singleLineStrVal -match '#GITBUILD') {
+          if ($singleLineStrVal -match '#GITBUILD') {
             Write-Host 'Build commit detected. Proceeding with build...'
             echo "build_trigger=true" >> $env:GITHUB_ENV
           } else {
             Write-Host 'No build commit. Skipping build steps...'
             echo "build_trigger=false" >> $env:GITHUB_ENV
 
+      # Step to ensure the repository is checked out
       - uses: actions/checkout@v2
 
+      # Conditional steps for building the project
       - name: Conditional Build Steps
         if: env.build_trigger == 'true'
-        steps:
-          - name: Install 7Zip PowerShell Module
-            shell: powershell
-            run: Install-Module 7Zip4PowerShell -Force -Verbose 
+        run: echo "Build steps will proceed because commit contains #GITBUILD."
 
-          - name: Restore NuGet packages
-            run: nuget restore UnityLauncherPro.sln
+      # Install 7Zip PowerShell module
+      - name: Install 7Zip PowerShell Module
+        if: env.build_trigger == 'true'
+        shell: powershell
+        run: Install-Module 7Zip4PowerShell -Force -Verbose
 
-          - name: Build Binary
-            shell: cmd
-            run: call .\Build.cmd      
+      # Restore NuGet packages
+      - name: Restore NuGet packages
+        if: env.build_trigger == 'true'
+        run: nuget restore UnityLauncherPro.sln
 
-          - name: Build Artifact
-            shell: cmd
-            run: call .\ArtifactBuild.cmd
+      # Build the binary
+      - name: Build Binary
+        if: env.build_trigger == 'true'
+        shell: cmd
+        run: call .\Build.cmd      
 
+      # Build the artifact
+      - name: Build Artifact
+        if: env.build_trigger == 'true'
+        shell: cmd
+        run: call .\ArtifactBuild.cmd
+
+      # Get the current date and time
       - name: Get current date and time
         id: datetime
         run: |
+          # Save the current date and time to an environment variable
           echo "current_datetime=$(date +'%d/%m/%Y %H:%M')" >> $GITHUB_ENV
 
+      # Step to get previous tag and commits
       - name: Get commits since last release
         id: get_commits
         shell: bash
         run: |
+          # Get the most recent tag
           PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
           if [ "$PREV_TAG" = "none" ]; then
+            echo "No previous tag found, listing all commits"
             COMMITS=$(git log --pretty=format:"* %s" --no-merges)
           else
+            echo "Previous tag: $PREV_TAG"
+            # List commits since last tag
             COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"* %s" --no-merges)
           fi
           echo "commits=$COMMITS" >> $GITHUB_ENV
 
+      # Create a release
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
@@ -75,6 +103,7 @@ jobs:
           draft: false
           prerelease: false
 
+      # Upload the release asset
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
