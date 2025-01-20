@@ -30,14 +30,15 @@ jobs:
           } else {
             Write-Host 'No build commit. Skipping build steps...'
             echo "build_trigger=false" >> $env:GITHUB_ENV
+          }
 
       # Step to ensure the repository is checked out
       - uses: actions/checkout@v2
 
-      # Conditional steps for building the project
-      - name: Conditional Build Steps
-        if: env.build_trigger == 'true'
-        run: echo "Build steps will proceed because commit contains #GITBUILD."
+      # Inform if build steps are skipped
+      - name: Inform Skipped Build Steps
+        if: env.build_trigger != 'true'
+        run: echo "Skipping build steps because the commit message does not contain #GITBUILD."
 
       # Install 7Zip PowerShell module
       - name: Install 7Zip PowerShell Module
@@ -79,7 +80,7 @@ jobs:
           if [ "$PREV_TAG" = "none" ]; then
             echo "No previous tag found, listing all commits"
             COMMITS=$(git log --pretty=format:"* %s" --no-merges)
-          else
+          else:
             echo "Previous tag: $PREV_TAG"
             # List commits since last tag
             COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"* %s" --no-merges)
