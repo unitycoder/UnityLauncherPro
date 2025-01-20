@@ -68,6 +68,7 @@ jobs:
       # Get the current date and time
       - name: Get current date and time
         id: datetime
+        if: env.build_trigger == 'true' # Only run if build was triggered
         run: |
           # Save the current date and time to an environment variable
           echo "current_datetime=$(date +'%d/%m/%Y %H:%M')" >> $GITHUB_ENV
@@ -75,6 +76,7 @@ jobs:
       # Step to get previous tag and commits
       - name: Get commits since last release
         id: get_commits
+        if: env.build_trigger == 'true' # Only run if build was triggered
         shell: bash
         run: |
           # Get the most recent tag
@@ -93,8 +95,8 @@ jobs:
       # Create a release
       - name: Create Release
         id: create_release
-        uses: actions/create-release@latest
         if: env.build_trigger == 'true' # Execute only if build was triggered
+        uses: actions/create-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -111,8 +113,8 @@ jobs:
       # Upload the release asset
       - name: Upload Release Asset
         id: upload-release-asset
-        uses: actions/upload-release-asset@v1
         if: env.build_trigger == 'true' # Execute only if build was triggered
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
