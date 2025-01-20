@@ -38,7 +38,9 @@ jobs:
       # Inform if build steps are skipped
       - name: Inform Skipped Build Steps
         if: env.build_trigger != 'true'
-        run: echo "Skipping build steps because the commit message does not contain #GITBUILD."
+        shell: powershell
+        run: |
+          Write-Host "Skipping build steps because the commit message does not contain #GITBUILD."
 
       # Install 7Zip PowerShell module
       - name: Install 7Zip PowerShell Module
@@ -116,4 +118,3 @@ jobs:
           asset_path: ./UnityLauncherPro.zip
           asset_name: UnityLauncherPro.zip
           asset_content_type: application/zip
-
