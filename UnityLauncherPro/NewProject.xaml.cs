@@ -15,6 +15,7 @@ namespace UnityLauncherPro
         public static string newName = null;
         public static string templateZipPath = null;
         public static string selectedPlatform = null;
+        public static bool forceDX11 = false;
         public static string[] platformsForThisUnity = null;
 
         bool isInitializing = true; // to keep OnChangeEvent from firing too early
@@ -289,6 +290,10 @@ namespace UnityLauncherPro
             // update templates list for selected unity version
             UpdateTemplatesDropDown(k.Path);
             UpdateModulesDropdown(k.Version);
+
+            // hide forceDX11 checkbox if version is below 6000
+            bool is6000 = k.Version.Contains("6000");
+            chkForceDX11.Visibility = is6000 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
@@ -322,6 +327,11 @@ namespace UnityLauncherPro
             {
                 BtnCreateNewProject_Click(null, null);
             }
+        }
+
+        private void chkForceDX11_Checked(object sender, RoutedEventArgs e)
+        {
+            forceDX11 = chkForceDX11.IsChecked == true;
         }
     }
 }

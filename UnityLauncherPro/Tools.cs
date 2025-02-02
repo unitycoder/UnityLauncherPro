@@ -1630,7 +1630,7 @@ namespace UnityLauncherPro
         }
 
         // TODO too many params..
-        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null, string[] platformsForThisUnity = null, string platform = null, bool useInitScript = false, string initScriptPath = null)
+        public static Project FastCreateProject(string version, string baseFolder, string projectName = null, string templateZipPath = null, string[] platformsForThisUnity = null, string platform = null, bool useInitScript = false, string initScriptPath = null, bool forceDX11 = false)
         {
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
@@ -1694,7 +1694,7 @@ namespace UnityLauncherPro
             proj.TargetPlatform = platform;
             proj.Modified = DateTime.Now;
             proj.folderExists = true; // have to set this value, so item is green on list
-
+            proj.Arguments = version.Contains("6000") ? (forceDX11 ? "-force-d3d11" : null) : null; // this gets erased later, since its not saved? would be nice to not add it at all though
             var proc = LaunchProject(proj, null, useInitScript);
             ProcessHandler.Add(proj, proc);
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
         mc:Ignorable="d"
-        Title="Create New Project" Height="480" Width="450" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
+        Title="Create New Project" Height="480" Width="500" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
 
     <Grid>
         <StackPanel Margin="10,3">
@@ -20,24 +20,28 @@
 
             <Grid HorizontalAlignment="Stretch" Margin="0,3,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40*"/>
-                    <ColumnDefinition Width="20*"/>
-                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="35*"/>
+                    <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="22*"/>
+                    <ColumnDefinition Width="10*"/>
                 </Grid.ColumnDefinitions>
                 <Label x:Name="lblNewProjectNameLabel" Grid.Column="0" Content="Project Name:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,5,0" />
                 <Label Grid.Column="1" Content="Platform:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,0,0" />
                 <Label x:Name="lblTemplateTitleAndCount" Grid.Column="2" Content="Templates:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="5,5,5,0" />
+                <Label Content="Override" Grid.Column="3" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,0,0"/>
             </Grid>
 
             <Grid HorizontalAlignment="Stretch" Margin="0,3,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40*"/>
-                    <ColumnDefinition Width="20*"/>
-                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="35*"/>
+                    <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="22*"/>
+                    <ColumnDefinition Width="10*"/>
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Column="0" x:Name="txtNewProjectName" VerticalAlignment="Center" IsUndoEnabled="True" TextChanged="TxtNewProjectName_TextChanged" PreviewKeyDown="TxtNewProjectName_PreviewKeyDown" TabIndex="0" Margin="0,2,6,2" />
                 <ComboBox Grid.Column="1" x:Name="cmbNewProjectPlatform" SelectedIndex="0" Margin="0,0,0,0" TabIndex="2" DropDownOpened="CmbNewProjectPlatform_DropDownOpened"  />
                 <ComboBox Grid.Column="2" x:Name="cmbNewProjectTemplate" DisplayMemberPath="Key" SelectedIndex="0" Margin="6,0,0,0" TabIndex="2" DropDownOpened="CmbNewProjectTemplate_DropDownOpened"  />
+                <CheckBox Grid.Column="3" x:Name="chkForceDX11" Content="DX11" ToolTip="Use DX11 instead of DX12" Margin="6,0,0,0" IsChecked="True" Checked="chkForceDX11_Checked" Unchecked="chkForceDX11_Checked"/>
             </Grid>
 
             <Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ThemeButtonForegroundDisabled}" Margin="0" FontSize="10" Padding="5,0,5,3" />
