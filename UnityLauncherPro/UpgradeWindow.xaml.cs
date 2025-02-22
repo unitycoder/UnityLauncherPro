@@ -40,8 +40,12 @@ namespace UnityLauncherPro
                 txtCurrentVersion.BorderThickness = new Thickness(1);
             }
 
+            // remove china c1 from version
+            if (currentVersion.Contains('c')) currentVersion= currentVersion.Replace("c1", "");
+
             // find nearest version
             string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
+
             if (nearestVersion != null)
             {
                 // select nearest version
