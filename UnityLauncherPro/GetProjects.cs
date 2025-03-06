@@ -120,7 +120,7 @@ namespace UnityLauncherPro
             return projectsFound;
         } // Scan()
 
-        static Project GetProjectInfo(string projectPath, bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, bool searchGitbranchRecursivly = false, bool showSRP = false)
+        static Project GetProjectInfo(string projectPath, bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, bool searchGitbranchRecursively = false, bool showSRP = false)
         {
             bool folderExists = Directory.Exists(projectPath);
 
@@ -165,7 +165,8 @@ namespace UnityLauncherPro
             string gitBranch = "";
             if (getGitBranch == true)
             {
-                gitBranch = folderExists ? Tools.ReadGitBranchInfo(projectPath, searchGitbranchRecursivly) : null;
+                gitBranch = folderExists ? Tools.ReadGitBranchInfo(projectPath, searchGitbranchRecursively) : null;
+                
                 // check for plastic, if enabled
                 if (getPlasticBranch == true && gitBranch == null)
                 {

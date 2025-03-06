@@ -1424,12 +1424,9 @@ namespace UnityLauncherPro
             {
                 string dirName = Path.Combine(projectPath, ".git");
                 if (Directory.Exists(dirName))
-
-
                 {
                     string branchFile = Path.Combine(dirName, "HEAD");
                     if (File.Exists(branchFile))
-
                     {
                         // removes extra end of line
                         results = string.Join(" ", File.ReadAllLines(branchFile));
@@ -1438,7 +1435,6 @@ namespace UnityLauncherPro
                         results = results.Substring(pos, results.Length - pos);
 
                     }
-
                 }
             }
             return results;
@@ -1446,22 +1442,33 @@ namespace UnityLauncherPro
 
         public static string ReadPlasticBranchInfo(string projectPath)
         {
-            string results = null;
-            string dirName = Path.Combine(projectPath, ".plastic");
-            if (Directory.Exists(dirName))
+            string branchName = null;
+            string plasticSelectorPath = Path.Combine(projectPath, ".plastic", "plastic.selector");
+
+            if (File.Exists(plasticSelectorPath))
             {
-                string branchFile = Path.Combine(dirName, "plastic.selector");
-                if (File.Exists(branchFile))
+                string[] lines = File.ReadAllLines(plasticSelectorPath);
+                foreach (string line in lines)
                 {
-                    // removes extra end of line
-                    results = string.Join(" ", File.ReadAllText(branchFile));
-                    // get branch only
-                    int pos = results.LastIndexOf("\"/") + 1;
-                    // -1 to remove last "
-                    results = results.Substring(pos, results.Length - pos - 1);
+                    string trimmedLine = line.Trim();
+                    if (trimmedLine.StartsWith("br ") || trimmedLine.StartsWith("smartbranch "))
+                    {
+                        // Extract the branch name between quotes
+                        var match = Regex.Match(trimmedLine, "\"([^\"]+)\"");
+                        if (match.Success)
+                        {
+                            branchName = match.Groups[1].Value;
+                            // Remove the leading slash if present
+                            if (branchName.StartsWith("/"))
+                            {
+                                branchName = branchName.Substring(1);
+                            }
+                            break;
+                        }
+                    }
                 }
             }
-            return results;
+            return branchName;
         }
 
         //public static Platform GetTargetPlatform(string projectPath)
