@@ -170,7 +170,7 @@ namespace UnityLauncherPro
                 // check for plastic, if enabled
                 if (getPlasticBranch == true && gitBranch == null)
                 {
-                    gitBranch = folderExists ? Tools.ReadPlasticBranchInfo(projectPath) : null;
+                    gitBranch = folderExists ? Tools.ReadPlasticBranchInfo(projectPath, searchGitbranchRecursively) : null;
                 }
             }
 

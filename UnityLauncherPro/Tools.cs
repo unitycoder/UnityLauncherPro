@@ -1394,82 +1394,83 @@ namespace UnityLauncherPro
         /// <returns></returns>
         public static string ReadGitBranchInfo(string projectPath, bool searchParentFolders)
         {
-            string results = null;
-
-            if (searchParentFolders)
+            DirectoryInfo directoryInfo = new DirectoryInfo(projectPath);
+            while (directoryInfo != null)
             {
-                DirectoryInfo directoryInfo = new DirectoryInfo(projectPath);
+                string gitDir = Path.Combine(directoryInfo.FullName, ".git");
+                string headFile = Path.Combine(gitDir, "HEAD");
 
-                while (directoryInfo != null)
+                if (Directory.Exists(gitDir) && File.Exists(headFile))
                 {
-                    string dirName = Path.Combine(directoryInfo.FullName, ".git");
-
-                    if (Directory.Exists(dirName))
-                    {
-                        string branchFile = Path.Combine(dirName, "HEAD");
-                        if (File.Exists(branchFile))
-                        {
-                            // removes extra end of line
-                            results = string.Join(" ", File.ReadAllLines(branchFile));
-                            // get branch only
-                            int pos = results.LastIndexOf("/") + 1;
-                            results = results.Substring(pos, results.Length - pos);
-                            return results;
-                        }
-                    }
-                    directoryInfo = directoryInfo.Parent;
+                    string headContent = File.ReadAllText(headFile).Trim();
+                    int pos = headContent.LastIndexOf('/') + 1;
+                    return (pos < headContent.Length) ? headContent.Substring(pos) : headContent;
                 }
-            }
-            else
-            {
-                string dirName = Path.Combine(projectPath, ".git");
-                if (Directory.Exists(dirName))
+
+                if (!searchParentFolders)
                 {
-                    string branchFile = Path.Combine(dirName, "HEAD");
-                    if (File.Exists(branchFile))
-                    {
-                        // removes extra end of line
-                        results = string.Join(" ", File.ReadAllLines(branchFile));
-                        // get branch only
-                        int pos = results.LastIndexOf("/") + 1;
-                        results = results.Substring(pos, results.Length - pos);
-
-                    }
+                    break;
                 }
+                directoryInfo = directoryInfo.Parent;
             }
-            return results;
+
+            return null;
         }
 
-        public static string ReadPlasticBranchInfo(string projectPath)
+
+        public static string ReadPlasticBranchInfo(string projectPath, bool searchParentFolders)
         {
             string branchName = null;
-            string plasticSelectorPath = Path.Combine(projectPath, ".plastic", "plastic.selector");
+            DirectoryInfo directoryInfo = new DirectoryInfo(projectPath);
 
-            if (File.Exists(plasticSelectorPath))
+            while (directoryInfo != null)
             {
-                string[] lines = File.ReadAllLines(plasticSelectorPath);
-                foreach (string line in lines)
+                string plasticSelectorPath = Path.Combine(directoryInfo.FullName, ".plastic", "plastic.selector");
+                if (File.Exists(plasticSelectorPath))
                 {
-                    string trimmedLine = line.Trim();
-                    if (trimmedLine.StartsWith("br ") || trimmedLine.StartsWith("smartbranch "))
+                    branchName = ExtractPlasticBranch(plasticSelectorPath);
+                    if (!string.IsNullOrEmpty(branchName))
                     {
-                        // Extract the branch name between quotes
-                        var match = Regex.Match(trimmedLine, "\"([^\"]+)\"");
-                        if (match.Success)
+                        return branchName;
+                    }
+                }
+
+                if (!searchParentFolders)
+                {
+                    break;
+                }
+
+                directoryInfo = directoryInfo.Parent;
+            }
+
+            return branchName;
+        }
+
+        private static string ExtractPlasticBranch(string plasticSelectorPath)
+        {
+            string[] lines = File.ReadAllLines(plasticSelectorPath);
+            foreach (string line in lines)
+            {
+                string trimmedLine = line.Trim();
+                if (trimmedLine.StartsWith("br ") || trimmedLine.StartsWith("smartbranch "))
+                {
+                    // Extract the first quoted string
+                    var match = Regex.Match(trimmedLine, "\"([^\"]+)\"");
+                    if (match.Success)
+                    {
+                        string branchName = match.Groups[1].Value;
+                        // Remove leading slash if present (e.g., "/main" becomes "main")
+                        if (branchName.StartsWith("/"))
                         {
-                            branchName = match.Groups[1].Value;
-                            // Remove the leading slash if present
-                            if (branchName.StartsWith("/"))
-                            {
-                                branchName = branchName.Substring(1);
-                            }
-                            break;
+                            branchName = branchName.Substring(1);
                         }
+                        return branchName;
                     }
                 }
             }
-            return branchName;
+            return null;
         }
+
 
         //public static Platform GetTargetPlatform(string projectPath)
         static string GetTargetPlatformRaw(string projectPath)
