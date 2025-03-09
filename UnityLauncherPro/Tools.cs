@@ -869,18 +869,20 @@ namespace UnityLauncherPro
 
             var split = version.Split('.');
             float parsedVersion = float.Parse($"{split[0]}.{split[1]}");
-            // 2023.3 and newer Alpha releases, no replace
-            if (IsAlpha(version) && parsedVersion >= 2023.3)
+
+            // For 2023.3 and newer pre-release (alpha or beta) versions, do not clean.
+            if ((IsAlpha(version) || version.Contains("b")) && parsedVersion >= 2023.3)
             {
-                // do nothing
+                // Do nothing; leave version unchanged.
             }
             else
             {
-                // note old patch versions still contains p## in the end
-                version = Regex.Replace(version, @"[f|a|b][0-9]{1,2}", "", RegexOptions.IgnoreCase);
+                // Remove the trailing patch/build indicator.
+                version = Regex.Replace(version, @"[fab][0-9]{1,2}", "", RegexOptions.IgnoreCase);
             }
             return version;
         }
+
 
         // TODO only hash version is used, cleanup the rest
         public static string ParseDownloadURLFromWebpage(string version, string hash = null, bool preferFullInstaller = false, bool useHash = false)
