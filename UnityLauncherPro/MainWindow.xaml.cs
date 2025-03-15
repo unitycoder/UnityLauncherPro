@@ -150,7 +150,7 @@ namespace UnityLauncherPro
             //Properties.Settings.Default.projectPaths = null;
             //Properties.Settings.Default.Save();
 
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursively: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
 
             //Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
 
@@ -904,7 +904,7 @@ namespace UnityLauncherPro
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Settings.Default.projectPaths, searchGitbranchRecursivly: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
+            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Settings.Default.projectPaths, searchGitbranchRecursively: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
             gridRecent.ItemsSource = projectsSource;
 
             // fix sorting on refresh

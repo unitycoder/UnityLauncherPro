@@ -2578,7 +2578,11 @@ public static class UnityLauncherProTools
 
             var allText = File.ReadAllText(settingsFile);
             var srpIndex = allText.IndexOf("m_SRPDefaultSettings:");
-            if (srpIndex == -1) return null; // BIRP
+            if (srpIndex == -1)
+            {
+                srpIndex = allText.IndexOf("m_RenderPipelineGlobalSettingsMap:"); // unity 6000.2- ?
+                if (srpIndex == -1) return null; // BIRP
+            }
 
             // urp = UnityEngine.Rendering.Universal.UniversalRenderPipeline
             // hdrp = UnityEngine.Rendering.HighDefinition.HDRenderPipeline
