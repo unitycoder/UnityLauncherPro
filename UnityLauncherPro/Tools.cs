@@ -817,20 +817,24 @@ namespace UnityLauncherPro
                         {
                             File.Move(tempFile, currentInitScriptFullPath);
                         }
+                        SetStatus("Downloaded latest init script.");
                     }
                     else
                     {
                         Console.WriteLine("Invalid c# init file..(missing correct Namespace, Class or Method)");
+                        SetStatus("Invalid c# init file..(missing correct Namespace, Class or Method)");
                     }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("File exception: " + e.Message);
+                    SetStatus("File exception: " + e.Message);
                 }
             }
             else
             {
                 Console.WriteLine("Failed to download init script from: " + currentInitScriptLocationOrURL);
+                SetStatus("Failed to download init script from: " + currentInitScriptLocationOrURL);
             }
         }
 
