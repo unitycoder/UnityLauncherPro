@@ -2187,6 +2187,8 @@ namespace UnityLauncherPro
             {
                 RefreshRecentProjects();
             }
+
+            SetStatus("Streamer mode " + (isChecked ? "enabled" : "disabled"), MessageType.Info);
         }
 
         private void ChkShowPlatform_Checked(object sender, RoutedEventArgs e)
@@ -4030,7 +4032,41 @@ namespace UnityLauncherPro
 
         }
 
+        private void btnExcludeFolderForDefender_Click(object sender, RoutedEventArgs e)
+        {
+            var foldersToExclude = new List<string>();
+            foreach (var unity in unityInstallationsSource)
+            {
+                var unityEditorFolder = Path.GetDirectoryName(unity.Path);
+                //Console.WriteLine(unityEditorFolder);
+                if (Directory.Exists(unityEditorFolder))
+                {
+                    foldersToExclude.Add(unityEditorFolder);
+                }
+            }
 
+            Tools.RunExclusionElevated(foldersToExclude);
+        }
+
+        private void menuExcludeFromDefender_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            if (proj == null) return;
+            if (Directory.Exists(proj.Path) == false) return;
+
+            var foldersToExclude = new List<string>();
+            foldersToExclude.Add(proj.Path);
+            var res = Tools.RunExclusionElevated(foldersToExclude, silent: true);
+            var tempPath = ((chkStreamerMode.IsChecked == true) ? "***" : proj.Path);
+            if (res == false)
+            {
+                SetStatus("Failed to add exclusion for: " + tempPath);
+            }
+            else
+            {
+                SetStatus("Added exclusion for project path: " + tempPath);
+            }
+        }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{

@@ -228,6 +228,9 @@
                                     <MenuItem x:Name="menuBatchBuildAndroid" Header="Android" Click="MenuBatchBuildAndroid_Click"/>
                                     <MenuItem x:Name="menuBatchBuildIOS" Header="IOS" Click="MenuBatchBuildIOS_Click"/>
                                 </MenuItem>
+                                <MenuItem Header="Tools">
+                                    <MenuItem x:Name="menuExcludeFromDefender" Header="Exclude Path From Defender" Click="menuExcludeFromDefender_Click"/>
+                                </MenuItem>
                                 <Separator/>
                                 <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />
                                 <!--<MenuItem x:Name="menuProjectProperties" Header="Properties..." Click="menuProjectProperties_Click" />-->
@@ -597,6 +600,9 @@
                                     <Label Content="Tools" Foreground="{DynamicResource ThemeButtonForeground}" />
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenADBLogCat" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenADBLogCat_Click" ToolTip="Start ADB logcat commandline">
                                         <Label Content="_ADB logcat" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                    </Button>
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnExcludeFolderForDefender" Margin="10,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Exclude all Editor folders from Windows Defender" Click="btnExcludeFolderForDefender_Click">
+                                        <Label Content="Exclude Folders*" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
                                 </StackPanel>
                             </Border>

@@ -2696,6 +2696,66 @@ public static class UnityLauncherProTools
             }
         }
 
+        // exclude folders from windows defender
+        internal static bool RunExclusionElevated(IEnumerable<string> paths, bool silent = false)
+        {
+            var escapedPaths = new List<string>();
+            foreach (var rawPath in paths)
+            {
+                var path = rawPath.Trim();
+                string safePath = path.Replace("'", "''");
+                escapedPaths.Add($"'{safePath}'");
+            }
+
+            string joinedPaths = string.Join(", ", escapedPaths);
+            string psCommand = $"Add-MpPreference -ExclusionPath {joinedPaths}";
+
+            string fullCommand;
+
+            if (silent)
+            {
+                // No output, just run the command silently
+                fullCommand = psCommand;
+            }
+            else
+            {
+                // Show command and keep window open
+                var quotedPathsForDisplay = string.Join(", ", escapedPaths.ConvertAll(p => $"'{p.Trim('\'')}'"));
+                string displayCommand = $"Add-MpPreference -ExclusionPath {quotedPathsForDisplay}";
+                fullCommand = $"Write-Host 'Running: {displayCommand}'; {psCommand}; Write-Host ''; Write-Host 'Done. Press any key to exit...'; pause";
+            }
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = silent
+                    ? $"-WindowStyle Hidden -Command \"{fullCommand}\""
+                    : $"-NoExit -Command \"{fullCommand}\"",
+                UseShellExecute = true,
+                Verb = "runas", // Requires admin rights
+                WindowStyle = silent ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
+            };
+
+            try
+            {
+                Process.Start(startInfo);
+            }
+            catch (Win32Exception)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show("Operation cancelled or failed due to insufficient privileges.", "Cancelled", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                    return false;
+            }
+
+            return true;
+        }
+
+
+
+
+
 
 
     } // class
