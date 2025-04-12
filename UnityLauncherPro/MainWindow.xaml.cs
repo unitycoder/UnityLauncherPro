@@ -66,8 +66,6 @@ namespace UnityLauncherPro
         string defaultDateFormat = "dd/MM/yyyy HH:mm:ss";
         string adbLogCatArgs = defaultAdbLogCatArgs;
 
-        Dictionary<string, SolidColorBrush> origResourceColors = new Dictionary<string, SolidColorBrush>();
-
         string currentBuildReportProjectPath = null;
         string currentBuildPluginsRelativePath = null;
         //List<List<string>> buildReports = new List<List<string>>();
@@ -168,12 +166,6 @@ namespace UnityLauncherPro
             // build notifyicon (using windows.forms)
             notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
 
-            // get original colors
-            foreach (DictionaryEntry item in Application.Current.Resources.MergedDictionaries[0])
-            {
-                origResourceColors[item.Key.ToString()] = (SolidColorBrush)item.Value;
-            }
-
             ApplyTheme(txtCustomThemeFile.Text);
 
             // for autostart with minimized
@@ -198,7 +190,7 @@ namespace UnityLauncherPro
             if (Settings.Default.disableUnityHubLaunch == true) StartHubPipe();
 
             isInitializing = false;
-        }
+        } // Start()
 
         private static NamedPipeServerStream hubPipeServer;
         private CancellationTokenSource _hubCancellationTokenSource;
@@ -2762,9 +2754,12 @@ namespace UnityLauncherPro
 
         void ResetTheme()
         {
-            foreach (KeyValuePair<string, SolidColorBrush> item in origResourceColors)
+            foreach (DictionaryEntry item in Application.Current.Resources.MergedDictionaries[0])
             {
-                Application.Current.Resources[item.Key] = item.Value;
+                if (item.Key is string key && item.Value is SolidColorBrush brush)
+                {
+                    Application.Current.Resources[key] = brush;
+                }
             }
         }
 
