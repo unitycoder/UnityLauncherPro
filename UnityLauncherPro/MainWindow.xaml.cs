@@ -22,6 +22,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
+using System.Windows.Threading;
 using UnityLauncherPro.Data;
 using UnityLauncherPro.Helpers;
 using UnityLauncherPro.Properties;
@@ -1318,7 +1319,8 @@ namespace UnityLauncherPro
             // if coming from explorer launch, and missing unity version, projectsource is still null?
             if (projectsSource != null) SetStatus("Ready (" + projectsSource.Count + " projects)");
             RefreshSorting();
-            Tools.SetFocusToGrid(gridRecent);
+            //Tools.SetFocusToGrid(gridRecent);
+            Dispatcher.InvokeAsync(() => Tools.SetFocusToGrid(gridRecent), DispatcherPriority.ApplicationIdle);
         }
 
         void RefreshSorting()

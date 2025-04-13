@@ -17,6 +17,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using UnityLauncherPro.Helpers;
 
 namespace UnityLauncherPro
@@ -1592,46 +1593,38 @@ namespace UnityLauncherPro
 
         public static void SetFocusToGrid(DataGrid targetGrid, int index = -1)
         {
-            // set main component focus
-            //targetGrid.Focus();
-            //Keyboard.Focus(targetGrid);
-
-            // no items
             if (targetGrid.Items.Count < 1) return;
 
-            // keep current row selected
             if (index == -1 && targetGrid.SelectedIndex > -1) index = targetGrid.SelectedIndex;
-
-            // if no item selected, pick first
             if (index == -1) index = 0;
 
             targetGrid.SelectedIndex = index;
 
-            // set full focus
+            // Try get the row, if not realized yet, defer
             DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
             if (row == null)
             {
-                targetGrid.UpdateLayout();
-                if (index < targetGrid.Items.Count)
+                targetGrid.ScrollIntoView(targetGrid.Items[index]);
+                // Defer the focus once row is generated
+                targetGrid.Dispatcher.InvokeAsync(() =>
                 {
-                    // scroll selected into view
-                    targetGrid.ScrollIntoView(targetGrid.Items[index]);
-                    row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
-                }
-                else
-                {
-                    Console.WriteLine("selected row out of bounds: " + index);
-                }
+                    var newRow = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
+                    if (newRow != null)
+                    {
+                        newRow.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up));
+                        newRow.Focus();
+                        Keyboard.Focus(newRow);
+                    }
+                }, DispatcherPriority.Background);
             }
-            // NOTE does this causes move below?
-            //row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-            if (row != null)
+            else
             {
-                row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up)); // works better than Up
+                row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up));
                 row.Focus();
                 Keyboard.Focus(row);
             }
         }
+
 
         public static string BrowseForOutputFolder(string title, string initialDirectory = null)
         {
