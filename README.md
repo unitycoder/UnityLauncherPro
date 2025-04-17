@@ -27,6 +27,9 @@ Handle all your Unity versions and Projects easily!
 - Select template for new project (template based on selected unity version)
 - And more: https://github.com/unitycoder/UnityLauncherPro/wiki/Launcher-Comparison
 
+### Powered by
+[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSourceSupport)
+
 ### Forum Thread
 https://forum.unity.com/threads/unity-launcher-launch-correct-unity-versions-for-each-project-automatically.488718/
 
