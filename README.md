@@ -50,7 +50,7 @@ Pre-releases are sometimes available from dev branch: https://github.com/unityco
 
 ![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/6f8dce07-c640-42db-a1ef-d8bcc7a80cc2)
 
-![image](https://user-images.githubusercontent.com/5438317/206923022-4b4bb8ed-0351-408f-b1d3-82bd6eefbc45.png)
+![Image](https://github.com/user-attachments/assets/e5f79e61-95e7-4792-92e2-616f76d601ed)
 
 ### Perform tasks on selected project
 ![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/a0b468ba-e3a6-420b-8155-78bc32814752)
