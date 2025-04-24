@@ -113,8 +113,6 @@ namespace UnityLauncherPro
             {
                 lblVersion.Content = "Build: " + Version.Stamp;
             }
-
-            CheckCustomIcon();
         }
 
         void Start()
@@ -153,7 +151,7 @@ namespace UnityLauncherPro
 
             //Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
 
-            gridRecent.Items.Clear();
+            //gridRecent.Items.Clear(); // not needed?
             gridRecent.ItemsSource = projectsSource;
 
             // clear updates grid
@@ -189,6 +187,8 @@ namespace UnityLauncherPro
             // open "Unity-hubIPCService" pipe, if not already open
 
             if (Settings.Default.disableUnityHubLaunch == true) StartHubPipe();
+
+            CheckCustomIcon();
 
             isInitializing = false;
         } // Start()
@@ -2043,8 +2043,10 @@ namespace UnityLauncherPro
 
         private void TxtRootFolderForNewProjects_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Properties.Settings.Default.newProjectsRoot = txtRootFolderForNewProjects.Text;
-            Properties.Settings.Default.Save();
+            if (this.IsActive == false) return; // dont run code on window init
+
+            Settings.Default.newProjectsRoot = txtRootFolderForNewProjects.Text;
+            Settings.Default.Save();
         }
 
 
@@ -2263,8 +2265,8 @@ namespace UnityLauncherPro
         {
             if (this.IsActive == false) return; // dont run code on window init
 
-            Properties.Settings.Default.enableProjectRename = (bool)chkEnableProjectRename.IsChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.enableProjectRename = (bool)chkEnableProjectRename.IsChecked;
+            Settings.Default.Save();
         }
 
         private void MenuItemKillProcess_Click(object sender, RoutedEventArgs e)
@@ -2666,8 +2668,10 @@ namespace UnityLauncherPro
 
         private void TxtWebglRelativePath_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Properties.Settings.Default.webglBuildPath = txtWebglRelativePath.Text;
-            Properties.Settings.Default.Save();
+            if (this.IsActive == false) return; // dont run code on window init
+
+            Settings.Default.webglBuildPath = txtWebglRelativePath.Text;
+            Settings.Default.Save();
         }
 
         private void MenuItemBrowsePersistentDataPath_Click(object sender, RoutedEventArgs e)
@@ -3232,6 +3236,8 @@ namespace UnityLauncherPro
 
         private void TxtShortcutBatchFileFolder_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (this.IsActive == false) return; // dont run code on window init
+
             var folder = ((TextBox)sender).Text;
             if (Directory.Exists(folder))
             {

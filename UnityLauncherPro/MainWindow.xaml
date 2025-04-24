@@ -237,7 +237,8 @@
                             </ContextMenu>
                         </DataGrid.ContextMenu>
 
-                        <!-- sample data for testing -->
+                        <!-- TODO cannot have this enabled, otherwise needs additional .Clear() at start before setting itemsource data -->
+                        <!-- sample data for testing --><!--
                         <local:Project TargetPlatform="win64" GITBranch="Best" Modified="" Title="M dfgh dfghMO" Path="A:/temp" Version="2099.1.2.3" />
                         <local:Project GITBranch="" Modified="" Title="asdgdfg" Path="A:/temp" Version="5.6.7f1"/>
                         <local:Project GITBranch="" Modified="" Title="Mghdfghdf dfghdfgMO" Path="A:/temp" Version="2018.3.13f1"/>
@@ -269,7 +270,7 @@
                         <local:Project GITBranch="" Modified="" Title="MMd fghO" Path="A:/temp" Version="2099.1.2.3"/>
                         <local:Project GITBranch="" Modified="" Title="MMO" Path="A:/temp" Version="2099.1.2.3"/>
                         <local:Project GITBranch="" Modified="" Title="MMdfg hO" Path="A:/temp" Version="2099.1.2.3"/>
-                        <local:Project GITBranch="" Modified="" Title="Md fghMO" Path="A:/temp" Version="2099.1.2.3"/>
+                        <local:Project GITBranch="" Modified="" Title="Md fghMO" Path="A:/temp" Version="2099.1.2.3"/>-->
                     </DataGrid>
 
                     <!-- bottom buttoms row -->

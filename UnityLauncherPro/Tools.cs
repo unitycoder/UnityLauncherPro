@@ -1493,47 +1493,63 @@ namespace UnityLauncherPro
             return null;
         }
 
-
-        //public static Platform GetTargetPlatform(string projectPath)
         static string GetTargetPlatformRaw(string projectPath)
         {
             string results = null;
-            //Platform results = Platform.Unknown;
 
             // get buildtarget from .csproj
             // <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
             // get main csproj file
             var csproj = Path.Combine(projectPath, "Assembly-CSharp.csproj");
+
             // TODO check projname also, if no assembly-.., NOTE already checked above
-            //var csproj = Path.Combine(projectPath, projectName + ".csproj");
+            // var csproj = Path.Combine(projectPath, projectName + ".csproj");
+
             if (File.Exists(csproj))
             {
-                var csprojtxt = File.ReadAllText(csproj);
-                var csprojsplit = csprojtxt.Split(new[] { "<UnityBuildTarget>" }, StringSplitOptions.None);
-                if (csprojsplit != null && csprojsplit.Length > 1)
+                // Read the file line by line for performance
+                using (var reader = new StreamReader(csproj))
                 {
-                    var endrow = csprojsplit[1].IndexOf(":");
-                    if (endrow > -1)
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        //Console.WriteLine("build target: " + csprojsplit[1].Substring(0, endrow));
-                        // 5.6 : win32, win64, osx, linux, linux64, ios, android, web, webstreamed, webgl, xboxone, ps4, psp2, wsaplayer, tizen, samsungtv
-                        // 2017: standalone, Win, Win64, OSXUniversal, Linux, Linux64, LinuxUniversal, iOS, Android, Web, WebStreamed, WebGL, XboxOne, PS4, PSP2, WindowsStoreApps, Switch, WiiU, N3DS, tvOS, PSM
-                        // 2018: standalone, Win, Win64, OSXUniversal, Linux, Linux64, LinuxUniversal, iOS, Android, Web, WebStreamed, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, N3DS, tvOS
-                        // 2019: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
-                        // 2020: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
-                        // 2021: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
-                        results = csprojsplit[1].Substring(0, endrow);
-                        //results = (Platform)Enum.Parse(typeof(Platform), csprojsplit[1].Substring(0, endrow));
+                        const string tagStart = "<UnityBuildTarget>";
+                        const string tagEnd = "</UnityBuildTarget>";
+
+                        int startIdx = line.IndexOf(tagStart);
+                        if (startIdx >= 0)
+                        {
+                            int endIdx = line.IndexOf(tagEnd, startIdx);
+                            if (endIdx > startIdx)
+                            {
+                                string inner = line.Substring(startIdx + tagStart.Length, endIdx - startIdx - tagStart.Length);
+                                int colonIndex = inner.IndexOf(':');
+                                if (colonIndex > -1)
+                                {
+                                    //Console.WriteLine("build target: " + inner.Substring(0, colonIndex));
+                                    // 5.6 : win32, win64, osx, linux, linux64, ios, android, web, webstreamed, webgl, xboxone, ps4, psp2, wsaplayer, tizen, samsungtv
+                                    // 2017: standalone, Win, Win64, OSXUniversal, Linux, Linux64, LinuxUniversal, iOS, Android, Web, WebStreamed, WebGL, XboxOne, PS4, PSP2, WindowsStoreApps, Switch, WiiU, N3DS, tvOS, PSM
+                                    // 2018: standalone, Win, Win64, OSXUniversal, Linux, Linux64, LinuxUniversal, iOS, Android, Web, WebStreamed, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, N3DS, tvOS
+                                    // 2019: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
+                                    // 2020: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
+                                    // 2021: Standalone, Win, Win64, OSXUniversal, Linux64, iOS, Android, WebGL, XboxOne, PS4, WindowsStoreApps, Switch, tvOS
+                                    results = inner.Substring(0, colonIndex);
+                                    //results = (Platform)Enum.Parse(typeof(Platform), inner.Substring(0, colonIndex));
+                                    break; // we found it, exit early
+                                }
+                            }
+                        }
                     }
                 }
             }
             else
             {
-                //Console.WriteLine("Missing csproj, cannot parse target platform: "+ projectPath);
+                //Console.WriteLine("Missing csproj, cannot parse target platform: " + projectPath);
             }
 
             return results;
         }
+
 
         public static string GetTargetPlatform(string projectPath)
         {
