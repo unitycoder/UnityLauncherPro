@@ -133,8 +133,11 @@ namespace UnityLauncherPro
                     // Send a wake-up message to the running instance
                     ActivateRunningInstance();
 
-                    // Exit the current instance
-                    App.Current.Shutdown();
+                    // Exit the current instance (if not coming from Explorer launch)
+                    if (Directory.GetCurrentDirectory().ToLower() != @"c:\windows\system32")
+                    {
+                        App.Current.Shutdown();
+                    }
                 }
                 else
                 {
