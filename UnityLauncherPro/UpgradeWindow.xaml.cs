@@ -32,28 +32,29 @@ namespace UnityLauncherPro
             btnDownload.IsEnabled = true;
 
             // if dont have exact version, show red outline
-            if (MainWindow.unityInstalledVersions.ContainsKey(currentVersion) == false)
+            if (currentVersion == null || MainWindow.unityInstalledVersions.ContainsKey(currentVersion) == false)
             {
                 txtCurrentVersion.BorderBrush = Brushes.Red;
                 txtCurrentVersion.BorderThickness = new Thickness(1);
             }
-
-            // remove china c1 from version
-            if (currentVersion.Contains('c')) currentVersion= currentVersion.Replace("c1", "");
-
-            // find nearest version
-            string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
-
-            if (nearestVersion != null)
+            else // not null
             {
-                // select nearest version
-                for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
+                // remove china c1 from version
+                if (currentVersion.Contains('c')) currentVersion = currentVersion.Replace("c1", "");
+                // find nearest version
+                string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
+
+                if (nearestVersion != null)
                 {
-                    if (MainWindow.unityInstallationsSource[i].Version == nearestVersion)
+                    // select nearest version
+                    for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
                     {
-                        gridAvailableVersions.SelectedIndex = i;
-                        gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
-                        break;
+                        if (MainWindow.unityInstallationsSource[i].Version == nearestVersion)
+                        {
+                            gridAvailableVersions.SelectedIndex = i;
+                            gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
+                            break;
+                        }
                     }
                 }
             }
@@ -77,7 +78,7 @@ namespace UnityLauncherPro
             Tools.OpenReleaseNotes(txtCurrentVersion.Text);
         }
 
-        
+
         private void BtnDownloadEditor_Click(object sender, RoutedEventArgs e)
         {
             Tools.DownloadInBrowser(txtCurrentVersion.Text);

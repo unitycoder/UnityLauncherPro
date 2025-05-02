@@ -122,6 +122,7 @@ namespace UnityLauncherPro
             UpdateUnityInstallationsList();
             HandleCommandLineLaunch();
 
+
             // check for duplicate instance, and activate that instead
             if (chkAllowSingleInstanceOnly.IsChecked == true)
             {
