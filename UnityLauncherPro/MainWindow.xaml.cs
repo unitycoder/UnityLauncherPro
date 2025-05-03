@@ -330,13 +330,15 @@ namespace UnityLauncherPro
                     // NOTE if keydown, window doesnt become active and focused
                     if (string.IsNullOrEmpty(version) || (Keyboard.Modifiers & ModifierKeys.Shift) != 0)
                     {
-                        if (Directory.Exists(Path.Combine(proj.Path, "Assets")) == true)
+                        // if Assets folder exists, then its existing project
+                        if (Directory.Exists(Path.Combine(proj.Path, "Assets")) == true && (Directory.GetFiles(Path.Combine(proj.Path, "Assets")).Length > 0))
                         {
-                            Tools.DisplayUpgradeDialog(proj, null, false);
+                            bool useInitScript = (bool)chkUseInitScript.IsChecked;
+
+                            Tools.DisplayUpgradeDialog(proj, null, useInitScript);
                         }
-                        else // no assets folder here, then its new project
+                        else // no Assets folder here OR Assets folder is empty, then its new project
                         {
-                            //Tools.DisplayUpgradeDialog(proj, null);
                             CreateNewEmptyProject(proj.Path);
                         }
                     }
@@ -1315,7 +1317,7 @@ namespace UnityLauncherPro
             var proj = GetSelectedProject();
             if (proj == null) return;
 
-            Tools.DisplayUpgradeDialog(proj, this, false);
+            Tools.DisplayUpgradeDialog(proj: proj, owner: this, useInitScript: false);
         }
 
         private void GridRecent_Loaded(object sender, RoutedEventArgs e)
