@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
@@ -150,6 +151,9 @@ namespace UnityLauncherPro
             // TEST erase custom history data
             //Properties.Settings.Default.projectPaths = null;
             //Properties.Settings.Default.Save();
+
+
+
 
             projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursively: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
 
@@ -1183,6 +1187,7 @@ namespace UnityLauncherPro
                 gridRecent.SelectedIndex = 0;
             }
 
+            // NOTE this doesnt remove from settings list?
         }
 
         private async void OnTabSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -4076,6 +4081,37 @@ namespace UnityLauncherPro
                 SetStatus("Added exclusion for project path: " + tempPath);
             }
         }
+
+        private void btnPurgeMissingFolders_Click(object sender, RoutedEventArgs e)
+        {
+            var validPaths = new List<string>();
+            int removedCount = 0;
+            foreach (string path in Settings.Default.projectPaths)
+            {
+                if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
+                {
+                    validPaths.Add(path);
+                }
+                else
+                {
+                    Console.WriteLine("Path not found: " + path);
+                    removedCount++;
+                }
+            }
+
+            // Replace the old collection with the filtered one
+            var newCollection = new StringCollection();
+            foreach (string path in validPaths)
+            {
+                newCollection.Add(path);
+            }
+
+            Settings.Default.projectPaths = newCollection;
+            Settings.Default.Save();
+
+            SetStatus("Purged " + removedCount + " items", MessageType.Info);
+        }
+
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{

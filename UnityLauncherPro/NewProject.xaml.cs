@@ -40,12 +40,12 @@ namespace UnityLauncherPro
             txtNewProjectName.Text = newName;
             lblNewProjectFolder.Content = targetFolder;
 
-            //// fill available versions
+            // fill available versions
             if (gridAvailableVersions.ItemsSource == null)
             {
                 gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
             }
-            
+
             // we have that version installed
             if (MainWindow.unityInstalledVersions.ContainsKey(unityVersion) == true)
             {
@@ -131,10 +131,9 @@ namespace UnityLauncherPro
             var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
             if (txtNewProjectName.IsEnabled == true && Directory.Exists(targetPath) == true)
             {
-                System.Console.WriteLine("Project already exists");
+                Tools.SetStatus("Project already exists: " + txtNewProjectName.Text);
                 return;
             }
-
 
             templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
             selectedPlatform = cmbNewProjectPlatform.SelectedValue.ToString();

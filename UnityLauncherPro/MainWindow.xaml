@@ -238,7 +238,8 @@
                         </DataGrid.ContextMenu>
 
                         <!-- TODO cannot have this enabled, otherwise needs additional .Clear() at start before setting itemsource data -->
-                        <!-- sample data for testing --><!--
+                        <!-- sample data for testing -->
+                        <!--
                         <local:Project TargetPlatform="win64" GITBranch="Best" Modified="" Title="M dfgh dfghMO" Path="A:/temp" Version="2099.1.2.3" />
                         <local:Project GITBranch="" Modified="" Title="asdgdfg" Path="A:/temp" Version="5.6.7f1"/>
                         <local:Project GITBranch="" Modified="" Title="Mghdfghdf dfghdfgMO" Path="A:/temp" Version="2018.3.13f1"/>
@@ -772,7 +773,13 @@
                                     </StackPanel>
                                     <CheckBox x:Name="chkAskNameForQuickProject" Content="Ask name for New Project"  Checked="ChkAskNameForQuickProject_Checked" Unchecked="ChkAskNameForQuickProject_Checked" ToolTip="If disabled, uses automatic quick project naming (Should be enabled, unless you want instant project creation)" HorizontalAlignment="Left"/>
                                     <CheckBox x:Name="chkCheckSRP" Content="Show SRP column" ToolTip="Display Scriptable Render Pipeline column" HorizontalAlignment="Left" Checked="chkCheckSRP_Checked" Unchecked="chkCheckSRP_Checked"/>
-                                    <CheckBox  x:Name="chkShowMissingFolderProjects" Content="Show projects that don't exist on disk"  Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" ToolTip="List in recent projects, even if the project folder is missing" HorizontalAlignment="Left"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <CheckBox  x:Name="chkShowMissingFolderProjects" Content="Show projects that don't exist on disk"  Checked="ChkShowMissingFolderProjects_CheckedChanged" Unchecked="ChkShowMissingFolderProjects_CheckedChanged" ToolTip="List in recent projects, even if the project folder is missing" HorizontalAlignment="Left"/>
+                                        <Button Style="{StaticResource CustomButton}" x:Name="btnPurgeMissingFolders" Margin="12,0,0,0" BorderBrush="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Cleanup projects with missing project folder from the recent list (in settings data)" Click="btnPurgeMissingFolders_Click">
+                                            <Label Content="Purge list" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
+                                        </Button>
+
+                                    </StackPanel>
                                     <CheckBox  x:Name="chkShowLauncherArgumentsColumn" Content="Show commandline arguments column"  Unchecked="ChkShowLauncherArgumentsColumn_CheckedChanged" Checked="ChkShowLauncherArgumentsColumn_CheckedChanged" ToolTip="Shows column for custom project commandline params" HorizontalAlignment="Left"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                         <Label Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,5,5,0" HorizontalAlignment="Left">Project name:</Label>

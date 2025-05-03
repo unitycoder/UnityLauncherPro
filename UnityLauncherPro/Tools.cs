@@ -1673,21 +1673,22 @@ namespace UnityLauncherPro
             // check for base folders in settings tab
             if (string.IsNullOrEmpty(baseFolder) == true)
             {
-                Console.WriteLine("Missing baseFolder value");
+                SetStatus("Missing baseFolder value");
                 return null;
             }
 
             // check if base folder exists
             if (Directory.Exists(baseFolder) == false)
             {
-                Console.WriteLine("Missing baseFolder: " + baseFolder);
+                // TODO add streaming filter
+                SetStatus("Missing baseFolder: " + baseFolder);
                 return null;
             }
 
             // check selected unity version
             if (string.IsNullOrEmpty(version) == true)
             {
-                Console.WriteLine("Missing unity version string");
+                SetStatus("Missing unity version string");
                 return null;
             }
 
@@ -1773,6 +1774,8 @@ namespace UnityLauncherPro
         static void CreateEmptyProjectFolder(string path, string version)
         {
             Console.WriteLine("Create new project folder: " + path);
+            // TODO add streaming filter
+            SetStatus("Creating new project folder: " + path);
             Directory.CreateDirectory(path);
 
             // create project version file, to avoid wrong version warning
