@@ -413,14 +413,14 @@ namespace UnityLauncherPro
                     {
                         Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                         var uniqueFileName = "Recovered_Scene" + unixTimestamp + ".unity";
-                        
+
                         try
                         {
                             File.Move(recoveryFile, Path.Combine(restoreFolder, uniqueFileName));
                             // remove folder, otherwise unity 6000.2 asks for recovery
                             Directory.Delete(Path.Combine(projectPath, "Temp", "__Backupscenes"), true);
 
-                            Console.WriteLine("moved file to "+ uniqueFileName);
+                            Console.WriteLine("moved file to " + uniqueFileName);
                         }
                         catch (IOException)
                         {
@@ -1130,8 +1130,7 @@ namespace UnityLauncherPro
             string result = null;
 
             // add current version to list, to sort it with others
-            if (!allAvailable.Contains(currentVersion))
-                allAvailable.Add(currentVersion);
+            if (!allAvailable.Contains(currentVersion)) allAvailable.Add(currentVersion);
 
             // sort list
             if (checkBelow)
@@ -1181,6 +1180,7 @@ namespace UnityLauncherPro
                     multiplier *= 50;
                 }
             }
+
             return result;
         }
 

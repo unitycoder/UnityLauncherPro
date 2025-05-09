@@ -37,10 +37,11 @@ namespace UnityLauncherPro
                 txtCurrentVersion.BorderBrush = Brushes.Red;
                 txtCurrentVersion.BorderThickness = new Thickness(1);
             }
-            else // not null
+
+            if (currentVersion != null)
             {
                 // remove china c1 from version
-                if (currentVersion.Contains('c')) currentVersion = currentVersion.Replace("c1", "");
+                if (currentVersion.Contains("c")) currentVersion = currentVersion.Replace("c1", "");
                 // find nearest version
                 string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
 
