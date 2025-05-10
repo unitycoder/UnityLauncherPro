@@ -32,11 +32,13 @@ CD /D "%current_path%"
 ECHO:
 ECHO === Building Installer ===
 CALL "%devenv_path%" UnityLauncherPro.sln /Rebuild Release /Project UnityLauncherProInstaller
+SET "exitCode=%ERRORLEVEL%"
 
 ECHO:
 ECHO === Build Complete ===
 
-REM Clean up registry key if needed (optional)
+REM Optional cleanup: disable workaround
 REG DELETE "HKCU\Software\Microsoft\VisualStudio\Setup" /v VSDisableOutOfProcBuild /f >NUL 2>&1
 
 ENDLOCAL
+EXIT /B %exitCode%
