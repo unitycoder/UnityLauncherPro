@@ -71,13 +71,11 @@ jobs:
         shell: cmd
         run: call .\InstallerBumpVersion.bat
 
-      # Build MSI installer project using Visual Studio 2022
+      # Build MSI installer project using Visual Studio 2022 workaround
       - name: Build Installer MSI
         if: env.build_trigger == 'true'
         shell: cmd
-        run: |
-          "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com" UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj /Build Release
-
+        run: call .\BuildInstaller.bat
 
       # Get the current date and time
       - name: Get current date and time
