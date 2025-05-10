@@ -83,19 +83,30 @@ jobs:
           )
           echo Found UnityLauncherPro.exe
 
-      # download vs installer builder
-      - name: Download Installer‐Projects VSIX
+      # locate VS 2022
+      - name: Locate Visual Studio 2022
+        id: vswhere
+        shell: pwsh
+        run: |
+          $installPath = vswhere -latest -products * -requires Microsoft.Component.MSBuild `
+                         -property installationPath
+          if (-not $installPath) { throw 'VS 2022 not found' }
+          Write-Host "##[set-output name=installPath]$installPath"
+
+      # download vs installer builder (v2.0.1)
+      - name: Download Installer-Projects VSIX
         shell: pwsh
         run: |
           $vsixUrl = "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/VisualStudioClient/vsextensions/MicrosoftVisualStudio2022InstallerProjects/2.0.1/vspackage"
           Invoke-WebRequest $vsixUrl -OutFile installerprojects.vsix
 
       # install vs installer builder
-      - name: Install Installer‐Projects extension
+      - name: Install Installer-Projects extension
         shell: pwsh
         run: |
-          & "${{ steps.vswhere.outputs.installPath }}\Common7\IDE\VSIXInstaller.exe" \
-            installerprojects.vsix /quiet
+          $vsixInstaller = Join-Path "${{ steps.vswhere.outputs.installPath }}" 'Common7\IDE\VSIXInstaller.exe'
+          Write-Host "Running: $vsixInstaller installerprojects.vsix /quiet"
+          & $vsixInstaller installerprojects.vsix /quiet
 
       # Build MSI installer project using Visual Studio 2022 workaround
       - name: Build Installer MSI
