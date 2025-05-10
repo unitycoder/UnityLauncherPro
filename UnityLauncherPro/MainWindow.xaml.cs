@@ -3918,7 +3918,7 @@ namespace UnityLauncherPro
                 try
                 {
                     // Load the custom icon using System.Drawing.Icon
-                    using (var icon = new System.Drawing.Icon(customIconPath))
+                    using (var icon = new Icon(customIconPath))
                     {
                         // Convert the icon to a BitmapSource and assign it to the WPF window's Icon property
                         this.Icon = Imaging.CreateBitmapSourceFromHIcon(
