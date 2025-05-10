@@ -804,7 +804,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7E1343CBA8EB43B8864B8A7BBEB62BCA"
             {
-            "SourcePath" = "8:..\\UnityLauncherPro\\obj\\Release\\UnityLauncherPro.exe"
+            "SourcePath" = "8:..\\UnityLauncherPro\\bin\\Release\\UnityLauncherPro.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_68B52FAF3D0E46A7BB2DA063CB0BC570"
