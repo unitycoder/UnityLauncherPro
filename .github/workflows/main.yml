@@ -71,6 +71,18 @@ jobs:
         shell: cmd
         run: call .\InstallerBumpVersion.bat
 
+      # Check that output exists
+      - name: Validate UnityLauncherPro.exe exists
+        if: env.build_trigger == 'true'
+        shell: cmd
+        run: |
+          if not exist "UnityLauncherPro\bin\Release\UnityLauncherPro.exe" (
+            echo ERROR: UnityLauncherPro.exe not found.
+            exit /b 1
+          )
+          echo Found UnityLauncherPro.exe
+
+
       # Build MSI installer project using Visual Studio 2022 workaround
       - name: Build Installer MSI
         if: env.build_trigger == 'true'
