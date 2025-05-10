@@ -43,7 +43,7 @@ namespace UnityLauncherPro
         public static readonly string projectNameFile = "ProjectName.txt";
         public static string preferredVersion = null;
         public static int projectNameSetting = 0; // 0 = folder or ProjectName.txt if exists, 1=ProductName
-        public static readonly string initScriptFileFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "InitializeProject.cs");
+        public static readonly string initScriptFileFullPath = GetInitScriptPath();
 
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
@@ -3911,8 +3911,6 @@ namespace UnityLauncherPro
         private void CheckCustomIcon()
         {
             string customIconPath = Path.Combine(Environment.CurrentDirectory, "icon.ico");
-            //Console.WriteLine(customIconPath);
-
             if (File.Exists(customIconPath))
             {
                 try
@@ -3921,12 +3919,7 @@ namespace UnityLauncherPro
                     using (var icon = new Icon(customIconPath))
                     {
                         // Convert the icon to a BitmapSource and assign it to the WPF window's Icon property
-                        this.Icon = Imaging.CreateBitmapSourceFromHIcon(
-                            icon.Handle,
-                            Int32Rect.Empty,
-                            BitmapSizeOptions.FromEmptyOptions() // Use BitmapSizeOptions here
-                        );
-
+                        this.Icon = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
                         // window icon
                         IconImage.Source = this.Icon;
                         // tray icon
@@ -4112,6 +4105,30 @@ namespace UnityLauncherPro
             SetStatus("Purged " + removedCount + " items", MessageType.Info);
         }
 
+        // to handle folders where user has no write access ()
+        private static string GetInitScriptPath()
+        {
+            string preferredDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts");
+            string fallbackDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UnityLauncherPro", "Scripts");
+
+            try
+            {
+                Directory.CreateDirectory(preferredDir); // safe even if it exists
+                return Path.Combine(preferredDir, "InitializeProject.cs");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // No write permission in Program Files etc.
+            }
+            catch (Exception ex)
+            {
+                // Optional: log other unexpected errors
+                Console.WriteLine("Init folder fallback: " + ex.Message);
+            }
+
+            Directory.CreateDirectory(fallbackDir); // always safe
+            return Path.Combine(fallbackDir, "InitializeProject.cs");
+        }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
