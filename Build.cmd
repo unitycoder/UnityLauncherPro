@@ -1,10 +1,10 @@
 @echo off
 
 REM Default VS paths to check if no Paths.cmd file exists
-set VISUAL_STUDIO_PATH_0="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe"
-set VISUAL_STUDIO_PATH_1="%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\msbuild.exe"
-set VISUAL_STUDIO_PATH_2="%programfiles(x86)%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\msbuild.exe"
-set VISUAL_STUDIO_PATH_3="%programfiles(x86)%\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\msbuild.exe"
+set VISUAL_STUDIO_PATH_0="%programfiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\msbuild.exe"
+set VISUAL_STUDIO_PATH_1="%programfiles%\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\msbuild.exe"
+set VISUAL_STUDIO_PATH_2="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe"
+set VISUAL_STUDIO_PATH_3="%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\msbuild.exe"
 
 pushd "%~dp0"
 if exist Debug rd /s /q Debug
