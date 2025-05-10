@@ -29,6 +29,27 @@ CALL DisableOutOfProcBuild.exe
 REM Restore previous directory
 CD /D "%current_path%"
 
+REM === Validate required files ===
+ECHO:
+ECHO === Checking required files ===
+
+SET "error=0"
+
+IF NOT EXIST "UnityLauncherPro\bin\Release\UnityLauncherPro.exe" (
+    ECHO [ERROR] Missing file: UnityLauncherPro\bin\Release\UnityLauncherPro.exe
+    SET "error=1"
+)
+IF NOT EXIST "UnityLauncherPro\Images\icon.ico" (
+    ECHO [ERROR] Missing file: UnityLauncherPro\Images\icon.ico
+    SET "error=1"
+)
+
+IF %error% NEQ 0 (
+    ECHO [ERROR] Required files are missing. Aborting installer build.
+    EXIT /B 1
+)
+
+
 ECHO:
 ECHO === Building Installer ===
 CALL "%devenv_path%" UnityLauncherPro.sln /Rebuild Release /Project UnityLauncherProInstaller
