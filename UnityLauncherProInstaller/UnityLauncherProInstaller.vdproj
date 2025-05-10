@@ -180,7 +180,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -241,7 +241,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UnityLauncherPro"
         "ProductCode" = "8:{904A3434-1B2D-42CB-AC64-C311F3956044}"
-        "PackageCode" = "8:{3664D852-11B6-4748-9A43-649441EEE5DF}"
+        "PackageCode" = "8:{1E8EE2AB-7275-4599-9F22-E57650F33D2B}"
         "UpgradeCode" = "8:{4F3ACBAF-4673-4808-9A4F-50ED1E82F59F}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -386,7 +386,7 @@
             "Target" = "8:_68B52FAF3D0E46A7BB2DA063CB0BC570"
             "Folder" = "8:_68B52FAF3D0E46A7BB2DA063CB0BC570"
             "WorkingFolder" = "8:_19ED9D0C790D4F4D9166B197E25DE46F"
-            "Icon" = "8:"
+            "Icon" = "8:_56C1F622109E4E31983910358EA5BCB3"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_DC1220A510594DA78B14B2A948B17BB5"
