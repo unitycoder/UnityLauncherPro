@@ -57,8 +57,8 @@ namespace UnityLauncherPro
                         //Console.WriteLine(projectPath+" "+p.TargetPlatform);
 
                         // if want to hide project and folder path for screenshot
-                        //p.Title = "Example Project ";
-                        //p.Path = "C:/Projects/ExamplePath/MyProj";
+                        //p.Title = "Example Project";
+                        //p.Path = "C:/Projects/MyProj";
 
                         if (p != null)
                         {
