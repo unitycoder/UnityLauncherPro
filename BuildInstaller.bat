@@ -52,8 +52,18 @@ IF %error% NEQ 0 (
 
 ECHO:
 ECHO === Building Installer ===
-CALL "%devenv_path%" UnityLauncherPro.sln /Rebuild Release /Project UnityLauncherProInstaller
+"%devenv_path%" UnityLauncherPro.sln /Rebuild Release /Project UnityLauncherProInstaller > build_output.log 2>&1
 SET "exitCode=%ERRORLEVEL%"
+
+TYPE build_output.log
+ECHO:
+ECHO === devenv.exe exit code: %exitCode% ===
+
+IF NOT "%exitCode%"=="0" (
+    ECHO [ERROR] Installer build failed. Check build_output.log for details.
+    EXIT /B %exitCode%
+)
+
 
 ECHO:
 ECHO === Build Complete ===
