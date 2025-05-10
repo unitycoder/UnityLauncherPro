@@ -65,6 +65,19 @@ jobs:
         shell: cmd
         run: call .\ArtifactBuild.cmd
 
+      # Bump version for installer
+      - name: Bump Installer Version
+        if: env.build_trigger == 'true'
+        shell: cmd
+        run: call .\InstallerBumpVersion.bat
+
+      # Build MSI installer project
+      - name: Build Installer MSI
+        if: env.build_trigger == 'true'
+        shell: cmd
+        run: |
+          msbuild UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj /p:Configuration=Release
+
       # Get the current date and time
       - name: Get current date and time
         id: datetime
@@ -123,3 +136,14 @@ jobs:
           asset_name: UnityLauncherPro.zip
           asset_content_type: application/zip
 
+      # Upload MSI installer to release
+      - name: Upload MSI Installer
+        if: env.build_trigger == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./UnityLauncherProInstaller/Release/UnityLauncherPro-Installer.msi
+          asset_name: UnityLauncherPro-Installer.msi
+          asset_content_type: application/x-msi
