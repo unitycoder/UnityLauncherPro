@@ -43,7 +43,28 @@ namespace UnityLauncherPro
         public static readonly string projectNameFile = "ProjectName.txt";
         public static string preferredVersion = null;
         public static int projectNameSetting = 0; // 0 = folder or ProjectName.txt if exists, 1=ProductName
-        public static readonly string initScriptFileFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "InitializeProject.cs");
+
+        // required setup for exe and msix builds
+        public static string InitScriptFileFullPath
+        {
+            get
+            {
+                string basePath;
+                if (AppDomain.CurrentDomain.BaseDirectory.Contains(@"\WindowsApps\"))
+                {
+                    // MSIX: Use user-writable folder
+                    basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UnityLauncherPro", "Scripts");
+                }
+                else
+                {
+                    // EXE: Use app folder
+                    basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts");
+                }
+                // Ensure directory exists
+                if (!Directory.Exists(basePath)) Directory.CreateDirectory(basePath);
+                return Path.Combine(basePath, "InitializeProject.cs");
+            }
+        }
 
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
@@ -2131,7 +2152,7 @@ namespace UnityLauncherPro
                     Console.WriteLine("Create project " + NewProject.newVersion + " : " + rootFolder);
                     if (string.IsNullOrEmpty(rootFolder)) return;
 
-                    var p = Tools.FastCreateProject(NewProject.newVersion, rootFolder, NewProject.newProjectName, NewProject.templateZipPath, NewProject.platformsForThisUnity, NewProject.selectedPlatform, (bool)chkUseInitScript.IsChecked, initScriptFileFullPath, NewProject.forceDX11);
+                    var p = Tools.FastCreateProject(NewProject.newVersion, rootFolder, NewProject.newProjectName, NewProject.templateZipPath, NewProject.platformsForThisUnity, NewProject.selectedPlatform, (bool)chkUseInitScript.IsChecked, InitScriptFileFullPath, NewProject.forceDX11);
 
                     // add to list (just in case new project fails to start, then folder is already generated..)
                     if (p != null) AddNewProjectToList(p);
@@ -2154,7 +2175,7 @@ namespace UnityLauncherPro
                 {
                     newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
                 }
-                var p = Tools.FastCreateProject(newVersion, rootFolder, null, null, null, null, (bool)chkUseInitScript.IsChecked, initScriptFileFullPath);
+                var p = Tools.FastCreateProject(newVersion, rootFolder, null, null, null, null, (bool)chkUseInitScript.IsChecked, InitScriptFileFullPath);
 
                 if (p != null) AddNewProjectToList(p);
             }
@@ -3472,15 +3493,30 @@ namespace UnityLauncherPro
 
         private void btnExploreScriptsFolder_Click(object sender, RoutedEventArgs e)
         {
-            if (Tools.LaunchExplorer(Path.GetDirectoryName(initScriptFileFullPath)) == false)
+            // handle exe vs msix locations
+            try
             {
-                // if failed, open parent folder (probably path was using URL or no scripts yet)
-                var parentPath = Directory.GetParent(Path.GetDirectoryName(initScriptFileFullPath)).FullName;
-                if (Tools.LaunchExplorer(parentPath) == false)
+                string scriptFolder = Path.GetDirectoryName(InitScriptFileFullPath);
+
+                if (!Tools.LaunchExplorer(scriptFolder))
                 {
-                    // if still failed, open exe folder
-                    Tools.LaunchExplorer(AppDomain.CurrentDomain.BaseDirectory);
+                    // fallback: try parent of script folder
+                    string parentPath = Directory.GetParent(scriptFolder)?.FullName;
+
+                    if (string.IsNullOrEmpty(parentPath) || !Tools.LaunchExplorer(parentPath))
+                    {
+                        // final fallback: show %LOCALAPPDATA% for MSIX, or exe dir for EXE builds
+                        string fallback = AppDomain.CurrentDomain.BaseDirectory.Contains(@"\WindowsApps\")
+                            ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+                            : AppDomain.CurrentDomain.BaseDirectory;
+
+                        Tools.LaunchExplorer(fallback);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to open folder: " + ex.Message);
             }
         }
 
@@ -3823,7 +3859,7 @@ namespace UnityLauncherPro
 
         private void btnFetchLatestInitScript_Click(object sender, RoutedEventArgs e)
         {
-            Tools.DownloadInitScript(initScriptFileFullPath, txtCustomInitFileURL.Text);
+            Tools.DownloadInitScript(InitScriptFileFullPath, txtCustomInitFileURL.Text);
         }
 
         private void btnHubLogs_Click(object sender, RoutedEventArgs e)
@@ -3910,26 +3946,23 @@ namespace UnityLauncherPro
 
         private void CheckCustomIcon()
         {
-            string customIconPath = Path.Combine(Environment.CurrentDirectory, "icon.ico");
-            //Console.WriteLine(customIconPath);
+            // Use app-specific writable folder (same as used for themes/scripts)
+            string baseFolder = AppDomain.CurrentDomain.BaseDirectory.Contains(@"\WindowsApps\")
+                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UnityLauncherPro")
+                : AppDomain.CurrentDomain.BaseDirectory;
+
+            string customIconPath = Path.Combine(baseFolder, "icon.ico");
 
             if (File.Exists(customIconPath))
             {
                 try
                 {
-                    // Load the custom icon using System.Drawing.Icon
-                    using (var icon = new System.Drawing.Icon(customIconPath))
+                    using (var icon = new Icon(customIconPath))
                     {
-                        // Convert the icon to a BitmapSource and assign it to the WPF window's Icon property
-                        this.Icon = Imaging.CreateBitmapSourceFromHIcon(
-                            icon.Handle,
-                            Int32Rect.Empty,
-                            BitmapSizeOptions.FromEmptyOptions() // Use BitmapSizeOptions here
-                        );
-
-                        // window icon
+                        // Set WPF window icon
+                        this.Icon = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
                         IconImage.Source = this.Icon;
-                        // tray icon
+                        // Tray icon
                         notifyIcon.Icon = new Icon(customIconPath);
                     }
                 }
@@ -3939,12 +3972,13 @@ namespace UnityLauncherPro
                     Debug.WriteLine($"Failed to load custom icon: {ex.Message}");
                 }
             }
-            else // no custom icon found
+            else
             {
+                // Fallback to default embedded icon
                 notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Images/icon.ico")).Stream);
-                //Debug.WriteLine("Custom icon not found. Using default.");
             }
         }
+
 
         private void chkCheckSRP_Checked(object sender, RoutedEventArgs e)
         {

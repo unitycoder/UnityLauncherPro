@@ -109,7 +109,7 @@ namespace UnityLauncherPro
 
         private void BtnSaveTheme_Click(object sender, RoutedEventArgs e)
         {
-            var themeFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes");
+            var themeFolder = GetThemeFolder();
 
             if (Directory.Exists(themeFolder) == false) Directory.CreateDirectory(themeFolder);
 
@@ -287,5 +287,24 @@ namespace UnityLauncherPro
                     break;
             }
         }
+
+        private string GetThemeFolder()
+        {
+            string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            // If running inside MSIX (installed to Program Files\WindowsApps), use local app data
+            if (exeDir.Contains(@"\WindowsApps\"))
+            {
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                return Path.Combine(localAppData, "UnityLauncherPro", "Themes");
+            }
+            else
+            {
+                // Standalone .exe build, use app folder
+                return Path.Combine(exeDir, "Themes");
+            }
+        }
+
+
     } // class
 } // namespace

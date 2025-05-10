@@ -854,6 +854,22 @@ namespace UnityLauncherPro
             }
         }
 
+        public static string GetInitScriptFolder()
+        {
+            string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Check for MSIX install
+            if (exeDir.Contains(@"\WindowsApps\"))
+            {
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                return Path.Combine(localAppData, "UnityLauncherPro", "Scripts");
+            }
+            else
+            {
+                return Path.Combine(exeDir, "Scripts");
+            }
+        }
+
         static void DeleteTempFile(string path)
         {
             if (File.Exists(path) == true)
