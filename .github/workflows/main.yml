@@ -112,7 +112,15 @@ jobs:
       - name: Build Installer MSI
         if: env.build_trigger == 'true'
         shell: cmd
-        run: call .\BuildInstaller.bat
+        run: |
+          echo === Running BuildInstaller.bat ===
+          call .\BuildInstaller.bat || echo WARNING: BuildInstaller.bat exited with %ERRORLEVEL%, continuing...
+          echo === Verifying MSI ===
+          if not exist "UnityLauncherProInstaller\Release\UnityLauncherPro-Installer.msi" (
+            echo ERROR: MSI not found in UnityLauncherProInstaller\Release
+            exit /b 1
+          )
+          echo Success: MSI found at UnityLauncherProInstaller\Release\UnityLauncherPro-Installer.msi
 
       # Get the current date and time
       - name: Get current date and time
