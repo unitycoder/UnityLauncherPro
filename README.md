@@ -41,7 +41,7 @@ Pre-releases are sometimes available from dev branch: https://github.com/unityco
 
 ### Screenshots
 
-![image](https://user-images.githubusercontent.com/5438317/71485879-184b3a00-281c-11ea-97db-73c5dfa9bb4e.png)
+![Image](https://github.com/user-attachments/assets/80bd8ff4-7e90-4c1a-9501-74cf3ea538f6)
 
 ![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/21eb1fcd-3cb1-4dea-8133-9ce440de77d8)
 
