@@ -87,7 +87,7 @@ jobs:
       - name: Download Installer‐Projects VSIX
         shell: pwsh
         run: |
-          $vsixUrl = "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/VisualStudioClient/extensions/VisualStudioInstallerProjects/versions/1.0.0/media"
+          $vsixUrl = "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/VisualStudioClient/vsextensions/MicrosoftVisualStudio2022InstallerProjects/2.0.1/vspackage"
           Invoke-WebRequest $vsixUrl -OutFile installerprojects.vsix
 
       # install vs installer builder
