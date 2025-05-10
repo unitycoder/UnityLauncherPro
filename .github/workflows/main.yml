@@ -83,6 +83,19 @@ jobs:
           )
           echo Found UnityLauncherPro.exe
 
+      # download vs installer builder
+      - name: Download Installer‐Projects VSIX
+        shell: pwsh
+        run: |
+          $vsixUrl = "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/VisualStudioClient/extensions/VisualStudioInstallerProjects/versions/1.0.0/media"
+          Invoke-WebRequest $vsixUrl -OutFile installerprojects.vsix
+
+      # install vs installer builder
+      - name: Install Installer‐Projects extension
+        shell: pwsh
+        run: |
+          & "${{ steps.vswhere.outputs.installPath }}\Common7\IDE\VSIXInstaller.exe" \
+            installerprojects.vsix /quiet
 
       # Build MSI installer project using Visual Studio 2022 workaround
       - name: Build Installer MSI
