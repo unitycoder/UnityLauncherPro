@@ -99,33 +99,29 @@ jobs:
         shell: pwsh
         run: |
           $proj = 'UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj'
-          $ver  = '${{ env.INSTALLER_VER }}'               # e.g. "0.0.117"
-          $guid = [Guid]::NewGuid().ToString("B").ToUpper() # e.g. "{1D05663F-...}"
+          $ver  = "${{ env.INSTALLER_VER }}"               # e.g. 0.0.118
+          $guid = [Guid]::NewGuid().ToString("B").ToUpper() # e.g. {E821A3F5-1F84-4A4B-BE9D-115D93E9E6F0}
 
-          # Load entire file
-          $content = Get-Content $proj -Raw
+          # Read & rewrite line-by-line
+          $fixed = Get-Content $proj | ForEach-Object {
+            if ($_ -match '^(\s*)"ProductVersion"') {
+              # preserve indentation, then inject exactly one pair of braces
+              "$($Matches[1])""ProductVersion"" = ""8:$ver"""
+            }
+            elseif ($_ -match '^(\s*)"ProductCode"') {
+              "$($Matches[1])""ProductCode"" = ""8:$guid"""
+            }
+            else {
+              $_
+            }
+          }
 
-          # Build the literal replacement strings
-          $replacementVer  = '$1' + $ver  + '"'    # yields: $1<version>"
-          $replacementCode = '$1{' + $guid + '}'   # yields: $1{<GUID>}
+          # Overwrite the project
+          Set-Content -Path $proj -Value $fixed
 
-          # Do the replacements
-          $content = [regex]::Replace(
-            $content,
-            '("ProductVersion"\s*=\s*"8:)[^"]+"',
-            $replacementVer
-          )
-          $content = [regex]::Replace(
-            $content,
-            '("ProductCode"\s*=\s*"8:)\{[^}]+\}"',
-            $replacementCode
-          )
+          Write-Host "→ ProductVersion patched to 8:$ver"
+          Write-Host "→ ProductCode    patched to 8:$guid"
 
-          # Overwrite the file
-          Set-Content -Path $proj -Value $content
-
-          Write-Host "→ ProductVersion patched to $ver"
-          Write-Host "→ ProductCode    patched to $guid"
 
  # 3) **DEBUG**: print out the patched .vdproj so you can inspect it
       - name: Show patched .vdproj
