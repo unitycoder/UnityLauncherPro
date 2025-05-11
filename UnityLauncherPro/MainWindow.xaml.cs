@@ -43,7 +43,7 @@ namespace UnityLauncherPro
         public static readonly string projectNameFile = "ProjectName.txt";
         public static string preferredVersion = null;
         public static int projectNameSetting = 0; // 0 = folder or ProjectName.txt if exists, 1=ProductName
-        public static readonly string initScriptFileFullPath = GetInitScriptPath();
+        public static readonly string initScriptFileFullPath = Tools.GetSafeFilePath("Scripts", "InitializeProject.cs");
 
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
@@ -2724,50 +2724,51 @@ namespace UnityLauncherPro
             }
         }
 
-        void ApplyTheme(string themeFile)
+        private void ApplyTheme(string themeFileName)
         {
-            if (chkUseCustomTheme.IsChecked == false) return;
+            if (chkUseCustomTheme.IsChecked != true)
+                return;
 
-            //Console.WriteLine("Load theme: " + themefile);
+            // 1) Compute the full, safe path to the INI
+            string themePath = Tools.GetSafeFilePath("Themes", themeFileName);
 
-            themeFile = "Themes/" + themeFile;
-
-            if (File.Exists(themeFile) == true)
+            // 2) Try to load it
+            if (File.Exists(themePath))
             {
-                var colors = File.ReadAllLines(themeFile);
-
-                // parse lines
-                for (int i = 0, length = colors.Length; i < length; i++)
+                var lines = File.ReadAllLines(themePath);
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    // skip comments
-                    if (colors[i].IndexOf('#') == 0) continue;
-                    // split row (name and color)
-                    var row = colors[i].Split('=');
-                    // skip bad rows
-                    if (row.Length != 2) continue;
+                    string line = lines[i].Trim();
+                    // skip empty or comment
+                    if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
+                        continue;
 
-                    // parse color
+                    var parts = line.Split(new[] { '=' }, 2);
+                    if (parts.Length != 2)
+                        continue;
+
+                    string key = parts[0].Trim();
+                    string value = parts[1].Trim();
+
                     try
                     {
-                        //Console.WriteLine(row[0] +"="+ row[1].Trim());
-                        var col = new BrushConverter().ConvertFrom(row[1].Trim());
-                        // apply color
-                        Application.Current.Resources[row[0]] = (SolidColorBrush)col;
+                        var brush = (SolidColorBrush)new BrushConverter().ConvertFrom(value);
+                        Application.Current.Resources[key] = brush;
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Console.WriteLine(e);
-                        SetStatus("Failed to parse color value: " + row[1]);
+                        Console.WriteLine(ex);
+                        SetStatus($"Failed to parse color value: {value}");
                     }
-
                 }
             }
             else
             {
-                Console.WriteLine("Theme file not found: " + themeFile);
-                SetStatus("Theme file not found: " + themeFile);
+                Console.WriteLine($"Theme file not found: {themePath}");
+                SetStatus($"Theme file not found: {themePath}");
             }
         }
+
 
         void ResetTheme()
         {
@@ -2809,8 +2810,8 @@ namespace UnityLauncherPro
         private void TxtCustomThemeFile_LostFocus(object sender, RoutedEventArgs e)
         {
             var s = (TextBox)sender;
-            Properties.Settings.Default.themeFile = s.Text;
-            Properties.Settings.Default.Save();
+            Settings.Default.themeFile = s.Text;
+            Settings.Default.Save();
         }
 
         private void TxtCustomThemeFile_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -4103,31 +4104,6 @@ namespace UnityLauncherPro
             Settings.Default.Save();
 
             SetStatus("Purged " + removedCount + " items", MessageType.Info);
-        }
-
-        // to handle folders where user has no write access ()
-        private static string GetInitScriptPath()
-        {
-            string preferredDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts");
-            string fallbackDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UnityLauncherPro", "Scripts");
-
-            try
-            {
-                Directory.CreateDirectory(preferredDir); // safe even if it exists
-                return Path.Combine(preferredDir, "InitializeProject.cs");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                // No write permission in Program Files etc.
-            }
-            catch (Exception ex)
-            {
-                // Optional: log other unexpected errors
-                Console.WriteLine("Init folder fallback: " + ex.Message);
-            }
-
-            Directory.CreateDirectory(fallbackDir); // always safe
-            return Path.Combine(fallbackDir, "InitializeProject.cs");
         }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)

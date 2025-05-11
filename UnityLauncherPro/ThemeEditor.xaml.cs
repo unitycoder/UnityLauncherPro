@@ -109,35 +109,47 @@ namespace UnityLauncherPro
 
         private void BtnSaveTheme_Click(object sender, RoutedEventArgs e)
         {
-            var themeFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes");
+            // 1) Determine the default filename (with .ini)
+            string defaultName = string.IsNullOrEmpty(previousSaveFileName)
+                ? "custom.ini"
+                : previousSaveFileName + ".ini";
 
-            if (Directory.Exists(themeFolder) == false) Directory.CreateDirectory(themeFolder);
+            // 2) Ask the helper for a safe full path
+            string initialFullPath = Tools.GetSafeFilePath("Themes", defaultName);
+            string initialDir = Path.GetDirectoryName(initialFullPath);
+            string initialFile = Path.GetFileNameWithoutExtension(initialFullPath);
 
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            if (string.IsNullOrEmpty(previousSaveFileName))
+            // 3) Configure the save dialog
+            var saveFileDialog = new SaveFileDialog
             {
-                saveFileDialog.FileName = "custom";
-            }
-            else
-            {
-                saveFileDialog.FileName = previousSaveFileName;
-            }
-            saveFileDialog.DefaultExt = ".ini";
-            saveFileDialog.Filter = "Theme files (.ini)|*.ini";
-            saveFileDialog.InitialDirectory = themeFolder;
-            saveFileDialog.RestoreDirectory = true;
+                FileName = initialFile,   // no extension here
+                DefaultExt = ".ini",
+                Filter = "Theme files (.ini)|*.ini",
+                InitialDirectory = initialDir,
+                RestoreDirectory = true
+            };
 
+            // 4) Show and, if confirmed, write out the INI
             if (saveFileDialog.ShowDialog() == true)
             {
-                List<string> iniRows = new List<string>();
-                iniRows.Add("# Created with UnityLauncherPro built-in theme editor " + DateTime.Now.ToString("dd/MM/yyyy"));
+                // Build INI lines
+                var iniRows = new List<string>
+        {
+            "# Created with UnityLauncherPro built-in theme editor "
+              + DateTime.Now.ToString("dd/MM/yyyy")
+        };
+                // original-style loop
                 for (int i = 0; i < themeColors.Count; i++)
                 {
                     iniRows.Add(themeColors[i].Key + "=" + themeColors[i].Brush.ToString());
                 }
 
-                var themePath = saveFileDialog.FileName;
+                // Get the chosen path & ensure its folder exists
+                string themePath = saveFileDialog.FileName;
                 previousSaveFileName = Path.GetFileNameWithoutExtension(themePath);
+                Directory.CreateDirectory(Path.GetDirectoryName(themePath));
+
+                // Write out
                 File.WriteAllLines(themePath, iniRows);
                 Console.WriteLine("Saved theme: " + themePath);
             }

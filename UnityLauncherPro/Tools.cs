@@ -2779,7 +2779,42 @@ public static class UnityLauncherProTools
             return true;
         }
 
+        /// <summary>
+        /// Returns a full file path under either the application's install folder
+        /// or, if that isn't writable, under LocalAppData\UnityLauncherPro\<subfolder>.
+        /// </summary>
+        /// <param name="subfolder">e.g. "Themes", "Scripts"</param>
+        /// <param name="fileName">e.g. "custom.ini", "InitializeProject.cs"</param>
+        public static string GetSafeFilePath(string subfolder, string fileName)
+        {
+            // 1) Preferred: under the app folder
+            string preferredDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subfolder);
+            // 2) Fallback: in LocalAppData
+            string fallbackDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "UnityLauncherPro",
+                subfolder);
 
+            try
+            {
+                // Safe even if it already exists
+                Directory.CreateDirectory(preferredDir);
+                return Path.Combine(preferredDir, fileName);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // no write access under Program Files
+            }
+            catch (Exception ex)
+            {
+                // optional: log unexpected errors
+                Console.WriteLine($"Warning: couldn’t create {preferredDir}: {ex.Message}");
+            }
+
+            // Ensure fallback always exists
+            Directory.CreateDirectory(fallbackDir);
+            return Path.Combine(fallbackDir, fileName);
+        }
 
 
 
