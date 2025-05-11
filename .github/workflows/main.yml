@@ -66,6 +66,17 @@ jobs:
         shell: cmd
         run: call .\ArtifactBuild.cmd
 
+      # Check that output exists
+      - name: Validate UnityLauncherPro.exe exists
+        if: env.build_trigger == 'true'
+        shell: cmd
+        run: |
+          if not exist "UnityLauncherPro\bin\Release\UnityLauncherPro.exe" (
+            echo ERROR: UnityLauncherPro.exe not found.
+            exit /b 1
+          )
+          echo Found UnityLauncherPro.exe
+
       # 1) Compute a wrapped major.minor.build from the run number
       - name: Compute installer version
         if: env.build_trigger == 'true'
@@ -101,16 +112,15 @@ jobs:
           Write-Host "→ ProductVersion patched to $ver"
           Write-Host "→ ProductCode patched to $guid"
 
-      # Check that output exists
-      - name: Validate UnityLauncherPro.exe exists
+ # 3) **DEBUG**: print out the patched .vdproj so you can inspect it
+      - name: Show patched .vdproj
         if: env.build_trigger == 'true'
-        shell: cmd
+        shell: pwsh
         run: |
-          if not exist "UnityLauncherPro\bin\Release\UnityLauncherPro.exe" (
-            echo ERROR: UnityLauncherPro.exe not found.
-            exit /b 1
-          )
-          echo Found UnityLauncherPro.exe
+          $proj = 'UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj'
+          Write-Host "=== BEGIN .vdproj CONTENT ==="
+          Get-Content $proj
+          Write-Host "=== END .vdproj CONTENT ==="
 
       # locate VS 2022
       - name: Locate Visual Studio 2022
