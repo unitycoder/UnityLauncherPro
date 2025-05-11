@@ -99,18 +99,33 @@ jobs:
         shell: pwsh
         run: |
           $proj = 'UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj'
-          $ver  = "${{ env.INSTALLER_VER }}"
-          $guid = [guid]::NewGuid().ToString("B").ToUpper()
+          $ver  = '${{ env.INSTALLER_VER }}'               # e.g. "0.0.117"
+          $guid = [Guid]::NewGuid().ToString("B").ToUpper() # e.g. "{1D05663F-...}"
 
-          (Get-Content $proj) |
-            ForEach-Object {
-              $_ -replace '("ProductVersion"\s*=\s*"8:)[^"]+"', "`$1$ver`"" `
-                 -replace '("ProductCode"\s*=\s*"8:)\{[^}]+\}"',    "`$1{$guid}`""
-            } |
-            Set-Content $proj
+          # Load entire file
+          $content = Get-Content $proj -Raw
+
+          # Build the literal replacement strings
+          $replacementVer  = '$1' + $ver  + '"'    # yields: $1<version>"
+          $replacementCode = '$1{' + $guid + '}'   # yields: $1{<GUID>}
+
+          # Do the replacements
+          $content = [regex]::Replace(
+            $content,
+            '("ProductVersion"\s*=\s*"8:)[^"]+"',
+            $replacementVer
+          )
+          $content = [regex]::Replace(
+            $content,
+            '("ProductCode"\s*=\s*"8:)\{[^}]+\}"',
+            $replacementCode
+          )
+
+          # Overwrite the file
+          Set-Content -Path $proj -Value $content
 
           Write-Host "→ ProductVersion patched to $ver"
-          Write-Host "→ ProductCode patched to $guid"
+          Write-Host "→ ProductCode    patched to $guid"
 
  # 3) **DEBUG**: print out the patched .vdproj so you can inspect it
       - name: Show patched .vdproj
