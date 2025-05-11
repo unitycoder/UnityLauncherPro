@@ -42,10 +42,11 @@ namespace UnityLauncherPro
                 allVersions = unofficialVersions.Concat(allVersions).ToList();
             }
 
-            if (newVersions.Count > 0)
+            if (newVersions.Count > 0 || (useUnofficialList && unofficialReleaseURLs.Count > 0))
             {
                 SaveCachedVersions(allVersions);
             }
+
 
             return allVersions;
         }
