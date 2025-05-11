@@ -66,11 +66,40 @@ jobs:
         shell: cmd
         run: call .\ArtifactBuild.cmd
 
-      # Bump version for installer
-      - name: Bump Installer Version
+      # 1) Compute a wrapped major.minor.build from the run number
+      - name: Compute installer version
         if: env.build_trigger == 'true'
-        shell: cmd
-        run: call .\InstallerBumpVersion.bat
+        shell: bash
+        run: |
+          TOTAL=${{ github.run_number }}
+          BUILD=$(( TOTAL % 65536 ))
+          MINOR_TOTAL=$(( TOTAL / 65536 ))
+          MINOR=$(( MINOR_TOTAL % 256 ))
+          MAJOR=$(( MINOR_TOTAL / 256 ))
+          echo "INSTALLER_MAJOR=$MAJOR"  >> $GITHUB_ENV
+          echo "INSTALLER_MINOR=$MINOR"  >> $GITHUB_ENV
+          echo "INSTALLER_BUILD=$BUILD"  >> $GITHUB_ENV
+          echo "INSTALLER_VER=$MAJOR.$MINOR.$BUILD" >> $GITHUB_ENV
+          echo "Computed installer version → $MAJOR.$MINOR.$BUILD (run #${{ github.run_number }})"
+
+      # 2) Patch your .vdproj in place (inject ProductVersion and a new GUID)
+      - name: Patch .vdproj ProductVersion & ProductCode
+        if: env.build_trigger == 'true'
+        shell: pwsh
+        run: |
+          $proj = 'UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj'
+          $ver  = "${{ env.INSTALLER_VER }}"
+          $guid = [guid]::NewGuid().ToString("B").ToUpper()
+
+          (Get-Content $proj) |
+            ForEach-Object {
+              $_ -replace '("ProductVersion"\s*=\s*"8:)[^"]+"', "`$1$ver`"" `
+                 -replace '("ProductCode"\s*=\s*"8:)\{[^}]+\}"',    "`$1{$guid}`""
+            } |
+            Set-Content $proj
+
+          Write-Host "→ ProductVersion patched to $ver"
+          Write-Host "→ ProductCode patched to $guid"
 
       # Check that output exists
       - name: Validate UnityLauncherPro.exe exists
