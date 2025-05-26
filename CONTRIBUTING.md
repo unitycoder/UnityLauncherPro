@@ -23,6 +23,7 @@ Here’s how you can help:
 
 - Open an issue with `[Feature]` in the title
 - Describe the problem your feature solves
+- Note: Not all features get merged! *i'd like to keep workflows and UI something close to my own preferences (Sorry!), but you can of course make your own forks with additional features!
 
 ## Code Style & External Libraries
 
