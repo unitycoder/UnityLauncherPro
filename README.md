@@ -39,6 +39,9 @@ https://github.com/unitycoder/UnityLauncherPro/wiki
 See DEV branch for latest commits https://github.com/unitycoder/UnityLauncherPro/tree/dev <br>
 Pre-releases are sometimes available from dev branch: https://github.com/unitycoder/UnityLauncherPro/releases
 
+### Contributing
+See https://github.com/unitycoder/UnityLauncherPro/blob/master/CONTRIBUTING.md
+
 ### Screenshots
 
 ![Image](https://github.com/user-attachments/assets/80bd8ff4-7e90-4c1a-9501-74cf3ea538f6)
