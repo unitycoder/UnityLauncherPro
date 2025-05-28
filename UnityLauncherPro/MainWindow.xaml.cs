@@ -439,16 +439,16 @@ namespace UnityLauncherPro
                 bool found = true;
                 foreach (var word in searchWords)
                 {
-                    bool titleMatched = proj.Title.IndexOf(word, 0, StringComparison.CurrentCultureIgnoreCase) != -1;
-                    bool pathMatched = searchProjectPathAlso && proj.Path.IndexOf(word, 0, StringComparison.CurrentCultureIgnoreCase) != -1;
+                    bool titleMatched = proj.Title.IndexOf(word, 0, StringComparison.OrdinalIgnoreCase) != -1;
+                    bool pathMatched = searchProjectPathAlso && proj.Path.IndexOf(word, 0, StringComparison.OrdinalIgnoreCase) != -1;
                     found = found && (titleMatched || pathMatched);
                 }
                 return found;
             }
             else // single word search
             {
-                bool titleMatched = proj.Title.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1;
-                bool pathMatched = searchProjectPathAlso && proj.Path.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1;
+                bool titleMatched = proj.Title.IndexOf(_filterString, 0, StringComparison.OrdinalIgnoreCase) != -1;
+                bool pathMatched = searchProjectPathAlso && proj.Path.IndexOf(_filterString, 0, StringComparison.OrdinalIgnoreCase) != -1;
 
                 return titleMatched || pathMatched;
             }

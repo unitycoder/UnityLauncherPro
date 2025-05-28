@@ -2603,34 +2603,36 @@ public static class UnityLauncherProTools
 
         internal static string GetSRP(string projectPath)
         {
-            // read projectsettings/graphicsettings file, look for m_SRPDefaultSettings: value
             var settingsFile = Path.Combine(projectPath, "ProjectSettings", "GraphicsSettings.asset");
-            if (File.Exists(settingsFile) == false) return null;
+            if (!File.Exists(settingsFile)) return null;
 
-            var allText = File.ReadAllText(settingsFile);
-            var srpIndex = allText.IndexOf("m_SRPDefaultSettings:");
-            if (srpIndex == -1)
-            {
-                srpIndex = allText.IndexOf("m_RenderPipelineGlobalSettingsMap:"); // unity 6000.2- ?
-                if (srpIndex == -1) return null; // BIRP
-            }
+            bool srpSectionFound = false;
 
-            // urp = UnityEngine.Rendering.Universal.UniversalRenderPipeline
-            // hdrp = UnityEngine.Rendering.HighDefinition.HDRenderPipeline
+            using (var reader = new StreamReader(settingsFile))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (!srpSectionFound)
+                    {
+                        if (line.Contains("m_SRPDefaultSettings:") || line.Contains("m_RenderPipelineGlobalSettingsMap:"))
+                        {
+                            srpSectionFound = true;
+                        }
+                        continue;
+                    }
 
-            if (allText.IndexOf("UnityEngine.Rendering.Universal.UniversalRenderPipeline", srpIndex) > -1)
-            {
-                return "URP";
+                    if (line.Contains("UniversalRenderPipeline"))
+                    {
+                        return "URP";
+                    }
+                    else if (line.Contains("HDRenderPipeline"))
+                    {
+                        return "HDRP";
+                    }
+                }
             }
-            else if (allText.IndexOf("UnityEngine.Rendering.HighDefinition.HDRenderPipeline", srpIndex) > -1)
-            {
-                return "HDRP";
-            }
-            else
-            {
-                return null; // BIRP
-            }
-
+            return null; // BIRP or unknown
         }
 
         internal static void InstallAPK(string ApkPath)
