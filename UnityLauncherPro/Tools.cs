@@ -1705,10 +1705,27 @@ namespace UnityLauncherPro
             // create folder
             CreateEmptyProjectFolder(newPath, version);
 
-            // unzip template, if any
+            // unzip or copy template
             if (templateZipPath != null)
             {
-                TarLib.Tar.ExtractTarGz(templateZipPath, newPath);
+                //Console.WriteLine(templateZipPath);
+
+                if (File.Exists(templateZipPath))
+                {
+                    TarLib.Tar.ExtractTarGz(templateZipPath, newPath);
+                }
+                else if (Directory.Exists(templateZipPath))
+                {
+                    try
+                    {
+                        CopyDirectory(templateZipPath, newPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        SetStatus("Error copying template folder: " + ex.Message);
+                    }
+                }
+
             }
 
             // copy init file into project
@@ -1830,21 +1847,35 @@ namespace UnityLauncherPro
             var templateFolder = Path.Combine(unityPath, "Data/Resources/PackageManager/ProjectTemplates/");
             if (Directory.Exists(templateFolder) == false) return items;
 
+            // get all files in template folder
             var fileEntries = Directory.GetFiles(templateFolder).ToList();
 
             // process found files
-            for (int i = fileEntries.Count - 1; i > -1; i--)
+            for (int i = 0; i < fileEntries.Count; i++)
             {
+                //Console.WriteLine(fileEntries[i]);
                 // check if its tgz
-                if (fileEntries[i].IndexOf(".tgz") == -1)
+                if (fileEntries[i].ToLower().IndexOf(".tgz") > -1)
                 {
-                    fileEntries.RemoveAt(i);
-                }
-                else
-                {
-                    // cleanup name
+                    // cleanup displayed name
                     var name = Path.GetFileName(fileEntries[i]).Replace("com.unity.template.", "").Replace(".tgz", "");
                     items.Add(name, fileEntries[i]);
+                }
+            }
+
+            // 2018.4 has folders instead of tgz files
+            // BUT do this for all versions, in case user has added custom template folders (that contain Assets/ folder)
+            var dirEntries = Directory.GetDirectories(templateFolder).ToList();
+            for (int i = 0; i < dirEntries.Count; i++)
+            {
+                //Console.WriteLine(dirEntries[i]);
+                // if it has com.unity.template. prefix, then its a template
+                // if that directory contains Assets/ folder, then its a template
+                if (Directory.Exists(Path.Combine(dirEntries[i], "Assets")) == true)
+                {
+                    //Console.WriteLine(dirEntries[i]);
+                    var name = Path.GetFileName(dirEntries[i]).Replace("com.unity.template.", "");
+                    items.Add(name, dirEntries[i]);
                 }
             }
 
@@ -2792,10 +2823,7 @@ public static class UnityLauncherProTools
             // 1) Preferred: under the app folder
             string preferredDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subfolder);
             // 2) Fallback: in LocalAppData
-            string fallbackDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "UnityLauncherPro",
-                subfolder);
+            string fallbackDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UnityLauncherPro", subfolder);
 
             try
             {
@@ -2818,9 +2846,26 @@ public static class UnityLauncherProTools
             return Path.Combine(fallbackDir, fileName);
         }
 
+        // copy directory structure (for template folder)
+        public static void CopyDirectory(string sourceDir, string targetDir)
+        {
+            // Create the target directory if it doesn't exist
+            Directory.CreateDirectory(targetDir);
 
+            // Copy all files
+            foreach (var file in Directory.GetFiles(sourceDir))
+            {
+                var destFile = Path.Combine(targetDir, Path.GetFileName(file));
+                File.Copy(file, destFile, overwrite: false);
+            }
 
-
+            // Recursively copy subdirectories
+            foreach (var directory in Directory.GetDirectories(sourceDir))
+            {
+                var destDir = Path.Combine(targetDir, Path.GetFileName(directory));
+                CopyDirectory(directory, destDir);
+            }
+        }
 
     } // class
 
