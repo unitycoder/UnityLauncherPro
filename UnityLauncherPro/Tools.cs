@@ -2104,6 +2104,33 @@ public static class UnityLauncherProTools
 
         }
 
+        public static void BuildProjectCustom(Project proj)
+        {
+            Console.WriteLine("Building " + proj.Title + " (custom)");
+            SetStatus("Build process started: " + DateTime.Now.ToString("HH:mm:ss"));
+
+            // get selected project unity exe path
+            var unityExePath = Tools.GetUnityExePath(proj.Version);
+            if (unityExePath == null) return;
+
+            // create commandline string for building and launch it
+            //var buildcmd = $"\"{unityExePath}\" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"Builder.BuildAndroid\" -buildTarget android -logFile -";
+            // TODO test without nographics : https://forum.unity.com/threads/batch-build-one-scene-is-black-works-in-normal-file-build.1282823/#post-9456524
+            var buildParams = $" -quit -batchmode -nographics -projectPath \"{proj.Path}\" -executeMethod \"UnityLauncherProToolsCustom.BuildCustom\"";
+            Console.WriteLine("buildcmd= " + buildParams);
+
+            // launch build
+            var proc = Tools.LaunchExe(unityExePath, buildParams);
+
+            // wait for process exit then open output folder
+            proc.Exited += (o, i) =>
+            {
+                SetStatus("Build process finished: " + DateTime.Now.ToString("HH:mm:ss"));
+                // TODO set color based on results
+                SetBuildStatus(Colors.Green);
+            };
+        }
+
         // runs unity SimpleWebServer.exe and launches default Browser into project build/ folder'
         public static void LaunchWebGL(Project proj, string relativeFolder)
         {
