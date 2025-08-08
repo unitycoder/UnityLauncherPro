@@ -227,6 +227,7 @@
                                 <MenuItem Header="Build">
                                     <MenuItem x:Name="menuBatchBuildAndroid" Header="Android" Click="MenuBatchBuildAndroid_Click"/>
                                     <MenuItem x:Name="menuBatchBuildIOS" Header="IOS" Click="MenuBatchBuildIOS_Click"/>
+                                    <MenuItem x:Name="menuBatchBuildCustom" Header="Custom" Click="MenuBatchBuildCustom_Click"/>
                                 </MenuItem>
                                 <MenuItem Header="Tools">
                                     <MenuItem x:Name="menuExcludeFromDefender" Header="Exclude Path From Defender" Click="menuExcludeFromDefender_Click"/>
