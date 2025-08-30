@@ -3226,6 +3226,12 @@ namespace UnityLauncherPro
             Tools.BuildProject(proj, Platform.iOS);
         }
 
+        private void MenuBatchBuildCustom_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            Tools.BuildProjectCustom(proj);
+        }
+
         private void ChkCheckPlasticBranch_Checked(object sender, RoutedEventArgs e)
         {
             if (this.IsActive == false) return; // dont run code on window init
