@@ -336,11 +336,26 @@ namespace UnityLauncherPro
         private void btnBrowseForProjectFolder_Click(object sender, RoutedEventArgs e)
         {
             var folder = Tools.BrowseForOutputFolder("Select New Project folder");
-            if (string.IsNullOrEmpty(folder) == false)
+            if (string.IsNullOrEmpty(folder) == false && Directory.Exists(folder) == true)
             {
                 txtNewProjectFolder.Text = folder;
             }
 
+        }
+
+        private void txtNewProjectFolder_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // validate that folder exists
+            if (Directory.Exists(txtNewProjectFolder.Text) == false)
+            {
+                txtNewProjectFolder.BorderBrush = Brushes.Red; // not visible if focused
+                btnCreateNewProject.IsEnabled = false;
+            }
+            else
+            {
+                txtNewProjectFolder.BorderBrush = null;
+                btnCreateNewProject.IsEnabled = true;
+            }
         }
     }
 }
