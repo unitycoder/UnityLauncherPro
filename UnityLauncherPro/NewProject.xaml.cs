@@ -38,7 +38,7 @@ namespace UnityLauncherPro
             txtNewProjectName.IsEnabled = !nameIsLocked;
 
             txtNewProjectName.Text = newName;
-            lblNewProjectFolder.Content = targetFolder;
+            txtNewProjectFolder.Text = targetFolder;
 
             // fill available versions
             if (gridAvailableVersions.ItemsSource == null)
@@ -272,7 +272,7 @@ namespace UnityLauncherPro
 
         void GenerateNewName()
         {
-            var newProj = Tools.GetSuggestedProjectName(newVersion, lblNewProjectFolder.Content.ToString());
+            var newProj = Tools.GetSuggestedProjectName(newVersion, txtNewProjectFolder.Text.ToString());
             txtNewProjectName.Text = newProj;
         }
 
@@ -331,6 +331,16 @@ namespace UnityLauncherPro
         private void chkForceDX11_Checked(object sender, RoutedEventArgs e)
         {
             forceDX11 = chkForceDX11.IsChecked == true;
+        }
+
+        private void btnBrowseForProjectFolder_Click(object sender, RoutedEventArgs e)
+        {
+            var folder = Tools.BrowseForOutputFolder("Select New Project folder");
+            if (string.IsNullOrEmpty(folder) == false)
+            {
+                txtNewProjectFolder.Text = folder;
+            }
+
         }
     }
 }

@@ -10,7 +10,7 @@
     <Grid>
         <StackPanel Margin="10,3">
             <Label Content="Unity Version" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
-            <DataGrid x:Name="gridAvailableVersions" KeyboardNavigation.TabNavigation = "None" SelectionMode="Single" Height="270" Margin="0" VerticalAlignment="Top" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="1"  Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" PreviewMouseDoubleClick="gridAvailableVersions_PreviewMouseDoubleClick" CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserResizeRows="False" CanUserDeleteRows="False">
+            <DataGrid x:Name="gridAvailableVersions" KeyboardNavigation.TabNavigation = "None" SelectionMode="Single" Height="230" Margin="0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="1"  Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" PreviewMouseDoubleClick="gridAvailableVersions_PreviewMouseDoubleClick" CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserResizeRows="False" CanUserDeleteRows="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Version" Binding="{Binding Version}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
                     <DataGridTextColumn Header="Platforms" Binding="{Binding PlatformsCombined}" IsReadOnly="True" CanUserResize="False" MinWidth="270" />
@@ -44,10 +44,20 @@
                 <CheckBox Grid.Column="3" x:Name="chkForceDX11" Content="DX11" ToolTip="Use DX11 instead of DX12" Margin="6,0,0,0" IsChecked="True" Checked="chkForceDX11_Checked" Unchecked="chkForceDX11_Checked"/>
             </Grid>
 
-            <Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ThemeButtonForegroundDisabled}" Margin="0" FontSize="10" Padding="5,0,5,3" />
-            <Grid HorizontalAlignment="Stretch" Margin="0,8,0,0">
+            <Label x:Name="lblNewProjectFolderLabel" Grid.Column="0" Content="Project Folder:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,5,0" />
+            <Grid HorizontalAlignment="Stretch" Margin="0,3,0,0">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="18*"/>
                     <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" x:Name="txtNewProjectFolder" VerticalAlignment="Center" IsUndoEnabled="True" TextChanged="TxtNewProjectName_TextChanged" PreviewKeyDown="TxtNewProjectName_PreviewKeyDown" TabIndex="0" Margin="0,2,6,2" />
+                <Button Grid.Column="1" x:Name="btnBrowseForProjectFolder" Style="{StaticResource CustomButton}" ToolTip="Browse for New Project folder"  Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnBrowseForProjectFolder_Click"/>
+            </Grid>
+
+            <!--<Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ThemeButtonForegroundDisabled}" Margin="0" FontSize="10" Padding="5,0,5,3" />-->
+            <Grid HorizontalAlignment="Stretch" Margin="0,24,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.7*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject"  Margin="0,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" TabIndex="4" >
