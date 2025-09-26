@@ -1,3 +1,7 @@
+### Disclaimer
+This is un-official, alternative Project launcher for Unity Editor.
+These materials are not sponsored by or affiliated with Unity Technologies or its affiliates. “Unity” is a trademark or registered trademark of Unity Technologies or its affiliates in the U.S. and elsewhere.
+
 # UnitÿLauncherPro 
 [![Build Status](https://github.com/unitycoder/UnityLauncherPro/actions/workflows/main.yml/badge.svg)](https://github.com/unitycoder/UnityLauncherPro/releases/latest/download/UnityLauncherPro.zip) [![Downloads](https://img.shields.io/github/downloads/unitycoder/unitylauncherpro/total)](https://github.com/unitycoder/UnityLauncherPro/releases/latest/download/UnityLauncherPro.zip) [![GitHub license](https://img.shields.io/github/license/unitycoder/UnityLauncherPro)](https://github.com/unitycoder/UnityLauncherPro/blob/master/LICENSE) [](https://discord.gg/cXT97hU)<a href="https://discord.gg/cXT97hU"><img src="https://img.shields.io/discord/337579253866692608.svg"></a> [![VirusTotal scan now](https://img.shields.io/static/v1?label=VirusTotal&message=Scan)](https://www.virustotal.com/gui/url/e123b616cf4cbe3d3f7ba13b0d88cf5fff4638f72d5b9461088d0b11e9a41de3?nocache=1) [![CodeQL](https://github.com/unitycoder/UnityLauncherPro/actions/workflows/codeql.yml/badge.svg)](https://github.com/unitycoder/UnityLauncherPro/actions/workflows/codeql.yml)
 
@@ -75,5 +79,4 @@ See https://github.com/unitycoder/UnityLauncherPro/blob/master/CONTRIBUTING.md
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
 
-### For Unity Lawyers
-These materials are not sponsored by or affiliated with Unity Technologies or its affiliates. “Unity” is a trademark or registered trademark of Unity Technologies or its affiliates in the U.S. and elsewhere.
+
