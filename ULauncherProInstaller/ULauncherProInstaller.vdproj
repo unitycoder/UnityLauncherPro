@@ -3,7 +3,7 @@
 "VSVersion" = "3:800"
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
 "IsWebType" = "8:FALSE"
-"ProjectName" = "8:UnityLauncherProInstaller"
+"ProjectName" = "8:ULauncherProInstaller"
 "LanguageId" = "3:1033"
 "CodePage" = "3:1252"
 "UILanguageId" = "3:1033"
@@ -51,7 +51,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\UnityLauncherProInstaller.msi"
+        "OutputFilename" = "8:Debug\\ULauncherProInstaller.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -83,7 +83,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\UnityLauncherPro-Installer.msi"
+        "OutputFilename" = "8:Release\\ULauncherPro-Installer.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -135,7 +135,7 @@
         {
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_56C1F622109E4E31983910358EA5BCB3"
             {
-            "SourcePath" = "8:..\\UnityLauncherPro\\Images\\icon.ico"
+            "SourcePath" = "8:..\\ULauncherPro\\Images\\icon.ico"
             "TargetName" = "8:icon.ico"
             "Tag" = "8:"
             "Folder" = "8:_68B52FAF3D0E46A7BB2DA063CB0BC570"
@@ -239,7 +239,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:UnityLauncherPro"
+        "ProductName" = "8:ULauncherPro"
         "ProductCode" = "8:{904A3434-1B2D-42CB-AC64-C311F3956044}"
         "PackageCode" = "8:{1E8EE2AB-7275-4599-9F22-E57650F33D2B}"
         "UpgradeCode" = "8:{4F3ACBAF-4673-4808-9A4F-50ED1E82F59F}"
@@ -252,7 +252,7 @@
         "Manufacturer" = "8:unitycoder.com"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/unitycoder/UnityLauncherPro"
-        "Title" = "8:UnityLauncherPro"
+        "Title" = "8:ULauncherPro"
         "Subject" = "8:"
         "ARPCONTACT" = "8:unitycoder.com"
         "Keywords" = "8:unity"
@@ -363,7 +363,7 @@
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_43C0E1ACE07D4DBEA0C42EC6C9AD587A"
             {
-            "Name" = "8:UnityLauncherPro"
+            "Name" = "8:ULauncherPro"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
@@ -377,7 +377,7 @@
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_C0602FC78BDC49EEBC2B8D63BF602DB2"
             {
-            "Name" = "8:UnityLauncherPro"
+            "Name" = "8:ULauncherPro"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
@@ -391,7 +391,7 @@
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_DC1220A510594DA78B14B2A948B17BB5"
             {
-            "Name" = "8:UnityLauncherPro"
+            "Name" = "8:ULauncherPro"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
@@ -804,7 +804,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7E1343CBA8EB43B8864B8A7BBEB62BCA"
             {
-            "SourcePath" = "8:..\\UnityLauncherPro\\bin\\Release\\UnityLauncherPro.exe"
+            "SourcePath" = "8:..\\ULauncherPro\\bin\\Release\\ULauncherPro.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_68B52FAF3D0E46A7BB2DA063CB0BC570"

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityLauncherPro", "UnityLauncherPro\UnityLauncherPro.csproj", "{EC78D91A-3E63-4CAA-8BC3-9673A30FDA45}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ULauncherPro", "ULauncherPro\ULauncherPro.csproj", "{EC78D91A-3E63-4CAA-8BC3-9673A30FDA45}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UnityLauncherProInstaller", "UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj", "{249180EF-BFC1-9DD7-48CC-E2B9253A64E0}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ULauncherProInstaller", "ULauncherProInstaller\ULauncherProInstaller.vdproj", "{249180EF-BFC1-9DD7-48CC-E2B9253A64E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

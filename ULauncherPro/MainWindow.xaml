@@ -32,7 +32,7 @@
                 </Button.Template>
             </Button>
             <Image Source="Images/icon.png" x:Name="IconImage" RenderOptions.BitmapScalingMode="NearestNeighbor" HorizontalAlignment="Left" Width="16" Height="16" Margin="4,0,0,0" SnapsToDevicePixels="True" UseLayoutRounding="True" />
-            <Label Content="UnityLauncherPro" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="{DynamicResource ThemeMainTitle}" FontSize="12" HorizontalAlignment="Left"  />
+            <Label Content="ULauncherPro" IsHitTestVisible="False" Margin="19,0,0,-5"  Foreground="{DynamicResource ThemeMainTitle}" FontSize="12" HorizontalAlignment="Left"  />
             <!-- minimize -->
             <Button x:Name="btnMinimize" BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Click="BtnMinimize_Click" Margin="0,0,27,0" Padding="2,0,2,8" IsTabStop="False">
                 <TextBlock Text="–" FontSize="15" Foreground="{DynamicResource ThemeWindowMinClose}" Padding="0" Height="23" HorizontalAlignment="Center"/>

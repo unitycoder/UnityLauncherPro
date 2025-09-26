@@ -52,7 +52,7 @@ jobs:
       # Restore NuGet packages
       - name: Restore NuGet packages
         if: env.build_trigger == 'true'
-        run: nuget restore UnityLauncherPro.sln
+        run: nuget restore ULauncherPro.sln
 
       # Build the binary
       - name: Build Binary
@@ -67,15 +67,15 @@ jobs:
         run: call .\ArtifactBuild.cmd
 
       # Check that output exists
-      - name: Validate UnityLauncherPro.exe exists
+      - name: Validate ULauncherPro.exe exists
         if: env.build_trigger == 'true'
         shell: cmd
         run: |
-          if not exist "UnityLauncherPro\bin\Release\UnityLauncherPro.exe" (
-            echo ERROR: UnityLauncherPro.exe not found.
+          if not exist "ULauncherPro\bin\Release\ULauncherPro.exe" (
+            echo ERROR: ULauncherPro.exe not found.
             exit /b 1
           )
-          echo Found UnityLauncherPro.exe
+          echo Found ULauncherPro.exe
 
       # 1) Compute a wrapped major.minor.build from the run number
       - name: Compute installer version
@@ -98,7 +98,7 @@ jobs:
         if: env.build_trigger == 'true'
         shell: pwsh
         run: |
-          $proj = 'UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj'
+          $proj = 'ULauncherProInstaller\ULauncherProInstaller.vdproj'
           $ver  = "${{ env.INSTALLER_VER }}"               # e.g. 0.0.118
           $guid = [Guid]::NewGuid().ToString("B").ToUpper() # e.g. {E821A3F5-1F84-4A4B-BE9D-115D93E9E6F0}
 
@@ -128,7 +128,7 @@ jobs:
         if: env.build_trigger == 'true'
         shell: pwsh
         run: |
-          $proj = 'UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj'
+          $proj = 'ULauncherProInstaller\ULauncherProInstaller.vdproj'
           Write-Host "=== BEGIN .vdproj CONTENT ==="
           Get-Content $proj
           Write-Host "=== END .vdproj CONTENT ==="
@@ -166,11 +166,11 @@ jobs:
           echo === Running BuildInstaller.bat ===
           call .\BuildInstaller.bat || echo WARNING: BuildInstaller.bat exited with %ERRORLEVEL%, continuing...
           echo === Verifying MSI ===
-          if exist "UnityLauncherProInstaller\Release\UnityLauncherPro-Installer.msi" (
-            echo Success: MSI found at UnityLauncherProInstaller\Release\UnityLauncherPro-Installer.msi
+          if exist "ULauncherProInstaller\Release\ULauncherPro-Installer.msi" (
+            echo Success: MSI found at ULauncherProInstaller\Release\ULauncherPro-Installer.msi
             exit /b 0
           ) else (
-            echo ERROR: MSI not found in UnityLauncherProInstaller\Release
+            echo ERROR: MSI not found in ULauncherProInstaller\Release
             exit /b 1
           )
 
@@ -228,8 +228,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./UnityLauncherPro.zip
-          asset_name: UnityLauncherPro.zip
+          asset_path: ./ULauncherPro.zip
+          asset_name: ULauncherPro.zip
           asset_content_type: application/zip
 
       # Upload MSI installer to release
@@ -240,6 +240,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./UnityLauncherProInstaller/Release/UnityLauncherPro-Installer.msi
-          asset_name: UnityLauncherPro-Installer.msi
+          asset_path: ./ULauncherProInstaller/Release/ULauncherPro-Installer.msi
+          asset_name: ULauncherPro-Installer.msi
           asset_content_type: application/x-msi
