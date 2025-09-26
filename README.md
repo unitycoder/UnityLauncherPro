@@ -1,4 +1,4 @@
-### Disclaimer
+# Disclaimer
 This is un-official, alternative Project launcher for Unity Editor.
 These materials are not sponsored by or affiliated with Unity Technologies or its affiliates. “Unity” is a trademark or registered trademark of Unity Technologies or its affiliates in the U.S. and elsewhere.
 
