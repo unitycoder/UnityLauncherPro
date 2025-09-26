@@ -73,9 +73,6 @@ See https://github.com/unitycoder/UnityLauncherPro/blob/master/CONTRIBUTING.md
 ### View and Select current platform
 ![unitylauncherpro_platform](https://user-images.githubusercontent.com/5438317/132997691-5ed50f1d-e285-4c83-b356-46c1e3f431e4.gif)
 
-### Rename Project title
-![pro-rename](https://user-images.githubusercontent.com/5438317/193453048-aa5527c6-a345-4f93-b934-f68ac2524cac.gif)
-
 <br>
 Old (winforms) version is here: https://github.com/unitycoder/UnityLauncher
 
