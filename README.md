@@ -48,15 +48,15 @@ See https://github.com/unitycoder/UnityLauncherPro/blob/master/CONTRIBUTING.md
 
 ### Screenshots
 
-![Image](https://github.com/user-attachments/assets/80bd8ff4-7e90-4c1a-9501-74cf3ea538f6)
+<img width="896" height="881" alt="image" src="https://github.com/user-attachments/assets/8b951b5d-a531-4b25-b395-579dea768805" />
 
-![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/21eb1fcd-3cb1-4dea-8133-9ce440de77d8)
+<img width="891" height="888" alt="image" src="https://github.com/user-attachments/assets/6553db81-d302-45e8-80b2-fc0625870230" />
 
-![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/2942c1d7-2006-4dee-8b68-e1f6f2e0fbf4)
+<img width="891" height="888" alt="image" src="https://github.com/user-attachments/assets/8acfbf9d-4180-4067-a588-9a7cf9e91343" />
 
-![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/6f8dce07-c640-42db-a1ef-d8bcc7a80cc2)
+<img width="891" height="888" alt="image" src="https://github.com/user-attachments/assets/c6b08679-2995-4032-8c6e-aaed4f9c291c" />
 
-![Image](https://github.com/user-attachments/assets/fa4e004a-f3c6-47d5-996f-9b603048ad18)
+<img width="931" height="850" alt="image" src="https://github.com/user-attachments/assets/a91ce746-b1f5-4af8-b475-d1525d61c967" />
 
 ### Perform tasks on selected project
 ![image](https://github.com/unitycoder/UnityLauncherPro/assets/5438317/a0b468ba-e3a6-420b-8155-78bc32814752)
