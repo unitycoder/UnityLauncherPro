@@ -1708,11 +1708,18 @@ namespace UnityLauncherPro
             // unzip or copy template
             if (templateZipPath != null)
             {
-                //Console.WriteLine(templateZipPath);
+                // Console.WriteLine(templateZipPath);
 
                 if (File.Exists(templateZipPath))
                 {
-                    TarLib.Tar.ExtractTarGz(templateZipPath, newPath);
+                    try
+                    {
+                        TarLib.Tar.ExtractTarGz(templateZipPath, newPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        SetStatus("Error extract template file:" + ex.Message);
+                    }
                 }
                 else if (Directory.Exists(templateZipPath))
                 {
