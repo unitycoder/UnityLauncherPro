@@ -22,7 +22,7 @@ namespace UnityLauncherPro
         int previousSelectedTemplateIndex = -1;
         int previousSelectedModuleIndex = -1;
 
-        static string targetFolder = null;
+        public static string targetFolder { get; private set; } = null;
 
         public NewProject(string unityVersion, string suggestedName, string targetFolder, bool nameIsLocked = false)
         {
@@ -355,6 +355,7 @@ namespace UnityLauncherPro
             {
                 txtNewProjectFolder.BorderBrush = null;
                 btnCreateNewProject.IsEnabled = true;
+                targetFolder = txtNewProjectFolder.Text;
             }
         }
     }

@@ -2128,6 +2128,7 @@ namespace UnityLauncherPro
                 if (results == true)
                 {
                     // TODO check if that folder already exists (automatic naming avoids it, but manual naming could cause it)
+                    rootFolder = NewProject.targetFolder;
                     Console.WriteLine("Create project " + NewProject.newVersion + " : " + rootFolder);
                     if (string.IsNullOrEmpty(rootFolder)) return;
 
