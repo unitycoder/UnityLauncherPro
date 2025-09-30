@@ -7,9 +7,9 @@ only_commits:
 build:
   verbosity: minimal
 after_build:
-- cmd: 7z a ULauncherPro.zip %APPVEYOR_BUILD_FOLDER%\ULauncherPro\bin\Release\*.exe %APPVEYOR_BUILD_FOLDER%\ULauncherPro\bin\Release\*.exe.config
+- cmd: 7z a UnityLauncherPro.zip %APPVEYOR_BUILD_FOLDER%\UnityLauncherPro\bin\Release\*.exe %APPVEYOR_BUILD_FOLDER%\UnityLauncherPro\bin\Release\*.exe.config
 artifacts:
-- path: ULauncherPro.zip
+- path: UnityLauncherPro.zip
   name: deploy
 deploy:
 - provider: GitHub

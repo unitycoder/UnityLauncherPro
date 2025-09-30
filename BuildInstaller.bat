@@ -35,12 +35,12 @@ ECHO === Checking required files ===
 
 SET "error=0"
 
-IF NOT EXIST "ULauncherPro\bin\Release\ULauncherPro.exe" (
-    ECHO [ERROR] Missing file: ULauncherPro\bin\Release\ULauncherPro.exe
+IF NOT EXIST "UnityLauncherPro\bin\Release\UnityLauncherPro.exe" (
+    ECHO [ERROR] Missing file: UnityLauncherPro\bin\Release\UnityLauncherPro.exe
     SET "error=1"
 )
-IF NOT EXIST "ULauncherPro\Images\icon.ico" (
-    ECHO [ERROR] Missing file: ULauncherPro\Images\icon.ico
+IF NOT EXIST "UnityLauncherPro\Images\icon.ico" (
+    ECHO [ERROR] Missing file: UnityLauncherPro\Images\icon.ico
     SET "error=1"
 )
 
@@ -52,7 +52,7 @@ IF %error% NEQ 0 (
 
 ECHO:
 ECHO === Building Installer ===
-"%devenv_path%" ULauncherPro.sln /Rebuild Release /Project ULauncherProInstaller > build_output.log 2>&1
+"%devenv_path%" UnityLauncherPro.sln /Rebuild Release /Project UnityLauncherProInstaller > build_output.log 2>&1
 SET "exitCode=%ERRORLEVEL%"
 
 TYPE build_output.log
