@@ -141,7 +141,7 @@ jobs:
           $installPath = vswhere -latest -products * -requires Microsoft.Component.MSBuild `
                          -property installationPath
           if (-not $installPath) { throw 'VS 2022 not found' }
-          Write-Host "##[set-output name=installPath]$installPath"
+          "installPath=$installPath" >> $env:GITHUB_OUTPUT
 
       # download vs installer builder (v2.0.1)
       - name: Download Installer-Projects VSIX
