@@ -117,9 +117,15 @@
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Setter Property="Foreground" Value="{DynamicResource ThemeGridRedText}" />
+                                                <Setter Property="BorderBrush" Value="{x:Null}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Version, Converter={StaticResource VersionInstalledConverter}}" Value="true">
+                                            <DataTrigger Binding="{Binding Version, Converter={StaticResource VersionInstalledConverter}}" Value="1">
                                                 <Setter Property="Foreground" Value="{DynamicResource ThemeGridGreenText}" />
+                                                <Setter Property="BorderBrush" Value="{x:Null}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Version, Converter={StaticResource VersionInstalledConverter}}" Value="-1">
+                                                <Setter Property="Foreground" Value="{DynamicResource ThemeGridGreenText}" />
+                                                <Setter Property="BorderBrush" Value="Orange" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -845,6 +851,7 @@
                                     <CheckBox x:Name="useAlphaReleaseNotesSite" Content="Use Unity Alpha Release Notes Site (only for final versions) "  ToolTip="Use the superior (but alpha) Unity Release Notes (https://alpha.release-notes.ds.unity3d.com/) site when clicking on the ReleaseNotes button. Otherwise will default to the normal build page." Checked="UseAlphaReleaseNotes_Checked" Unchecked="UseAlphaReleaseNotes_Checked"/>
                                     <CheckBox x:Name="useUnofficialReleaseList" Content="Use Unofficial Release Watch List (for latest downloads)"  ToolTip="Checks latest releases from https://github.com/unitycoder/UnofficialUnityReleasesWatcher (if not yet available in The Unity Releases API)" Checked="useUnofficialReleaseList_Checked" Unchecked="useUnofficialReleaseList_Checked"/>
                                     <CheckBox x:Name="chkDisableUnityHubLaunch" Content="Disable UnityHub launch at Editor start"  ToolTip="Overrides UnityHub IPC port. Note: You will be logged out in Editor!" Checked="chkDisableUnityHubLaunch_Checked" Unchecked="chkDisableUnityHubLaunch_Checked"/>
+                                    <CheckBox x:Name="chkFetchAdditionalInfo" Content="Fetch additional info about Editor"  ToolTip="Reads releases API for security related info" Checked="chkFetchAdditionalInfo_Checked" Unchecked="chkFetchAdditionalInfo_Checked"/>
                                     <CheckBox x:Name="chkStreamerMode" Content="Streamer Mode (hide project names and folders)"  ToolTip="Hide project names and folders in main view" Checked="ChkStreamerMode_Checked" Unchecked="ChkStreamerMode_Checked" HorizontalAlignment="Left"/>
                                     <!--<StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                 <TextBox x:Name="txtTemplatePackagesFolder" BorderBrush="Transparent" CaretBrush="{DynamicResource ThemeSearchCaret}" Background="{DynamicResource ThemeTextBoxBackground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" Foreground="{DynamicResource ThemeSearchForeground}" ToolTip="Folder for your custom unitypackage templates (for new project)" Padding="0,3,0,0" Width="110" TextChanged="TxtTemplatePackagesFolder_TextChanged" />

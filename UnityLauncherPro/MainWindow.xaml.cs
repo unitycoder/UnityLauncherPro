@@ -198,6 +198,8 @@ namespace UnityLauncherPro
 
             CheckCustomIcon();
 
+            if (chkFetchAdditionalInfo.IsChecked == true) Tools.FetchAdditionalInfoForEditors();
+
             isInitializing = false;
         } // Start()
 
@@ -543,6 +545,7 @@ namespace UnityLauncherPro
                 useAlphaReleaseNotesSite.IsChecked = Settings.Default.useAlphaReleaseNotes;
                 useUnofficialReleaseList.IsChecked = Settings.Default.useUnofficialReleaseList;
                 chkDisableUnityHubLaunch.IsChecked = Settings.Default.disableUnityHubLaunch;
+                chkFetchAdditionalInfo.IsChecked = Settings.Default.fetchAdditionalInfo;
 
                 chkEnablePlatformSelection.IsChecked = Settings.Default.enablePlatformSelection;
                 chkRunAutomatically.IsChecked = Settings.Default.runAutomatically;
@@ -1332,6 +1335,7 @@ namespace UnityLauncherPro
             RefreshSorting();
             //Tools.SetFocusToGrid(gridRecent);
             Dispatcher.InvokeAsync(() => Tools.SetFocusToGrid(gridRecent), DispatcherPriority.ApplicationIdle);
+
         }
 
         void RefreshSorting()
@@ -4111,6 +4115,14 @@ namespace UnityLauncherPro
             Settings.Default.Save();
 
             SetStatus("Purged " + removedCount + " items", MessageType.Info);
+        }
+
+        private void chkFetchAdditionalInfo_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return; // dont run code on window init
+
+            Settings.Default.fetchAdditionalInfo = (bool)chkFetchAdditionalInfo.IsChecked;
+            Settings.Default.Save();
         }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)

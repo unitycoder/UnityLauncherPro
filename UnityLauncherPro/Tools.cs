@@ -2901,6 +2901,172 @@ public static class UnityLauncherProTools
             }
         }
 
+
+
+        // test fetching
+
+        // Reuse a single HttpClient
+        private static readonly HttpClient _http = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(15)
+        };
+
+        /// <summary>
+        /// Fire-and-forget entry; returns immediately. Keeps your UI thread free.
+        /// </summary>
+        internal static void FetchAdditionalInfoForEditors()
+        {
+            _ = FetchImplAsync(); // don't await -> no UI hang
+        }
+
+        private static async Task FetchImplAsync()
+        {
+            try
+            {
+                foreach (var version in MainWindow.unityInstalledVersions.Keys)
+                {
+                    Console.WriteLine("******** Fetching " + version);
+
+                    var url = $"https://services.api.unity.com/unity/editor/release/v1/releases?order=RELEASE_DATE_DESC&limit=1&version={Uri.EscapeDataString(version)}";
+
+                    string json;
+                    try
+                    {
+                        json = await _http.GetStringAsync(url).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[FetchAdditionalInfo] {version}: HTTP error: {ex.Message}");
+                        continue;
+                    }
+
+                    try
+                    {
+                        //Console.WriteLine("received: " + json);
+                        UnityEditorInfoLabel label = ExtractLabelText(json);
+                        if (label != null)
+                        {
+
+                            // feed this info back to main window
+                            if (string.IsNullOrEmpty(label.labelText) == false)
+                            {
+                                //Console.WriteLine(label.description);
+
+                                var u = MainWindow.unityInstallationsSource.FirstOrDefault(x => x.Version == version);
+                                u.InfoLabel = label.labelText;
+                                // replace old item in list
+
+                                int index = MainWindow.unityInstallationsSource.IndexOf(u);
+                                if (index >= 0)
+                                {
+                                    MainWindow.unityInstallationsSource[index] = u;
+                                }
+
+                                SetStatus($"Info for {version}: {label.labelText}");
+                                Console.WriteLine("got infolabel for "+version);
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[FetchAdditionalInfo] {version}: JSON parse error: {ex.Message}");
+                    }
+
+                    // delay
+                    await Task.Delay(5000).ConfigureAwait(false);
+
+                } // foreach version
+            }
+            catch (Exception ex)
+            {
+                // Last-resort catch so fire-and-forget exceptions aren’t unobserved
+                Debug.WriteLine($"[FetchAdditionalInfo] Fatal: {ex}");
+            }
+        } // FetchImplAsync()
+
+        public class UnityEditorInfoLabel
+        {
+            public string description; // may contain HTML
+            public string labelText;
+            public string icon;
+            public string color;
+        }
+
+        private static UnityEditorInfoLabel ExtractLabelText(string json)
+        {
+            var label = new UnityEditorInfoLabel();
+            if (string.IsNullOrEmpty(json) || json.Contains("\"results\":[]")) return label;
+
+            int resultsIndex = json.IndexOf("\"results\":", StringComparison.Ordinal);
+            if (resultsIndex == -1) return label;
+
+            // Use the LAST "label": in the payload (the editor-level one)
+            int labelIndex = json.LastIndexOf("\"label\":", StringComparison.Ordinal);
+            if (labelIndex == -1 || labelIndex < resultsIndex) return label;
+
+            // labelText
+            int ltIndex = json.IndexOf("\"labelText\":", labelIndex, StringComparison.Ordinal);
+            if (ltIndex != -1)
+            {
+                int vStart = json.IndexOf('\"', ltIndex + 12) + 1; // "labelText": => +12
+                if (vStart > 0)
+                {
+                    int vEnd = json.IndexOf('\"', vStart);
+                    if (vEnd > vStart) label.labelText = json.Substring(vStart, vEnd - vStart);
+                }
+            }
+
+            // icon
+            int iconIndex = json.IndexOf("\"icon\":", labelIndex, StringComparison.Ordinal);
+            if (iconIndex != -1)
+            {
+                int vStart = json.IndexOf('\"', iconIndex + 7) + 1; // "icon": => +7
+                if (vStart > 0)
+                {
+                    int vEnd = json.IndexOf('\"', vStart);
+                    if (vEnd > vStart) label.icon = json.Substring(vStart, vEnd - vStart);
+                }
+            }
+
+            // color
+            int colorIndex = json.IndexOf("\"color\":", labelIndex, StringComparison.Ordinal);
+            if (colorIndex != -1)
+            {
+                int vStart = json.IndexOf('\"', colorIndex + 8) + 1; // "color": => +8
+                if (vStart > 0)
+                {
+                    int vEnd = json.IndexOf('\"', vStart);
+                    if (vEnd > vStart) label.color = json.Substring(vStart, vEnd - vStart);
+                }
+            }
+
+            // description (may contain escaped quotes)
+            int descIndex = json.IndexOf("\"description\":", labelIndex, StringComparison.Ordinal);
+            if (descIndex != -1)
+            {
+                int qStart = json.IndexOf('\"', descIndex + 14) + 1; // "description": => +14
+                if (qStart > 0)
+                {
+                    int i = qStart;
+                    for (; i < json.Length; i++)
+                        if (json[i] == '\"' && json[i - 1] != '\\') break;
+
+                    if (i > qStart)
+                        label.description = json.Substring(qStart, i - qStart)
+                                                .Replace("\\\"", "\"")
+                                                .Replace("\\n", "\n")
+                                                .Replace("\\r", "\r")
+                                                .Replace("\\t", "\t");
+                }
+            }
+
+            return label;
+        }
+
+
+
+
     } // class
 
 } // namespace

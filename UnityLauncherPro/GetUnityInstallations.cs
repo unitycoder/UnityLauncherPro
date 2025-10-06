@@ -11,7 +11,6 @@ namespace UnityLauncherPro
     {
         static Dictionary<string, string> platformNames = new Dictionary<string, string> { { "androidplayer", "Android" }, { "windowsstandalonesupport", "Win" }, { "linuxstandalonesupport", "Linux" }, { "LinuxStandalone", "Linux" }, { "OSXStandalone", "OSX" }, { "webglsupport", "WebGL" }, { "metrosupport", "UWP" }, { "iossupport", "iOS" } };
 
-
         // returns unity installations
         public static List<UnityInstallation> Scan()
         {
@@ -64,6 +63,9 @@ namespace UnityLauncherPro
                     unity.Installed = installDate;
                     unity.IsPreferred = (version == MainWindow.preferredVersion);
                     unity.ProjectCount = GetProjectCountForUnityVersion(version);
+
+                    // TODO here need to check for vulnerabilities from CACHED data, BUT if its cached, then it might be old
+                    unity.InfoLabel = null;
 
                     if (Tools.IsAlpha(version))
                     {
