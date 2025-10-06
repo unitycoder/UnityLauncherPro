@@ -1,10 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Data;
 
 namespace UnityLauncherPro
 {
-    public class Project : IValueConverter
+    public class Project : IValueConverter, INotifyPropertyChanged
     {
         public string Title { set; get; }
         public string Version { set; get; }
@@ -17,6 +18,19 @@ namespace UnityLauncherPro
         public string[] TargetPlatforms { set; get; }
         public bool folderExists { set; get; }
         public string SRP { set; get; } // Scriptable Render Pipeline, TODO add version info?
+
+        //public string InfoLabel { set; get; } // this is additional info from Releases API (like vulnerabilities..)
+        private string _infoLabel;
+        public string InfoLabel
+        {
+            get => _infoLabel;
+            set
+            {
+                if (_infoLabel == value) return;
+                _infoLabel = value;
+                OnPropertyChanged(nameof(InfoLabel));
+            }
+        }
 
         // WPF keeps calling this method from AppendFormatHelper, GetNameCore..? not sure if need to return something else or default would be faster?
         public override string ToString()
@@ -41,5 +55,8 @@ namespace UnityLauncherPro
         {
             throw new NotSupportedException();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

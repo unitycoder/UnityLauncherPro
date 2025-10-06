@@ -4125,6 +4125,11 @@ namespace UnityLauncherPro
             Settings.Default.Save();
         }
 
+        private void gridRecent_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
         //    var proj = GetSelectedProject();

@@ -2925,7 +2925,7 @@ public static class UnityLauncherProTools
             {
                 foreach (var version in MainWindow.unityInstalledVersions.Keys)
                 {
-                    Console.WriteLine("******** Fetching " + version);
+                    //Console.WriteLine("******** Fetching " + version);
 
                     var url = $"https://services.api.unity.com/unity/editor/release/v1/releases?order=RELEASE_DATE_DESC&limit=1&version={Uri.EscapeDataString(version)}";
 
@@ -2953,8 +2953,10 @@ public static class UnityLauncherProTools
                                 //Console.WriteLine(label.description);
 
                                 var u = MainWindow.unityInstallationsSource.FirstOrDefault(x => x.Version == version);
-                                u.InfoLabel = label.labelText;
-                                // replace old item in list
+
+                                string infoText = label.labelText + "\n" + label.description; ;
+
+                                u.InfoLabel = infoText;
 
                                 int index = MainWindow.unityInstallationsSource.IndexOf(u);
                                 if (index >= 0)
@@ -2962,8 +2964,19 @@ public static class UnityLauncherProTools
                                     MainWindow.unityInstallationsSource[index] = u;
                                 }
 
-                                SetStatus($"Info for {version}: {label.labelText}");
-                                Console.WriteLine("got infolabel for "+version);
+                                // update all projectsSource items with this version too
+                                foreach (var p in MainWindow.projectsSource)
+                                {
+                                    if (p.Version == version)
+                                    {
+                                        p.InfoLabel = infoText;
+                                    }
+                                }
+
+
+
+                                //SetStatus($"Info for {version}: {label.labelText}");
+                                //Console.WriteLine("got infolabel for " + version);
                             }
                         }
 
@@ -2974,7 +2987,7 @@ public static class UnityLauncherProTools
                     }
 
                     // delay
-                    await Task.Delay(5000).ConfigureAwait(false);
+                    await Task.Delay(500).ConfigureAwait(false);
 
                 } // foreach version
             }
@@ -3053,11 +3066,11 @@ public static class UnityLauncherProTools
                         if (json[i] == '\"' && json[i - 1] != '\\') break;
 
                     if (i > qStart)
-                        label.description = json.Substring(qStart, i - qStart)
-                                                .Replace("\\\"", "\"")
-                                                .Replace("\\n", "\n")
-                                                .Replace("\\r", "\r")
-                                                .Replace("\\t", "\t");
+                    {
+                        label.description = json.Substring(qStart, i - qStart).Replace("\\\"", "\"").Replace("\\n", "\n").Replace("\\r", "\r").Replace("\\t", "\t");
+                        // strip HTML tags for now
+                        label.description = System.Text.RegularExpressions.Regex.Replace(label.description, "<.*?>", string.Empty);
+                    }
                 }
             }
 

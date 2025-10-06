@@ -1,9 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Data;
 
 namespace UnityLauncherPro
 {
-    public class UnityInstallation : IValueConverter
+    public class UnityInstallation : IValueConverter, INotifyPropertyChanged
     {
         public string Version { set; get; }
         public long VersionCode { set; get; } // version as number, cached for sorting
@@ -15,7 +16,19 @@ namespace UnityLauncherPro
         public bool IsPreferred { set; get; }
         public string ReleaseType { set; get; } // Alpha, Beta, LTS.. TODO could be enum
 
-        public string InfoLabel { set; get; } // this is additional info from Releases API (like vulnerabilities..)
+        //public string InfoLabel { set; get; } // this is additional info from Releases API (like vulnerabilities..)
+
+        private string _infoLabel;
+        public string InfoLabel
+        {
+            get => _infoLabel;
+            set
+            {
+                if (_infoLabel == value) return;
+                _infoLabel = value;
+                OnPropertyChanged(nameof(InfoLabel));
+            }
+        }
 
         // https://stackoverflow.com/a/5551986/5452781
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -30,7 +43,7 @@ namespace UnityLauncherPro
                 //Console.WriteLine("checking version: "+version);
                 if (checkInfoLabel && string.IsNullOrEmpty(InfoLabel) == false)
                 {
-                    Console.WriteLine("Contains warning: "+version);
+                    Console.WriteLine("Contains warning: " + version);
                     return -1; // has warning
                 }
                 else
@@ -48,6 +61,10 @@ namespace UnityLauncherPro
         {
             throw new NotSupportedException();
         }
+
+        // status label results are ready
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
     }
 }
