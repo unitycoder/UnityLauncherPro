@@ -43,7 +43,7 @@ namespace UnityLauncherPro
         public static readonly string projectNameFile = "ProjectName.txt";
         public static string preferredVersion = null;
         public static int projectNameSetting = 0; // 0 = folder or ProjectName.txt if exists, 1=ProductName
-        public static readonly string initScriptFileFullPath = Tools.GetSafeFilePath("Scripts", "InitializeProject.cs");
+        public static string initScriptFileFullPath;
 
         const string contextRegRoot = "Software\\Classes\\Directory\\Background\\shell";
         const string githubURL = "https://github.com/unitycoder/UnityLauncherPro";
@@ -3835,6 +3835,11 @@ namespace UnityLauncherPro
 
         private void btnFetchLatestInitScript_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(initScriptFileFullPath) == true)
+            {
+                initScriptFileFullPath = Tools.GetSafeFilePath("Scripts","InitializeProject.cs");
+            }
+
             Tools.DownloadInitScript(initScriptFileFullPath, txtCustomInitFileURL.Text);
         }
 
