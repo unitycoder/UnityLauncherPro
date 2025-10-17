@@ -694,7 +694,8 @@ namespace UnityLauncherPro
             // https://beta.unity3d.com/download/330fbefc18b7/UnityDownloadAssistant-6000.1.0a8.exe
             if (exeURL == null)
             {
-                Console.WriteLine("TODO DownloadInBrowser");
+                Console.WriteLine("TODO DownloadInBrowser ,v=" + version);
+                return;
             }
 
             if (preferFullInstaller == true)
@@ -780,6 +781,7 @@ namespace UnityLauncherPro
         public static async Task DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
         {
             string currentInitScriptFolder = Path.GetDirectoryName(currentInitScriptFullPath);
+
             string currentInitScriptFile = Path.GetFileName(currentInitScriptFullPath);
             string tempFile = Path.Combine(Path.GetTempPath(), currentInitScriptFile);
             bool isLocalFile = false;
@@ -1568,19 +1570,31 @@ namespace UnityLauncherPro
 
         public static string ReadCustomProjectData(string projectPath, string customFile)
         {
-            string results = null;
-            customFile = Path.Combine(projectPath, "ProjectSettings", customFile);
-            if (File.Exists(customFile) == true)
+            // ProjectSettings is the old deprecated location (and current location from Hub 3.15.x, but later they will use UserSettings first too)
+            string[] directories = { "UserSettings", "ProjectSettings" };
+
+            foreach (var directory in directories)
             {
-                results = string.Join(" ", File.ReadAllLines(customFile));
+                string filePath = Path.Combine(projectPath, directory, customFile);
+                if (File.Exists(filePath))
+                {
+                    return string.Join(" ", File.ReadAllLines(filePath));
+                }
             }
-            return results;
+
+            return null;
         }
 
         public static bool SaveCustomProjectData(string projectPath, string customFile, string data)
         {
-            customFile = Path.Combine(projectPath, "ProjectSettings", customFile);
+            // NOTE: now saving into UserSettings folder only (there might be old custom data is in ProjectSettings/ still..)
+            var customPath = Path.Combine(projectPath, "UserSettings");
+            if (!Directory.Exists(customPath))
+            {
+                Directory.CreateDirectory(customPath);
+            }
 
+            customFile = Path.Combine(customPath, customFile);
             try
             {
                 File.WriteAllText(customFile, data);
@@ -1588,6 +1602,7 @@ namespace UnityLauncherPro
             }
             catch (Exception)
             {
+                SetStatus("Failed to save custom project data to: " + customFile);
             }
 
             return false;
