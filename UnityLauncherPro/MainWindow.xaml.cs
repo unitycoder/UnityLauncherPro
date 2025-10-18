@@ -2095,6 +2095,11 @@ namespace UnityLauncherPro
                 }
             }
 
+            if (string.IsNullOrEmpty(initScriptFileFullPath) == true)
+            {
+                initScriptFileFullPath = Tools.GetSafeFilePath("Scripts", "InitializeProject.cs");
+            }
+
             // for new projects created from explorer, always ask for name
             if (chkAskNameForQuickProject.IsChecked == true || targetFolder != null)
             {
@@ -3486,6 +3491,11 @@ namespace UnityLauncherPro
         {
             if (Tools.LaunchExplorer(Path.GetDirectoryName(initScriptFileFullPath)) == false)
             {
+                if (string.IsNullOrEmpty(initScriptFileFullPath) == true)
+                {
+                    initScriptFileFullPath = Tools.GetSafeFilePath("Scripts", "InitializeProject.cs");
+                }
+
                 // if failed, open parent folder (probably path was using URL or no scripts yet)
                 var parentPath = Directory.GetParent(Path.GetDirectoryName(initScriptFileFullPath)).FullName;
                 if (Tools.LaunchExplorer(parentPath) == false)

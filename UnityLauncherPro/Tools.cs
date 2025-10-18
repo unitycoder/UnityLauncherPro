@@ -455,6 +455,8 @@ namespace UnityLauncherPro
         // opens Explorer to target folder
         public static bool LaunchExplorer(string folder)
         {
+            if (folder == null || folder.Length < 1) return false;
+
             if (Directory.Exists(folder) == true)
             {
                 Process.Start(folder);
