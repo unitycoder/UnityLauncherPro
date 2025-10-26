@@ -540,7 +540,7 @@
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Version, Converter={StaticResource VersionInstalledConverter}}" Value="true">
+                                            <DataTrigger Binding="{Binding Version, Converter={StaticResource VersionInstalledConverter}}" Value="1">
                                                 <Setter Property="Foreground" Value="{DynamicResource ThemeGridGreenText}" />
                                             </DataTrigger>
                                         </Style.Triggers>
