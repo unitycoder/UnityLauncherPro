@@ -16,6 +16,7 @@ namespace UnityLauncherPro
         private const int DelayBetweenBatches = 1000; // 1 second in milliseconds
         private const string CacheFileName = "UnityVersionCache.json";
         private static readonly HttpClient Client = new HttpClient();
+        public static string unofficalReleasesURL = "https://raw.githubusercontent.com/unitycoder/UnofficialUnityReleasesWatcher/refs/heads/main/unity-releases.md";
 
         static Dictionary<string, string> unofficialReleaseURLs = new Dictionary<string, string>();
 
@@ -30,15 +31,19 @@ namespace UnityLauncherPro
             {
                 var unofficialVersions = await FetchUnofficialVersions(cachedVersions);
                 unofficialReleaseURLs.Clear();
-                // TODO modify FetchUnofficialVersions to put items in this dictionary directlys
+
+                // TODO modify FetchUnofficialVersions to put items in this dictionary directly
                 foreach (var version in unofficialVersions)
                 {
-                    //Console.WriteLine("unofficial: " + version.Version + " , " + version.directURL);
+                    Console.WriteLine("version in unofficials: " + version);
+                    // add only if not there yet
                     if (unofficialReleaseURLs.ContainsKey(version.Version) == false)
                     {
+                        Console.WriteLine("added unofficial: " + version.Version + " , " + version.directURL);
                         unofficialReleaseURLs.Add(version.Version, version.directURL);
                     }
                 }
+                // combine
                 allVersions = unofficialVersions.Concat(allVersions).ToList();
             }
 
@@ -58,22 +63,27 @@ namespace UnityLauncherPro
 
             try
             {
-                string url = "https://raw.githubusercontent.com/unitycoder/UnofficialUnityReleasesWatcher/refs/heads/main/unity-releases.md";
-
-                var content = await Client.GetStringAsync(url);
+                var content = await Client.GetStringAsync(unofficalReleasesURL);
 
                 // Parse the Markdown content
                 var lines = content.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var line in lines)
                 {
+                    //Console.WriteLine(line);
+
                     if (line.StartsWith("- ")) // Identify Markdown list items
                     {
-                        var urlPart = line.Substring(2).Trim();
+                        var urlPart = line.Substring(4).Trim(); // bug in server, has double -
                         var version = ExtractVersionFromUrl(urlPart);
 
-                        if (!string.IsNullOrEmpty(version) && !existingVersions.Contains(version))
+                        //Console.WriteLine("VERSION: " + version);
+                        //Console.WriteLine("IsNullOrEmpty: " + (string.IsNullOrEmpty(version)) + ", existingVersions:" + (existingVersions.Contains(version)));
+
+                        if (string.IsNullOrEmpty(version) == false && existingVersions.Contains(version) == false)
                         {
                             var stream = InferStreamFromVersion(version);
+
+                            Console.WriteLine(version + " , " + urlPart);
 
                             unofficialVersions.Add(new UnityVersion
                             {
@@ -148,28 +158,25 @@ namespace UnityLauncherPro
             }
         }
 
-        static string ParseHashCodeFromURL(string url)
-        {
-            // https://beta.unity3d.com/download/330fbefc18b7/download.html#6000.1.0a8 > 330fbefc18b7
-
-            int hashStart = url.IndexOf("download/") + 9;
-            int hashEnd = url.IndexOf("/download.html", hashStart);
-            return url.Substring(hashStart, hashEnd - hashStart);
-        }
-
         private static async Task<string> ExtractDownloadUrlAsync(string json, string unityVersion)
         {
             //Console.WriteLine("json: " + json + " vers: " + unityVersion);
 
             if (json.Contains("\"results\":[]"))
             {
-                Console.WriteLine("No results found from releases API, checking unofficial list (if enabled)");
+                Console.WriteLine("No results found from releases API, checking unofficial list (if enabled), v=" + unityVersion);
+
+                // print unofficialReleaseURLs
+                foreach (var kvp in unofficialReleaseURLs)
+                {
+                    Console.WriteLine($"Unofficial: {kvp.Key} => {kvp.Value}");
+                }
 
                 if (unofficialReleaseURLs.ContainsKey(unityVersion))
                 {
-                    Console.WriteLine("Unofficial release found in the list.");
+                    Console.WriteLine("Unofficial release found in the list: ");
 
-                    string unityHash = ParseHashCodeFromURL(unofficialReleaseURLs[unityVersion]);
+                    string unityHash = Tools.ParseHashCodeFromURL(unofficialReleaseURLs[unityVersion]);
                     // Console.WriteLine(unityHash);
                     string downloadURL = Tools.ParseDownloadURLFromWebpage(unityVersion, unityHash, false, true);
                     // Console.WriteLine("direct download url: "+downloadURL);
@@ -385,6 +392,8 @@ namespace UnityLauncherPro
             string cacheFilePath = Path.Combine(configDirectory, CacheFileName);
             if (!File.Exists(cacheFilePath)) return new List<UnityVersion>();
 
+            Console.WriteLine("cache file: " + cacheFilePath);
+
             string json = File.ReadAllText(cacheFilePath);
             return ParseCachedUnityVersions(json);
         }
@@ -405,6 +414,28 @@ namespace UnityLauncherPro
             string cacheFilePath = Path.Combine(configDirectory, CacheFileName);
             //Console.WriteLine("Saving cachedrelease: " + cacheFilePath);
             File.WriteAllText(cacheFilePath, json);
+        }
+
+        internal static async Task<string> CheckUnofficialVersionList(string version)
+        {
+            // fetch md page from unofficalReleasesURL
+            var content = await Client.GetStringAsync(unofficalReleasesURL);
+            // parse lines
+            var lines = content.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                if (line.StartsWith("- ")) // Identify Markdown list items
+                {
+                    var urlPart = line.Substring(4).Trim(); // bug in server, has double -
+                    var foundVersion = ExtractVersionFromUrl(urlPart);
+                    if (foundVersion == version)
+                    {
+                        Console.WriteLine("Found unofficial version in the list: " + foundVersion + " , " + urlPart);
+                        return urlPart;
+                    }
+                }
+            }
+            return null;
         }
     }
 }

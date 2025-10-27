@@ -696,7 +696,14 @@ namespace UnityLauncherPro
             // https://beta.unity3d.com/download/330fbefc18b7/UnityDownloadAssistant-6000.1.0a8.exe
             if (exeURL == null)
             {
-                Console.WriteLine("TODO DownloadInBrowser ,v=" + version);
+                // exe url not found, try unofficial list (TODO this is hack to avoid null url, because unofficial list items have been cached to local json, without download url..)
+                Console.WriteLine("Fixing null in DownloadInBrowser ,v=" + version);
+                var downloadURL = await GetUnityUpdates.CheckUnofficialVersionList(version);
+                if (string.IsNullOrEmpty(downloadURL) == false)
+                {
+                    string unityHash = ParseHashCodeFromURL(downloadURL);
+                    exeURL = ParseDownloadURLFromWebpage(version, unityHash, false, true);
+                }
                 return;
             }
 
@@ -722,12 +729,26 @@ namespace UnityLauncherPro
 
         public static async void DownloadAndInstall(string version)
         {
+            string exeURL = await GetUnityUpdates.FetchDownloadUrl(version);
+
             if (version == null)
             {
                 Console.WriteLine("Error> Cannot download and install null version");
                 return;
             }
-            string exeURL = await GetUnityUpdates.FetchDownloadUrl(version);
+
+            if (string.IsNullOrEmpty(exeURL) == true)
+            {
+                // exe url not found, try unofficial list (TODO this is hack to avoid null url, because unofficial list items have been cached to local json, without download url..)
+                Console.WriteLine("Fixing null in DownloadInBrowser ,v=" + version);
+                var downloadURL = await GetUnityUpdates.CheckUnofficialVersionList(version);
+                if (string.IsNullOrEmpty(downloadURL) == false)
+                {
+                    string unityHash = ParseHashCodeFromURL(downloadURL);
+                    exeURL = ParseDownloadURLFromWebpage(version, unityHash, false, true);
+                }
+
+            }
 
             Console.WriteLine("download exeURL= (" + exeURL + ")");
 
@@ -762,11 +783,18 @@ namespace UnityLauncherPro
                         process.Exited += (sender, e) => DeleteTempFile(tempFile);
                         process.Start();
                     }
-                    catch (Exception)
+                    catch (Win32Exception ex) when (ex.NativeErrorCode == 1223) // ERROR_CANCELLED
                     {
-                        Console.WriteLine("Failed to run exe: " + tempFile);
+                        // User declined the UAC prompt
+                        Console.WriteLine("User cancelled elevation (UAC).");
                         DeleteTempFile(tempFile);
                     }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Failed to run exe: " + tempFile + " - " + ex.Message);
+                        DeleteTempFile(tempFile);
+                    }
+
                     // TODO refresh upgrade dialog after installer finished
                 }
             }
@@ -3094,7 +3122,14 @@ public static class UnityLauncherProTools
             return label;
         }
 
+        public static string ParseHashCodeFromURL(string url)
+        {
+            // https://beta.unity3d.com/download/330fbefc18b7/download.html#6000.1.0a8 > 330fbefc18b7
 
+            int hashStart = url.IndexOf("download/") + 9;
+            int hashEnd = url.IndexOf("/download.html", hashStart);
+            return url.Substring(hashStart, hashEnd - hashStart);
+        }
 
 
     } // class
