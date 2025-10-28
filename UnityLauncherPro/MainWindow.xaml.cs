@@ -123,7 +123,6 @@ namespace UnityLauncherPro
             UpdateUnityInstallationsList();
             HandleCommandLineLaunch();
 
-
             // check for duplicate instance, and activate that instead
             if (chkAllowSingleInstanceOnly.IsChecked == true)
             {
@@ -132,6 +131,7 @@ namespace UnityLauncherPro
 
                 if (!isNewInstance)
                 {
+
                     // Send a wake-up message to the running instance
                     ActivateRunningInstance();
 
@@ -151,9 +151,6 @@ namespace UnityLauncherPro
             // TEST erase custom history data
             //Properties.Settings.Default.projectPaths = null;
             //Properties.Settings.Default.Save();
-
-
-
 
             projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursively: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
 
@@ -279,8 +276,6 @@ namespace UnityLauncherPro
             string[] args = Environment.GetCommandLineArgs();
             if (args != null && args.Length > 2)
             {
-
-
                 // first argument needs to be -projectPath
                 var commandLineArgs = args[1];
 
@@ -302,12 +297,9 @@ namespace UnityLauncherPro
                     Tools.InstallAPK(apkPath);
                     Environment.Exit(0);
                 }
-                else
-
-
-                if (commandLineArgs == "-projectPath")
+                else if (commandLineArgs == "-projectPath")
                 {
-                    Console.WriteLine("Launching from commandline...");
+                    Console.WriteLine("Launching project from commandline...");
 
                     // path
                     var projectPathArgument = args[2];
@@ -348,12 +340,17 @@ namespace UnityLauncherPro
                             CreateNewEmptyProject(proj.Path);
                         }
                     }
-                    else
+                    else // has version info, just launch it
                     {
-                        // try launching it
-                        var proc = Tools.LaunchProject(proj);
-                        //proj.Process = proc;
-                        //ProcessHandler.Add(proj, proc);
+                        // try launching it through
+                        bool launchedViaPipe = LaunchProjectViaPipe(proj);
+
+                        if (launchedViaPipe == false)
+                        {
+                            var proc = Tools.LaunchProject(proj);
+                            //proj.Process = proc;
+                            //ProcessHandler.Add(proj, proc);
+                        }
                     }
 
                     // quit after launch if enabled in settings
@@ -367,6 +364,33 @@ namespace UnityLauncherPro
                 {
                     Console.WriteLine("Error> Invalid arguments:" + args[1]);
                 }
+            }
+        } // HandleCommandLineLaunch()
+
+        private bool LaunchProjectViaPipe(Project proj)
+        {
+            string sep = "<|>";
+            try
+            {
+                using (var client = new NamedPipeClientStream(".", launcherPipeName, PipeDirection.Out))
+                {
+                    client.Connect(500);
+                    using (var writer = new StreamWriter(client))
+                    {
+                        writer.AutoFlush = true;
+                        writer.WriteLine("OpenProject:" + sep + proj.Version + sep + proj.Path + sep + proj.Arguments);
+                    }
+                }
+                return true;
+            }
+            catch (TimeoutException)
+            {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error launching via pipe: " + ex.Message);
+                return false;
             }
         }
 
@@ -3847,7 +3871,7 @@ namespace UnityLauncherPro
         {
             if (string.IsNullOrEmpty(initScriptFileFullPath) == true)
             {
-                initScriptFileFullPath = Tools.GetSafeFilePath("Scripts","InitializeProject.cs");
+                initScriptFileFullPath = Tools.GetSafeFilePath("Scripts", "InitializeProject.cs");
             }
 
             Tools.DownloadInitScript(initScriptFileFullPath, txtCustomInitFileURL.Text);
@@ -3919,6 +3943,20 @@ namespace UnityLauncherPro
                         {
                             // Bring the app to the foreground
                             RestoreFromTray();
+                        });
+                    }
+                    else if (message.StartsWith("OpenProject:"))
+                    {
+                        string[] sep = new string[] { "<|>" };
+                        var projData = message.Split(sep, StringSplitOptions.None);
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            var proj = new Project();
+                            proj.Version = projData[1];
+                            proj.Path = projData[2];
+                            proj.Arguments = projData[3];
+                            Tools.LaunchProject(proj);
                         });
                     }
                 }

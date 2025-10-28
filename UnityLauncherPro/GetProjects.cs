@@ -64,6 +64,7 @@ namespace UnityLauncherPro
                         {
                             projectsFound.Add(p);
 
+                            // TODO FIXME, this gets called everytime for same projects?
                             // add found projects to history also (gets added only if its not already there)
                             Tools.AddProjectToHistory(p.Path);
                         }
