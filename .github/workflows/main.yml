@@ -12,7 +12,8 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
+    permissions:
+      contents: write
     runs-on: windows-2022
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -229,17 +230,13 @@ jobs:
             printf '%s\n' "$COMMITS"
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
-
-      # Create the release with that commit list
-      - name: Create Release
-        id: create_release
+      
+      - name: Create GitHub Release + Upload Assets
         if: env.build_trigger == 'true'
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.run_number }}
-          release_name: ${{ env.current_datetime }} (${{ github.run_number }})
+          name: ${{ env.current_datetime }} (${{ github.run_number }})
           body: |
             Automated Release by GitHub Action CI
       
@@ -247,28 +244,6 @@ jobs:
             ${{ steps.get_commits.outputs.commits }}
           draft: false
           prerelease: false
-
-      # Upload the release asset
-      - name: Upload Release Asset
-        id: upload-release-asset
-        if: env.build_trigger == 'true' # Execute only if build was triggered
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./UnityLauncherPro.zip
-          asset_name: UnityLauncherPro.zip
-          asset_content_type: application/zip
-
-      # Upload MSI installer to release
-      - name: Upload MSI Installer
-        if: env.build_trigger == 'true'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./UnityLauncherProInstaller/Release/UnityLauncherPro-Installer.msi
-          asset_name: UnityLauncherPro-Installer.msi
-          asset_content_type: application/x-msi
+          files: |
+            ./UnityLauncherPro.zip
+            ./UnityLauncherProInstaller/Release/UnityLauncherPro-Installer.msi
