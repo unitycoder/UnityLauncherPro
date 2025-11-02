@@ -34,7 +34,10 @@ jobs:
           }
 
       # Step to ensure the repository is checked out
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       # Inform if build steps are skipped
       - name: Inform Skipped Build Steps
@@ -182,40 +185,66 @@ jobs:
           # Save the current date and time to an environment variable
           echo "current_datetime=$(date +'%d/%m/%Y %H:%M')" >> $GITHUB_ENV
 
-      # Step to get previous tag and commits
-      - name: Get commits since last release
+      # Get commits since last build
+      - name: Get commits since last numeric CI tag
         id: get_commits
-        if: env.build_trigger == 'true' # Only run if build was triggered
+        if: env.build_trigger == 'true'
         shell: bash
         run: |
-          # Get the most recent tag
-          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
-          if [ "$PREV_TAG" = "none" ]; then
-            echo "No previous tag found, listing all commits"
-            COMMITS=$(git log --pretty=format:"* %s" --no-merges)
+          set -euo pipefail
+      
+          # Defensive: fetch tags
+          git fetch --tags --force
+      
+          # Collect numeric-only tags (e.g., 145, 143...) and sort ascending numerically
+          mapfile -t NUM_TAGS < <(git tag --list '[0-9]*' | sort -n)
+      
+          PREV_TAG=""
+          # Walk from newest to oldest and pick the newest tag that is an ancestor of HEAD
+          for (( idx=${#NUM_TAGS[@]}-1 ; idx>=0 ; idx-- )); do
+            t="${NUM_TAGS[$idx]}"
+            if git merge-base --is-ancestor "$t" HEAD; then
+              PREV_TAG="$t"
+              break
+            fi
+          done
+      
+          if [ -z "$PREV_TAG" ]; then
+            echo "No previous numeric CI tag reachable from HEAD → listing all commits"
+            RANGE="--all"
           else
-            echo "Previous tag: $PREV_TAG"
-            # List commits since last tag
-            COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"* %s" --no-merges)
+            echo "Previous CI tag: $PREV_TAG"
+            RANGE="$PREV_TAG..HEAD"
           fi
-          # Save commits to the environment
-          echo "commits=$COMMITS" >> $GITHUB_ENV
+      
+          # Nicely formatted bullets; add --date=short if you want dates
+          COMMITS=$(git log $RANGE --no-merges --pretty='* %h %s (by %an)')
+      
+          if [ -z "$COMMITS" ]; then
+            COMMITS="* No code changes since last CI tag."
+          fi
+      
+          {
+            echo 'commits<<EOF'
+            printf '%s\n' "$COMMITS"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
-      # Create a release
+      # Create the release with that commit list
       - name: Create Release
         id: create_release
-        if: env.build_trigger == 'true' # Execute only if build was triggered
+        if: env.build_trigger == 'true'
         uses: actions/create-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{github.run_number}}
+          tag_name: ${{ github.run_number }}
           release_name: ${{ env.current_datetime }} (${{ github.run_number }})
           body: |
             Automated Release by GitHub Action CI
-
-            ### Commits in this release:
-            ${{ env.commits }}
+      
+            ### Commits in this release
+            ${{ steps.get_commits.outputs.commits }}
           draft: false
           prerelease: false
 
