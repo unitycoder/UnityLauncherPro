@@ -179,14 +179,21 @@ jobs:
           )
 
       # Get the current date and time
-      - name: Get current date and time
-        id: datetime
-        if: env.build_trigger == 'true' # Only run if build was triggered
+      - name: Get current date and time (Helsinki)
+        if: env.build_trigger == 'true'
+        shell: pwsh
         run: |
-          # Save the current date and time to an environment variable
-          echo "current_datetime=$(date +'%d/%m/%Y %H:%M')" >> $GITHUB_ENV
-          echo "build_timestamp=$(date +'%H:%M:%S - %d/%m/%Y')" >> $GITHUB_ENV
-
+          $nowUtc = Get-Date -AsUTC
+          $tz = [TimeZoneInfo]::FindSystemTimeZoneById('FLE Standard Time') # Europe/Helsinki
+          $now = [TimeZoneInfo]::ConvertTimeFromUtc($nowUtc, $tz)
+      
+          "current_datetime=$($now.ToString('dd/MM/yyyy HH:mm'))"        >> $env:GITHUB_ENV
+          "build_timestamp=$($now.ToString('HH:mm:ss - dd/MM/yyyy'))"    >> $env:GITHUB_ENV
+      - name: Echo timestamp (debug)
+        if: env.build_trigger == 'true'
+        shell: pwsh
+        run: echo "build_timestamp=${env:build_timestamp}"
+          
       # Get commits since last build
       - name: Get commits since last numeric CI tag
         id: get_commits
