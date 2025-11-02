@@ -185,6 +185,7 @@ jobs:
         run: |
           # Save the current date and time to an environment variable
           echo "current_datetime=$(date +'%d/%m/%Y %H:%M')" >> $GITHUB_ENV
+          echo "build_timestamp=$(date +'%H:%M:%S - %d/%m/%Y')" >> $GITHUB_ENV
 
       # Get commits since last build
       - name: Get commits since last numeric CI tag
@@ -238,7 +239,9 @@ jobs:
           tag_name: ${{ github.run_number }}
           name: ${{ env.current_datetime }} (${{ github.run_number }})
           body: |
-            Automated Release by GitHub Action CI
+            Automated Release by GitHub Action CI.
+            **Build time:** ${{ env.build_timestamp }}
+            NOTE: Installer is experimental (and it loses settings from previous version)
       
             ### Commits in this release
             ${{ steps.get_commits.outputs.commits }}
