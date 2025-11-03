@@ -152,7 +152,9 @@ namespace UnityLauncherPro
             //Properties.Settings.Default.projectPaths = null;
             //Properties.Settings.Default.Save();
 
-            projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursively: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
+            // TODO fixme 8.0
+            Console.WriteLine("TODO fixme 8.0");
+            //projectsSource = GetProjects.Scan(getGitBranch: (bool)chkShowGitBranchColumn.IsChecked, getPlasticBranch: (bool)chkCheckPlasticBranch.IsChecked, getArguments: (bool)chkShowLauncherArgumentsColumn.IsChecked, showMissingFolders: (bool)chkShowMissingFolderProjects.IsChecked, showTargetPlatform: (bool)chkShowPlatform.IsChecked, AllProjectPaths: Properties.Settings.Default.projectPaths, searchGitbranchRecursively: (bool)chkGetGitBranchRecursively.IsChecked, showSRP: (bool)chkCheckSRP.IsChecked);
 
             //Console.WriteLine("projectsSource.Count: " + projectsSource.Count);
 
@@ -531,15 +533,46 @@ namespace UnityLauncherPro
             return (reportItem.Path.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
         }
 
+        void UpgradeOnceIfNeeded()
+        {
+            if (!Settings.Default.__UpgradedOnce)
+            {
+                try { Settings.Default.Upgrade(); } catch { /* ignore */ }
+                Settings.Default.__UpgradedOnce = true;
+                Settings.Default.Save();
+            }
+        }
+
+        void RepairProblematicSettings()
+        {
+            // Ensure XML-serializable defaults for complex types
+            try { var _ = Settings.Default.rootFolders; }
+            catch { Settings.Default.rootFolders = new System.Collections.Specialized.StringCollection(); }
+
+            try { var _ = Settings.Default.gridColumnWidths; }
+            catch { Settings.Default.gridColumnWidths = Array.Empty<int>(); }
+
+            try { var _ = Settings.Default.gridColumnWidthsBuildReport; }
+            catch { Settings.Default.gridColumnWidthsBuildReport = Array.Empty<int>(); }
+
+            try { var _ = Settings.Default.recentColumnsOrder; }
+            catch { Settings.Default.recentColumnsOrder = Array.Empty<int>(); }
+
+            Settings.Default.Save();
+        }
+
+
         void LoadSettings()
         {
-            // debug, print filename
-            //Console.WriteLine(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath);
+            UpgradeOnceIfNeeded();
+            RepairProblematicSettings();
+            Settings.Default.Reload();
 
-            // catch corrupted config file
             try
             {
+                // For .NET 8: Reload is still needed to get latest values from user.config
                 Settings.Default.Reload();
+
                 // form size
                 this.Width = Settings.Default.windowWidth;
                 this.Height = Settings.Default.windowHeight;
@@ -553,7 +586,7 @@ namespace UnityLauncherPro
                 chkQuitAfterOpen.IsChecked = Settings.Default.closeAfterProject;
                 chkShowLauncherArgumentsColumn.IsChecked = Settings.Default.showArgumentsColumn;
                 chkShowGitBranchColumn.IsChecked = Settings.Default.showGitBranchColumn;
-                chkGetGitBranchRecursively.IsChecked = Settings.Default.searchGitFolderRecursivly; // FIXME typo
+                chkGetGitBranchRecursively.IsChecked = Settings.Default.searchGitFolderRecursivly;
                 chkCheckPlasticBranch.IsChecked = Settings.Default.checkPlasticBranch;
                 chkShowMissingFolderProjects.IsChecked = Settings.Default.showProjectsMissingFolder;
                 chkAllowSingleInstanceOnly.IsChecked = Settings.Default.AllowSingleInstanceOnly;
@@ -584,9 +617,15 @@ namespace UnityLauncherPro
                 // update installations folder listbox
                 lstRootFolders.Items.Clear();
 
-                // check if no installation root folders are added, then add default folder(s), this usually happens only on first run (or if user has not added any folders)
-                if (Settings.Default.rootFolders.Count == 0)
+                // check if no installation root folders are added, then add default folder(s)
+                if (Settings.Default.rootFolders == null || Settings.Default.rootFolders.Count == 0)
                 {
+                    // Initialize the collection if null
+                    if (Settings.Default.rootFolders == null)
+                    {
+                        Settings.Default.rootFolders = new System.Collections.Specialized.StringCollection();
+                    }
+
                     // default hub installation folder
                     string baseFolder = "\\Program Files\\Unity\\Hub\\Editor";
                     string baseFolder2 = "\\Program Files\\";
@@ -594,47 +633,48 @@ namespace UnityLauncherPro
                     string defaultFolder2 = "D:" + baseFolder;
                     string defaultFolder3 = "C:" + baseFolder2;
                     string defaultFolder4 = "D:" + baseFolder2;
+
                     if (Directory.Exists(defaultFolder1))
                     {
-                        Properties.Settings.Default.rootFolders.Add(defaultFolder1);
+                        Settings.Default.rootFolders.Add(defaultFolder1);
                     }
                     else if (Directory.Exists(defaultFolder2))
                     {
-                        Properties.Settings.Default.rootFolders.Add(defaultFolder2);
+                        Settings.Default.rootFolders.Add(defaultFolder2);
                     }
                     else if (Directory.Exists(defaultFolder3))
                     {
                         if (GetUnityInstallations.HasUnityInstallations(defaultFolder3))
                         {
-                            Properties.Settings.Default.rootFolders.Add(defaultFolder3);
+                            Settings.Default.rootFolders.Add(defaultFolder3);
                         }
                         else if (GetUnityInstallations.HasUnityInstallations(defaultFolder4))
                         {
-                            Properties.Settings.Default.rootFolders.Add(defaultFolder4);
+                            Settings.Default.rootFolders.Add(defaultFolder4);
                         }
                     }
                 }
 
-                lstRootFolders.ItemsSource = Properties.Settings.Default.rootFolders;
+                lstRootFolders.ItemsSource = Settings.Default.rootFolders;
 
                 // restore recent project datagrid column widths
-                int[] gridColumnWidths = Properties.Settings.Default.gridColumnWidths;
+                int[] gridColumnWidths = Settings.Default.gridColumnWidths;
                 if (gridColumnWidths != null)
                 {
                     for (int i = 0; i < gridColumnWidths.Length; ++i)
                     {
-                        if (i >= gridRecent.Columns.Count) break; // too many columns were saved, probably some test columns
+                        if (i >= gridRecent.Columns.Count) break;
                         gridRecent.Columns[i].Width = gridColumnWidths[i];
                     }
                 }
 
                 // restore buildreport datagrid column widths
-                gridColumnWidths = Properties.Settings.Default.gridColumnWidthsBuildReport;
+                gridColumnWidths = Settings.Default.gridColumnWidthsBuildReport;
                 if (gridColumnWidths != null)
                 {
                     for (int i = 0; i < gridColumnWidths.Length; ++i)
                     {
-                        if (i >= gridBuildReport.Columns.Count) break; // too many columns were saved, probably some test columns
+                        if (i >= gridBuildReport.Columns.Count) break;
                         gridBuildReport.Columns[i].Width = gridColumnWidths[i];
                     }
                 }
@@ -650,13 +690,12 @@ namespace UnityLauncherPro
                 {
                     currentDateFormat = Settings.Default.customDateFormat;
                 }
-                else // use default
+                else
                 {
                     currentDateFormat = defaultDateFormat;
                 }
 
                 chkHumanFriendlyDateTime.IsChecked = Settings.Default.useHumandFriendlyLastModified;
-                // if both enabled, then disable custom
                 if (chkHumanFriendlyDateTime.IsChecked == true && chkUseCustomLastModified.IsChecked == true)
                 {
                     chkUseCustomLastModified.IsChecked = false;
@@ -669,8 +708,6 @@ namespace UnityLauncherPro
                 // recent grid column display index order
                 var order = Settings.Default.recentColumnsOrder;
 
-                // if we dont have any values, get & set them now
-                // also, if user has disabled optional columns, saved order must be reset to default
                 if (order == null || gridRecent.Columns.Count != Settings.Default.recentColumnsOrder.Length)
                 {
                     Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
@@ -680,7 +717,7 @@ namespace UnityLauncherPro
                     }
                     Settings.Default.Save();
                 }
-                else // load existing order
+                else
                 {
                     for (int i = 0; i < gridRecent.Columns.Count; i++)
                     {
@@ -708,58 +745,104 @@ namespace UnityLauncherPro
                         break;
                 }
 
-                // set default .bat folder location to appdata/.., if nothing is set, or current one is invalid
-                if (string.IsNullOrEmpty(txtShortcutBatchFileFolder.Text) || Directory.Exists(txtShortcutBatchFileFolder.Text) == false)
+                // set default .bat folder location
+                if (string.IsNullOrEmpty(Settings.Default.shortcutBatchFileFolder) ||
+                    !Directory.Exists(Settings.Default.shortcutBatchFileFolder))
                 {
-                    Settings.Default.shortcutBatchFileFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-                    txtShortcutBatchFileFolder.Text = Settings.Default.shortcutBatchFileFolder;
+                    Settings.Default.shortcutBatchFileFolder = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+                    Settings.Default.Save();
                 }
+                txtShortcutBatchFileFolder.Text = Settings.Default.shortcutBatchFileFolder;
 
                 chkUseInitScript.IsChecked = Settings.Default.useInitScript;
                 txtCustomInitFileURL.Text = Settings.Default.customInitFileURL;
 
                 // load webgl port
-                txtWebglPort.Text = "" + Settings.Default.webglPort;
+                txtWebglPort.Text = Settings.Default.webglPort.ToString();
                 webglPort = Settings.Default.webglPort;
 
                 txtMaxProjectCount.Text = Settings.Default.maxProjectCount.ToString();
                 chkOverride40ProjectCount.IsChecked = Settings.Default.override40ProjectCount;
-                if ((bool)chkOverride40ProjectCount.IsChecked)
-                {
-                    maxProjectCount = Settings.Default.maxProjectCount;
-                }
-                else
-                {
-                    maxProjectCount = 40;
-                }
+                maxProjectCount = (bool)chkOverride40ProjectCount.IsChecked
+                    ? Settings.Default.maxProjectCount
+                    : 40;
             }
             catch (ConfigurationErrorsException ex)
             {
-                string filename = ((ConfigurationErrorsException)ex.InnerException).Filename;
+                Console.WriteLine($"Configuration error: {ex.Message}");
 
-                if (MessageBox.Show("This may be due to a Windows crash/BSOD.\n" +
-                                      "Click 'Yes' to use automatic backup (if exists, otherwise settings are reset), then start application again.\n\n" +
-                                      "Click 'No' to exit now (and delete user.config manually)\n\nCorrupted file: " + filename,
-                                      appName + " - Corrupt user settings",
-                                      MessageBoxButton.YesNo,
-                                      MessageBoxImage.Error) == MessageBoxResult.Yes)
+                // Try to get the corrupted file path
+                string filename = ex.InnerException is ConfigurationErrorsException innerEx
+                    ? innerEx.Filename
+                    : null;
+
+                if (!string.IsNullOrEmpty(filename))
                 {
+                    var result = MessageBox.Show(
+                        "Settings file is corrupted or incompatible with .NET 8.\n\n" +
+                        "Click 'Yes' to reset settings to defaults.\n" +
+                        "Click 'No' to exit and fix manually.\n\n" +
+                        $"Corrupted file: {filename}",
+                        $"{appName} - Configuration Error",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Error);
 
-                    // try to use backup
-                    string backupFilename = filename + ".bak";
-                    if (File.Exists(backupFilename))
+                    if (result == MessageBoxResult.Yes)
                     {
-                        File.Copy(backupFilename, filename, true);
+                        try
+                        {
+                            // Try to delete the corrupted user.config
+                            if (File.Exists(filename))
+                            {
+                                File.Delete(filename);
+                            }
+
+                            // Reset to defaults
+                            Settings.Default.Reset();
+                            Settings.Default.Save();
+
+                            MessageBox.Show(
+                                "Settings have been reset. Please restart the application.",
+                                appName,
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
+
+                            Application.Current.Shutdown();
+                        }
+                        catch (Exception deleteEx)
+                        {
+                            MessageBox.Show(
+                                $"Failed to reset settings: {deleteEx.Message}\n\n" +
+                                $"Please manually delete: {filename}",
+                                appName,
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                            Application.Current.Shutdown();
+                        }
                     }
                     else
                     {
-                        File.Delete(filename);
+                        Application.Current.Shutdown();
                     }
                 }
-                // need to restart, otherwise settings not loaded
-                Process.GetCurrentProcess().Kill();
+                else
+                {
+                    // No specific file, just reset
+                    Settings.Default.Reset();
+                    Settings.Default.Save();
+                }
             }
-        } // LoadSettings()
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error loading settings: {ex.Message}");
+                MessageBox.Show(
+                    $"Error loading settings: {ex.Message}\n\nUsing defaults.",
+                    appName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
 
         private void SaveSettingsOnExit()
         {
@@ -835,6 +918,14 @@ namespace UnityLauncherPro
             //preferredVersion = "none";
 
             unityInstallationsSource = GetUnityInstallations.Scan();
+
+            if (unityInstallationsSource == null)
+            {
+                lblFoundXInstallations.Content = "Found 0 installations";
+                dataGridUnitys.ItemsSource = null;
+                return;
+            }
+
             dataGridUnitys.ItemsSource = unityInstallationsSource;
 
             // Also make dictionary of installed unitys, to search faster
@@ -1261,7 +1352,7 @@ namespace UnityLauncherPro
         {
             // (TODO force) close theme editor, if still open, TODO NEED to cancel all changes
             CloseThemeEditor();
-            SaveSettingsOnExit();
+            //SaveSettingsOnExit();
             CloseHubPipeAsync();
         }
 

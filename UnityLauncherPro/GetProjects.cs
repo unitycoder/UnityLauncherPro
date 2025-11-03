@@ -17,6 +17,10 @@ namespace UnityLauncherPro
 
         public static List<Project> Scan(bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, StringCollection AllProjectPaths = null, bool searchGitbranchRecursively = false, bool showSRP = false)
         {
+            // TODO FIXME
+            Console.WriteLine("TODO fixme 8.0");
+            return null;
+
             List<Project> projectsFound = new List<Project>();
 
             var hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 
 namespace UnityLauncherPro
@@ -14,8 +15,13 @@ namespace UnityLauncherPro
         // returns unity installations
         public static List<UnityInstallation> Scan()
         {
+            // TODO fixme 8.0
+            Console.WriteLine("TODO fixme 8.0");
+            return null;
+
+
             // get list from settings
-            var rootFolders = Properties.Settings.Default.rootFolders;
+            StringCollection rootFolders = Properties.Settings.Default.rootFolders;
 
             // unityversion, exe_path
             List<UnityInstallation> results = new List<UnityInstallation>();

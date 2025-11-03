@@ -637,5 +637,17 @@ namespace UnityLauncherPro.Properties {
                 this["fetchAdditionalInfo"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool @__UpgradedOnce {
+            get {
+                return ((bool)(this["__UpgradedOnce"]));
+            }
+            set {
+                this["__UpgradedOnce"] = value;
+            }
+        }
     }
 }

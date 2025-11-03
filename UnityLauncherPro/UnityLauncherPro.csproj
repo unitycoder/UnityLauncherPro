@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -22,6 +22,7 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <ApplicationIcon>Images/icon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
@@ -51,6 +52,19 @@
     <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$pattern = 'public static string Stamp = \&quot;.*?\&quot;;'; $replacement = 'public static string Stamp = \&quot;\&quot;;'; $path = '$(ProjectDir)Version.cs'; $content = Get-Content $path -Raw; $newContent = $content -replace $pattern, $replacement; [System.IO.File]::WriteAllText($path, $newContent, [System.Text.Encoding]::UTF8)&quot;" />
   </Target>
   <ItemGroup>
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.10" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>
