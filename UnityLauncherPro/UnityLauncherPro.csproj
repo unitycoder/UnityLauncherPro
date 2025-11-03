@@ -1,19 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EC78D91A-3E63-4CAA-8BC3-9673A30FDA45}</ProjectGuid>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>UnityLauncherPro</RootNamespace>
-    <AssemblyName>UnityLauncherPro</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -29,157 +17,16 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <ApplicationIcon>Images/icon.ico</ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup />
-  <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-  </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Converters\ReleaseDateConverter.cs" />
-    <Compile Include="Converters\LastModifiedConverter.cs" />
-    <Compile Include="Data\BuildReport.cs" />
-    <Compile Include="Data\BuildReportItem.cs" />
-    <Compile Include="Data\DownloadProgress.cs" />
-    <Compile Include="Data\MessageType.cs" />
-    <Compile Include="Data\Platform.cs" />
-    <Compile Include="Data\Tabs.cs" />
-    <Compile Include="Data\ThemeColor.cs" />
-    <Compile Include="Data\UnityVersion.cs" />
-    <Compile Include="Data\UnityVersionResponse.cs" />
-    <Compile Include="Data\UnityVersionStream.cs" />
-    <Compile Include="DownloadProgressWindow.xaml.cs">
-      <DependentUpon>DownloadProgressWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="GetProjects.cs" />
-    <Compile Include="GetUnityInstallations.cs" />
-    <Compile Include="GetUnityUpdates.cs" />
-    <Compile Include="Helpers\ObservableDictionary.cs" />
-    <Compile Include="Helpers\ProcessHandler.cs" />
-    <Compile Include="Libraries\ExtractTarGz.cs" />
-    <Compile Include="NewProject.xaml.cs">
-      <DependentUpon>NewProject.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ProjectProperties.xaml.cs">
-      <DependentUpon>ProjectProperties.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ThemeEditor.xaml.cs">
-      <DependentUpon>ThemeEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Tools.cs" />
-    <Compile Include="Data\UnityInstallation.cs" />
-    <Compile Include="UpgradeWindow.xaml.cs">
-      <DependentUpon>UpgradeWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Version.cs" />
-    <Page Include="DownloadProgressWindow.xaml" />
-    <Page Include="NewProject.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ProjectProperties.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Resources\Colors.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="ThemeEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UpgradeWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Data\Project.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="app.manifest" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
@@ -202,12 +49,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\UnityVersionCache.json" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- PowerShell command to feed current timestamp into version.cs (it is displayed in the app -->
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$pattern = 'public static string Stamp = \&quot;.*?\&quot;;'; $date = Get-Date -Format 'dd-MM-yyyy HH:mm:ss'; $replacement = 'public static string Stamp = \&quot;' + $date + '\&quot;;'; $path = '$(ProjectDir)Version.cs'; $content = Get-Content $path -Raw; $newContent = $content -replace $pattern, $replacement; [System.IO.File]::WriteAllText($path, $newContent, [System.Text.Encoding]::UTF8)&quot;" />
   </Target>
-  <!-- PowerShell command to restore the Stamp string to its initial state -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$pattern = 'public static string Stamp = \&quot;.*?\&quot;;'; $replacement = 'public static string Stamp = \&quot;\&quot;;'; $path = '$(ProjectDir)Version.cs'; $content = Get-Content $path -Raw; $newContent = $content -replace $pattern, $replacement; [System.IO.File]::WriteAllText($path, $newContent, [System.Text.Encoding]::UTF8)&quot;" />
   </Target>
