@@ -24,11 +24,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Configuration" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data.DataSetExtensions" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
@@ -55,4 +50,7 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$pattern = 'public static string Stamp = \&quot;.*?\&quot;;'; $replacement = 'public static string Stamp = \&quot;\&quot;;'; $path = '$(ProjectDir)Version.cs'; $content = Get-Content $path -Raw; $newContent = $content -replace $pattern, $replacement; [System.IO.File]::WriteAllText($path, $newContent, [System.Text.Encoding]::UTF8)&quot;" />
   </Target>
+  <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.10" />
+  </ItemGroup>
 </Project>
