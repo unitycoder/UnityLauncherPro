@@ -335,7 +335,30 @@ namespace UnityLauncherPro
 
         private void btnBrowseForProjectFolder_Click(object sender, RoutedEventArgs e)
         {
-            var folder = Tools.BrowseForOutputFolder("Select New Project folder");
+            string defaultFolder = null;
+            if (txtNewProjectFolder.Text != null)
+            {
+                if (Directory.Exists(txtNewProjectFolder.Text) == true)
+                {
+                    defaultFolder = txtNewProjectFolder.Text;
+                }
+                else
+                {
+                    // find closest existing parent folder
+                    var dir = new DirectoryInfo(txtNewProjectFolder.Text);
+                    while (dir.Parent != null)
+                    {
+                        dir = dir.Parent;
+                        if (Directory.Exists(dir.FullName) == true)
+                        {
+                            defaultFolder = dir.FullName;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            var folder = Tools.BrowseForOutputFolder("Select New Project folder", defaultFolder);
             if (string.IsNullOrEmpty(folder) == false && Directory.Exists(folder) == true)
             {
                 txtNewProjectFolder.Text = folder;
