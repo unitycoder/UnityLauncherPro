@@ -49,9 +49,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="18*"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Column="0" x:Name="txtNewProjectFolder" VerticalAlignment="Center" IsUndoEnabled="True" TextChanged="txtNewProjectFolder_TextChanged" PreviewKeyDown="TxtNewProjectName_PreviewKeyDown" TabIndex="0" Margin="0,2,6,2" />
                 <Button Grid.Column="1" x:Name="btnBrowseForProjectFolder" Style="{StaticResource CustomButton}" ToolTip="Browse for New Project folder"  Content="..." Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnBrowseForProjectFolder_Click"/>
+                <Button Grid.Column="2" x:Name="btnCreateMissingFolder" Style="{StaticResource CustomButton}" ToolTip="Create Missing Folder from your path"  Content="+" Height="22" Width="22" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnCreateMissingFolder_Click"/>
             </Grid>
 
             <!--<Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ThemeButtonForegroundDisabled}" Margin="0" FontSize="10" Padding="5,0,5,3" />-->
@@ -64,7 +66,7 @@
                     <Label  Content="Cancel" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                 </Button>
                 <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Margin="3,0,0,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click" TabIndex="3">
-                    <Label Content="_Create" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
+                    <Label Content="_Create Project" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                 </Button>
             </Grid>
 

@@ -373,12 +373,29 @@ namespace UnityLauncherPro
             {
                 txtNewProjectFolder.BorderBrush = Brushes.Red; // not visible if focused
                 btnCreateNewProject.IsEnabled = false;
+                btnCreateMissingFolder.IsEnabled = true;
             }
             else
             {
                 txtNewProjectFolder.BorderBrush = null;
                 btnCreateNewProject.IsEnabled = true;
                 targetFolder = txtNewProjectFolder.Text;
+                btnCreateMissingFolder.IsEnabled = false;
+            }
+        }
+
+        private void btnCreateMissingFolder_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Directory.CreateDirectory(txtNewProjectFolder.Text);
+                txtNewProjectFolder.BorderBrush = null;
+                btnCreateNewProject.IsEnabled = true;
+                targetFolder = txtNewProjectFolder.Text;
+            }
+            catch (Exception ex)
+            {
+                Tools.SetStatus("Failed to create folder: " + ex.Message);
             }
         }
     }
