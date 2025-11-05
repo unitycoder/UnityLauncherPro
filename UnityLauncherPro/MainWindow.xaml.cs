@@ -333,7 +333,17 @@ namespace UnityLauncherPro
                         {
                             bool useInitScript = (bool)chkUseInitScript.IsChecked;
 
-                            Tools.DisplayUpgradeDialog(proj, null, useInitScript);
+                            // if not editors found, then dont open commandline?
+                            if (unityInstallationsSource.Count > 0)
+                            {
+                                Tools.DisplayUpgradeDialog(proj, null, useInitScript);
+                            }
+                            else
+                            {
+                                MessageBox.Show("No Unity installations found. Please setup Unity Editor root folders first by running UnityLauncherPro.", "No Unity Installations found", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                // TODO display setup tab
+                            }
+
                         }
                         else // no Assets folder here OR Assets folder is empty, then its new project
                         {
