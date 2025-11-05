@@ -26,11 +26,6 @@ namespace UnityLauncherPro
 
             gridAvailableVersions.SelectedItem = null;
 
-            // we have current version info in project
-            // enable release and dl buttons
-            btnOpenReleasePage.IsEnabled = true;
-            btnDownload.IsEnabled = true;
-
             // if dont have exact version, show red outline
             if (currentVersion == null || MainWindow.unityInstalledVersions.ContainsKey(currentVersion) == false)
             {
@@ -40,6 +35,10 @@ namespace UnityLauncherPro
 
             if (currentVersion != null)
             {
+                // we know the version, enable buttons
+                btnOpenReleasePage.IsEnabled = true;
+                btnDownload.IsEnabled = true;
+
                 // remove china c1 from version
                 if (currentVersion.Contains("c")) currentVersion = currentVersion.Replace("c1", "");
                 // find nearest version
@@ -150,6 +149,13 @@ namespace UnityLauncherPro
         void Upgrade()
         {
             var k = (UnityInstallation)gridAvailableVersions.SelectedItem;
+
+            if (k == null)
+            {
+                DialogResult = false;
+                return;
+            }
+
             upgradeVersion = k.Version;
             DialogResult = true;
         }

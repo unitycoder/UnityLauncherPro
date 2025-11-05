@@ -274,6 +274,13 @@ namespace UnityLauncherPro
             var unityExePath = GetUnityExePath(proj.Version);
             if (unityExePath == null)
             {
+                // if no editors installed, show message
+                if (MainWindow.unityInstallationsSource.Count == 0)
+                {
+                    MessageBox.Show($"No Unity versions installed. Please run {MainWindow.appName} first to setup root folders.", MainWindow.appName, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return null;
+                }
+
                 DisplayUpgradeDialog(proj, null, useInitScript);
                 return null;
             }
@@ -1665,6 +1672,9 @@ namespace UnityLauncherPro
             DataGridRow row = (DataGridRow)targetGrid.ItemContainerGenerator.ContainerFromIndex(index);
             if (row == null)
             {
+                // clamp to max items
+                if (index >= targetGrid.Items.Count) index = targetGrid.Items.Count - 1;
+
                 targetGrid.ScrollIntoView(targetGrid.Items[index]);
                 // Defer the focus once row is generated
                 targetGrid.Dispatcher.InvokeAsync(() =>
