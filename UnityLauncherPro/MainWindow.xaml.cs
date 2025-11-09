@@ -890,11 +890,18 @@ namespace UnityLauncherPro
 
             var result = dialog.ShowDialog();
             var newRoot = dialog.SelectedPath;
+
+            if (lstRootFolders.Items.Contains(newRoot) == true)
+            {
+                SetStatus("Folder already exists in the list!", MessageType.Error);
+                return;
+            }
+
             if (String.IsNullOrWhiteSpace(newRoot) == false && Directory.Exists(newRoot) == true)
             {
-                Properties.Settings.Default.rootFolders.Add(newRoot);
+                Settings.Default.rootFolders.Add(newRoot);
                 lstRootFolders.Items.Refresh();
-                Properties.Settings.Default.Save();
+                Settings.Default.Save();
                 UpdateUnityInstallationsList();
                 RefreshRecentProjects();
             }
