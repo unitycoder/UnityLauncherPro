@@ -85,6 +85,7 @@
     </ApplicationDefinition>
     <Compile Include="Converters\ReleaseDateConverter.cs" />
     <Compile Include="Converters\LastModifiedConverter.cs" />
+    <Compile Include="Converters\ThumbnailConverter.cs" />
     <Compile Include="Data\BuildReport.cs" />
     <Compile Include="Data\BuildReportItem.cs" />
     <Compile Include="Data\DownloadProgress.cs" />

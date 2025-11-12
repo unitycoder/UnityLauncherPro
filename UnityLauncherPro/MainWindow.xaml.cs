@@ -4211,6 +4211,14 @@ namespace UnityLauncherPro
 
         }
 
+        private void Image_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            if (proj == null) return;
+            var thumbnailPath = Path.Combine(proj.Path, "ProjectSettings", "icon.png");
+            Tools.LaunchExe(thumbnailPath);
+        }
+
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
         //    var proj = GetSelectedProject();

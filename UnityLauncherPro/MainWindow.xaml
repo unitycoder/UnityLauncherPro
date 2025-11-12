@@ -12,6 +12,7 @@
         <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>
         <converters:LastModifiedConverterTooltip x:Key="LastModifiedConverterTooltip"/>
         <converters:ReleaseDateConverter x:Key="releaseDateConverter"/>
+        <converters:ThumbnailConverter x:Key="thumbnailConverter"/>
     </Window.Resources>
 
     <!-- UI -->
@@ -258,6 +259,21 @@
                                 </MenuItem>
                                 <Separator/>
                                 <MenuItem x:Name="menuRemoveProject" Header="Remove from recent list" Click="MenuRemoveProject_Click" />
+                                <Separator/>
+                                <Image Margin="0,0,0,0" SnapsToDevicePixels="True" MouseDown="Image_MouseDown">
+                                    <Image.Width>
+                                        <Binding Path="PlacementTarget.SelectedItem" RelativeSource="{RelativeSource AncestorType=ContextMenu}" 
+                 Converter="{StaticResource thumbnailConverter}" ConverterParameter="Width"/>
+                                    </Image.Width>
+                                    <Image.Height>
+                                        <Binding Path="PlacementTarget.SelectedItem" RelativeSource="{RelativeSource AncestorType=ContextMenu}" 
+                 Converter="{StaticResource thumbnailConverter}" ConverterParameter="Height"/>
+                                    </Image.Height>
+                                    <Image.Source>
+                                        <Binding Path="PlacementTarget.SelectedItem" RelativeSource="{RelativeSource AncestorType=ContextMenu}" 
+                 Converter="{StaticResource thumbnailConverter}"/>
+                                    </Image.Source>
+                                </Image>
                                 <!--<MenuItem x:Name="menuProjectProperties" Header="Properties..." Click="menuProjectProperties_Click" />-->
                             </ContextMenu>
                         </DataGrid.ContextMenu>
