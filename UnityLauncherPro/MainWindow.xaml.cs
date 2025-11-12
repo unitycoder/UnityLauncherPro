@@ -747,14 +747,16 @@ namespace UnityLauncherPro
             {
                 string filename = ((ConfigurationErrorsException)ex.InnerException).Filename;
 
-                if (MessageBox.Show("This may be due to a Windows crash/BSOD.\n" +
+                var res = MessageBox.Show("This may be due to a Windows crash/BSOD.\n" +
                                       "Click 'Yes' to use automatic backup (if exists, otherwise settings are reset), then start application again.\n\n" +
-                                      "Click 'No' to exit now (and delete user.config manually)\n\nCorrupted file: " + filename,
+                                      "Click 'No' to reset config file (you'll need to setup settings again)\n\n" +
+                                      "Click 'Cancel' to exit now (and delete user.config manually)\n\nCorrupted file: " + filename,
                                       appName + " - Corrupt user settings",
-                                      MessageBoxButton.YesNo,
-                                      MessageBoxImage.Error) == MessageBoxResult.Yes)
-                {
+                                      MessageBoxButton.YesNoCancel,
+                                      MessageBoxImage.Error);
 
+                if (res == MessageBoxResult.Yes)
+                {
                     // try to use backup
                     string backupFilename = filename + ".bak";
                     if (File.Exists(backupFilename))
@@ -766,6 +768,15 @@ namespace UnityLauncherPro
                         File.Delete(filename);
                     }
                 }
+                else if (res == MessageBoxResult.No)
+                {
+                    File.Delete(filename);
+                }
+                else if (res == MessageBoxResult.Cancel)
+                {
+                    Tools.ExploreFolder(Path.GetDirectoryName(filename));
+                }
+
                 // need to restart, otherwise settings not loaded
                 Process.GetCurrentProcess().Kill();
             }
