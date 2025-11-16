@@ -90,6 +90,7 @@
     <Compile Include="Data\BuildReportItem.cs" />
     <Compile Include="Data\DownloadProgress.cs" />
     <Compile Include="Data\MessageType.cs" />
+    <Compile Include="Data\OnlineTemplateItem.cs" />
     <Compile Include="Data\Platform.cs" />
     <Compile Include="Data\Tabs.cs" />
     <Compile Include="Data\ThemeColor.cs" />

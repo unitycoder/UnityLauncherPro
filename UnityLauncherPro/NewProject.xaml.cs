@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using UnityLauncherPro.Data;
 
 namespace UnityLauncherPro
 {
@@ -30,6 +31,9 @@ namespace UnityLauncherPro
             InitializeComponent();
 
             NewProject.targetFolder = targetFolder;
+
+            // TODO could optionally disable templates in settings
+            _ = LoadOnlineTemplatesAsync();
 
             // get version
             newVersion = unityVersion;
@@ -397,6 +401,60 @@ namespace UnityLauncherPro
             {
                 Tools.SetStatus("Failed to create folder: " + ex.Message);
             }
+        }
+
+        private async System.Threading.Tasks.Task LoadOnlineTemplatesAsync()
+        {
+            // Simulate async loading (replace with actual async HTTP call later)
+            await System.Threading.Tasks.Task.Run(() =>
+            {
+                var templates = new List<OnlineTemplateItem>
+        {
+            new OnlineTemplateItem
+            {
+                Name = "3D Template",
+                Description = "A great starting point for 3D projects using the Universal Render Pipeline (URP).",
+                PreviewImageURL = "https://storage.googleapis.com/live-platform-resources-prd/templates/assets/AR_Mobile_Thumbnail_HUB_464008d11a/AR_Mobile_Thumbnail_HUB_464008d11a.png",
+                Type = "CORE",
+                RenderPipeline = "URP",
+                TarBallURL = "https://download.packages.unity.com/com.unity.template.hdrp-blank/-/com.unity.template.hdrp-blank-17.0.2.tgz"
+            },
+            new OnlineTemplateItem
+            {
+                Name = "2D Template",
+                Description = "A great starting point for 2D projects using the Built-in Render Pipeline.",
+                PreviewImageURL = "https://storage.googleapis.com/live-platform-resources-prd/templates/assets/Platformer_preview_887cd85a63/Platformer_preview_887cd85a63.png",
+                Type = "CORE",
+                RenderPipeline = "Built-in",
+                TarBallURL = "https://download.packages.unity.com/com.unity.template.mr-multiplayer/-/com.unity.template.mr-multiplayer-1.0.3.tgz"
+            },
+            new OnlineTemplateItem
+            {
+                Name = "Wubba Template",
+                Description = "A great asdfasdf projects using.",
+                PreviewImageURL = "https://storage.googleapis.com/live-platform-resources-prd/templates/assets/2_4_1_Overview_627c09d1be/2_4_1_Overview_627c09d1be.png",
+                Type = "SAMPLES",
+                RenderPipeline = "URP",
+                TarBallURL = "https://download.packages.unity.com/com.unity.template.vr/-/com.unity.template.vr-9.2.0.tgz"
+            },
+            new OnlineTemplateItem
+            {
+                Name = "ASDF Template",
+                Description = "A great asdfasdf projects using.",
+                PreviewImageURL = "https://storage.googleapis.com/live-platform-resources-prd/templates/assets/HDRP_c27702ce66/HDRP_c27702ce66.jpg",
+                Type = "LEARNING",
+                RenderPipeline = "HDRP",
+                TarBallURL = "https://download.packages.unity.com/com.unity.template.platformer/-/com.unity.template.platformer-5.0.5.tgz"
+            }
+        };
+
+                // Update UI on dispatcher thread
+                Dispatcher.Invoke(() =>
+                {
+                    listOnlineTemplates.Items.Clear();
+                    listOnlineTemplates.ItemsSource = templates;
+                });
+            });
         }
     }
 }

@@ -4,10 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnityLauncherPro"
+        xmlns:data="clr-namespace:UnityLauncherPro.Data"
+        d:DataContext="{d:DesignInstance Type=local:NewProject}"
         mc:Ignorable="d"
-        Title="Create New Project" Height="480" Width="500" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
+        Title="Create New Project" Height="480" Width="640" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="164"/>
+        </Grid.ColumnDefinitions>
         <StackPanel Margin="10,3">
             <Label Content="Unity Version" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
             <DataGrid x:Name="gridAvailableVersions" KeyboardNavigation.TabNavigation = "None" SelectionMode="Single" Height="230" Margin="0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="1"  Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" PreviewMouseDoubleClick="gridAvailableVersions_PreviewMouseDoubleClick" CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserResizeRows="False" CanUserDeleteRows="False">
@@ -77,7 +83,67 @@
                     </StatusBarItem>
                 </StatusBar>
             </Grid>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Margin="0,3,10,3" Grid.Column="1">
+            <Label Content="Unity Online Templates" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
+            <!-- search box -->
+            <Grid Background="{DynamicResource ThemeTextBoxBackground}" VerticalAlignment="Top" Margin="6,5,0,0" Height="20"  >
+                <TextBlock Margin="3,2" MinWidth="100" Text="Filter" Foreground="{DynamicResource ThemeSearchPlaceholder}" Height="24">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=txtFilterTemplates}" Value="">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBox MinWidth="100" CaretBrush="{DynamicResource ThemeSearchCaret}" x:Name="txtFilterTemplates" Background="Transparent" BorderBrush="{x:Null}" Foreground="{DynamicResource ThemeSearchForeground}" SelectionBrush="{DynamicResource ThemeSearchSelection}" BorderThickness="0" Margin="2,2,0,0" UndoLimit="64"  />
+                <Button x:Name="btnClearUpdatesSearch" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderThickness="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="23" Background="Transparent" Padding="0,2" Visibility="Visible" BorderBrush="{x:Null}" >
+                    <TextBlock Text="❌" FontSize="8" Foreground="{DynamicResource ThemeSearchClose}" Padding="5,3,4,4" HorizontalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=txtFilterTemplates}" Value="">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Text, ElementName=txtFilterTemplates}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Button>
+            </Grid>
 
+            <ListBox x:Name="listOnlineTemplates" Margin="6,5,0,0" Height="340" 
+         Background="{DynamicResource ThemeMainBackgroundColor}" 
+         Foreground="{DynamicResource ThemeButtonForeground}" 
+         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+         d:ItemsSource="{d:SampleData ItemCount=4}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="3">
+                            <Image Source="{Binding PreviewImageURL}" 
+                       Margin="0,0,0,5" 
+                       ToolTip="{Binding Description}" 
+                       Stretch="Uniform"
+                       HorizontalAlignment="Stretch"/>
+                            <TextBlock Text="{Binding Name}" 
+                           FontWeight="Bold" 
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource ThemeButtonForeground}"/>
+                            <TextBlock Text="{Binding Type}" 
+                           FontSize="10" 
+                           Foreground="{DynamicResource ThemeButtonForeground}" 
+                           Opacity="0.7"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
     </Grid>
 </Window>
