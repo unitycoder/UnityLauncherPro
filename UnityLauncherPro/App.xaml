@@ -136,7 +136,7 @@
                             <!--mouseover colors for dropdown combobox https://stackoverflow.com/a/39228553/5452781 -->
                             <ControlTemplate.Triggers>
                                 <Trigger Property="ComboBoxItem.IsMouseOver" Value="True">
-                                    <Setter TargetName="Border"  Property="Background" Value="DarkBlue"></Setter>
+                                    <Setter TargetName="Border"  Property="Background" Value="{DynamicResource ThemeDataGridRowMouseOver}"></Setter>
                                 </Trigger>
                                 <Trigger Property="ComboBoxItem.IsSelected" Value="True">
                                     <Setter TargetName="Border"  Property="Background" Value="{DynamicResource ThemeDataGridRowSelectedBackground}"></Setter>
@@ -529,9 +529,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-
-            <!--new project-->
-
 
         </ResourceDictionary>
     </Application.Resources>
