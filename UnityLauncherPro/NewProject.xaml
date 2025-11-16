@@ -34,7 +34,7 @@
                 <Label x:Name="lblNewProjectNameLabel" Grid.Column="0" Content="Project Name:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,5,0" />
                 <Label Grid.Column="1" Content="Platform:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,0,0" />
                 <Label x:Name="lblTemplateTitleAndCount" Grid.Column="2" Content="Templates:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="5,5,5,0" />
-                <Label Content="Override" Grid.Column="3" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,0,0"/>
+                <Label Content="Override" x:Name="lblOverride" Grid.Column="3" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,0,0"/>
             </Grid>
 
             <Grid HorizontalAlignment="Stretch" Margin="0,3,0,0">
@@ -47,7 +47,7 @@
                 <TextBox Grid.Column="0" x:Name="txtNewProjectName" VerticalAlignment="Center" IsUndoEnabled="True" TextChanged="TxtNewProjectName_TextChanged" PreviewKeyDown="TxtNewProjectName_PreviewKeyDown" TabIndex="0" Margin="0,2,6,2" />
                 <ComboBox Grid.Column="1" x:Name="cmbNewProjectPlatform" SelectedIndex="0" Margin="0,0,0,0" TabIndex="2" DropDownOpened="CmbNewProjectPlatform_DropDownOpened"  />
                 <ComboBox Grid.Column="2" x:Name="cmbNewProjectTemplate" DisplayMemberPath="Key" SelectedIndex="0" Margin="6,0,0,0" TabIndex="2" DropDownOpened="CmbNewProjectTemplate_DropDownOpened"  />
-                <CheckBox Grid.Column="3" x:Name="chkForceDX11" Content="DX11" ToolTip="Use DX11 instead of DX12" Margin="6,0,0,0" IsChecked="True" Checked="chkForceDX11_Checked" Unchecked="chkForceDX11_Checked"/>
+                <CheckBox Grid.Column="3" x:Name="chkForceDX11" Content="DX11" ToolTip="Use DX11 instead of DX12" Margin="6,0,0,0" IsChecked="False" Checked="chkForceDX11_Checked" Unchecked="chkForceDX11_Checked"/>
             </Grid>
 
             <Label x:Name="lblNewProjectFolderLabel" Grid.Column="0" Content="Project Root Folder:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0" Padding="0,5,5,0" />

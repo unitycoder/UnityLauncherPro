@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using UnityLauncherPro.Data;
+using UnityLauncherPro.Properties;
 
 namespace UnityLauncherPro
 {
@@ -34,6 +37,8 @@ namespace UnityLauncherPro
 
             // TODO could optionally disable templates in settings
             _ = LoadOnlineTemplatesAsync();
+
+            LoadSettings();
 
             // get version
             newVersion = unityVersion;
@@ -82,6 +87,11 @@ namespace UnityLauncherPro
 
             isInitializing = false;
         }  // NewProject
+
+        private void LoadSettings()
+        {
+            chkForceDX11.IsChecked = Settings.Default.forceDX11;
+        }
 
         void UpdateTemplatesDropDown(string unityPath)
         {
@@ -296,7 +306,9 @@ namespace UnityLauncherPro
 
             // hide forceDX11 checkbox if version is below 6000
             bool is6000 = k.Version.Contains("6000");
-            chkForceDX11.Visibility = is6000 ? Visibility.Visible : Visibility.Collapsed;
+            lblOverride.Visibility = chkForceDX11.Visibility = is6000 ? Visibility.Visible : Visibility.Collapsed;
+            //chkForceDX11.IsChecked = chkForceDX11.Visibility == Visibility.Visible ? forceDX11 : false;
+            forceDX11 = Settings.Default.forceDX11 && is6000;
         }
 
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
@@ -334,7 +346,10 @@ namespace UnityLauncherPro
 
         private void chkForceDX11_Checked(object sender, RoutedEventArgs e)
         {
-            forceDX11 = chkForceDX11.IsChecked == true;
+            if (isInitializing) return; // Don't save during initialization
+
+            Settings.Default.forceDX11 = forceDX11;
+            Settings.Default.Save();
         }
 
         private void btnBrowseForProjectFolder_Click(object sender, RoutedEventArgs e)
@@ -405,55 +420,181 @@ namespace UnityLauncherPro
 
         private async System.Threading.Tasks.Task LoadOnlineTemplatesAsync()
         {
-            // Simulate async loading (replace with actual async HTTP call later)
-            await System.Threading.Tasks.Task.Run(() =>
+            try
             {
-                var templates = new List<OnlineTemplateItem>
-        {
-            new OnlineTemplateItem
-            {
-                Name = "3D Template",
-                Description = "A great starting point for 3D projects using the Universal Render Pipeline (URP).",
-                PreviewImageURL = "https://storage.googleapis.com/live-platform-resources-prd/templates/assets/AR_Mobile_Thumbnail_HUB_464008d11a/AR_Mobile_Thumbnail_HUB_464008d11a.png",
-                Type = "CORE",
-                RenderPipeline = "URP",
-                TarBallURL = "https://download.packages.unity.com/com.unity.template.hdrp-blank/-/com.unity.template.hdrp-blank-17.0.2.tgz"
-            },
-            new OnlineTemplateItem
-            {
-                Name = "2D Template",
-                Description = "A great starting point for 2D projects using the Built-in Render Pipeline.",
-                PreviewImageURL = "https://storage.googleapis.com/live-platform-resources-prd/templates/assets/Platformer_preview_887cd85a63/Platformer_preview_887cd85a63.png",
-                Type = "CORE",
-                RenderPipeline = "Built-in",
-                TarBallURL = "https://download.packages.unity.com/com.unity.template.mr-multiplayer/-/com.unity.template.mr-multiplayer-1.0.3.tgz"
-            },
-            new OnlineTemplateItem
-            {
-                Name = "Wubba Template",
-                Description = "A great asdfasdf projects using.",
-                PreviewImageURL = "https://storage.googleapis.com/live-platform-resources-prd/templates/assets/2_4_1_Overview_627c09d1be/2_4_1_Overview_627c09d1be.png",
-                Type = "SAMPLES",
-                RenderPipeline = "URP",
-                TarBallURL = "https://download.packages.unity.com/com.unity.template.vr/-/com.unity.template.vr-9.2.0.tgz"
-            },
-            new OnlineTemplateItem
-            {
-                Name = "ASDF Template",
-                Description = "A great asdfasdf projects using.",
-                PreviewImageURL = "https://storage.googleapis.com/live-platform-resources-prd/templates/assets/HDRP_c27702ce66/HDRP_c27702ce66.jpg",
-                Type = "LEARNING",
-                RenderPipeline = "HDRP",
-                TarBallURL = "https://download.packages.unity.com/com.unity.template.platformer/-/com.unity.template.platformer-5.0.5.tgz"
-            }
-        };
-
-                // Update UI on dispatcher thread
-                Dispatcher.Invoke(() =>
+                using (var client = new HttpClient())
                 {
-                    listOnlineTemplates.Items.Clear();
-                    listOnlineTemplates.ItemsSource = templates;
-                });
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+                    // Build JSON manually
+                    var graphqlJson = "{\"query\":\"fragment TemplateEntity on Template { __typename name packageName description type buildPlatforms renderPipeline previewImage { url } versions { name tarball { url } } } query HUB__getTemplates($limit: Int! $skip: Int! $orderBy: TemplateOrder! $supportedUnityEditorVersions: [String!]!) { getTemplates(limit: $limit skip: $skip orderBy: $orderBy supportedUnityEditorVersions: $supportedUnityEditorVersions) { edges { node { ...TemplateEntity } } } }\",\"variables\":{\"limit\":50,\"skip\":0,\"orderBy\":\"WEIGHTED_DESC\",\"supportedUnityEditorVersions\":[\"6000.0\"]}}";
+
+                    var content = new StringContent(graphqlJson, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync("https://live-platform-api.prd.ld.unity3d.com/graphql", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        var templates = ParseTemplatesFromJson(responseString);
+
+                        // Update UI on dispatcher thread
+                        Dispatcher.Invoke(() =>
+                        {
+                            listOnlineTemplates.Items.Clear();
+                            listOnlineTemplates.ItemsSource = templates;
+                        });
+                    }
+                    else
+                    {
+                        Console.WriteLine($"GraphQL request failed: {response.StatusCode}");
+                        LoadFallbackTemplates();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading online templates: {ex.Message}");
+                LoadFallbackTemplates();
+            }
+        }
+
+        private List<OnlineTemplateItem> ParseTemplatesFromJson(string json)
+        {
+            var templates = new List<OnlineTemplateItem>();
+
+            try
+            {
+                // Find the edges array
+                int edgesStart = json.IndexOf("\"edges\":");
+                if (edgesStart == -1) return templates;
+
+                // Find all node objects
+                int currentPos = edgesStart;
+                while (true)
+                {
+                    int nodeStart = json.IndexOf("{\"__typename\":\"Template\"", currentPos);
+                    if (nodeStart == -1) break;
+
+                    // Find the end of this node object (simplified - find matching brace)
+                    int nodeEnd = FindMatchingBrace(json, nodeStart);
+                    if (nodeEnd == -1) break;
+
+                    string nodeJson = json.Substring(nodeStart, nodeEnd - nodeStart + 1);
+
+                    // Parse individual fields
+                    var template = new OnlineTemplateItem
+                    {
+                        Name = ExtractJsonString(nodeJson, "\"name\""),
+                        Description = ExtractJsonString(nodeJson, "\"description\""),
+                        Type = ExtractJsonString(nodeJson, "\"type\""),
+                        RenderPipeline = ExtractJsonString(nodeJson, "\"renderPipeline\""),
+                        PreviewImageURL = ExtractNestedJsonString(nodeJson, "\"previewImage\"", "\"url\"") ?? "pack://application:,,,/Images/icon.png",
+                        TarBallURL = ExtractNestedJsonString(nodeJson, "\"tarball\"", "\"url\"")
+                    };
+
+                    templates.Add(template);
+                    currentPos = nodeEnd + 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error parsing templates: {ex.Message}");
+            }
+
+            return templates;
+        }
+
+        private string ExtractJsonString(string json, string key)
+        {
+            int keyIndex = json.IndexOf(key + ":");
+            if (keyIndex == -1) return null;
+
+            int valueStart = json.IndexOf("\"", keyIndex + key.Length + 1);
+            if (valueStart == -1) return null;
+
+            int valueEnd = json.IndexOf("\"", valueStart + 1);
+            if (valueEnd == -1) return null;
+
+            return json.Substring(valueStart + 1, valueEnd - valueStart - 1);
+        }
+
+        private string ExtractNestedJsonString(string json, string parentKey, string childKey)
+        {
+            int parentIndex = json.IndexOf(parentKey + ":");
+            if (parentIndex == -1) return null;
+
+            // Find the object after parentKey
+            int objectStart = json.IndexOf("{", parentIndex);
+            if (objectStart == -1) return null;
+
+            int objectEnd = FindMatchingBrace(json, objectStart);
+            if (objectEnd == -1) return null;
+
+            string nestedJson = json.Substring(objectStart, objectEnd - objectStart + 1);
+            return ExtractJsonString(nestedJson, childKey);
+        }
+
+        private int FindMatchingBrace(string json, int openBraceIndex)
+        {
+            int braceCount = 0;
+            bool inString = false;
+            bool escapeNext = false;
+
+            for (int i = openBraceIndex; i < json.Length; i++)
+            {
+                char c = json[i];
+
+                if (escapeNext)
+                {
+                    escapeNext = false;
+                    continue;
+                }
+
+                if (c == '\\')
+                {
+                    escapeNext = true;
+                    continue;
+                }
+
+                if (c == '"')
+                {
+                    inString = !inString;
+                    continue;
+                }
+
+                if (!inString)
+                {
+                    if (c == '{') braceCount++;
+                    else if (c == '}')
+                    {
+                        braceCount--;
+                        if (braceCount == 0) return i;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        private void LoadFallbackTemplates()
+        {
+            var templates = new List<OnlineTemplateItem>
+            {
+                new OnlineTemplateItem
+                {
+                    Name = "3D Template",
+                    Description = "A great starting point for 3D projects using the Universal Render Pipeline (URP).",
+                    PreviewImageURL = "pack://application:,,,/Images/icon.png",
+                    Type = "CORE",
+                    RenderPipeline = "URP"
+                }
+            };
+
+            Dispatcher.Invoke(() =>
+            {
+                listOnlineTemplates.Items.Clear();
+                listOnlineTemplates.ItemsSource = templates;
             });
         }
     }

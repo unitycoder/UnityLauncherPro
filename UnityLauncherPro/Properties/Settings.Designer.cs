@@ -637,5 +637,17 @@ namespace UnityLauncherPro.Properties {
                 this["fetchAdditionalInfo"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool forceDX11 {
+            get {
+                return ((bool)(this["forceDX11"]));
+            }
+            set {
+                this["forceDX11"] = value;
+            }
+        }
     }
 }

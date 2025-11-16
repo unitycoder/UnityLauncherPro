@@ -93,6 +93,7 @@
     <Compile Include="Data\OnlineTemplateItem.cs" />
     <Compile Include="Data\Platform.cs" />
     <Compile Include="Data\Tabs.cs" />
+    <Compile Include="Data\TemplateGraphQLResponse.cs" />
     <Compile Include="Data\ThemeColor.cs" />
     <Compile Include="Data\UnityVersion.cs" />
     <Compile Include="Data\UnityVersionResponse.cs" />
