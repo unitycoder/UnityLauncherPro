@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -27,6 +29,7 @@ namespace UnityLauncherPro
         int previousSelectedModuleIndex = -1;
 
         public static string targetFolder { get; private set; } = null;
+        private CancellationTokenSource _templateLoadCancellation;
 
         public NewProject(string unityVersion, string suggestedName, string targetFolder, bool nameIsLocked = false)
         {
@@ -34,9 +37,6 @@ namespace UnityLauncherPro
             InitializeComponent();
 
             NewProject.targetFolder = targetFolder;
-
-            // TODO could optionally disable templates in settings
-            _ = LoadOnlineTemplatesAsync();
 
             LoadSettings();
 
@@ -65,6 +65,9 @@ namespace UnityLauncherPro
                     {
                         gridAvailableVersions.SelectedIndex = i;
                         gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
+
+                        string baseVersion = GetBaseVersion(newVersion);
+                        _ = LoadOnlineTemplatesAsync(baseVersion);
                         break;
                     }
                 }
@@ -309,6 +312,23 @@ namespace UnityLauncherPro
             lblOverride.Visibility = chkForceDX11.Visibility = is6000 ? Visibility.Visible : Visibility.Collapsed;
             //chkForceDX11.IsChecked = chkForceDX11.Visibility == Visibility.Visible ? forceDX11 : false;
             forceDX11 = Settings.Default.forceDX11 && is6000;
+
+            string baseVersion = GetBaseVersion(k.Version);
+            // Cancel previous request
+            _templateLoadCancellation?.Cancel();
+            _templateLoadCancellation = new CancellationTokenSource();
+            _ = LoadOnlineTemplatesAsync(baseVersion, _templateLoadCancellation.Token);
+        }
+
+        string GetBaseVersion(string version)
+        {
+            // e.g. 2020.3.15f1 -> 2020.3
+            var parts = version.Split('.');
+            if (parts.Length >= 2)
+            {
+                return parts[0] + "." + parts[1];
+            }
+            return version;
         }
 
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
@@ -418,7 +438,7 @@ namespace UnityLauncherPro
             }
         }
 
-        private async System.Threading.Tasks.Task LoadOnlineTemplatesAsync()
+        private async Task LoadOnlineTemplatesAsync(string baseVersion, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -426,37 +446,81 @@ namespace UnityLauncherPro
                 {
                     client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-                    // Build JSON manually
-                    var graphqlJson = "{\"query\":\"fragment TemplateEntity on Template { __typename name packageName description type buildPlatforms renderPipeline previewImage { url } versions { name tarball { url } } } query HUB__getTemplates($limit: Int! $skip: Int! $orderBy: TemplateOrder! $supportedUnityEditorVersions: [String!]!) { getTemplates(limit: $limit skip: $skip orderBy: $orderBy supportedUnityEditorVersions: $supportedUnityEditorVersions) { edges { node { ...TemplateEntity } } } }\",\"variables\":{\"limit\":50,\"skip\":0,\"orderBy\":\"WEIGHTED_DESC\",\"supportedUnityEditorVersions\":[\"6000.0\"]}}";
+                    var graphqlJson = "{\"query\":\"fragment TemplateEntity on Template { __typename name packageName description type buildPlatforms renderPipeline previewImage { url } versions { name tarball { url } } } query HUB__getTemplates($limit: Int! $skip: Int! $orderBy: TemplateOrder! $supportedUnityEditorVersions: [String!]!) { getTemplates(limit: $limit skip: $skip orderBy: $orderBy supportedUnityEditorVersions: $supportedUnityEditorVersions) { edges { node { ...TemplateEntity } } } }\",\"variables\":{\"limit\":40,\"skip\":0,\"orderBy\":\"WEIGHTED_DESC\",\"supportedUnityEditorVersions\":[\"" + baseVersion + "\"]}}";
 
                     var content = new StringContent(graphqlJson, Encoding.UTF8, "application/json");
 
-                    var response = await client.PostAsync("https://live-platform-api.prd.ld.unity3d.com/graphql", content);
+                    // Check for cancellation before making request
+                    if (cancellationToken.IsCancellationRequested) return;
+
+                    var response = await client.PostAsync("https://live-platform-api.prd.ld.unity3d.com/graphql", content, cancellationToken);
+
+                    // Check for cancellation after request
+                    if (cancellationToken.IsCancellationRequested) return;
 
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
+
+                        // Check for cancellation before parsing
+                        if (cancellationToken.IsCancellationRequested) return;
+
                         var templates = ParseTemplatesFromJson(responseString);
 
-                        // Update UI on dispatcher thread
-                        Dispatcher.Invoke(() =>
+                        // Update UI on dispatcher thread only if not cancelled
+                        if (!cancellationToken.IsCancellationRequested)
                         {
-                            listOnlineTemplates.Items.Clear();
-                            listOnlineTemplates.ItemsSource = templates;
-                        });
+                            Dispatcher.Invoke(() =>
+                            {
+                                // Only set ItemsSource, don't touch Items
+                                listOnlineTemplates.ItemsSource = templates;
+                            });
+                        }
                     }
                     else
                     {
                         Console.WriteLine($"GraphQL request failed: {response.StatusCode}");
-                        LoadFallbackTemplates();
+                        if (!cancellationToken.IsCancellationRequested)
+                        {
+                            LoadFallbackTemplates();
+                        }
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                // Request was cancelled, this is expected
+                Console.WriteLine("Template loading cancelled");
+            }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading online templates: {ex.Message}");
-                LoadFallbackTemplates();
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    Console.WriteLine($"Error loading online templates: {ex.Message}");
+                    LoadFallbackTemplates();
+                }
             }
+        }
+
+        private void LoadFallbackTemplates()
+        {
+            var templates = new List<OnlineTemplateItem>
+    {
+        new OnlineTemplateItem
+        {
+            Name = "3D Template",
+            Description = "A great starting point for 3D projects using the Universal Render Pipeline (URP).",
+            PreviewImageURL = "pack://application:,,,/Images/icon.png",
+            Type = "CORE",
+            RenderPipeline = "URP"
+        }
+    };
+
+            Dispatcher.Invoke(() =>
+            {
+                // Only set ItemsSource, don't use Items.Clear()
+                listOnlineTemplates.ItemsSource = templates;
+            });
         }
 
         private List<OnlineTemplateItem> ParseTemplatesFromJson(string json)
@@ -576,26 +640,5 @@ namespace UnityLauncherPro
 
             return -1;
         }
-
-        private void LoadFallbackTemplates()
-        {
-            var templates = new List<OnlineTemplateItem>
-            {
-                new OnlineTemplateItem
-                {
-                    Name = "3D Template",
-                    Description = "A great starting point for 3D projects using the Universal Render Pipeline (URP).",
-                    PreviewImageURL = "pack://application:,,,/Images/icon.png",
-                    Type = "CORE",
-                    RenderPipeline = "URP"
-                }
-            };
-
-            Dispatcher.Invoke(() =>
-            {
-                listOnlineTemplates.Items.Clear();
-                listOnlineTemplates.ItemsSource = templates;
-            });
-        }
-    }
-}
+    } // class NewProject
+} // namespace UnityLauncherPro
