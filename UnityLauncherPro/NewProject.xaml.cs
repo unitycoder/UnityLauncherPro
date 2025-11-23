@@ -152,7 +152,43 @@ namespace UnityLauncherPro
                 return;
             }
 
-            templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
+            // Check if online template is selected
+            if (listOnlineTemplates.SelectedItem is OnlineTemplateItem selectedOnlineTemplate)
+            {
+                // Use online template path
+                string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string templatesPath = Path.Combine(appDataPath, "UnityHub", "Templates");
+
+                if (!string.IsNullOrEmpty(selectedOnlineTemplate.TarBallURL))
+                {
+                    string fileName = Path.GetFileName(new Uri(selectedOnlineTemplate.TarBallURL).LocalPath);
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        string safeFileName = string.Join("_", selectedOnlineTemplate.Name.Split(Path.GetInvalidFileNameChars()));
+                        fileName = $"{safeFileName}.tgz";
+                    }
+
+                    templateZipPath = Path.Combine(templatesPath, fileName);
+
+                    // Verify the file exists
+                    if (!File.Exists(templateZipPath))
+                    {
+                        Tools.SetStatus("Selected online template is not downloaded. Please download it first.");
+                        return;
+                    }
+                }
+                else
+                {
+                    Tools.SetStatus("Invalid online template URL");
+                    return;
+                }
+            }
+            else
+            {
+                // Use built-in template from dropdown
+                templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
+            }
+
             selectedPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
             UpdateSelectedVersion();
 
@@ -162,6 +198,7 @@ namespace UnityLauncherPro
 
             DialogResult = true;
         }
+
 
         private void BtnCancelNewProject_Click(object sender, RoutedEventArgs e)
         {
@@ -666,6 +703,7 @@ namespace UnityLauncherPro
         } // FindMatchingBrace
 
 
+
         private void listOnlineTemplates_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             // Get the item that was clicked
@@ -693,20 +731,27 @@ namespace UnityLauncherPro
             }
         }
 
+
         private void listOnlineTemplates_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (listOnlineTemplates.SelectedItem is OnlineTemplateItem selectedTemplate)
             {
                 lblSelectedTemplate.Content = selectedTemplate.Name;
                 lblSelectedTemplate.BorderThickness = new Thickness(1);
+
+                // Disable built-in template dropdown when online template is selected
+                cmbNewProjectTemplate.IsEnabled = false;
+                cmbNewProjectTemplate.SelectedIndex = 0; // Reset to default
             }
             else
             {
                 lblSelectedTemplate.Content = "None";
                 lblSelectedTemplate.BorderThickness = new Thickness(0);
+
+                // Re-enable built-in template dropdown when no online template is selected
+                cmbNewProjectTemplate.IsEnabled = true;
             }
         }
-
         private async void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
