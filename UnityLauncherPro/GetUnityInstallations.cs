@@ -48,7 +48,23 @@ namespace UnityLauncherPro
                     var haveUninstaller = File.Exists(uninstallExe);
 
                     var exePath = Path.Combine(editorFolder, "Unity.exe");
-                    if (File.Exists(exePath) == false) continue;
+
+//                    bool supportTuanjie = true;
+                    if (File.Exists(exePath) == false)
+                    {
+                        //if (supportTuanjie == false)
+                        {
+                            continue;
+                        }
+                        //else
+                        //{
+                        //    exePath = Path.Combine(editorFolder, "Tuanjie.exe");
+                        //    if (File.Exists(exePath) == false)
+                        //    {
+                        //        continue;
+                        //    }
+                        //}
+                    }
 
                     // get full version number from uninstaller (or try exe, if no uninstaller)
                     var version = Tools.GetFileVersionData(haveUninstaller ? uninstallExe : exePath);

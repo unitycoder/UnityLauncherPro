@@ -1,6 +1,3 @@
-// source https://gist.github.com/Su-s/438be493ae692318c73e30367cbc5c2a
-// updated source https://gist.github.com/Matheos96/da8990030dfe3e27b0a48722042d9c0b
-
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -11,10 +8,8 @@ namespace TarLib
     public class Tar
     {
         /// <summary>
-        /// Extracts a <i>.tar.gz</i> archive to the specified directory.
+        /// Extracts a .tar.gz archive to the specified directory.
         /// </summary>
-        /// <param name="filename">The <i>.tar.gz</i> to decompress and extract.</param>
-        /// <param name="outputDir">Output directory to write the files.</param>
         public static void ExtractTarGz(string filename, string outputDir)
         {
             using (var stream = File.OpenRead(filename))
@@ -24,39 +19,29 @@ namespace TarLib
         }
 
         /// <summary>
-        /// Extracts a <i>.tar.gz</i> archive stream to the specified directory.
+        /// Extracts a .tar.gz archive stream to the specified directory.
         /// </summary>
-        /// <param name="stream">The <i>.tar.gz</i> to decompress and extract.</param>
-        /// <param name="outputDir">Output directory to write the files.</param>
         public static void ExtractTarGz(Stream stream, string outputDir)
         {
-            int read;
-            const int chunk = 4096;
+            const int chunk = 4096*4;
             var buffer = new byte[chunk];
 
-            // A GZipStream is not seekable, so copy it first to a MemoryStream
             using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress))
+            using (var memStream = new MemoryStream())
             {
-                using (var memStream = new MemoryStream())
+                int read;
+                while ((read = gzipStream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    //For .NET 6+
-                    while ((read = gzipStream.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        memStream.Write(buffer, 0, read);
-                    }
-                    memStream.Seek(0, SeekOrigin.Begin);
-
-                    //ExtractTar(gzip, outputDir);
-                    ExtractTar(memStream, outputDir);
+                    memStream.Write(buffer, 0, read);
                 }
+                memStream.Seek(0, SeekOrigin.Begin);
+                ExtractTar(memStream, outputDir);
             }
         }
 
         /// <summary>
-        /// Extractes a <c>tar</c> archive to the specified directory.
+        /// Extracts a tar archive file.
         /// </summary>
-        /// <param name="filename">The <i>.tar</i> to extract.</param>
-        /// <param name="outputDir">Output directory to write the files.</param>
         public static void ExtractTar(string filename, string outputDir)
         {
             using (var stream = File.OpenRead(filename))
@@ -66,85 +51,206 @@ namespace TarLib
         }
 
         /// <summary>
-        /// Extractes a <c>tar</c> archive to the specified directory.
+        /// Extracts a tar archive stream.
+        /// Fixes path loss caused by ignoring the POSIX 'prefix' field and wrong header offsets.
         /// </summary>
-        /// <param name="stream">The <i>.tar</i> to extract.</param>
-        /// <param name="outputDir">Output directory to write the files.</param>
         public static void ExtractTar(Stream stream, string outputDir)
         {
-            var buffer = new byte[100];
-            var longFileName = string.Empty;
+            // Tar header constants
+            const int HeaderSize = 512;
+            byte[] header = new byte[HeaderSize];
+
+            string pendingLongName = null; // For GNU long name ('L') entries
+
             while (true)
             {
-                stream.Read(buffer, 0, 100);
-                string name = string.IsNullOrEmpty(longFileName) ? Encoding.ASCII.GetString(buffer).Trim('\0') : longFileName; //Use longFileName if we have one read
+                int bytesRead = ReadExact(stream, header, 0, HeaderSize);
+                if (bytesRead == 0) break; // End of stream
+                if (bytesRead < HeaderSize) throw new EndOfStreamException("Unexpected end of tar stream.");
 
-                if (String.IsNullOrWhiteSpace(name)) break;
-                stream.Seek(24, SeekOrigin.Current);
-                stream.Read(buffer, 0, 12);
-                var size = Convert.ToInt64(Encoding.UTF8.GetString(buffer, 0, 12).Trim('\0').Trim(), 8);
-                stream.Seek(20, SeekOrigin.Current); //Move head to typeTag byte
-                var typeTag = stream.ReadByte();
-                stream.Seek(355L, SeekOrigin.Current); //Move head to beginning of data (byte 512)
-
-                if (typeTag == 'L')
+                // Detect two consecutive zero blocks (end of archive)
+                bool allZero = IsAllZero(header);
+                if (allZero)
                 {
-                    //If Type Tag is 'L' we have a filename that is longer than the 100 bytes reserved for it in the header.
-                    //We read it here and save it temporarily as it will be the file name of the next block where the actual data is
-                    var buf = new byte[size];
-                    stream.Read(buf, 0, buf.Length);
-                    longFileName = Encoding.ASCII.GetString(buf).Trim('\0');
+                    // Peek next block; if also zero -> end
+                    bytesRead = ReadExact(stream, header, 0, HeaderSize);
+                    if (bytesRead == 0 || IsAllZero(header)) break;
+                    if (bytesRead < HeaderSize) throw new EndOfStreamException("Unexpected end of tar stream.");
                 }
-                else
+
+                // Parse fields (POSIX ustar)
+                string name = GetString(header, 0, 100);
+                string mode = GetString(header, 100, 8);
+                string uid = GetString(header, 108, 8);
+                string gid = GetString(header, 116, 8);
+                string sizeOctal = GetString(header, 124, 12);
+                string mtime = GetString(header, 136, 12);
+                string checksum = GetString(header, 148, 8);
+                char typeFlag = (char)header[156];
+                string linkName = GetString(header, 157, 100);
+                string magic = GetString(header, 257, 6); // "ustar\0" or "ustar "
+                string version = GetString(header, 263, 2);
+                string uname = GetString(header, 265, 32);
+                string gname = GetString(header, 297, 32);
+                string prefix = GetString(header, 345, 155);
+
+                // Compose full name using prefix (if present and not using GNU long name override)
+                if (!string.IsNullOrEmpty(prefix))
                 {
-                    longFileName = string.Empty; //Reset longFileName if current entry is not indicating one
+                    name = prefix + "/" + name;
+                }
 
-                    var output = Path.Combine(outputDir, name);
+                // If we previously read a GNU long name block, override current name
+                if (!string.IsNullOrEmpty(pendingLongName))
+                {
+                    name = pendingLongName;
+                    pendingLongName = null;
+                }
 
-                    // only include these folders
-                    var include = (output.IndexOf("package/ProjectData~/Assets/") > -1);
-                    include |= (output.IndexOf("package/ProjectData~/ProjectSettings/") > -1);
-                    include |= (output.IndexOf("package/ProjectData~/Packages/") > -1);
+                long size = ParseOctal(sizeOctal);
 
-                    // rename output path from "package/ProjectData~/Assets/" into "Assets/"
-                    output = output.Replace("package/ProjectData~/", "");
+                // Handle GNU long name extension block: the data of this entry is the filename of next entry.
+                if (typeFlag == 'L')
+                {
+                    byte[] longNameData = new byte[size];
+                    ReadExact(stream, longNameData, 0, (int)size);
+                    pendingLongName = Encoding.ASCII.GetString(longNameData).Trim('\0', '\r', '\n');
+                    SkipPadding(stream, size);
+                    continue; // Move to next header
+                }
 
-                    if (include == true && !Directory.Exists(Path.GetDirectoryName(output))) Directory.CreateDirectory(Path.GetDirectoryName(output));
+                // Skip PAX extended header (type 'x') - metadata only
+                if (typeFlag == 'x')
+                {
+                    SkipData(stream, size);
+                    SkipPadding(stream, size);
+                    continue;
+                }
 
-                    // not folder
-                    //if (name.Equals("./", StringComparison.InvariantCulture) == false)
-                    if (name.EndsWith("/") == false) //Directories are zero size and don't need anything written
+                // Normalize name
+                if (string.IsNullOrWhiteSpace(name)) continue;
+
+                // Directory?
+                bool isDirectory = typeFlag == '5' || name.EndsWith("/");
+
+                // Inclusion filter (original logic)
+                string originalName = name;
+                bool include =
+                    originalName.IndexOf("package/ProjectData~/Assets/", StringComparison.Ordinal) > -1 ||
+                    originalName.IndexOf("package/ProjectData~/ProjectSettings/", StringComparison.Ordinal) > -1 ||
+                    originalName.IndexOf("package/ProjectData~/Library/", StringComparison.Ordinal) > -1 ||
+                    originalName.IndexOf("package/ProjectData~/Packages/", StringComparison.Ordinal) > -1;
+
+                // Strip leading prefix.
+                string cleanedName = originalName.StartsWith("package/ProjectData~/", StringComparison.Ordinal)
+                    ? originalName.Substring("package/ProjectData~/".Length)
+                    : originalName;
+
+                string finalPath = Path.Combine(outputDir, cleanedName.Replace('/', Path.DirectorySeparatorChar));
+
+                if (isDirectory)
+                {
+                    if (include && !Directory.Exists(finalPath))
+                        Directory.CreateDirectory(finalPath);
+                    // No data to read for directory; continue to next header
+                    SkipData(stream, size); // size should be 0
+                    SkipPadding(stream, size);
+                    continue;
+                }
+
+                // Ensure directory exists
+                if (include)
+                {
+                    string dir = Path.GetDirectoryName(finalPath);
+                    if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+                }
+
+                // Read file data (always advance stream even if not included)
+                byte[] fileData = new byte[size];
+                ReadExact(stream, fileData, 0, (int)size);
+
+                if (include)
+                {
+                    using (var fs = File.Open(finalPath, FileMode.Create, FileAccess.Write))
                     {
-                        if (include == true)
-                        {
-                            //Console.WriteLine("output=" + output);
-                            using (var str = File.Open(output, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                            {
-                                var buf = new byte[size];
-                                stream.Read(buf, 0, buf.Length);
-                                // take only data from this folder
-                                str.Write(buf, 0, buf.Length);
-                            }
-                        }
-                        else
-                        {
-                            var buf = new byte[size];
-                            stream.Read(buf, 0, buf.Length);
-                        }
+                        fs.Write(fileData, 0, fileData.Length);
                     }
                 }
 
-                //Move head to next 512 byte block 
-                var pos = stream.Position;
-                var offset = 512 - (pos % 512);
-                if (offset == 512) offset = 0;
-
-                stream.Seek(offset, SeekOrigin.Current);
+                // Skip padding to 512 boundary
+                SkipPadding(stream, size);
             }
         }
-    }  // class Tar
-} // namespace TarLib
 
+        private static string GetString(byte[] buffer, int offset, int length)
+        {
+            var s = Encoding.ASCII.GetString(buffer, offset, length);
+            int nullIndex = s.IndexOf('\0');
+            if (nullIndex >= 0) s = s.Substring(0, nullIndex);
+            return s.Trim();
+        }
+
+        private static long ParseOctal(string s)
+        {
+            s = s.Trim();
+            if (string.IsNullOrEmpty(s)) return 0;
+            try
+            {
+                return Convert.ToInt64(s, 8);
+            }
+            catch
+            {
+                // Fallback: treat as decimal if malformed
+                long val;
+                return long.TryParse(s, out val) ? val : 0;
+            }
+        }
+
+        private static bool IsAllZero(byte[] buffer)
+        {
+            for (int i = 0; i < buffer.Length; i++)
+                if (buffer[i] != 0) return false;
+            return true;
+        }
+
+        private static int ReadExact(Stream stream, byte[] buffer, int offset, int count)
+        {
+            int total = 0;
+            while (total < count)
+            {
+                int read = stream.Read(buffer, offset + total, count - total);
+                if (read <= 0) break;
+                total += read;
+            }
+            return total;
+        }
+
+        private static void SkipData(Stream stream, long size)
+        {
+            if (size <= 0) return;
+            const int chunk = 8192;
+            byte[] tmp = new byte[Math.Min(chunk, (int)size)];
+            long remaining = size;
+            while (remaining > 0)
+            {
+                int toRead = (int)Math.Min(tmp.Length, remaining);
+                int read = stream.Read(tmp, 0, toRead);
+                if (read <= 0) throw new EndOfStreamException("Unexpected end while skipping data.");
+                remaining -= read;
+            }
+        }
+
+        private static void SkipPadding(Stream stream, long size)
+        {
+            long padding = (512 - (size % 512)) % 512;
+            if (padding > 0)
+            {
+                stream.Seek(padding, SeekOrigin.Current);
+            }
+        }
+    }
+}
 
 /*
 This software is available under 2 licenses-- choose whichever you prefer.
