@@ -119,11 +119,24 @@
                 </Button>
             </Grid>
 
-            <ListBox x:Name="listOnlineTemplates" Margin="6,5,0,0" Height="340" 
+            <ListBox x:Name="listOnlineTemplates" Margin="6,5,0,0" Height="310" 
          Background="{DynamicResource ThemeMainBackgroundColor}" 
          Foreground="{DynamicResource ThemeButtonForeground}" 
          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-         d:ItemsSource="{d:SampleData ItemCount=4}">
+         d:ItemsSource="{d:SampleData ItemCount=4}"
+         PreviewMouseDown="listOnlineTemplates_PreviewMouseDown"
+         SelectionChanged="listOnlineTemplates_SelectionChanged">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="2"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="BorderBrush" Value="Green"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Vertical" Margin="3">
@@ -144,6 +157,15 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+            <Label x:Name="lblSelectedTemplate" 
+                   Content="" 
+                   BorderBrush="{DynamicResource ThemeGridGreenText}" 
+                   BorderThickness="0"
+                   Foreground="{DynamicResource ThemeButtonForeground}" 
+                   Margin="6,5,0,0" 
+                   Padding="5,3,5,3"
+                   FontSize="11"
+                   Height="25"/>
         </StackPanel>
     </Grid>
 </Window>

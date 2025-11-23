@@ -639,6 +639,49 @@ namespace UnityLauncherPro
             }
 
             return -1;
+        } // FindMatchingBrace
+
+
+        private void listOnlineTemplates_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // Get the item that was clicked
+            var listBox = sender as ListBox;
+            if (listBox == null) return;
+
+            // Find the ListBoxItem that was clicked
+            var clickedElement = e.OriginalSource as DependencyObject;
+            while (clickedElement != null && clickedElement != listBox)
+            {
+                if (clickedElement is ListBoxItem)
+                {
+                    var clickedItem = clickedElement as ListBoxItem;
+
+                    // If the clicked item is already selected, deselect it
+                    if (clickedItem.IsSelected)
+                    {
+                        listBox.SelectedItem = null;
+                        e.Handled = true;
+                        return;
+                    }
+                    break;
+                }
+                clickedElement = VisualTreeHelper.GetParent(clickedElement);
+            }
         }
+
+        private void listOnlineTemplates_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (listOnlineTemplates.SelectedItem is OnlineTemplateItem selectedTemplate)
+            {
+                lblSelectedTemplate.Content = selectedTemplate.Name;
+                lblSelectedTemplate.BorderThickness = new Thickness(1);
+            }
+            else
+            {
+                lblSelectedTemplate.Content = "None";
+                lblSelectedTemplate.BorderThickness = new Thickness(0);
+            }
+        }
+
     } // class NewProject
 } // namespace UnityLauncherPro
