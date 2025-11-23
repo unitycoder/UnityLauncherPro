@@ -529,6 +529,10 @@ namespace UnityLauncherPro
 
             try
             {
+                // Get templates directory path
+                string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string templatesPath = Path.Combine(appDataPath, "UnityHub", "Templates");
+
                 // Find the edges array
                 int edgesStart = json.IndexOf("\"edges\":");
                 if (edgesStart == -1) return templates;
@@ -547,6 +551,8 @@ namespace UnityLauncherPro
                     string nodeJson = json.Substring(nodeStart, nodeEnd - nodeStart + 1);
 
                     // Parse individual fields
+                    var tarballUrl = ExtractNestedJsonString(nodeJson, "\"tarball\"", "\"url\"");
+
                     var template = new OnlineTemplateItem
                     {
                         Name = ExtractJsonString(nodeJson, "\"name\""),
@@ -554,8 +560,27 @@ namespace UnityLauncherPro
                         Type = ExtractJsonString(nodeJson, "\"type\""),
                         RenderPipeline = ExtractJsonString(nodeJson, "\"renderPipeline\""),
                         PreviewImageURL = ExtractNestedJsonString(nodeJson, "\"previewImage\"", "\"url\"") ?? "pack://application:,,,/Images/icon.png",
-                        TarBallURL = ExtractNestedJsonString(nodeJson, "\"tarball\"", "\"url\"")
+                        TarBallURL = tarballUrl,
+                        IsDownloaded = false
                     };
+
+                    // Check if template file already exists
+                    if (!string.IsNullOrEmpty(tarballUrl) && Directory.Exists(templatesPath))
+                    {
+                        try
+                        {
+                            string fileName = Path.GetFileName(new Uri(tarballUrl).LocalPath);
+                            if (!string.IsNullOrEmpty(fileName))
+                            {
+                                string filePath = Path.Combine(templatesPath, fileName);
+                                template.IsDownloaded = File.Exists(filePath);
+                            }
+                        }
+                        catch
+                        {
+                            // If URL parsing fails, keep IsDownloaded as false
+                        }
+                    }
 
                     templates.Add(template);
                     currentPos = nodeEnd + 1;
@@ -568,7 +593,6 @@ namespace UnityLauncherPro
 
             return templates;
         }
-
         private string ExtractJsonString(string json, string key)
         {
             int keyIndex = json.IndexOf(key + ":");
@@ -683,5 +707,73 @@ namespace UnityLauncherPro
             }
         }
 
+        private async void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.Tag is OnlineTemplateItem template)
+            {
+                if (string.IsNullOrEmpty(template.TarBallURL))
+                {
+                    Tools.SetStatus("No download URL available for this template");
+                    return;
+                }
+
+                try
+                {
+                    // Disable button during download
+                    button.IsEnabled = false;
+                    button.Content = "⏳";
+
+                    // Create templates directory in %APPDATA%\UnityHub\Templates
+                    string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                    string templatesPath = Path.Combine(appDataPath, "UnityHub", "Templates");
+
+                    if (!Directory.Exists(templatesPath))
+                    {
+                        Directory.CreateDirectory(templatesPath);
+                    }
+
+                    // Extract original filename from URL
+                    string fileName = Path.GetFileName(new Uri(template.TarBallURL).LocalPath);
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        // Fallback to sanitized template name if URL doesn't have a filename
+                        string safeFileName = string.Join("_", template.Name.Split(Path.GetInvalidFileNameChars()));
+                        fileName = $"{safeFileName}.tgz";
+                    }
+
+                    string targetFilePath = Path.Combine(templatesPath, fileName);
+
+                    // Download the template (overwrite if exists)
+                    using (var client = new HttpClient())
+                    {
+                        var response = await client.GetAsync(template.TarBallURL);
+                        response.EnsureSuccessStatusCode();
+
+                        var fileBytes = await response.Content.ReadAsByteArrayAsync();
+                        File.WriteAllBytes(targetFilePath, fileBytes);
+
+                        // Mark as downloaded
+                        template.IsDownloaded = true;
+
+                        Tools.SetStatus($"Template downloaded: {template.Name}");
+
+                        // Refresh no longer needed with INotifyPropertyChanged
+                        // listOnlineTemplates.Items.Refresh();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.SetStatus($"Download failed: {ex.Message}");
+                    Console.WriteLine($"Error downloading template: {ex.Message}");
+                }
+                finally
+                {
+                    // Re-enable button
+                    button.IsEnabled = true;
+                    button.Content = "⬇";
+                }
+            }
+        }
     } // class NewProject
 } // namespace UnityLauncherPro
