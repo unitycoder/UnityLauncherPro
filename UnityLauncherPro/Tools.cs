@@ -226,7 +226,7 @@ namespace UnityLauncherPro
         }
 
         // NOTE holding alt key (when using alt+o) brings up unity project selector
-        public static Process LaunchProject(Project proj, DataGrid dataGridRef = null, bool useInitScript = false, bool upgrade = false)
+        public static Process LaunchProject(Project proj, DataGrid dataGridRef = null, bool useInitScript = false, bool upgrade = false, bool cloneFromTemplate = false)
         {
             if (proj == null) return null;
 
@@ -298,7 +298,7 @@ namespace UnityLauncherPro
                 var cmd = "\"" + unityExePath + "\"";
                 newProcess.StartInfo.FileName = cmd;
 
-                var unitycommandlineparameters = " -projectPath " + "\"" + proj.Path + "\"";
+                string unitycommandlineparameters = (cloneFromTemplate ? " -createproject " : " -projectPath ") + "\"" + proj.Path + "\"";
 
                 string customArguments = proj.Arguments;
                 if (string.IsNullOrEmpty(customArguments) == false)
@@ -1760,6 +1760,7 @@ namespace UnityLauncherPro
             // create folder
             CreateEmptyProjectFolder(newPath, version);
 
+            bool cloneFromTemplate = false;
             // unzip or copy template
             if (templateZipPath != null)
             {
@@ -1767,9 +1768,11 @@ namespace UnityLauncherPro
 
                 if (File.Exists(templateZipPath))
                 {
+                    cloneFromTemplate = true;
                     try
                     {
-                        TarLib.Tar.ExtractTarGz(templateZipPath, newPath);
+                        // NOTE no need to extract, unity can handle it with -cloneFromTemplate
+                        //TarLib.Tar.ExtractTarGz(templateZipPath, newPath);
                     }
                     catch (Exception ex)
                     {
@@ -1778,6 +1781,7 @@ namespace UnityLauncherPro
                 }
                 else if (Directory.Exists(templateZipPath))
                 {
+                    // this is for folder templates, copy files
                     try
                     {
                         CopyDirectory(templateZipPath, newPath);
@@ -1813,7 +1817,11 @@ namespace UnityLauncherPro
             proj.Modified = DateTime.Now;
             proj.folderExists = true; // have to set this value, so item is green on list
             proj.Arguments = version.Contains("6000") ? (forceDX11 ? "-force-d3d11" : null) : null; // this gets erased later, since its not saved? would be nice to not add it at all though
-            var proc = LaunchProject(proj, null, useInitScript);
+            if (cloneFromTemplate == true)
+            {
+                proj.Arguments += " -cloneFromTemplate \"" + templateZipPath + "\"";
+            }
+            var proc = LaunchProject(proj, null, useInitScript, false, cloneFromTemplate);
             ProcessHandler.Add(proj, proc);
 
             return proj;

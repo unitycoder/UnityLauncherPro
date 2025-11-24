@@ -589,11 +589,13 @@ namespace UnityLauncherPro
 
                     // Parse individual fields
                     var tarballUrl = ExtractNestedJsonString(nodeJson, "\"tarball\"", "\"url\"");
+                    var rawDescription = ExtractJsonString(nodeJson, "\"description\"");
+                    var splitDescription = SplitDescriptionIntoThree(rawDescription);
 
                     var template = new OnlineTemplateItem
                     {
                         Name = ExtractJsonString(nodeJson, "\"name\""),
-                        Description = ExtractJsonString(nodeJson, "\"description\""),
+                        Description = splitDescription,
                         Type = ExtractJsonString(nodeJson, "\"type\""),
                         RenderPipeline = ExtractJsonString(nodeJson, "\"renderPipeline\""),
                         PreviewImageURL = ExtractNestedJsonString(nodeJson, "\"previewImage\"", "\"url\"") ?? "pack://application:,,,/Images/icon.png",
@@ -630,6 +632,25 @@ namespace UnityLauncherPro
 
             return templates;
         }
+
+        private string SplitDescriptionIntoThree(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return description;
+
+            int len = description.Length;
+            if (len <= 2) return description; // too short to split meaningfully
+
+            int firstCut = (len / 3);
+            int secondCut = (len * 2) / 3;
+
+            // Raw split strictly by length/3 as requested
+            string part1 = description.Substring(0, firstCut).Trim();
+            string part2 = description.Substring(firstCut, secondCut - firstCut).Trim();
+            string part3 = description.Substring(secondCut).Trim();
+
+            return part1 + Environment.NewLine + part2 + Environment.NewLine + part3;
+        }
+
         private string ExtractJsonString(string json, string key)
         {
             int keyIndex = json.IndexOf(key + ":");
@@ -742,6 +763,10 @@ namespace UnityLauncherPro
                 // Disable built-in template dropdown when online template is selected
                 cmbNewProjectTemplate.IsEnabled = false;
                 cmbNewProjectTemplate.SelectedIndex = 0; // Reset to default
+
+                // disable create button if template not downloaded yet
+                btnCreateNewProject.IsEnabled = selectedTemplate.IsDownloaded;
+                btnCreateNewProject.Content = selectedTemplate.IsDownloaded ? "Create Project" : "Download Template First >";
             }
             else
             {
@@ -750,8 +775,13 @@ namespace UnityLauncherPro
 
                 // Re-enable built-in template dropdown when no online template is selected
                 cmbNewProjectTemplate.IsEnabled = true;
+
+                // enable create button
+                btnCreateNewProject.IsEnabled = true;
+                btnCreateNewProject.Content = "Create Project";
             }
         }
+
         private async void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
