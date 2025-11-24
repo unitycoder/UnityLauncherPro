@@ -580,6 +580,7 @@ namespace UnityLauncherPro
                 useUnofficialReleaseList.IsChecked = Settings.Default.useUnofficialReleaseList;
                 chkDisableUnityHubLaunch.IsChecked = Settings.Default.disableUnityHubLaunch;
                 chkFetchAdditionalInfo.IsChecked = Settings.Default.fetchAdditionalInfo;
+                chkFetchOnlineTemplates.IsChecked = Settings.Default.fetchOnlineTemplates;
 
                 chkEnablePlatformSelection.IsChecked = Settings.Default.enablePlatformSelection;
                 chkRunAutomatically.IsChecked = Settings.Default.runAutomatically;
@@ -2176,8 +2177,10 @@ namespace UnityLauncherPro
 
                 }
 
-                var suggestedName = targetFolder != null ? Path.GetFileName(targetFolder) : Tools.GetSuggestedProjectName(newVersion, rootFolder);
-                NewProject modalWindow = new NewProject(newVersion, suggestedName, rootFolder, targetFolder != null);
+                string suggestedName = targetFolder != null ? Path.GetFileName(targetFolder) : Tools.GetSuggestedProjectName(newVersion, rootFolder);
+                bool fetchOnlineTemplates = chkFetchOnlineTemplates.IsChecked == true;
+
+                NewProject modalWindow = new NewProject(newVersion, suggestedName, rootFolder, targetFolder != null, fetchOnlineTemplates);
                 modalWindow.ShowInTaskbar = this == null;
                 modalWindow.WindowStartupLocation = this == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
                 modalWindow.Topmost = this == null;
@@ -4217,6 +4220,14 @@ namespace UnityLauncherPro
             if (proj == null) return;
             var thumbnailPath = Path.Combine(proj.Path, "ProjectSettings", "icon.png");
             Tools.LaunchExe(thumbnailPath);
+        }
+
+        private void chkFetchOnlineTemplates_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.IsActive == false) return;
+
+            Settings.Default.fetchOnlineTemplates = (bool)chkFetchOnlineTemplates.IsChecked;
+            Settings.Default.Save();
         }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)

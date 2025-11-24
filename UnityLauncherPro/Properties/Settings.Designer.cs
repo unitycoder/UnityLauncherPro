@@ -649,5 +649,17 @@ namespace UnityLauncherPro.Properties {
                 this["forceDX11"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool fetchOnlineTemplates {
+            get {
+                return ((bool)(this["fetchOnlineTemplates"]));
+            }
+            set {
+                this["fetchOnlineTemplates"] = value;
+            }
+        }
     }
 }

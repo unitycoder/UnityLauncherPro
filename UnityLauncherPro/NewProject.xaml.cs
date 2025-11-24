@@ -27,14 +27,18 @@ namespace UnityLauncherPro
         bool isInitializing = true; // to keep OnChangeEvent from firing too early
         int previousSelectedTemplateIndex = -1;
         int previousSelectedModuleIndex = -1;
+        bool loadOnlineTemplates = true;
 
         public static string targetFolder { get; private set; } = null;
         private CancellationTokenSource _templateLoadCancellation;
 
-        public NewProject(string unityVersion, string suggestedName, string targetFolder, bool nameIsLocked = false)
+        public NewProject(string unityVersion, string suggestedName, string targetFolder, bool nameIsLocked = false, bool fetchOnlineTemplates = false)
         {
             isInitializing = true;
             InitializeComponent();
+
+            loadOnlineTemplates = fetchOnlineTemplates;
+            btnFetchTemplates.Visibility = fetchOnlineTemplates ? Visibility.Collapsed : Visibility.Visible;
 
             NewProject.targetFolder = targetFolder;
 
@@ -67,7 +71,7 @@ namespace UnityLauncherPro
                         gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
 
                         string baseVersion = GetBaseVersion(newVersion);
-                        _ = LoadOnlineTemplatesAsync(baseVersion);
+                        if (fetchOnlineTemplates) _ = LoadOnlineTemplatesAsync(baseVersion);
                         break;
                     }
                 }
@@ -103,7 +107,6 @@ namespace UnityLauncherPro
             cmbNewProjectTemplate.SelectedIndex = 0;
             lblTemplateTitleAndCount.Content = "Templates: (" + (cmbNewProjectTemplate.Items.Count - 1) + ")";
         }
-
 
         void UpdateModulesDropdown(string version)
         {
@@ -350,11 +353,15 @@ namespace UnityLauncherPro
             //chkForceDX11.IsChecked = chkForceDX11.Visibility == Visibility.Visible ? forceDX11 : false;
             forceDX11 = Settings.Default.forceDX11 && is6000;
 
-            string baseVersion = GetBaseVersion(k.Version);
-            // Cancel previous request
-            _templateLoadCancellation?.Cancel();
-            _templateLoadCancellation = new CancellationTokenSource();
-            _ = LoadOnlineTemplatesAsync(baseVersion, _templateLoadCancellation.Token);
+            listOnlineTemplates.ItemsSource = null; // clear previous items
+            if (loadOnlineTemplates)
+            {
+                string baseVersion = GetBaseVersion(k.Version);
+                // Cancel previous request
+                _templateLoadCancellation?.Cancel();
+                _templateLoadCancellation = new CancellationTokenSource();
+                _ = LoadOnlineTemplatesAsync(baseVersion, _templateLoadCancellation.Token);
+            }
         }
 
         string GetBaseVersion(string version)
@@ -519,7 +526,7 @@ namespace UnityLauncherPro
                         Console.WriteLine($"GraphQL request failed: {response.StatusCode}");
                         if (!cancellationToken.IsCancellationRequested)
                         {
-                            LoadFallbackTemplates();
+                            //LoadFallbackTemplates();
                         }
                     }
                 }
@@ -534,7 +541,7 @@ namespace UnityLauncherPro
                 if (!cancellationToken.IsCancellationRequested)
                 {
                     Console.WriteLine($"Error loading online templates: {ex.Message}");
-                    LoadFallbackTemplates();
+                    //LoadFallbackTemplates();
                 }
             }
         }
@@ -851,5 +858,15 @@ namespace UnityLauncherPro
             return part1 + Environment.NewLine + part2 + Environment.NewLine + part3;
         }
 
+        private void btnFetchTemplates_Click(object sender, RoutedEventArgs e)
+        {
+            if (gridAvailableVersions.SelectedItem is UnityInstallation selectedInstallation)
+            {
+                string baseVersion = GetBaseVersion(selectedInstallation.Version);
+                _templateLoadCancellation?.Cancel();
+                _templateLoadCancellation = new CancellationTokenSource();
+                _ = LoadOnlineTemplatesAsync(baseVersion, _templateLoadCancellation.Token);
+            }
+        }
     } // class NewProject
 } // namespace UnityLauncherPro

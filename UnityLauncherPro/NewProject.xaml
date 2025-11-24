@@ -85,7 +85,10 @@
             </Grid>
         </StackPanel>
         <StackPanel Orientation="Vertical" Margin="0,3,10,3" Grid.Column="1">
-            <Label Content="Unity Online Templates" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
+            <StackPanel Orientation="Horizontal">
+                <Label Name="lblUnityOnlineTemplates" Content="Online Templates" Foreground="{DynamicResource ThemeButtonForeground}" Margin="5,0,0,3" Padding="5,5,5,3" HorizontalAlignment="Left" />
+                <Button Style="{StaticResource CustomButton}" ToolTip="Fetch list of templates" x:Name="btnFetchTemplates" Content="⟳" Height="22" Width="26" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16"  Margin="20,0,0,0" Padding="1,-2,1,1" BorderBrush="{x:Null}" Click="btnFetchTemplates_Click"/>
+            </StackPanel>
 
 
             <ListBox x:Name="listOnlineTemplates" Margin="6,5,0,0" Height="411" 
