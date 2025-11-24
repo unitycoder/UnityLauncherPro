@@ -590,7 +590,7 @@ namespace UnityLauncherPro
                     // Parse individual fields
                     var tarballUrl = ExtractNestedJsonString(nodeJson, "\"tarball\"", "\"url\"");
                     var rawDescription = ExtractJsonString(nodeJson, "\"description\"");
-                    var splitDescription = SplitDescriptionIntoThree(rawDescription);
+                    var splitDescription = SplitTextToRows(rawDescription, 3);
 
                     var template = new OnlineTemplateItem
                     {
@@ -631,24 +631,6 @@ namespace UnityLauncherPro
             }
 
             return templates;
-        }
-
-        private string SplitDescriptionIntoThree(string description)
-        {
-            if (string.IsNullOrEmpty(description)) return description;
-
-            int len = description.Length;
-            if (len <= 2) return description; // too short to split meaningfully
-
-            int firstCut = (len / 3);
-            int secondCut = (len * 2) / 3;
-
-            // Raw split strictly by length/3 as requested
-            string part1 = description.Substring(0, firstCut).Trim();
-            string part2 = description.Substring(firstCut, secondCut - firstCut).Trim();
-            string part3 = description.Substring(secondCut).Trim();
-
-            return part1 + Environment.NewLine + part2 + Environment.NewLine + part3;
         }
 
         private string ExtractJsonString(string json, string key)
@@ -849,6 +831,25 @@ namespace UnityLauncherPro
                     button.Content = "⬇";
                 }
             }
+        } // btnDownloadTemplate_Click
+
+        private string SplitTextToRows(string description, int rows)
+        {
+            if (rows < 2) return description;
+            if (string.IsNullOrEmpty(description)) return description;
+
+            int len = description.Length;
+            if (len <= rows) return description; // too short to split meaningfully
+
+            int firstCut = (len / rows);
+            int secondCut = (len * 2) / rows;
+
+            string part1 = description.Substring(0, firstCut).Trim();
+            string part2 = description.Substring(firstCut, secondCut - firstCut).Trim();
+            string part3 = description.Substring(secondCut).Trim();
+
+            return part1 + Environment.NewLine + part2 + Environment.NewLine + part3;
         }
+
     } // class NewProject
 } // namespace UnityLauncherPro
