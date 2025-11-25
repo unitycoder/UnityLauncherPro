@@ -1292,7 +1292,7 @@ namespace UnityLauncherPro
                 // get selected version to upgrade for
                 Console.WriteLine("Upgrade to " + upgradeToVersion);
 
-                // inject new version for this item, TODO inject version to ProjectSettings file, so then no alert from unity wrong version dialog
+                // inject new version for this item
                 proj.Version = upgradeToVersion;
                 SaveProjectVersion(proj);
                 var proc = LaunchProject(proj, dataGridRef: null, useInitScript: false, upgrade: true);

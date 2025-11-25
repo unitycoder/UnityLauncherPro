@@ -1379,6 +1379,14 @@ namespace UnityLauncherPro
             if (proj == null) return;
 
             Tools.DisplayUpgradeDialog(proj: proj, owner: this, useInitScript: false);
+
+            // update displayed version number now
+            var updatedVersion = Tools.GetProjectVersion(proj.Path);
+            if (string.IsNullOrEmpty(updatedVersion) == false)
+            {
+                proj.Version = updatedVersion;
+                gridRecent.Items.Refresh();
+            }
         }
 
         private void GridRecent_Loaded(object sender, RoutedEventArgs e)
