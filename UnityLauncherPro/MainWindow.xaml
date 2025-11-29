@@ -98,19 +98,9 @@
 
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Project" x:Name="txtColumnTitle"  CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding Title}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="150">
-                                <DataGridTextColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="Project" IsHitTestVisible="False" />
-                                    </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
 
                             <DataGridTextColumn Header="Version" Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" IsReadOnly="True" Width="72">
-                                <DataGridTextColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="Version" IsHitTestVisible="False" />
-                                    </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Setter Property="Foreground" Value="{DynamicResource ThemeGridRedText}" />
@@ -152,11 +142,6 @@
                             </DataGridTextColumn>
                             <!--CellStyle="{StaticResource NoFocusCellStyle"}-->
                             <DataGridTextColumn Header="Path" x:Name="txtColumnPath" Binding="{Binding Path}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="185">
-                                <DataGridTextColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="Path" IsHitTestVisible="False" />
-                                    </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Style.Triggers>
@@ -173,11 +158,6 @@
                     ClipboardContentBinding="{x:Null}" 
                     IsReadOnly="True" 
                     Width="120">
-                                <DataGridTextColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="Modified" IsHitTestVisible="False" />
-                                    </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="DataGridCell">
                                         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -193,18 +173,8 @@
                             </DataGridTextColumn>
 
                             <DataGridTextColumn Header="Arguments" Binding="{Binding Arguments}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}"  IsReadOnly="False" Width="100">
-                                <DataGridTextColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="Arguments" IsHitTestVisible="False" />
-                                    </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
                             <DataGridTextColumn Header="Branch" x:Name="txtColumnGitBranch" Binding="{Binding GITBranch}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="60">
-                                <DataGridTextColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="Branch" IsHitTestVisible="False" />
-                                    </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
                             <!--TODO platform as dropdown?-->
                             <!--<DataGridTextColumn CellStyle="{StaticResource NoFocusCellStyle}" Binding="{Binding TargetPlatform}" ClipboardContentBinding="{x:Null}" Header="Platform" IsReadOnly="True" Width="100"/>-->
@@ -227,11 +197,6 @@
                             </DataGridTemplateColumn>
 
                             <DataGridTextColumn Header="SRP" x:Name="txtColumnRenderPipeline" Binding="{Binding SRP}" CellStyle="{StaticResource NoFocusCellStyle}" ClipboardContentBinding="{x:Null}"  IsReadOnly="True" Width="50">
-                                <DataGridTextColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="SRP" IsHitTestVisible="False" />
-                                    </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
                         </DataGrid.Columns>
 
@@ -403,11 +368,6 @@
                             </DataGridTextColumn>
 
                             <DataGridTextColumn Binding="{Binding Version}" ClipboardContentBinding="{x:Null}" Header="Version" IsReadOnly="True" MinWidth="90">
-                                <DataGridTextColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="Version" IsHitTestVisible="False" />
-                                    </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Setter Property="BorderBrush" Value="Orange" />
