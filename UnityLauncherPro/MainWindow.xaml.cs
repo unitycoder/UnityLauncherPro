@@ -1534,12 +1534,15 @@ namespace UnityLauncherPro
                     // if edit mode, dont override keys
                     if (IsEditingCell(gridRecent) == true) return;
                     // if in args column, dont jump to end of list, but end of this field
-                    if (gridRecent.CurrentCell.Column.DisplayIndex == 4)
+
+                    var currentColumnCell = gridRecent.CurrentCell.Column.Header.ToString();
+                    if (currentColumnCell == "Arguments")
                     {
                         // start editing this cell
                         gridRecent.BeginEdit();
                         return;
                     }
+
                     gridRecent.SelectedIndex = gridRecent.Items.Count - 1;
                     gridRecent.ScrollIntoView(gridRecent.SelectedItem);
                     e.Handled = true;
@@ -2024,8 +2027,11 @@ namespace UnityLauncherPro
             if (e.OriginalSource.GetType() != typeof(TextBlock)) return;
 
             // cancel run if double clicked Arguments or Platform editable field
-            var currentColumnCell = gridRecent.CurrentCell.Column.DisplayIndex;
-            if (currentColumnCell == 4 || currentColumnCell == 6) return;
+            var currentColumnCell = gridRecent.CurrentCell.Column.Header.ToString();
+            if (currentColumnCell == "Arguments" || currentColumnCell == "Platform")
+            {
+                return;
+            }
 
             var proj = GetSelectedProject();
             var proc = Tools.LaunchProject(proj);
