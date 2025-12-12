@@ -393,6 +393,8 @@
                                 <MenuItem x:Name="menuItemCopyEditorPath" Header="Copy Editor Path" Click="MenuItemCopyPath_Click" />
                                 <MenuItem x:Name="menuItemShowUnityInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
                                 <MenuItem x:Name="menuItemSetPreferredUnityVersion" Header="Set as Preferred Version" Click="MenuItemSetPreferredUnityVersion_Click"/>
+                                <Separator></Separator>
+                                <MenuItem x:Name="menuOpenReleasesApi" Header="Open in Releases API" Click="menuOpenReleasesApi_Click"/>
                                 <MenuItem x:Name="menuCheckUnityUpdates" Header="Check Updates" Click="BtnUpdateUnity_Click"/>
                                 <!--<MenuItem x:Name="menuItemEditPackages" Header="Edit Packages" Click="MenuItemEditPackages_Click"/>-->
                                 <Separator></Separator>

@@ -4244,6 +4244,13 @@ namespace UnityLauncherPro
             Settings.Default.Save();
         }
 
+        private void menuOpenReleasesApi_Click(object sender, RoutedEventArgs e)
+        {
+            var editor = GetSelectedUnity();
+            if (editor == null || editor.Version == null) return;
+            Tools.OpenReleasesApiForVersion(editor.Version);
+        }
+
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
         //    var proj = GetSelectedProject();

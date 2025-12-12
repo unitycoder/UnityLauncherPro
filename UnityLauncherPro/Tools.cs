@@ -3149,7 +3149,27 @@ public static class UnityLauncherProTools
             return url.Substring(hashStart, hashEnd - hashStart);
         }
 
+        internal static void OpenReleasesApiForVersion(string version)
+        {
+            string url = $"https://services.api.unity.com/unity/editor/release/v1/releases?limit=1&version={version}";
+            LaunchBrowser(url);
+        }
 
+        private static void LaunchBrowser(string url)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to open URL: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     } // class
 
 } // namespace
