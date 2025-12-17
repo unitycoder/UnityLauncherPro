@@ -23,7 +23,7 @@ jobs:
         shell: powershell
         run: |
           # Get the commit message
-          $strVal = '${{ github.event.commits[0].message }}'
+          $strVal ='${{ github.event. head_commit.message }}'
           # Convert commit message to a single line if multiline
           $singleLineStrVal = $strVal -replace "`r`n", " " -replace "`n", " "
           if ($singleLineStrVal -match '#GITBUILD') {
@@ -167,8 +167,11 @@ jobs:
         if: env.build_trigger == 'true'
         shell: cmd
         run: |
+          setlocal EnableDelayedExpansion
           echo === Running BuildInstaller.bat ===
           call .\BuildInstaller.bat || echo WARNING: BuildInstaller.bat exited with %ERRORLEVEL%, continuing...
+          set "ec=!ERRORLEVEL!"
+          if not "!ec!"=="0" echo WARNING: BuildInstaller.bat exited with !ec!, continuing...
           echo === Verifying MSI ===
           if exist "UnityLauncherProInstaller\Release\UnityLauncherPro-Installer.msi" (
             echo Success: MSI found at UnityLauncherProInstaller\Release\UnityLauncherPro-Installer.msi
