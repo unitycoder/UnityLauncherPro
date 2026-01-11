@@ -83,6 +83,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\SearchBoxControl.xaml.cs">
+      <DependentUpon>SearchBoxControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\ReleaseDateConverter.cs" />
     <Compile Include="Converters\LastModifiedConverter.cs" />
     <Compile Include="Converters\ThumbnailConverter.cs" />
@@ -122,6 +125,9 @@
       <DependentUpon>UpgradeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Version.cs" />
+    <Page Include="Controls\SearchBoxControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DownloadProgressWindow.xaml" />
     <Page Include="NewProject.xaml">
       <SubType>Designer</SubType>

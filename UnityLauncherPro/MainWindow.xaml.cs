@@ -197,6 +197,19 @@ namespace UnityLauncherPro
 
             if (chkFetchAdditionalInfo.IsChecked == true) Tools.FetchAdditionalInfoForEditors();
 
+            // Subscribe to search box events
+            searchBoxProjects.SearchTextChanged += SearchBoxProjects_SearchTextChanged;
+            searchBoxProjects.SearchKeyDown += SearchBoxProjects_SearchKeyDown;
+
+            searchBoxUnitys.SearchTextChanged += searchBoxUnitys_SearchTextChanged;
+            searchBoxUnitys.SearchKeyDown += searchBoxUnitys_SearchKeyDown;
+
+            searchBoxUpdates.SearchTextChanged += searchBoxUpdates_SearchTextChanged;
+            searchBoxUpdates.SearchKeyDown += searchBoxUpdates_SearchKeyDown;
+
+            searchBoxBuildReport.SearchTextChanged += searchBoxBuildReport_SearchTextChanged;
+            searchBoxBuildReport.SearchKeyDown += searchBoxBuildReport_SearchKeyDown;
+
             isInitializing = false;
         } // Start()
 
@@ -408,7 +421,7 @@ namespace UnityLauncherPro
         void FilterRecentProjects()
         {
             // https://www.wpftutorial.net/DataViews.html
-            _filterString = txtSearchBox.Text;
+            _filterString = searchBoxProjects.SearchText;
 
             if (_filterString.IndexOf(' ') > -1)
             {
@@ -432,7 +445,7 @@ namespace UnityLauncherPro
 
         void FilterUpdates()
         {
-            _filterString = txtSearchBoxUpdates.Text.Trim();
+            _filterString = searchBoxUpdates.SearchText.Trim();
             ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUpdates.ItemsSource);
             if (collection == null) return;
 
@@ -445,7 +458,7 @@ namespace UnityLauncherPro
 
         void FilterUnitys()
         {
-            _filterString = txtSearchBoxUnity.Text.Trim();
+            _filterString = searchBoxUnitys.SearchText.Trim();
             ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUnitys.ItemsSource);
             collection.Filter = UnitysFilter;
             if (dataGridUnitys.Items.Count > 0)
@@ -456,7 +469,7 @@ namespace UnityLauncherPro
 
         void FilterBuildReport()
         {
-            _filterString = txtSearchBoxBuildReport.Text;
+            _filterString = searchBoxBuildReport.SearchText;
             ICollectionView collection = CollectionViewSource.GetDefaultView(gridBuildReport.ItemsSource);
             collection.Filter = BuildReportFilter;
             //if (gridBuildReport.Items.Count > 0)
@@ -929,7 +942,7 @@ namespace UnityLauncherPro
             if (updatesSource == null) return;
             dataGridUpdates.ItemsSource = updatesSource;
             // if search string is set, then filter it (after data is loaded)
-            if (string.IsNullOrEmpty(txtSearchBoxUpdates.Text) == false)
+            if (string.IsNullOrEmpty(searchBoxUpdates.SearchText) == false)
             {
                 FilterUpdates();
             }
@@ -947,19 +960,19 @@ namespace UnityLauncherPro
             {
                 tabControl.SelectedIndex = 2;
                 // need to clear old results first
-                txtSearchBoxUpdates.Text = "";
+                searchBoxUpdates.SearchText = "";
                 // reset filter
                 rdoAll.IsChecked = true;
 
                 // NOTE for now, just set filter to current version, minus patch version "2021.1.7f1" > "2021.1"
-                txtSearchBoxUpdates.Text = unity.Version.Substring(0, unity.Version.LastIndexOf('.'));
+                searchBoxUpdates.SearchText = unity.Version.Substring(0, unity.Version.LastIndexOf('.'));
             }
         }
 
         public void RefreshRecentProjects()
         {
             // clear search
-            txtSearchBox.Text = "";
+            searchBoxProjects.SearchText = "";
             // take currently selected project row
             lastSelectedProjectIndex = gridRecent.SelectedIndex;
             // rescan recent projects
@@ -1028,7 +1041,7 @@ namespace UnityLauncherPro
                 //AddNewProjectToList(proj);
                 Tools.AddProjectToHistory(proj.Path);
                 // clear search, so can see added project
-                txtSearchBox.Text = "";
+                searchBoxProjects.SearchText = "";
                 RefreshRecentProjects();
                 // NOTE 0 works for sort-by-date only
                 Tools.SetFocusToGrid(gridRecent, 0);
@@ -1053,8 +1066,8 @@ namespace UnityLauncherPro
             gridRecent.SelectedIndex = 0;
             Tools.SetFocusToGrid(gridRecent);
             // force refresh
-            txtSearchBox.Text = proj.Title;
-            txtSearchBox.Text = "";
+            searchBoxProjects.SearchText = proj.Title;
+            searchBoxProjects.SearchText = "";
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
@@ -1086,7 +1099,7 @@ namespace UnityLauncherPro
 
             // refresh installations, if already added some new ones
             UpdateUnityInstallationsList();
-            txtSearchBoxUpdates.Text = "";
+            searchBoxUpdates.SearchText = "";
             // clear filters, since right now they are not used after updates are loaded
             rdoAll.IsChecked = true;
             CallGetUnityUpdates();
@@ -1113,19 +1126,19 @@ namespace UnityLauncherPro
                             break;
 
                         case Key.Escape: // clear project search
-                            if (txtSearchBox.Text == "")
+                            if (searchBoxProjects.SearchText == "")
                             {
                                 // its already clear
                             }
                             else // we have text in searchbox, clear it
                             {
-                                txtSearchBox.Text = "";
+                                searchBoxProjects.SearchText = "";
                             }
                             // try to keep selected row selected and in view
                             Tools.SetFocusToGrid(gridRecent);
                             break;
                         case Key.F5:
-                            txtSearchBox.Text = "";
+                            searchBoxProjects.SearchText = "";
                             break;
                         case Key.Up:
                         case Key.Down:
@@ -1159,10 +1172,10 @@ namespace UnityLauncherPro
                             if (Keyboard.Modifiers == ModifierKeys.Control) return;
 
                             // activate searchbar if not active and we are in tab#1
-                            if (txtSearchBox.IsFocused == false)
+                            if (searchBoxProjects.IsFocused == false)
                             {
-                                txtSearchBox.Focus();
-                                txtSearchBox.Select(txtSearchBox.Text.Length, 0);
+                                searchBoxProjects.Focus();
+                                //searchBoxProjects.sele(searchBoxProjects.SearchText.Length, 0);
                             }
                             break;
                     }
@@ -1176,13 +1189,13 @@ namespace UnityLauncherPro
                             UpdateUnityInstallationsList();
                             break;
                         case Key.Escape: // clear project search
-                            txtSearchBoxUnity.Text = "";
+                            searchBoxUnitys.SearchText = "";
                             break;
                         default:
-                            if (txtSearchBoxUnity.IsFocused == false)
+                            if (searchBoxUnitys.IsFocused == false)
                             {
-                                txtSearchBoxUnity.Focus();
-                                txtSearchBoxUnity.Select(txtSearchBoxUnity.Text.Length, 0);
+                                searchBoxUnitys.Focus();
+                                //txtSearchBoxUnity.Select(txtSearchBoxUnity.Text.Length, 0);
                             }
                             break;
                     }
@@ -1196,7 +1209,7 @@ namespace UnityLauncherPro
                             CallGetUnityUpdates();
                             break;
                         case Key.Escape: // clear project search
-                            txtSearchBoxUpdates.Text = "";
+                            searchBoxUpdates.SearchText = "";
                             break;
                     }
                     break;
@@ -1206,7 +1219,7 @@ namespace UnityLauncherPro
                     switch (e.Key)
                     {
                         case Key.Escape: // clear search
-                            txtSearchBoxBuildReport.Text = "";
+                            searchBoxBuildReport.SearchText = "";
                             break;
                     }
                     break;
@@ -1262,7 +1275,7 @@ namespace UnityLauncherPro
                     if (updatesSource == null) return;
                     dataGridUpdates.ItemsSource = updatesSource;
                     // if search string is set, then filter it (after data is loaded)
-                    if (string.IsNullOrEmpty(txtSearchBoxUpdates.Text) == false)
+                    if (string.IsNullOrEmpty(searchBoxUpdates.SearchText) == false)
                     {
                         FilterUpdates();
                     }
@@ -1272,18 +1285,18 @@ namespace UnityLauncherPro
 
         private void OnClearProjectSearchClick(object sender, RoutedEventArgs e)
         {
-            txtSearchBox.Text = "";
+            searchBoxProjects.SearchText = "";
         }
 
         private void OnClearUnitySearchClick(object sender, RoutedEventArgs e)
         {
-            txtSearchBoxUnity.Text = "";
+            searchBoxUnitys.SearchText = "";
         }
 
         private void OnClearUpdateSearchClick(object sender, RoutedEventArgs e)
         {
             // FIXME doesnt hide button, becaus button should have opposite of Text.IsEmpty, or custom style to hide when not empty
-            txtSearchBoxUpdates.Text = "";
+            searchBoxUpdates.SearchText = "";
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -1450,58 +1463,6 @@ namespace UnityLauncherPro
             GoLookForUpdatesForThisUnity();
         }
 
-        // if press up/down in search box, move to first item in results
-        private void TxtSearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Return: // open selected project
-                    var proj = GetSelectedProject();
-                    var proc = Tools.LaunchProject(proj);
-                    //ProcessHandler.Add(proj, proc);
-                    break;
-                case Key.Tab:
-                case Key.Up:
-                    //Tools.SetFocusToGrid(gridRecent);
-                    var currentIndex = gridRecent.SelectedIndex - 1;
-                    //Console.WriteLine(currentIndex);
-                    if (currentIndex < 0) currentIndex = gridRecent.Items.Count - 1;
-                    gridRecent.SelectedIndex = currentIndex;
-                    e.Handled = true;
-                    break;
-                case Key.Down:
-                    // TODO move to 2nd row if first is already selected
-                    //if (GetSelectedProjectIndex() == 0)
-                    //{
-                    //    Tools.SetFocusToGrid(gridRecent, 1);
-                    //}
-                    //else
-                    //{
-                    //Tools.SetFocusToGrid(gridRecent);
-                    //                    }
-
-                    // if in searchbox, then move selected index up or down
-                    gridRecent.SelectedIndex = ++gridRecent.SelectedIndex % gridRecent.Items.Count;
-                    e.Handled = true; // to stay in first row
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void TxtSearchBoxUnity_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Up:
-                case Key.Down:
-                    Tools.SetFocusToGrid(dataGridUnitys);
-                    break;
-                default:
-                    break;
-            }
-        }
-
         private void BtnAddInstallationFolder_Click(object sender, RoutedEventArgs e)
         {
             AddUnityInstallationRootFolder();
@@ -1604,20 +1565,6 @@ namespace UnityLauncherPro
             {
                 e.Handled = true;
                 // TODO open release page?
-            }
-        }
-
-        private void TxtSearchBoxUpdates_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Up:
-                case Key.Down:
-                    Tools.SetFocusToGrid(dataGridUpdates);
-                    e.Handled = true;
-                    break;
-                default:
-                    break;
             }
         }
 
@@ -2006,16 +1953,6 @@ namespace UnityLauncherPro
             //gridRecent.CancelEdit();
 
             // TODO select the same row again
-        }
-
-        private void TxtSearchBoxUpdates_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            FilterUpdates();
-        }
-
-        private void TxtSearchBoxUnity_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            FilterUnitys();
         }
 
         private void GridRecent_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -3009,8 +2946,8 @@ namespace UnityLauncherPro
             if (Directory.Exists(textBox.Text) == true)
             {
                 // NOTE this saves for shortcutbat setting, so cannot be used for another fields
-                Properties.Settings.Default.shortcutBatchFileFolder = textBox.Text;
-                Properties.Settings.Default.Save();
+                Settings.Default.shortcutBatchFileFolder = textBox.Text;
+                Settings.Default.Save();
                 textBox.BorderBrush = System.Windows.Media.Brushes.Transparent;
             }
             else // invalid format
@@ -3066,14 +3003,14 @@ namespace UnityLauncherPro
         private void GridRecent_ColumnReordered(object sender, DataGridColumnEventArgs e)
         {
             // if amount has changed, need to reset array
-            if (Properties.Settings.Default.recentColumnsOrder.Length != gridRecent.Columns.Count) Properties.Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
+            if (Settings.Default.recentColumnsOrder.Length != gridRecent.Columns.Count) Properties.Settings.Default.recentColumnsOrder = new Int32[gridRecent.Columns.Count];
 
             // get new display indexes
             for (int i = 0; i < gridRecent.Columns.Count; i++)
             {
-                Properties.Settings.Default.recentColumnsOrder[i] = gridRecent.Columns[i].DisplayIndex;
+                Settings.Default.recentColumnsOrder[i] = gridRecent.Columns[i].DisplayIndex;
             }
-            Properties.Settings.Default.Save();
+            Settings.Default.Save();
         }
 
         private void MenuItemExploreBuildItem_Click(object sender, RoutedEventArgs e)
@@ -3125,25 +3062,7 @@ namespace UnityLauncherPro
 
         private void BtnClearBuildReportSearch_Click(object sender, RoutedEventArgs e)
         {
-            txtSearchBoxBuildReport.Text = "";
-        }
-
-        private void TxtSearchBoxBuildReport_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Up:
-                case Key.Down:
-                    Tools.SetFocusToGrid(gridBuildReport);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void TxtSearchBoxBuildReport_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (gridBuildReport.ItemsSource != null) FilterBuildReport();
+            searchBoxBuildReport.SearchText = "";
         }
 
         private void TxtLogCatArgs_TextChanged(object sender, TextChangedEventArgs e)
@@ -4249,6 +4168,104 @@ namespace UnityLauncherPro
             var editor = GetSelectedUnity();
             if (editor == null || editor.Version == null) return;
             Tools.OpenReleasesApiForVersion(editor.Version);
+        }
+
+        private void SearchBoxProjects_SearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            FilterRecentProjects();
+        }
+
+        private void SearchBoxProjects_SearchKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Return: // open selected project
+                    var proj = GetSelectedProject();
+                    var proc = Tools.LaunchProject(proj);
+                    //ProcessHandler.Add(proj, proc);
+                    break;
+                case Key.Tab:
+                case Key.Up:
+                    //Tools.SetFocusToGrid(gridRecent);
+                    var currentIndex = gridRecent.SelectedIndex - 1;
+                    //Console.WriteLine(currentIndex);
+                    if (currentIndex < 0) currentIndex = gridRecent.Items.Count - 1;
+                    gridRecent.SelectedIndex = currentIndex;
+                    e.Handled = true;
+                    break;
+                case Key.Down:
+                    // TODO move to 2nd row if first is already selected
+                    //if (GetSelectedProjectIndex() == 0)
+                    //{
+                    //    Tools.SetFocusToGrid(gridRecent, 1);
+                    //}
+                    //else
+                    //{
+                    //Tools.SetFocusToGrid(gridRecent);
+                    //                    }
+
+                    // if in searchbox, then move selected index up or down
+                    gridRecent.SelectedIndex = ++gridRecent.SelectedIndex % gridRecent.Items.Count;
+                    e.Handled = true; // to stay in first row
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void searchBoxUnitys_SearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            FilterUnitys();
+        }
+
+        private void searchBoxUnitys_SearchKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                    Tools.SetFocusToGrid(dataGridUnitys);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void searchBoxUpdates_SearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            FilterUpdates();
+        }
+
+        private void searchBoxUpdates_SearchKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                    Tools.SetFocusToGrid(dataGridUpdates);
+                    e.Handled = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void searchBoxBuildReport_SearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (gridBuildReport.ItemsSource != null) FilterBuildReport();
+        }
+
+        private void searchBoxBuildReport_SearchKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                    Tools.SetFocusToGrid(gridBuildReport);
+                    break;
+                default:
+                    break;
+            }
         }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
