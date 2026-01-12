@@ -57,7 +57,7 @@ namespace UnityLauncherPro.Converters
                             // Ignore and fall back to UnsetValue for Source, or 64.0 for dimensions
                             if (parameter != null && (parameter.ToString() == "Width" || parameter.ToString() == "Height"))
                             {
-                                return 64.0;
+                                return 1.0;
                             }
                             return DependencyProperty.UnsetValue;
                         }
@@ -67,7 +67,7 @@ namespace UnityLauncherPro.Converters
                 // Project path doesn't exist or no thumbnail found
                 if (parameter != null && (parameter.ToString() == "Width" || parameter.ToString() == "Height"))
                 {
-                    return 64.0; // Return default dimension
+                    return 1.0; // Return default dimension
                 }
                 return DependencyProperty.UnsetValue;
             }
