@@ -864,7 +864,7 @@ namespace UnityLauncherPro
             File.Copy(FullFileName, FullFileName + ".bak", true);
         }
 
-        void UpdateUnityInstallationsList()
+        public void UpdateUnityInstallationsList()
         {
             // Reset preferred string, if user changed it
             //preferredVersion = "none";
@@ -935,7 +935,7 @@ namespace UnityLauncherPro
         }
 
         // waits for unity update results and assigns to datagrid
-        async Task CallGetUnityUpdates()
+        public async Task CallGetUnityUpdates()
         {
             dataGridUpdates.ItemsSource = null;
             var task = GetUnityUpdates.FetchAll((bool)useUnofficialReleaseList.IsChecked);
@@ -1105,7 +1105,6 @@ namespace UnityLauncherPro
             // clear filters, since right now they are not used after updates are loaded
             rdoAll.IsChecked = true;
             CallGetUnityUpdates();
-
             button.IsEnabled = true;
         }
 

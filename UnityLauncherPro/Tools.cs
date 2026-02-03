@@ -754,7 +754,6 @@ namespace UnityLauncherPro
                     string unityHash = ParseHashCodeFromURL(downloadURL);
                     exeURL = ParseDownloadURLFromWebpage(version, unityHash, false, true);
                 }
-
             }
 
             Console.WriteLine("download exeURL= (" + exeURL + ")");
@@ -787,19 +786,19 @@ namespace UnityLauncherPro
                         process.StartInfo.FileName = tempFile;
                         process.StartInfo.Arguments = targetPathArgs;
                         process.EnableRaisingEvents = true;
-                        process.Exited += (sender, e) => DeleteTempFile(tempFile);
+                        process.Exited += (sender, e) => InstallationCompleted(tempFile);
                         process.Start();
                     }
                     catch (Win32Exception ex) when (ex.NativeErrorCode == 1223) // ERROR_CANCELLED
                     {
                         // User declined the UAC prompt
                         Console.WriteLine("User cancelled elevation (UAC).");
-                        DeleteTempFile(tempFile);
+                        InstallationCompleted(tempFile);
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine("Failed to run exe: " + tempFile + " - " + ex.Message);
-                        DeleteTempFile(tempFile);
+                        InstallationCompleted(tempFile);
                     }
 
                     // TODO refresh upgrade dialog after installer finished
@@ -893,12 +892,19 @@ namespace UnityLauncherPro
             }
         }
 
-        static void DeleteTempFile(string path)
+        static void InstallationCompleted(string path)
         {
             if (File.Exists(path) == true)
             {
-                Console.WriteLine("DeleteTempFile: " + path);
+                // delete temp installer file
                 File.Delete(path);
+
+                // refresh installed versions list
+                mainWindow.Dispatcher.Invoke(() =>
+                {
+                    mainWindow.UpdateUnityInstallationsList();
+                    mainWindow.CallGetUnityUpdates();
+                });
             }
         }
 
@@ -2722,7 +2728,7 @@ public static class UnityLauncherProTools
             {
                 if (!result)
                 {
-                    DeleteTempFile(destinationPath);
+                    InstallationCompleted(destinationPath);
                 }
                 progressWindow.Close();
             }
