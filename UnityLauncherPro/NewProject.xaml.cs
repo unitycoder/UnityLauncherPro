@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -52,6 +53,18 @@ namespace UnityLauncherPro
 
             txtNewProjectName.Text = newName;
             txtNewProjectFolder.Text = targetFolder;
+
+            if (MainWindow.unityInstallationsSource.Count == 0)
+            {
+                Tools.SetStatus("No Unity installations found! Please add Unity installations first.");
+                isInitializing = false;
+                btnCreateNewProject.IsEnabled = false;
+                return;
+            }
+            else
+            {
+                btnCreateNewProject.IsEnabled = true;
+            }
 
             // fill available versions
             if (gridAvailableVersions.ItemsSource == null)

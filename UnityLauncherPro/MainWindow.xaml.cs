@@ -886,6 +886,8 @@ namespace UnityLauncherPro
             }
 
             lblFoundXInstallations.Content = "Found " + unityInstallationsSource.Count + " installations";
+
+            btnCreateEmptyProject.IsEnabled = unityInstallationsSource.Count > 0;
         }
 
         Project GetSelectedProject()
@@ -2098,6 +2100,9 @@ namespace UnityLauncherPro
                     return;
                 }
             }
+
+            // refresh unity installations
+            UpdateUnityInstallationsList();
 
             if (string.IsNullOrEmpty(initScriptFileFullPath) == true)
             {
