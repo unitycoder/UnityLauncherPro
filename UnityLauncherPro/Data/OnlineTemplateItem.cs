@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows.Media.Imaging;
 
 namespace UnityLauncherPro.Data
 {
@@ -11,6 +12,7 @@ namespace UnityLauncherPro.Data
         public string RenderPipeline { get; set; }
         public string Type { get; set; } // Core, Learning, Sample, 
         public string PreviewImageURL { get; set; }
+        public BitmapImage PreviewImage { get; set; }
         public string TarBallURL { get; set; }
 
         public bool IsDownloaded

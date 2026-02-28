@@ -866,6 +866,9 @@ namespace UnityLauncherPro
 
         public void UpdateUnityInstallationsList()
         {
+            // keep currently selected row
+            var currentSelection = GetSelectedUnity();
+
             // Reset preferred string, if user changed it
             //preferredVersion = "none";
 
@@ -886,8 +889,21 @@ namespace UnityLauncherPro
             }
 
             lblFoundXInstallations.Content = "Found " + unityInstallationsSource.Count + " installations";
-
             btnCreateEmptyProject.IsEnabled = unityInstallationsSource.Count > 0;
+
+            // try to select previous selection
+            if (currentSelection != null)
+            {
+                for (int i = 0, len = unityInstallationsSource.Count; i < len; i++)
+                {
+                    if (unityInstallationsSource[i].Version == currentSelection.Version && unityInstallationsSource[i].Path == currentSelection.Path)
+                    {
+                        dataGridUnitys.SelectedIndex = i;
+                        Tools.SetFocusToGrid(dataGridUnitys);
+                        break;
+                    }
+                }
+            }
         }
 
         Project GetSelectedProject()
@@ -2100,7 +2116,19 @@ namespace UnityLauncherPro
                 }
             }
 
-            // refresh unity installations
+            string newVersion = null;
+
+            // if in maintab
+            if (tabControl.SelectedIndex == 0)
+            {
+                newVersion = GetSelectedProject()?.Version == null ? preferredVersion : GetSelectedProject().Version;
+            }
+            else // unity tab
+            {
+                newVersion = (GetSelectedUnity() == null || GetSelectedUnity().Version == null) ? preferredVersion : GetSelectedUnity().Version;
+            }
+
+            // refresh unity installations (so that latest installs are listed)
             UpdateUnityInstallationsList();
 
             if (string.IsNullOrEmpty(initScriptFileFullPath) == true)
@@ -2111,25 +2139,12 @@ namespace UnityLauncherPro
             // for new projects created from explorer, always ask for name
             if (chkAskNameForQuickProject.IsChecked == true || targetFolder != null)
             {
-                string newVersion = null;
-
-                // if in maintab
-                if (tabControl.SelectedIndex == 0)
-                {
-                    newVersion = GetSelectedProject()?.Version == null ? preferredVersion : GetSelectedProject().Version;
-                }
-                else // unity tab
-                {
-                    newVersion = (GetSelectedUnity() == null || GetSelectedUnity().Version == null) ? preferredVersion : GetSelectedUnity().Version;
-                }
-
                 if (string.IsNullOrEmpty(newVersion))
                 {
                     Console.WriteLine("Missing selected Unity version, probably launching from context menu");
                     newVersion = preferredVersion;
                     // if no preferred version, use latest
                     if (string.IsNullOrEmpty(newVersion)) newVersion = unityInstallationsSource[0].Version;
-
                 }
 
                 string suggestedName = targetFolder != null ? Path.GetFileName(targetFolder) : Tools.GetSuggestedProjectName(newVersion, rootFolder);
@@ -2164,22 +2179,10 @@ namespace UnityLauncherPro
             }
             else // use automatic name (project is instantly created, without asking anything)
             {
-                string newVersion = null;
-                // if in maintab
-                if (tabControl.SelectedIndex == 0)
-                {
-                    newVersion = GetSelectedProject().Version == null ? preferredVersion : GetSelectedProject().Version;
-                }
-                else // unity tab
-                {
-                    newVersion = GetSelectedUnity().Version == null ? preferredVersion : GetSelectedUnity().Version;
-                }
                 var p = Tools.FastCreateProject(newVersion, rootFolder, null, null, null, null, (bool)chkUseInitScript.IsChecked, initScriptFileFullPath);
-
                 if (p != null) AddNewProjectToList(p);
             }
-
-        }
+        } // CreateNewEmptyProject
 
         private void ChkAskNameForQuickProject_Checked(object sender, RoutedEventArgs e)
         {

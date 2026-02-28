@@ -113,7 +113,7 @@
                     <DataTemplate>
                         <StackPanel Orientation="Vertical" Margin="3">
                             <Grid>
-                                <Image Source="{Binding PreviewImageURL}" 
+                                <Image Source="{Binding PreviewImage}" 
                            Margin="0,0,0,5" 
                            ToolTip="{Binding Description}" 
                            Stretch="Uniform"

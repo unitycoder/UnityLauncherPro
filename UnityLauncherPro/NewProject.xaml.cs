@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using UnityLauncherPro.Data;
 using UnityLauncherPro.Properties;
 
@@ -523,6 +524,31 @@ namespace UnityLauncherPro
                         if (cancellationToken.IsCancellationRequested) return;
 
                         var templates = ParseTemplatesFromJson(responseString);
+
+                        // Download preview images to bypass WPF's ClickOnce security check on HTTPS URIs
+                        foreach (var template in templates)
+                        {
+                            if (cancellationToken.IsCancellationRequested) return;
+
+                            try
+                            {
+                                if (!string.IsNullOrEmpty(template.PreviewImageURL) && !template.PreviewImageURL.StartsWith("pack://"))
+                                {
+                                    var imageData = await client.GetByteArrayAsync(template.PreviewImageURL);
+                                    var bitmap = new BitmapImage();
+                                    bitmap.BeginInit();
+                                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                    bitmap.StreamSource = new MemoryStream(imageData);
+                                    bitmap.EndInit();
+                                    if (bitmap.CanFreeze) bitmap.Freeze();
+                                    template.PreviewImage = bitmap;
+                                }
+                            }
+                            catch
+                            {
+                                // Failed to download preview image, leave PreviewImage as null
+                            }
+                        }
 
                         // Update UI on dispatcher thread only if not cancelled
                         if (!cancellationToken.IsCancellationRequested)
