@@ -26,6 +26,8 @@ namespace UnityLauncherPro
     {
         const int SW_RESTORE = 9;
 
+        static readonly string initFileDefaultURL = "https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs";
+
         [DllImport("user32", CharSet = CharSet.Unicode)]
         static extern IntPtr FindWindow(string cls, string win);
         [DllImport("user32")]
@@ -779,6 +781,28 @@ namespace UnityLauncherPro
                     string outputVersionFolder = version.Split('.')[0] + "_" + version.Split('.')[1];
                     string targetPathArgs = " /D=" + lastRootFolder + outputVersionFolder; ;
 
+                    // NOTE cannot enable same modules as the previously installed version, because it requires elevated permissions..
+                    // GetPlatformsForUnityVersion..
+                    //var previousVersion = Tools.FindNearestVersion(version, MainWindow.unityInstalledVersions.Keys.ToList(), true);
+                    //if (previousVersion != null)
+                    //{
+                    //    string[] previousModules = GetPlatformsForUnityVersion(previousVersion);
+                    //    if (previousModules != null && previousModules.Length > 0)
+                    //    {
+                    //        // find registry Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Unity Technologies\Installer
+                    //        // then enable dword 1, for example key: "Select_Android", if my modules has "Android" etc.
+
+                    //        foreach (var module in previousModules)
+                    //        {
+                    //            Console.WriteLine(previousVersion + " has modules: " + module);
+                    //            // 6000.0.66f2 has modules: Android
+                    //            // 6000.0.66f2 has modules: iOS
+                    //            // 6000.0.66f2 has modules: Win
+                    //            // 6000.0.66f2 has modules: Win64
+                    //        }
+                    //    }
+                    //}
+
                     // if user clicks NO to UAC, this fails (so added try-catch)
                     try
                     {
@@ -793,11 +817,13 @@ namespace UnityLauncherPro
                     {
                         // User declined the UAC prompt
                         Console.WriteLine("User cancelled elevation (UAC).");
+                        SetStatus("Installation cancelled by user.");
                         InstallationCompleted(tempFile);
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine("Failed to run exe: " + tempFile + " - " + ex.Message);
+                        SetStatus("Failed to run installer: " + ex.Message);
                         InstallationCompleted(tempFile);
                     }
 
@@ -809,10 +835,10 @@ namespace UnityLauncherPro
                 //SetStatus("Error> Cannot find installer executable ... opening website instead");
                 var url = "https://unity3d.com/get-unity/download/archive";
                 Process.Start(url + "#installer-not-found---version-" + version);
+                SetStatus("Error> Cannot find installer executable for version " + version);
             }
-        }
+        } // DownloadAndInstall
 
-        static readonly string initFileDefaultURL = "https://raw.githubusercontent.com/unitycoder/UnityInitializeProject/main/Assets/Editor/InitializeProject.cs";
 
         public static async Task DownloadInitScript(string currentInitScriptFullPath, string currentInitScriptLocationOrURL)
         {
@@ -2014,6 +2040,7 @@ namespace UnityLauncherPro
         // https://stackoverflow.com/a/37724335/5452781
         public static void BringProcessToFront(Process process)
         {
+            if (process == null) return;
             IntPtr handle = process.MainWindowHandle;
             if (IsIconic(handle))
             {

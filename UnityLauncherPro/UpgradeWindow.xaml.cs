@@ -39,7 +39,7 @@ namespace UnityLauncherPro
                 btnOpenReleasePage.IsEnabled = true;
                 btnDownload.IsEnabled = true;
 
-                // remove china c1 from version
+                // remove china c1 from version, NOTE not used anymore.. its Tuanjie
                 if (currentVersion.Contains("c")) currentVersion = currentVersion.Replace("c1", "");
                 // find nearest version
                 string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
