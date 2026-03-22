@@ -1189,10 +1189,9 @@ namespace UnityLauncherPro
                             if (Keyboard.Modifiers == ModifierKeys.Control) return;
 
                             // activate searchbar if not active and we are in tab#1
-                            if (searchBoxProjects.IsFocused == false)
+                            if (searchBoxProjects.IsKeyboardFocusWithin == false)
                             {
                                 searchBoxProjects.Focus();
-                                //searchBoxProjects.sele(searchBoxProjects.SearchText.Length, 0);
                             }
                             break;
                     }
@@ -1209,10 +1208,9 @@ namespace UnityLauncherPro
                             searchBoxUnitys.SearchText = "";
                             break;
                         default:
-                            if (searchBoxUnitys.IsFocused == false)
+                            if (searchBoxUnitys.IsKeyboardFocusWithin == false)
                             {
                                 searchBoxUnitys.Focus();
-                                //txtSearchBoxUnity.Select(txtSearchBoxUnity.Text.Length, 0);
                             }
                             break;
                     }
