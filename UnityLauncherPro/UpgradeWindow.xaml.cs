@@ -19,7 +19,7 @@ namespace UnityLauncherPro
             txtCurrentVersion.Text = currentVersion;
             txtCurrentPlatform.Text = Tools.GetTargetPlatform(projectPath);
 
-            if (gridAvailableVersions.ItemsSource == null)
+            if (gridAvailableVersions.ItemsSource == null && MainWindow.unityInstallationsSource != null)
             {
                 gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
             }
