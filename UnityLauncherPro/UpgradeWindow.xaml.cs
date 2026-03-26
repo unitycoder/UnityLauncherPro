@@ -21,7 +21,14 @@ namespace UnityLauncherPro
 
             if (gridAvailableVersions.ItemsSource == null)
             {
-                gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
+                if (MainWindow.unityInstallationsSource != null)
+                {
+                    gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
+                }
+                else
+                {
+                    gridAvailableVersions.ItemsSource = new System.Collections.Generic.List<UnityInstallation>();
+                }
             }
 
             gridAvailableVersions.SelectedItem = null;
