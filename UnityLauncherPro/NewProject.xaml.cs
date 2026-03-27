@@ -67,8 +67,8 @@ namespace UnityLauncherPro
                 btnCreateNewProject.IsEnabled = true;
             }
 
-            // fill available versions
-            if (gridAvailableVersions.ItemsSource == null)
+            // fill available versions, only replace if it's a different collection instance
+            if (!ReferenceEquals(gridAvailableVersions.ItemsSource, MainWindow.unityInstallationsSource))
             {
                 gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
             }
@@ -77,21 +77,27 @@ namespace UnityLauncherPro
             if (MainWindow.unityInstalledVersions.ContainsKey(unityVersion) == true)
             {
                 // find this unity version, TODO theres probably easier way than looping all
-                for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
+                if (MainWindow.unityInstallationsSource != null)
                 {
-                    if (MainWindow.unityInstallationsSource[i].Version == newVersion)
+                    for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
                     {
-                        gridAvailableVersions.SelectedIndex = i;
-                        gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
+                        if (MainWindow.unityInstallationsSource[i].Version == newVersion)
+                        {
+                            gridAvailableVersions.SelectedIndex = i;
+                            gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
 
-                        string baseVersion = GetBaseVersion(newVersion);
-                        if (fetchOnlineTemplates) _ = LoadOnlineTemplatesAsync(baseVersion);
-                        break;
+                            string baseVersion = GetBaseVersion(newVersion);
+                            if (fetchOnlineTemplates) _ = LoadOnlineTemplatesAsync(baseVersion);
+                            break;
+                        }
                     }
                 }
 
-                UpdateTemplatesDropDown((gridAvailableVersions.SelectedItem as UnityInstallation).Path);
-                UpdateModulesDropdown(newVersion);
+                if (gridAvailableVersions.SelectedItem != null)
+                {
+                    UpdateTemplatesDropDown((gridAvailableVersions.SelectedItem as UnityInstallation).Path);
+                    UpdateModulesDropdown(newVersion);
+                }
             }
             else // we dont have requested unity version, select first item then
             {
@@ -203,15 +209,18 @@ namespace UnityLauncherPro
             else
             {
                 // Use built-in template from dropdown
-                templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
+                if (cmbNewProjectTemplate.SelectedValue != null) templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
             }
 
-            selectedPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
-            UpdateSelectedVersion();
+            if (cmbNewProjectTemplate.SelectedValue != null)
+            {
+                selectedPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
+                UpdateSelectedVersion();
 
-            // save last used value for platform
-            Properties.Settings.Default.newProjectPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
-            Properties.Settings.Default.Save();
+                // save last used value for platform
+                Settings.Default.newProjectPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
+                Settings.Default.Save();
+            }
 
             DialogResult = true;
         }
