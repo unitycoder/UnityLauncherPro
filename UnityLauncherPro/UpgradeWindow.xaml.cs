@@ -19,7 +19,7 @@ namespace UnityLauncherPro
             txtCurrentVersion.Text = currentVersion;
             txtCurrentPlatform.Text = Tools.GetTargetPlatform(projectPath);
 
-            if (gridAvailableVersions.ItemsSource == null)
+            if (!ReferenceEquals(gridAvailableVersions.ItemsSource, MainWindow.unityInstallationsSource))
             {
                 gridAvailableVersions.ItemsSource = MainWindow.unityInstallationsSource;
             }
@@ -44,7 +44,7 @@ namespace UnityLauncherPro
                 // find nearest version
                 string nearestVersion = Tools.FindNearestVersion(currentVersion, MainWindow.unityInstalledVersions.Keys.ToList());
 
-                if (nearestVersion != null)
+                if (nearestVersion != null && MainWindow.unityInstallationsSource != null)
                 {
                     // select nearest version
                     for (int i = 0; i < MainWindow.unityInstallationsSource.Count; i++)
