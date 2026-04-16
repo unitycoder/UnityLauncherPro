@@ -108,11 +108,21 @@ namespace UnityLauncherPro
             }
 
             // select projectname text so can overwrite if needed
-            txtNewProjectName.Focus();
-            txtNewProjectName.SelectAll();
             newProjectName = txtNewProjectName.Text;
 
+            if (nameIsLocked)
+            {
+                Tools.SetFocusToGrid(gridAvailableVersions);
+            }
+            else
+            {
+                txtNewProjectName.Focus();
+                txtNewProjectName.SelectAll();
+            }
+
             isInitializing = false;
+
+
         }  // NewProject
 
         private void LoadSettings()
@@ -505,78 +515,75 @@ namespace UnityLauncherPro
             }
         }
 
+        // Add this static field to the class (near other static fields)
+        private static readonly HttpClient _httpClient = new HttpClient();
+
         private async Task LoadOnlineTemplatesAsync(string baseVersion, CancellationToken cancellationToken = default)
         {
             try
             {
-                using (var client = new HttpClient())
+                _httpClient.DefaultRequestHeaders.Remove("Accept");
+                _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+
+                var graphqlJson = "{\"query\":\"fragment TemplateEntity on Template { __typename name packageName description type buildPlatforms renderPipeline previewImage { url } versions { name tarball { url } } } query HUB__getTemplates($limit: Int! $skip: Int! $orderBy: TemplateOrder! $supportedUnityEditorVersions: [String!]!) { getTemplates(limit: $limit skip: $skip orderBy: $orderBy supportedUnityEditorVersions: $supportedUnityEditorVersions) { edges { node { ...TemplateEntity } } } }\",\"variables\":{\"limit\":40,\"skip\":0,\"orderBy\":\"WEIGHTED_DESC\",\"supportedUnityEditorVersions\":[\"" + baseVersion + "\"]}}";
+
+                var content = new StringContent(graphqlJson, Encoding.UTF8, "application/json");
+
+                // Check for cancellation before making request
+                if (cancellationToken.IsCancellationRequested) return;
+
+                var response = await _httpClient.PostAsync("https://live-platform-api.prd.ld.unity3d.com/graphql", content, cancellationToken);
+
+                // Check for cancellation after request
+                if (cancellationToken.IsCancellationRequested) return;
+
+                if (response.IsSuccessStatusCode)
                 {
-                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+                    var responseString = await response.Content.ReadAsStringAsync();
 
-                    var graphqlJson = "{\"query\":\"fragment TemplateEntity on Template { __typename name packageName description type buildPlatforms renderPipeline previewImage { url } versions { name tarball { url } } } query HUB__getTemplates($limit: Int! $skip: Int! $orderBy: TemplateOrder! $supportedUnityEditorVersions: [String!]!) { getTemplates(limit: $limit skip: $skip orderBy: $orderBy supportedUnityEditorVersions: $supportedUnityEditorVersions) { edges { node { ...TemplateEntity } } } }\",\"variables\":{\"limit\":40,\"skip\":0,\"orderBy\":\"WEIGHTED_DESC\",\"supportedUnityEditorVersions\":[\"" + baseVersion + "\"]}}";
-
-                    var content = new StringContent(graphqlJson, Encoding.UTF8, "application/json");
-
-                    // Check for cancellation before making request
+                    // Check for cancellation before parsing
                     if (cancellationToken.IsCancellationRequested) return;
 
-                    var response = await client.PostAsync("https://live-platform-api.prd.ld.unity3d.com/graphql", content, cancellationToken);
+                    var templates = ParseTemplatesFromJson(responseString);
 
-                    // Check for cancellation after request
-                    if (cancellationToken.IsCancellationRequested) return;
-
-                    if (response.IsSuccessStatusCode)
+                    // Download preview images to bypass WPF's ClickOnce security check on HTTPS URIs
+                    foreach (var template in templates)
                     {
-                        var responseString = await response.Content.ReadAsStringAsync();
-
-                        // Check for cancellation before parsing
                         if (cancellationToken.IsCancellationRequested) return;
 
-                        var templates = ParseTemplatesFromJson(responseString);
-
-                        // Download preview images to bypass WPF's ClickOnce security check on HTTPS URIs
-                        foreach (var template in templates)
+                        try
                         {
-                            if (cancellationToken.IsCancellationRequested) return;
-
-                            try
+                            if (!string.IsNullOrEmpty(template.PreviewImageURL) && !template.PreviewImageURL.StartsWith("pack://"))
                             {
-                                if (!string.IsNullOrEmpty(template.PreviewImageURL) && !template.PreviewImageURL.StartsWith("pack://"))
-                                {
-                                    var imageData = await client.GetByteArrayAsync(template.PreviewImageURL);
-                                    var bitmap = new BitmapImage();
-                                    bitmap.BeginInit();
-                                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                                    bitmap.StreamSource = new MemoryStream(imageData);
-                                    bitmap.EndInit();
-                                    if (bitmap.CanFreeze) bitmap.Freeze();
-                                    template.PreviewImage = bitmap;
-                                }
-                            }
-                            catch
-                            {
-                                // Failed to download preview image, leave PreviewImage as null
+                                var imageData = await _httpClient.GetByteArrayAsync(template.PreviewImageURL);
+                                var bitmap = new BitmapImage();
+                                bitmap.BeginInit();
+                                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                bitmap.StreamSource = new MemoryStream(imageData);
+                                bitmap.EndInit();
+                                if (bitmap.CanFreeze) bitmap.Freeze();
+                                template.PreviewImage = bitmap;
                             }
                         }
-
-                        // Update UI on dispatcher thread only if not cancelled
-                        if (!cancellationToken.IsCancellationRequested)
+                        catch
                         {
-                            Dispatcher.Invoke(() =>
-                            {
-                                // Only set ItemsSource, don't touch Items
-                                listOnlineTemplates.ItemsSource = templates;
-                            });
+                            // Failed to download preview image, leave PreviewImage as null
                         }
                     }
-                    else
+
+                    // Update UI on dispatcher thread only if not cancelled
+                    if (!cancellationToken.IsCancellationRequested)
                     {
-                        Console.WriteLine($"GraphQL request failed: {response.StatusCode}");
-                        if (!cancellationToken.IsCancellationRequested)
+                        Dispatcher.Invoke(() =>
                         {
-                            //LoadFallbackTemplates();
-                        }
+                            // Only set ItemsSource, don't touch Items
+                            listOnlineTemplates.ItemsSource = templates;
+                        });
                     }
+                }
+                else
+                {
+                    Console.WriteLine($"GraphQL request failed: {response.StatusCode}");
                 }
             }
             catch (OperationCanceledException)
@@ -589,7 +596,6 @@ namespace UnityLauncherPro
                 if (!cancellationToken.IsCancellationRequested)
                 {
                     Console.WriteLine($"Error loading online templates: {ex.Message}");
-                    //LoadFallbackTemplates();
                 }
             }
         }
