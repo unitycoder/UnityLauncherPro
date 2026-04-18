@@ -4273,6 +4273,57 @@ namespace UnityLauncherPro
             }
         }
 
+        private void gridRecent_DragLeave(object sender, DragEventArgs e)
+        {
+            gridRecent.BorderBrush = (SolidColorBrush)Application.Current.Resources["ThemeBorderColor"];
+        }
+
+        private void gridRecent_DragEnter(object sender, DragEventArgs e)
+        {
+            gridRecent.BorderBrush = (SolidColorBrush)Application.Current.Resources["ThemeAccentColor"];
+        }
+
+        private void gridRecent_Drop(object sender, DragEventArgs e)
+        {
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            //MessageBox.Show("files: " + files.Length, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            bool addedAny = false;
+            // check if any of the files is a unity project (has Assets and ProjectSettings folder)
+            foreach (var file in files)
+            {
+                if (Directory.Exists(file) == true)
+                {
+                    var assetsFolder = Path.Combine(file, "Assets");
+                    var projectSettingsFolder = Path.Combine(file, "ProjectSettings");
+
+                    if (Directory.Exists(assetsFolder) == true && Directory.Exists(projectSettingsFolder) == true)
+                    {
+                        Tools.AddProjectToHistory(file);
+                        addedAny = true;
+                    }
+                    else
+                    {
+                        if ((bool)chkStreamerMode.IsChecked) SetStatus("Not a Unity project: " + file, MessageType.Warning);
+                    }
+                }
+                else
+                {
+                    if ((bool)chkStreamerMode.IsChecked) SetStatus("Not a folder: " + file, MessageType.Warning);
+                }
+            }
+
+            if (addedAny)
+            {
+                // clear search, so can see added project
+                searchBoxProjects.SearchText = "";
+                RefreshRecentProjects();
+                // NOTE 0 works for sort-by-date only
+                Tools.SetFocusToGrid(gridRecent, 0);
+                SetStatus("Added project(s) with drag and drop..");
+            }
+        }
+
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
         //{
         //    var proj = GetSelectedProject();
