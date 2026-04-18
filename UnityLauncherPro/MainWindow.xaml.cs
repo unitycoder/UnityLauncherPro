@@ -1268,7 +1268,7 @@ namespace UnityLauncherPro
                 projectsSource.Remove(proj);
                 gridRecent.Items.Refresh();
                 Tools.SetFocusToGrid(gridRecent);
-                gridRecent.SelectedIndex = 0;
+                if (gridRecent.Items.Count > 0) gridRecent.SelectedIndex = 0;
             }
 
             // NOTE this doesnt remove from settings list?
@@ -2332,8 +2332,15 @@ namespace UnityLauncherPro
             if (tabControl.SelectedIndex == 0)
             {
                 var proj = GetSelectedProject();
-                var proc = ProcessHandler.Get(proj.Path);
-                menuItemKillProcess.IsEnabled = proc != null;
+                if (proj != null)
+                {
+                    var proc = ProcessHandler.Get(proj.Path);
+                    menuItemKillProcess.IsEnabled = proc != null;
+                }
+                else
+                {
+                    menuItemKillProcess.IsEnabled = false;
+                }
             }
         }
 
@@ -3161,6 +3168,8 @@ namespace UnityLauncherPro
 
         private void MenuRemoveProject_Click(object sender, RoutedEventArgs e)
         {
+            var proj = GetSelectedProject();
+            if (proj == null) return;
             RemoveProjectFromList();
         }
 
@@ -4322,6 +4331,24 @@ namespace UnityLauncherPro
                 Tools.SetFocusToGrid(gridRecent, 0);
                 SetStatus("Added project(s) with drag and drop..");
             }
+        }
+
+        private void gridRecent_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var dep = e.OriginalSource as DependencyObject;
+            if (dep == null) return;
+
+            while (dep != null && !(dep is DataGridRow))
+            {
+                dep = VisualTreeHelper.GetParent(dep);
+            }
+
+            var row = dep as DataGridRow;
+            if (row == null) return;
+
+            gridRecent.SelectedItem = row.Item;
+            gridRecent.SelectedIndex = row.GetIndex();
+            row.Focus();
         }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)
