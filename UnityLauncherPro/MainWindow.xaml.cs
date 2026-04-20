@@ -1287,6 +1287,7 @@ namespace UnityLauncherPro
                     if (task.IsCompleted == false || task.IsFaulted == true) return;
                     if (items == null) return;
                     updatesSource = items.ToArray();
+                    SetStatus("Found " + updatesSource.Length + " versions");
                     if (updatesSource == null) return;
                     dataGridUpdates.ItemsSource = updatesSource;
                     // if search string is set, then filter it (after data is loaded)
