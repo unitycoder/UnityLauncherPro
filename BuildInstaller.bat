@@ -7,8 +7,7 @@ ECHO === Starting Installer Build Workaround ===
 REM Store current directory
 SET "current_path=%CD%"
 
-REM Try all known editions of Visual Studio 2022
-SET "vs_base_path=%ProgramFiles%\Microsoft Visual Studio\2022"
+SET "vs_base_path=%ProgramFiles%\Microsoft Visual Studio\18"
 FOR %%E IN (Community Professional Enterprise) DO (
     IF EXIST "%vs_base_path%\%%E\Common7\IDE\CommonExtensions\Microsoft\VSI\DisableOutOfProcBuild\DisableOutOfProcBuild.exe" (
         SET "buildfix_path=%vs_base_path%\%%E\Common7\IDE\CommonExtensions\Microsoft\VSI\DisableOutOfProcBuild"
@@ -18,11 +17,12 @@ FOR %%E IN (Community Professional Enterprise) DO (
     )
 )
 
-ECHO [ERROR] Could not find DisableOutOfProcBuild.exe in any known VS2022 edition.
+
+ECHO [ERROR] Could not find DisableOutOfProcBuild.exe in any known VS2026 edition.
 EXIT /B 1
 
 :FoundEdition
-ECHO Found Visual Studio 2022 Edition: %vs_edition%
+ECHO Found Visual Studio 2026 Edition: %vs_edition%
 CD /D "%buildfix_path%"
 CALL DisableOutOfProcBuild.exe
 
@@ -52,17 +52,25 @@ IF %error% NEQ 0 (
 
 ECHO:
 ECHO === Building Installer ===
-"%devenv_path%" UnityLauncherPro.sln /Rebuild Release /Project UnityLauncherProInstaller > build_output.log 2>&1
-SET "exitCode=%ERRORLEVEL%"
+ECHO Current dir: %CD%
 
-TYPE build_output.log
-ECHO:
-ECHO === devenv.exe exit code: %exitCode% ===
-
-IF NOT "%exitCode%"=="0" (
-    ECHO [ERROR] Installer build failed. Check build_output.log for details.
-    EXIT /B %exitCode%
+IF NOT EXIST "UnityLauncherPro.sln" (
+    ECHO [ERROR] Solution file not found: UnityLauncherPro.sln
+    EXIT /B 1
 )
+
+SET "installer_project=UnityLauncherProInstaller\UnityLauncherProInstaller.vdproj"
+
+IF NOT EXIST "%installer_project%" (
+    ECHO [ERROR] Installer project not found: %installer_project%
+    EXIT /B 1
+)
+
+ECHO Running:
+ECHO "%devenv_path%" "UnityLauncherPro.sln" /Rebuild "Release" /Project "%installer_project%"
+
+"%devenv_path%" "UnityLauncherPro.sln" /Rebuild "Release" /Project "%installer_project%" > build_output.log 2>&1
+SET "exitCode=%ERRORLEVEL%"
 
 
 ECHO:
