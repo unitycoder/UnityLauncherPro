@@ -205,6 +205,18 @@ namespace UnityLauncherPro.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool deleteRecoveredScene {
+            get {
+                return ((bool)(this["deleteRecoveredScene"]));
+            }
+            set {
+                this["deleteRecoveredScene"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool streamerMode {
             get {
                 return ((bool)(this["streamerMode"]));
