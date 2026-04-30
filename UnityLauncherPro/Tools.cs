@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using UnityLauncherPro.Helpers;
+using UnityLauncherPro.Properties;
 
 namespace UnityLauncherPro
 {
@@ -410,45 +411,54 @@ namespace UnityLauncherPro
             var recoveryFile = Path.Combine(projectPath, "Temp", "__Backupscenes", "0.backup");
             if (File.Exists(recoveryFile))
             {
-                var result = MessageBox.Show("Crash recovery scene found, do you want to MOVE it into Assets/_Recovery/-folder?", "UnityLauncherPro - Scene Recovery", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
+                if (Settings.Default.showRecoveredScenePopup)
                 {
-                    var restoreFolder = Path.Combine(projectPath, "Assets", "_Recovery");
-                    if (Directory.Exists(restoreFolder) == false)
+                    var result = MessageBox.Show("Crash recovery scene found, do you want to MOVE it into Assets/_Recovery/-folder?", "UnityLauncherPro - Scene Recovery", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.Yes)
                     {
-                        Directory.CreateDirectory(restoreFolder);
-                    }
-                    if (Directory.Exists(restoreFolder) == true)
-                    {
-                        Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-                        var uniqueFileName = "Recovered_Scene" + unixTimestamp + ".unity";
-
-                        try
+                        var restoreFolder = Path.Combine(projectPath, "Assets", "_Recovery");
+                        if (Directory.Exists(restoreFolder) == false)
                         {
-                            File.Move(recoveryFile, Path.Combine(restoreFolder, uniqueFileName));
-                            // remove folder, otherwise unity 6000.2 asks for recovery
-                            Directory.Delete(Path.Combine(projectPath, "Temp", "__Backupscenes"), true);
-
-                            Console.WriteLine("moved file to " + uniqueFileName);
-                        }
-                        catch (IOException)
-                        {
-                            // if move failed, try copy
-                            File.Copy(recoveryFile, Path.Combine(restoreFolder, uniqueFileName));
-                            Console.WriteLine("copied file");
+                            Directory.CreateDirectory(restoreFolder);
                         }
 
-                        Console.WriteLine("Recovered crashed scene into: " + restoreFolder);
+                        if (Directory.Exists(restoreFolder) == true)
+                        {
+                            Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                            var uniqueFileName = "Recovered_Scene" + unixTimestamp + ".unity";
+
+                            try
+                            {
+                                File.Move(recoveryFile, Path.Combine(restoreFolder, uniqueFileName));
+                                // remove folder, otherwise unity 6000.2 asks for recovery
+                                Directory.Delete(Path.Combine(projectPath, "Temp", "__Backupscenes"), true);
+
+                                Console.WriteLine("moved file to " + uniqueFileName);
+                            }
+                            catch (IOException)
+                            {
+                                // if move failed, try copy
+                                File.Copy(recoveryFile, Path.Combine(restoreFolder, uniqueFileName));
+                                Console.WriteLine("copied file");
+                            }
+
+                            Console.WriteLine("Recovered crashed scene into: " + restoreFolder);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error: Failed to create restore folder: " + restoreFolder);
+                            cancelRunningUnity = true;
+                        }
                     }
-                    else
+                    else if (result == MessageBoxResult.Cancel) // dont do restore, but run Unity
                     {
-                        Console.WriteLine("Error: Failed to create restore folder: " + restoreFolder);
                         cancelRunningUnity = true;
                     }
                 }
-                else if (result == MessageBoxResult.Cancel) // dont do restore, but run Unity
+                else
                 {
-                    cancelRunningUnity = true;
+                    File.Delete(recoveryFile);
+                    Directory.Delete(Path.GetDirectoryName(recoveryFile));
                 }
             }
             return cancelRunningUnity;

@@ -583,6 +583,7 @@ namespace UnityLauncherPro
                 chkAskNameForQuickProject.IsChecked = Settings.Default.askNameForQuickProject;
                 chkEnableProjectRename.IsChecked = Settings.Default.enableProjectRename;
                 chkStreamerMode.IsChecked = Settings.Default.streamerMode;
+                chkShowRecoveredScenePopup.IsChecked = Settings.Default.showRecoveredScenePopup;
                 chkShowPlatform.IsChecked = Settings.Default.showTargetPlatform;
                 chkCheckSRP.IsChecked = Settings.Default.checkSRP;
                 chkUseCustomTheme.IsChecked = Settings.Default.useCustomTheme;
@@ -2218,6 +2219,14 @@ namespace UnityLauncherPro
             }
 
             SetStatus("Streamer mode " + (isChecked ? "enabled" : "disabled"), MessageType.Info);
+        }
+
+        private void chkShowRecoveredScenePopup_Checked(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (bool)((CheckBox)sender).IsChecked;
+
+            Settings.Default.showRecoveredScenePopup = isChecked;
+            Settings.Default.Save();
         }
 
         private void ChkShowPlatform_Checked(object sender, RoutedEventArgs e)
