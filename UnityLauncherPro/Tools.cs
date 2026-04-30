@@ -411,12 +411,7 @@ namespace UnityLauncherPro
             var recoveryFile = Path.Combine(projectPath, "Temp", "__Backupscenes", "0.backup");
             if (File.Exists(recoveryFile))
             {
-                if (Settings.Default.deleteRecoveredScene)
-                {
-                    File.Delete(recoveryFile);
-                    Directory.Delete(Path.GetDirectoryName(recoveryFile));
-                }
-                else
+                if (Settings.Default.showRecoveredScenePopup)
                 {
                     var result = MessageBox.Show("Crash recovery scene found, do you want to MOVE it into Assets/_Recovery/-folder?", "UnityLauncherPro - Scene Recovery", MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (result == MessageBoxResult.Yes)
@@ -459,7 +454,12 @@ namespace UnityLauncherPro
                     {
                         cancelRunningUnity = true;
                     }
-                }            
+                }
+                else
+                {
+                    File.Delete(recoveryFile);
+                    Directory.Delete(Path.GetDirectoryName(recoveryFile));
+                }
             }
             return cancelRunningUnity;
         }

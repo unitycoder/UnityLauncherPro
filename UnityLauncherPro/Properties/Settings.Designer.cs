@@ -204,13 +204,13 @@ namespace UnityLauncherPro.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool deleteRecoveredScene {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool showRecoveredScenePopup {
             get {
-                return ((bool)(this["deleteRecoveredScene"]));
+                return ((bool)(this["showRecoveredScenePopup"]));
             }
             set {
-                this["deleteRecoveredScene"] = value;
+                this["showRecoveredScenePopup"] = value;
             }
         }
         
