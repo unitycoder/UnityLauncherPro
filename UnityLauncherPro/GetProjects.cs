@@ -13,12 +13,31 @@ namespace UnityLauncherPro
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
         // convert target platform name into valid buildtarget platform name, NOTE this depends on unity version, now only 2019 and later are supported
-        public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Win64" }, { "StandaloneWindows", "Win" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
+        public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { 
+            { "StandaloneWindows64", "Win64" },             
+            { "StandaloneWindows", "Win" }, 
+            { "Android", "Android" }, 
+            { "WebGL", "WebGL" } };
 
         public static List<Project> Scan(bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, StringCollection AllProjectPaths = null, bool searchGitbranchRecursively = false, bool showSRP = false)
         {
             List<Project> projectsFound = new List<Project>();
 
+            // first, scan projects from unity hub json file
+            VisitProjectsInUnityHubJson
+            (
+                getGitBranch, getPlasticBranch, getArguments, 
+                showMissingFolders, showTargetPlatform , searchGitbranchRecursively , showSRP, 
+                project =>
+            {
+                if (!projectsFound.ContainsProjectWithPath(project.Path))
+                    projectsFound.Add(project);
+
+                // add found projects to history also (gets added only if its not already there)
+                Tools.AddProjectToHistory(project.Path);
+            });
+
+            // then scan projects from registry
             VisitProjectsInRegistry
             (
                 getGitBranch, getPlasticBranch, getArguments, 
@@ -126,6 +145,85 @@ namespace UnityLauncherPro
                 } // each key
             } // for each registry root
         } // VisitProjectsInRegistry()
+
+        private static void VisitProjectsInUnityHubJson(            
+            bool getGitBranch, bool getPlasticBranch, bool getArguments, 
+            bool showMissingFolders, bool showTargetPlatform , bool searchGitbranchRecursively , bool showSRP, 
+            Action<Project> visitor)
+        {
+            string hubProjectsFile = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "UnityHub", "projects-v1.json");
+
+            if (!File.Exists(hubProjectsFile)) 
+                return;
+
+            string json;
+            try { json = File.ReadAllText(hubProjectsFile); }
+            catch { return; }
+
+            int dataIndex = json.IndexOf("\"data\":");
+            if (dataIndex == -1) return;
+
+            // find the opening { of the data object
+            int dataStart = json.IndexOf('{', dataIndex + 7);
+            if (dataStart == -1) return;
+
+            int searchFrom = dataStart + 1;
+            while (true)
+            {
+                // find the start of the next project entry object
+                int entryStart = json.IndexOf('{', searchFrom);
+                if (entryStart == -1) break;
+
+                // find the matching closing }
+                int entryEnd = JsonParser.FindMatchingBrace(json, entryStart);
+                if (entryEnd == -1) break;
+
+                string entry = json.Substring(entryStart, entryEnd - entryStart + 1);
+
+                string projectPath = JsonParser.GetStringValue(entry, "path");
+                if (!string.IsNullOrEmpty(projectPath))
+                {
+                    // unescape JSON backslashes and convert to normal path separators
+                    projectPath = projectPath.Replace(@"\\", @"/");
+
+                    // collect project info from disk, but override with hub json data where its more authoritative
+                    // todo: an optimization could be to only get data from disk that is missing from json, 
+                    // instead of getting all data and then overriding. 
+                    var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursively, showSRP);
+                    if (p != null)
+                    {
+                        string title = JsonParser.GetStringValue(entry, "title");
+                        if (!string.IsNullOrEmpty(title)) p.Title = title;
+
+                        // lastModified is a Unix millisecond timestamp
+                        string lastModifiedStr = JsonParser.GetNumberValue(entry, "lastModified");
+                        if (long.TryParse(lastModifiedStr, out long lastModifiedMs))
+                            p.Modified = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(lastModifiedMs).ToLocalTime();
+
+                        string version = JsonParser.GetStringValue(entry, "version");
+                        if (!string.IsNullOrEmpty(version)) p.Version = version;
+
+                        if (showTargetPlatform)
+                        {
+                            string buildTarget = JsonParser.GetStringValue(entry, "buildTarget");                            
+                            p.TargetPlatform = Tools.GetTargetPlatformFromRaw(buildTarget);                                                        
+                        }
+
+                        if (showSRP)
+                        {
+                            string renderPipeline = JsonParser.GetStringValue(entry, "renderPipeline");
+                            if (!string.IsNullOrEmpty(renderPipeline)) p.SRP = renderPipeline;
+                        }
+
+                        visitor(p);
+                    }
+                }
+
+                searchFrom = entryEnd + 1;
+            }
+        }
 
         private static bool ContainsProjectWithPath(this List<Project> projects, string projectPath)
         {
