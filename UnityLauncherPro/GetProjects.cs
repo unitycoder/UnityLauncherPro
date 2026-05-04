@@ -19,58 +19,18 @@ namespace UnityLauncherPro
         {
             List<Project> projectsFound = new List<Project>();
 
-            var hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
+            VisitProjectsInRegistry
+            (
+                getGitBranch, getPlasticBranch, getArguments, 
+                showMissingFolders, showTargetPlatform , searchGitbranchRecursively , showSRP, 
+                project =>
+            {                
+                projectsFound.Add(project);
 
-            // check each version path
-            for (int i = 0, len = registryPathsToCheck.Length; i < len; i++)
-            {
-                RegistryKey key = hklm.OpenSubKey(registryPathsToCheck[i]);
-
-                if (key == null)
-                {
-                    continue;
-                }
-                else
-                {
-                    //Console.WriteLine("Null registry key at " + registryPathsToCheck[i]);
-                }
-
-                // parse recent project path
-                foreach (var valueName in key.GetValueNames())
-                {
-                    if (valueName.IndexOf("RecentlyUsedProjectPaths-") == 0)
-                    {
-                        string projectPath = "";
-                        // check if binary or not
-                        var valueKind = key.GetValueKind(valueName);
-                        if (valueKind == RegistryValueKind.Binary)
-                        {
-                            byte[] projectPathBytes = (byte[])key.GetValue(valueName);
-                            projectPath = Encoding.UTF8.GetString(projectPathBytes, 0, projectPathBytes.Length - 1);
-                        }
-                        else // should be string then
-                        {
-                            projectPath = (string)key.GetValue(valueName);
-                        }
-
-                        var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursively, showSRP);
-                        //Console.WriteLine(projectPath+" "+p.TargetPlatform);
-
-                        // if want to hide project and folder path for screenshot
-                        //p.Title = "Example Project";
-                        //p.Path = "C:/Projects/MyProj";
-
-                        if (p != null)
-                        {
-                            projectsFound.Add(p);
-
-                            // TODO FIXME, this gets called everytime for same projects?
-                            // add found projects to history also (gets added only if its not already there)
-                            Tools.AddProjectToHistory(p.Path);
-                        }
-                    } // valid key
-                } // each key
-            } // for each registry root
+                // TODO FIXME, this gets called everytime for same projects?
+                // add found projects to history also (gets added only if its not already there)
+                Tools.AddProjectToHistory(project.Path);            
+            });
 
             // NOTE those 40 projects should be added to custom list, otherwise they will disappear (since last item is not yet added to our list, until its launched once, so need to launch many projects, to start collecting history..)
             // but then we would have to loop here again..? or add in the loop above..if doesnt exists on list, and the remove extra items from the end
@@ -120,6 +80,61 @@ namespace UnityLauncherPro
             }
             return projectsFound;
         } // Scan()
+
+        // visits each project path stored in the Unity registry, invoking the visitor for each one
+        static void VisitProjectsInRegistry(            
+            bool getGitBranch, bool getPlasticBranch, bool getArguments, 
+            bool showMissingFolders, bool showTargetPlatform , bool searchGitbranchRecursively , bool showSRP, 
+            Action<Project> visitor)
+        {
+            var hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
+
+            // check each version path
+            for (int i = 0, len = registryPathsToCheck.Length; i < len; i++)
+            {
+                RegistryKey key = hklm.OpenSubKey(registryPathsToCheck[i]);
+
+                if (key == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    //Console.WriteLine("Null registry key at " + registryPathsToCheck[i]);
+                }
+
+                // parse recent project path
+                foreach (var valueName in key.GetValueNames())
+                {
+                    if (valueName.IndexOf("RecentlyUsedProjectPaths-") == 0)
+                    {
+                        string projectPath = "";
+                        // check if binary or not
+                        var valueKind = key.GetValueKind(valueName);
+                        if (valueKind == RegistryValueKind.Binary)
+                        {
+                            byte[] projectPathBytes = (byte[])key.GetValue(valueName);
+                            projectPath = Encoding.UTF8.GetString(projectPathBytes, 0, projectPathBytes.Length - 1);
+                        }
+                        else // should be string then
+                        {
+                            projectPath = (string)key.GetValue(valueName);
+                        }
+
+                        var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursively, showSRP);
+                        //Console.WriteLine(projectPath+" "+p.TargetPlatform);
+
+                        // if want to hide project and folder path for screenshot
+                        //p.Title = "Example Project";
+                        //p.Path = "C:/Projects/MyProj";
+                        if (p != null)
+                        {
+                            visitor(p);
+                        }
+                    } // valid key
+                } // each key
+            } // for each registry root
+        } // VisitProjectsInRegistry()
 
         static Project GetProjectInfo(string projectPath, bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, bool searchGitbranchRecursively = false, bool showSRP = false)
         {
