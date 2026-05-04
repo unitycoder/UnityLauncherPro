@@ -24,8 +24,9 @@ namespace UnityLauncherPro
                 getGitBranch, getPlasticBranch, getArguments, 
                 showMissingFolders, showTargetPlatform , searchGitbranchRecursively , showSRP, 
                 project =>
-            {                
-                projectsFound.Add(project);
+            {
+                if (!projectsFound.ContainsProjectWithPath(project.Path))
+                    projectsFound.Add(project);
 
                 // TODO FIXME, this gets called everytime for same projects?
                 // add found projects to history also (gets added only if its not already there)
@@ -41,19 +42,9 @@ namespace UnityLauncherPro
                 // iterate custom full projects history
                 foreach (var projectPath in AllProjectPaths)
                 {
-                    // check if registry list contains this path already, then skip it
-                    bool found = false;
-                    for (int i = 0, len = projectsFound.Count; i < len; i++)
-                    {
-                        if (projectsFound[i].Path == projectPath)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-
+                    // check if registry list contains this path already
                     // if not found from registry, add to recent projects list
-                    if (found == false)
+                    if (!projectsFound.ContainsProjectWithPath(projectPath))
                     {
                         var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursively, showSRP);
                         if (p != null) projectsFound.Add(p);
@@ -82,7 +73,7 @@ namespace UnityLauncherPro
         } // Scan()
 
         // visits each project stored in the Unity registry, invoking the visitor for each one
-        static void VisitProjectsInRegistry(            
+        private static void VisitProjectsInRegistry(            
             bool getGitBranch, bool getPlasticBranch, bool getArguments, 
             bool showMissingFolders, bool showTargetPlatform , bool searchGitbranchRecursively , bool showSRP, 
             Action<Project> visitor)
@@ -135,6 +126,16 @@ namespace UnityLauncherPro
                 } // each key
             } // for each registry root
         } // VisitProjectsInRegistry()
+
+        private static bool ContainsProjectWithPath(this List<Project> projects, string projectPath)
+        {
+            foreach (var p in projects)
+            {
+                if (string.Equals(p.Path, projectPath, StringComparison.OrdinalIgnoreCase)) 
+                    return true;
+            }
+            return false;
+        }
 
         static Project GetProjectInfo(string projectPath, bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, bool searchGitbranchRecursively = false, bool showSRP = false)
         {
