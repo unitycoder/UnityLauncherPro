@@ -1636,6 +1636,11 @@ namespace UnityLauncherPro
         {
             var rawPlatformName = GetTargetPlatformRaw(projectPath);
 
+            return GetTargetPlatformFromRaw(rawPlatformName);
+        }
+
+        public static string GetTargetPlatformFromRaw(string rawPlatformName)
+        {
             if (string.IsNullOrEmpty(rawPlatformName) == false && GetProjects.remapPlatformNames.ContainsKey(rawPlatformName))
             {
                 return GetProjects.remapPlatformNames[rawPlatformName];

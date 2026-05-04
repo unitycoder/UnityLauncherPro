@@ -13,12 +13,90 @@ namespace UnityLauncherPro
         static readonly string[] registryPathsToCheck = new string[] { @"SOFTWARE\Unity Technologies\Unity Editor 5.x", @"SOFTWARE\Unity Technologies\Unity Editor 4.x" };
 
         // convert target platform name into valid buildtarget platform name, NOTE this depends on unity version, now only 2019 and later are supported
-        public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { { "StandaloneWindows64", "Win64" }, { "StandaloneWindows", "Win" }, { "Android", "Android" }, { "WebGL", "WebGL" } };
+        public static Dictionary<string, string> remapPlatformNames = new Dictionary<string, string> { 
+            { "StandaloneWindows64", "Win64" },             
+            { "StandaloneWindows", "Win" }, 
+            { "Android", "Android" }, 
+            { "WebGL", "WebGL" } };
 
         public static List<Project> Scan(bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, StringCollection AllProjectPaths = null, bool searchGitbranchRecursively = false, bool showSRP = false)
         {
             List<Project> projectsFound = new List<Project>();
 
+            // first, scan projects from unity hub json file
+            VisitProjectsInUnityHubJson
+            (
+                getGitBranch, getPlasticBranch, getArguments, 
+                showMissingFolders, showTargetPlatform , searchGitbranchRecursively , showSRP, 
+                project =>
+            {
+                if (!projectsFound.ContainsProjectWithPath(project.Path))
+                    projectsFound.Add(project);
+
+                // add found projects to history also (gets added only if its not already there)
+                Tools.AddProjectToHistory(project.Path);
+            });
+
+            // then scan projects from registry
+            VisitProjectsInRegistry
+            (
+                getGitBranch, getPlasticBranch, getArguments, 
+                showMissingFolders, showTargetPlatform , searchGitbranchRecursively , showSRP, 
+                project =>
+            {
+                if (!projectsFound.ContainsProjectWithPath(project.Path))
+                    projectsFound.Add(project);
+
+                // TODO FIXME, this gets called everytime for same projects?
+                // add found projects to history also (gets added only if its not already there)
+                Tools.AddProjectToHistory(project.Path);            
+            });
+
+            // NOTE those 40 projects should be added to custom list, otherwise they will disappear (since last item is not yet added to our list, until its launched once, so need to launch many projects, to start collecting history..)
+            // but then we would have to loop here again..? or add in the loop above..if doesnt exists on list, and the remove extra items from the end
+
+            // scan info for custom folders (if not already on the list)
+            if (AllProjectPaths != null)
+            {
+                // iterate custom full projects history
+                foreach (var projectPath in AllProjectPaths)
+                {
+                    // check if registry list contains this path already
+                    // if not found from registry, add to recent projects list
+                    if (!projectsFound.ContainsProjectWithPath(projectPath))
+                    {
+                        var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursively, showSRP);
+                        if (p != null) projectsFound.Add(p);
+                    }
+                }
+            }
+
+            // sometimes projects are in wrong order, seems to be related to messing up your unity registry, the keys are received in created order (so if you had removed/modified them manually, it might return wrong order instead of 0 - 40)
+            // sort by modified date, projects without modified date are put to last, NOTE: this would remove projects without modified date (if they become last items, before trimming list on next step)
+            projectsFound.Sort((x, y) =>
+            {
+                if (x.Modified == null && y.Modified == null) return 0; // cannot be -1, https://stackoverflow.com/a/42821992/5452781
+                if (x.Modified == null) return 1;
+                if (y.Modified == null) return -1;
+                return y.Modified.Value.CompareTo(x.Modified.Value);
+                //return x.Modified.Value.CompareTo(y.Modified.Value); // BUG this breaks something, so that last item platform is wrong (for project that is missing from disk) ?
+            });
+
+            // trim list to max amount (older ones are dropped)
+            if (projectsFound.Count > MainWindow.maxProjectCount)
+            {
+                //Console.WriteLine("Trimming projects list to " + MainWindow.maxProjectCount + " projects");
+                projectsFound.RemoveRange(MainWindow.maxProjectCount, projectsFound.Count - MainWindow.maxProjectCount);
+            }
+            return projectsFound;
+        } // Scan()
+
+        // visits each project stored in the Unity registry, invoking the visitor for each one
+        private static void VisitProjectsInRegistry(            
+            bool getGitBranch, bool getPlasticBranch, bool getArguments, 
+            bool showMissingFolders, bool showTargetPlatform , bool searchGitbranchRecursively , bool showSRP, 
+            Action<Project> visitor)
+        {
             var hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
 
             // check each version path
@@ -59,67 +137,103 @@ namespace UnityLauncherPro
                         // if want to hide project and folder path for screenshot
                         //p.Title = "Example Project";
                         //p.Path = "C:/Projects/MyProj";
-
                         if (p != null)
                         {
-                            projectsFound.Add(p);
-
-                            // TODO FIXME, this gets called everytime for same projects?
-                            // add found projects to history also (gets added only if its not already there)
-                            Tools.AddProjectToHistory(p.Path);
+                            visitor(p);
                         }
                     } // valid key
                 } // each key
             } // for each registry root
+        } // VisitProjectsInRegistry()
 
-            // NOTE those 40 projects should be added to custom list, otherwise they will disappear (since last item is not yet added to our list, until its launched once, so need to launch many projects, to start collecting history..)
-            // but then we would have to loop here again..? or add in the loop above..if doesnt exists on list, and the remove extra items from the end
+        private static void VisitProjectsInUnityHubJson(            
+            bool getGitBranch, bool getPlasticBranch, bool getArguments, 
+            bool showMissingFolders, bool showTargetPlatform , bool searchGitbranchRecursively , bool showSRP, 
+            Action<Project> visitor)
+        {
+            string hubProjectsFile = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "UnityHub", "projects-v1.json");
 
-            // scan info for custom folders (if not already on the list)
-            if (AllProjectPaths != null)
+            if (!File.Exists(hubProjectsFile)) 
+                return;
+
+            string json;
+            try { json = File.ReadAllText(hubProjectsFile); }
+            catch { return; }
+
+            int dataIndex = json.IndexOf("\"data\":");
+            if (dataIndex == -1) return;
+
+            // find the opening { of the data object
+            int dataStart = json.IndexOf('{', dataIndex + 7);
+            if (dataStart == -1) return;
+
+            int searchFrom = dataStart + 1;
+            while (true)
             {
-                // iterate custom full projects history
-                foreach (var projectPath in AllProjectPaths)
-                {
-                    // check if registry list contains this path already, then skip it
-                    bool found = false;
-                    for (int i = 0, len = projectsFound.Count; i < len; i++)
-                    {
-                        if (projectsFound[i].Path == projectPath)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
+                // find the start of the next project entry object
+                int entryStart = json.IndexOf('{', searchFrom);
+                if (entryStart == -1) break;
 
-                    // if not found from registry, add to recent projects list
-                    if (found == false)
+                // find the matching closing }
+                int entryEnd = JsonParser.FindMatchingBrace(json, entryStart);
+                if (entryEnd == -1) break;
+
+                string entry = json.Substring(entryStart, entryEnd - entryStart + 1);
+
+                string projectPath = JsonParser.GetStringValue(entry, "path");
+                if (!string.IsNullOrEmpty(projectPath))
+                {
+                    // unescape JSON backslashes and convert to normal path separators
+                    projectPath = projectPath.Replace(@"\\", @"/");
+
+                    // collect project info from disk, but override with hub json data where its more authoritative
+                    // todo: an optimization could be to only get data from disk that is missing from json, 
+                    // instead of getting all data and then overriding. 
+                    var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursively, showSRP);
+                    if (p != null)
                     {
-                        var p = GetProjectInfo(projectPath, getGitBranch, getPlasticBranch, getArguments, showMissingFolders, showTargetPlatform, searchGitbranchRecursively, showSRP);
-                        if (p != null) projectsFound.Add(p);
+                        string title = JsonParser.GetStringValue(entry, "title");
+                        if (!string.IsNullOrEmpty(title)) p.Title = title;
+
+                        // lastModified is a Unix millisecond timestamp
+                        string lastModifiedStr = JsonParser.GetNumberValue(entry, "lastModified");
+                        if (long.TryParse(lastModifiedStr, out long lastModifiedMs))
+                            p.Modified = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(lastModifiedMs).ToLocalTime();
+
+                        string version = JsonParser.GetStringValue(entry, "version");
+                        if (!string.IsNullOrEmpty(version)) p.Version = version;
+
+                        if (showTargetPlatform)
+                        {
+                            string buildTarget = JsonParser.GetStringValue(entry, "buildTarget");                            
+                            p.TargetPlatform = Tools.GetTargetPlatformFromRaw(buildTarget);                                                        
+                        }
+
+                        if (showSRP)
+                        {
+                            string renderPipeline = JsonParser.GetStringValue(entry, "renderPipeline");
+                            if (!string.IsNullOrEmpty(renderPipeline)) p.SRP = renderPipeline;
+                        }
+
+                        visitor(p);
                     }
                 }
-            }
 
-            // sometimes projects are in wrong order, seems to be related to messing up your unity registry, the keys are received in created order (so if you had removed/modified them manually, it might return wrong order instead of 0 - 40)
-            // sort by modified date, projects without modified date are put to last, NOTE: this would remove projects without modified date (if they become last items, before trimming list on next step)
-            projectsFound.Sort((x, y) =>
-            {
-                if (x.Modified == null && y.Modified == null) return 0; // cannot be -1, https://stackoverflow.com/a/42821992/5452781
-                if (x.Modified == null) return 1;
-                if (y.Modified == null) return -1;
-                return y.Modified.Value.CompareTo(x.Modified.Value);
-                //return x.Modified.Value.CompareTo(y.Modified.Value); // BUG this breaks something, so that last item platform is wrong (for project that is missing from disk) ?
-            });
-
-            // trim list to max amount (older ones are dropped)
-            if (projectsFound.Count > MainWindow.maxProjectCount)
-            {
-                //Console.WriteLine("Trimming projects list to " + MainWindow.maxProjectCount + " projects");
-                projectsFound.RemoveRange(MainWindow.maxProjectCount, projectsFound.Count - MainWindow.maxProjectCount);
+                searchFrom = entryEnd + 1;
             }
-            return projectsFound;
-        } // Scan()
+        }
+
+        private static bool ContainsProjectWithPath(this List<Project> projects, string projectPath)
+        {
+            foreach (var p in projects)
+            {
+                if (string.Equals(p.Path, projectPath, StringComparison.OrdinalIgnoreCase)) 
+                    return true;
+            }
+            return false;
+        }
 
         static Project GetProjectInfo(string projectPath, bool getGitBranch = false, bool getPlasticBranch = false, bool getArguments = false, bool showMissingFolders = false, bool showTargetPlatform = false, bool searchGitbranchRecursively = false, bool showSRP = false)
         {
