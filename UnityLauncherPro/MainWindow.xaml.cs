@@ -1587,18 +1587,29 @@ namespace UnityLauncherPro
 
         private void BtnOpenEditorLogsFolder_Click(object sender, RoutedEventArgs e)
         {
-            var logfolder = Tools.GetGlobalEditorLogsFolder();
-            if (Directory.Exists(logfolder) == true)
+            var proj = ProcessHandler.GetSingleRunning();
+            if (proj != null && Tools.IsVersionAtLeast(proj.Version, "6000.5"))
             {
-                if (Tools.LaunchExplorer(logfolder) == false)
+                var logFolder = Path.Combine(proj.Path, "Logs");
+                if (Directory.Exists(logFolder))
                 {
-                    Console.WriteLine("Cannot open folder.." + logfolder);
-                    SetStatus("Cannot open folder: " + logfolder);
+                    Tools.LaunchExplorer(logFolder);
+                    return;
+                }
+            }
+
+            var globalLogFolder = Tools.GetGlobalEditorLogsFolder();
+            if (Directory.Exists(globalLogFolder))
+            {
+                if (Tools.LaunchExplorer(globalLogFolder) == false)
+                {
+                    Console.WriteLine("Cannot open folder.." + globalLogFolder);
+                    SetStatus("Cannot open folder: " + globalLogFolder);
                 }
             }
             else
             {
-                SetStatus("Folder does not exist: " + logfolder);
+                SetStatus("Folder does not exist: " + globalLogFolder);
             }
         }
 
@@ -3880,9 +3891,16 @@ namespace UnityLauncherPro
         {
             if (e.ChangedButton == MouseButton.Middle)
             {
-                var logfolder = Tools.GetGlobalEditorLogsFolder();
-                var logFile = Path.Combine(logfolder, "Editor.log");
-                if (File.Exists(logFile) == true) Tools.LaunchExe(logFile);
+                var proj = ProcessHandler.GetSingleRunning();
+                if (proj != null && Tools.IsVersionAtLeast(proj.Version, "6000.5"))
+                {
+                    Tools.OpenEditorLogForProject(proj);
+                    return;
+                }
+
+                var logFolder = Tools.GetGlobalEditorLogsFolder();
+                var logFile = Path.Combine(logFolder, "Editor.log");
+                if (File.Exists(logFile)) Tools.LaunchExe(logFile);
             }
         }
 
@@ -4371,34 +4389,7 @@ namespace UnityLauncherPro
         {
             var proj = GetSelectedProject();
             if (proj == null) return;
-
-            // if version is 6000.5 or higher, then log file is in Proj/Logs, otherwise in Appdata/LocalLow
-            if (proj.Version != null && Tools.IsVersionAtLeast(proj.Version, "6000.5") == true)
-            {
-                var logFolder = Path.Combine(proj.Path, "Logs");
-                var logFile = Path.Combine(logFolder, "Editor.log");
-                if (File.Exists(logFile) == true)
-                {
-                    Tools.LaunchExe(logFile);
-                }
-                else
-                {
-                    SetStatus("Log file not found: " + logFile, MessageType.Warning);
-                }
-            }
-            else
-            {
-                var logFolder = Tools.GetGlobalEditorLogsFolder();
-                var logFile = Path.Combine(logFolder, "Editor.log");
-                if (File.Exists(logFile) == true)
-                {
-                    Tools.LaunchExe(logFile);
-                }
-                else
-                {
-                    SetStatus("Log file not found: " + logFile, MessageType.Warning);
-                }
-            }
+            Tools.OpenEditorLogForProject(proj);
         }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)

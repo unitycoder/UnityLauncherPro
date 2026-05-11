@@ -11,7 +11,7 @@ namespace UnityLauncherPro.Helpers
 {
     public static class ProcessHandler
     {
-        static Dictionary<string, Process> processes = new Dictionary<string, Process>();
+        static Dictionary<string, (Process, Project)> processes = new Dictionary<string, (Process, Project)>();
 
         public static void Add(Project proj, Process proc)
         {
@@ -21,11 +21,11 @@ namespace UnityLauncherPro.Helpers
             if (processes.ContainsKey(key))
             {
                 // already in the list, maybe trying to launch same project twice? only overwrite if previous process has closed
-                if (processes[key] == null) processes[key] = proc;
+                if (processes[key].Item1 == null) processes[key] = (proc, proj);
             }
             else
             {
-                processes.Add(key, proc);
+                processes.Add(key, (proc, proj));
             }
 
             // subscribe to process exit here, so that can update proj details row (if it was changed in Unity)
@@ -45,13 +45,35 @@ namespace UnityLauncherPro.Helpers
 
         public static Process Get(string key)
         {
-            if (processes.ContainsKey(key)) return processes[key];
+            if (processes.ContainsKey(key) && (processes[key].Item1 != null))
+            {
+                return processes[key].Item1;
+            }
             return null;
         }
 
+        // return project for given key
+        //public static Project GetProject(string key)
+        //{
+        //    if (processes.ContainsKey(key) && (processes[key].Item2 != null))
+        //    {
+        //        return processes[key].Item2;
+        //    }
+        //    return null;
+        //}
+
         public static bool IsRunning(string key)
         {
-            return processes.ContainsKey(key) && (processes[key] != null);
+            return processes.ContainsKey(key) && (processes[key].Item1 != null);
+        }
+
+        public static Project GetSingleRunning()
+        {
+            if (processes.Count != 1) return null;
+            var enumerator = processes.Values.GetEnumerator();
+            enumerator.MoveNext();
+            var entry = enumerator.Current;
+            return entry.Item1 != null ? entry.Item2 : null;
         }
 
         public static void Remove(string key)

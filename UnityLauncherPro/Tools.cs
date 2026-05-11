@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using UnityLauncherPro.Data;
 using UnityLauncherPro.Helpers;
 using UnityLauncherPro.Properties;
 
@@ -1926,6 +1927,37 @@ namespace UnityLauncherPro
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Unity", "Editor");
         }
 
+        public static void OpenEditorLogForProject(Project proj)
+        {
+            // if version is 6000.5 or higher, then log file is in Proj/Logs, otherwise in Appdata/LocalLow
+            if (proj.Version != null && Tools.IsVersionAtLeast(proj.Version, "6000.5") == true)
+            {
+                var logFolder = Path.Combine(proj.Path, "Logs");
+                var logFile = Path.Combine(logFolder, "Editor.log");
+                if (File.Exists(logFile) == true)
+                {
+                    Tools.LaunchExe(logFile);
+                }
+                else
+                {
+                    SetStatus("Log file not found: " + logFile, MessageType.Warning);
+                }
+            }
+            else
+            {
+                var logFolder = Tools.GetGlobalEditorLogsFolder();
+                var logFile = Path.Combine(logFolder, "Editor.log");
+                if (File.Exists(logFile) == true)
+                {
+                    Tools.LaunchExe(logFile);
+                }
+                else
+                {
+                    SetStatus("Log file not found: " + logFile, MessageType.Warning);
+                }
+            }
+        }
+
         public static string[] GetPlatformsForUnityVersion(string version)
         {
             // get platforms array for this unity version
@@ -2569,9 +2601,9 @@ public static class UnityLauncherProTools
         public static MainWindow mainWindow;
 
         // set status bar in main thread
-        public static void SetStatus(string text)
+        public static void SetStatus(string text, MessageType messageType = MessageType.Info)
         {
-            mainWindow.Dispatcher.Invoke(() => { mainWindow.SetStatus(text); });
+            mainWindow.Dispatcher.Invoke(() => { mainWindow.SetStatus(text, messageType); });
         }
 
         public static void SetBuildStatus(Color color)

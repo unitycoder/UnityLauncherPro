@@ -197,6 +197,7 @@ namespace UnityLauncherPro
                         string title = JsonParser.GetStringValue(entry, "title");
                         if (!string.IsNullOrEmpty(title)) p.Title = title;
 
+                        // NOTE: this has changed in newer hub versions? (not checking from folder anymore?)
                         // lastModified is a Unix millisecond timestamp
                         string lastModifiedStr = JsonParser.GetNumberValue(entry, "lastModified");
                         if (long.TryParse(lastModifiedStr, out long lastModifiedMs))
