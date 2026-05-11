@@ -1587,7 +1587,7 @@ namespace UnityLauncherPro
 
         private void BtnOpenEditorLogsFolder_Click(object sender, RoutedEventArgs e)
         {
-            var logfolder = Tools.GetEditorLogsFolder();
+            var logfolder = Tools.GetGlobalEditorLogsFolder();
             if (Directory.Exists(logfolder) == true)
             {
                 if (Tools.LaunchExplorer(logfolder) == false)
@@ -2361,6 +2361,12 @@ namespace UnityLauncherPro
             new KeyGesture(Key.Q, ModifierKeys.Alt)
         }));
 
+        public static readonly RoutedCommand OpenEditorLogsCommand = new RoutedUICommand("None", "OpenEditorLogsCommand", typeof(MainWindow), new InputGestureCollection(new InputGesture[]
+        {
+            new KeyGesture(Key.L, ModifierKeys.Control)
+        }));
+
+
         private void BtnRefreshBuildReport_Click(object sender, RoutedEventArgs e)
         {
             RefreshBuildReports();
@@ -2376,7 +2382,7 @@ namespace UnityLauncherPro
             btnPrevBuildReport.IsEnabled = false;
             btnNextBuildReport.IsEnabled = false;
 
-            var logFile = Path.Combine(Tools.GetEditorLogsFolder(), "Editor.log");
+            var logFile = Path.Combine(Tools.GetGlobalEditorLogsFolder(), "Editor.log");
             if (File.Exists(logFile) == false) return;
 
             BuildReport singleReport = null;// new BuildReport();
@@ -3874,7 +3880,7 @@ namespace UnityLauncherPro
         {
             if (e.ChangedButton == MouseButton.Middle)
             {
-                var logfolder = Tools.GetEditorLogsFolder();
+                var logfolder = Tools.GetGlobalEditorLogsFolder();
                 var logFile = Path.Combine(logfolder, "Editor.log");
                 if (File.Exists(logFile) == true) Tools.LaunchExe(logFile);
             }
@@ -4359,6 +4365,40 @@ namespace UnityLauncherPro
             gridRecent.SelectedItem = row.Item;
             gridRecent.SelectedIndex = row.GetIndex();
             row.Focus();
+        }
+
+        private void MenuOpenEditorLogs_Click(object sender, RoutedEventArgs e)
+        {
+            var proj = GetSelectedProject();
+            if (proj == null) return;
+
+            // if version is 6000.5 or higher, then log file is in Proj/Logs, otherwise in Appdata/LocalLow
+            if (proj.Version != null && Tools.IsVersionAtLeast(proj.Version, "6000.5") == true)
+            {
+                var logFolder = Path.Combine(proj.Path, "Logs");
+                var logFile = Path.Combine(logFolder, "Editor.log");
+                if (File.Exists(logFile) == true)
+                {
+                    Tools.LaunchExe(logFile);
+                }
+                else
+                {
+                    SetStatus("Log file not found: " + logFile, MessageType.Warning);
+                }
+            }
+            else
+            {
+                var logFolder = Tools.GetGlobalEditorLogsFolder();
+                var logFile = Path.Combine(logFolder, "Editor.log");
+                if (File.Exists(logFile) == true)
+                {
+                    Tools.LaunchExe(logFile);
+                }
+                else
+                {
+                    SetStatus("Log file not found: " + logFile, MessageType.Warning);
+                }
+            }
         }
 
         //private void menuProjectProperties_Click(object sender, RoutedEventArgs e)

@@ -1494,6 +1494,7 @@ namespace UnityLauncherPro
         /// reads .git/HEAD file from the project to get current branch name
         /// </summary>
         /// <param name="projectPath"></param>
+        /// <param name="searchParentFolders"></param>
         /// <returns></returns>
         public static string ReadGitBranchInfo(string projectPath, bool searchParentFolders)
         {
@@ -1919,8 +1920,9 @@ namespace UnityLauncherPro
             File.WriteAllText(settingsFile, "m_EditorVersion: " + version);
         }
 
-        public static string GetEditorLogsFolder()
+        public static string GetGlobalEditorLogsFolder()
         {
+            // NOTE this is pre 6.5 unity (in 6.5 and later its inside project: MyProj/Logs/Editor.log)
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Unity", "Editor");
         }
 
@@ -2312,7 +2314,7 @@ public static class UnityLauncherProTools
                         if (objEndPoints[i].Port == port)
                         {
                             port++;
-                            if (port > 65534)
+                            if (port > 65535)
                             {
                                 Console.WriteLine("Failed to find open port..");
                                 isAvailable = false;
@@ -2953,6 +2955,11 @@ public static class UnityLauncherProTools
                 }
                 return false;
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
 
             return true;
         }
@@ -3216,6 +3223,61 @@ public static class UnityLauncherProTools
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to open URL: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        internal static bool IsVersionAtLeast(string version, string v)
+        {
+            if (string.IsNullOrEmpty(version) || string.IsNullOrEmpty(v)) return false;
+
+            try
+            {
+                var versionParts = version.Split('.');
+                var vParts = v.Split('.');
+
+                int versionMajor = 0;
+                int vMajor = 0;
+                int versionMinor = 0;
+                int vMinor = 0;
+
+                if (versionParts.Length > 0)
+                {
+                    int i = 0;
+                    while (i < versionParts[0].Length && char.IsDigit(versionParts[0][i])) i++;
+                    int.TryParse(versionParts[0].Substring(0, i), out versionMajor);
+                }
+
+                if (vParts.Length > 0)
+                {
+                    int i = 0;
+                    while (i < vParts[0].Length && char.IsDigit(vParts[0][i])) i++;
+                    int.TryParse(vParts[0].Substring(0, i), out vMajor);
+                }
+
+                if (versionMajor != vMajor)
+                {
+                    return versionMajor > vMajor;
+                }
+
+                if (versionParts.Length > 1)
+                {
+                    int i = 0;
+                    while (i < versionParts[1].Length && char.IsDigit(versionParts[1][i])) i++;
+                    int.TryParse(versionParts[1].Substring(0, i), out versionMinor);
+                }
+
+                if (vParts.Length > 1)
+                {
+                    int i = 0;
+                    while (i < vParts[1].Length && char.IsDigit(vParts[1][i])) i++;
+                    int.TryParse(vParts[1].Substring(0, i), out vMinor);
+                }
+
+                return versionMinor >= vMinor;
+            }
+            catch
+            {
+                return false;
             }
         }
     } // class

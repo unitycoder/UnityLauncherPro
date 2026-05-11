@@ -9,6 +9,9 @@
         xmlns:converters="clr-namespace:UnityLauncherPro.Converters" x:Class="UnityLauncherPro.MainWindow"
 		mc:Ignorable="d"
         Title="UnityLauncherPro" Height="670" Width="880" WindowStartupLocation="CenterScreen" Background="{DynamicResource ThemeDarkestBackground}" MinWidth="780" MinHeight="650" AllowsTransparency="True" WindowStyle="None" Margin="0" KeyDown="OnWindowKeyDown" Closing="Window_Closing" SizeChanged="Window_SizeChanged" Icon="Images/icon.ico" SourceInitialized="Window_SourceInitialized" MouseDown="Window_MouseDown">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:MainWindow.OpenEditorLogsCommand}" Executed="MenuOpenEditorLogs_Click" />
+    </Window.CommandBindings>
     <Window.Resources>
         <converters:LastModifiedConverter x:Key="lastModifiedConverter"/>
         <converters:LastModifiedConverterTooltip x:Key="LastModifiedConverterTooltip"/>
@@ -61,6 +64,7 @@
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                             <CommandBinding Command="{x:Static local:MainWindow.KillProcessCommand}" Executed="KillSelectedProcess"/>
+                            <CommandBinding Command="{x:Static local:MainWindow.OpenEditorLogsCommand}" Executed="MenuOpenEditorLogs_Click"/>
                         </DataGrid.CommandBindings>
 
                         <DataGrid.Columns>
@@ -175,6 +179,7 @@
                                 <MenuItem x:Name="menuItemShowProjectInExplorer" Header="Show in Explorer" Click="MenuItemShowProjectInExplorer_Click" />
                                 <MenuItem x:Name="menuItemBrowsePersistentDataPath" Header="Open PersistentDataPath" Click="MenuItemBrowsePersistentDataPath_Click" />
                                 <MenuItem x:Name="menuCreateDesktopShortCut" Header="Create Shortcut on Desktop" Click="MenuCreateDesktopShortCut_Click" />
+                                <MenuItem x:Name="menuOpenEditorLogs" Header="Open Editor.Log" InputGestureText="Ctrl+L" Command="{x:Static local:MainWindow.OpenEditorLogsCommand}" Click="MenuOpenEditorLogs_Click" />
                                 <Separator/>
                                 <MenuItem x:Name="menuItemKillProcess" Header="Kill Process" Click="MenuItemKillProcess_Click" />
                                 <Separator/>
@@ -432,6 +437,11 @@
                                     </Style>
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
+                            <DataGridTextColumn Header="Release" Binding="{Binding ReleaseType}" IsReadOnly="True" CanUserResize="False" MinWidth="50" />
+                            <DataGridTextColumn Binding="{Binding PlatformsCombined}" ClipboardContentBinding="{x:Null}" Header="Platforms" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Installed, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}" ClipboardContentBinding="{x:Null}" Header="Installed" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding ProjectCount}" ClipboardContentBinding="{x:Null}" Header="Projects" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="Path" IsReadOnly="True"/>
                         </DataGrid.Columns>
 
                         <!-- right click context menu -->
@@ -496,7 +506,7 @@
                                 <!-- folders -->
                                 <StackPanel Orientation="Horizontal" Margin="0,4,10,4" VerticalAlignment="Top">
                                     <Label Content="Folders" Foreground="{DynamicResource ThemeButtonForeground}" />
-                                    <Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0"  HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Browse Editor logs folder or Right click to open editor.log" PreviewMouseDown="btnOpenEditorLogsFolder_PreviewMouseDown">
+                                    <Button Style="{StaticResource CustomButton}" x:Name="btnOpenEditorLogsFolder"  Margin="0"  HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenEditorLogsFolder_Click" ToolTip="Browse Editor logs folder or Middle click to open editor.log" PreviewMouseDown="btnOpenEditorLogsFolder_PreviewMouseDown">
                                         <Label Content="_Editor Logs" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" />
                                     </Button>
                                     <Button Style="{StaticResource CustomButton}" x:Name="btnOpenPlayerLogs" Margin="10,0,0,0"  HorizontalAlignment="Left" VerticalAlignment="Top" Click="BtnOpenPlayerLogs_Click" ToolTip="Browse Player logs folder">
