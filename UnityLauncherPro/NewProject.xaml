@@ -7,7 +7,7 @@
         xmlns:data="clr-namespace:UnityLauncherPro.Data"
         d:DataContext="{d:DesignInstance Type=local:NewProject}"
         mc:Ignorable="d"
-        Title="Create New Project" Height="520" Width="640" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
+        Title="Create New Project" Height="600" Width="640" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -15,8 +15,9 @@
             <ColumnDefinition Width="164"/>
         </Grid.ColumnDefinitions>
         <StackPanel Margin="10,3">
+            
             <Label Content="Unity Version" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
-            <DataGrid x:Name="gridAvailableVersions" KeyboardNavigation.TabNavigation = "None" SelectionMode="Single" Height="230" Margin="0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="0"  Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" PreviewMouseDoubleClick="gridAvailableVersions_PreviewMouseDoubleClick" CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserResizeRows="False" CanUserDeleteRows="False">
+            <DataGrid x:Name="gridAvailableVersions" KeyboardNavigation.TabNavigation = "None" SelectionMode="Single" Height="190" Margin="0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="0"  Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" PreviewMouseDoubleClick="gridAvailableVersions_PreviewMouseDoubleClick" CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserResizeRows="False" CanUserDeleteRows="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Version" Binding="{Binding Version}" IsReadOnly="True" CanUserResize="False" MinWidth="80" />
                     <DataGridTextColumn Header="Platforms" Binding="{Binding PlatformsCombined}" IsReadOnly="True" CanUserResize="False" MinWidth="270" />
@@ -24,7 +25,7 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <Grid HorizontalAlignment="Stretch" Margin="0,20,0,0">
+            <Grid HorizontalAlignment="Stretch" Margin="0,5,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="35*"/>
                     <ColumnDefinition Width="15*"/>
@@ -50,7 +51,8 @@
                 <CheckBox Grid.Column="3" x:Name="chkForceDX11" Content="DX11" ToolTip="Use DX11 instead of DX12" Margin="6,0,0,0" IsChecked="False" Checked="chkForceDX11_Checked" Unchecked="chkForceDX11_Checked"/>
             </Grid>
 
-            <Label x:Name="lblNewProjectFolderLabel" Grid.Column="0" Content="Project Root Folder:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" Padding="0,5,5,0" />
+            <Label x:Name="lblNewProjectFolderLabel" Grid.Column="0" Content="Project Root Folder:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,3,0,0" Padding="0,5,5,0" />
+            
             <Grid HorizontalAlignment="Stretch" Margin="0,3,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="18*"/>
@@ -63,7 +65,7 @@
             </Grid>
 
             <!--<Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ThemeButtonForegroundDisabled}" Margin="0" FontSize="10" Padding="5,0,5,3" />-->
-            <Grid HorizontalAlignment="Stretch" Margin="0,32,0,0">
+            <Grid HorizontalAlignment="Stretch" Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.7*"/>
                     <ColumnDefinition Width="*"/>
@@ -76,13 +78,55 @@
                 </Button>
             </Grid>
 
-            <Grid Grid.Row="2" UseLayoutRounding="False">
+            <Grid UseLayoutRounding="False">
+                <StackPanel Margin="0,6,0,0" Orientation="Vertical">
+                    <!--<Label Grid.Column="0" Content="Version Control" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,0,0,5" />-->
+                    <CheckBox x:Name="chkEnableVersionControl" Content="Enable Version Control (Github)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,6" VerticalAlignment="Center"/>
+
+                    <Grid Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Visibility:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <RadioButton x:Name="rbPrivate" Content="Private 🔒︎" IsChecked="True" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                            <RadioButton x:Name="rbPublic" Content="Public 🌐" Foreground="{DynamicResource ThemeButtonForeground}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <Grid Margin="0,3,0,0" HorizontalAlignment="Left">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Repository Name:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
+                        <TextBox Grid.Column="1" x:Name="txtRepoName" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2" HorizontalAlignment="Left" Width="200"/>
+                    </Grid>
+
+                    <Grid Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Description:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
+                        <TextBox Grid.Column="1" x:Name="txtRepoDescription" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2"/>
+                    </Grid>
+
+                    <CheckBox x:Name="chkEnableLfs" Content="Enable Git LFS" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="chkInitialCommit" Content="Create initial commit" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,5,0,0" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="chkAddUnityGitIgnore" Content="Add Unity .gitignore" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,5,0,0" VerticalAlignment="Center" IsEnabled="False" IsChecked="True"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid UseLayoutRounding="False" Margin="0,15,0,0">
                 <StatusBar VerticalAlignment="Center" Background="{x:Null}" Foreground="{DynamicResource ThemeStatusText}">
                     <StatusBarItem>
                         <TextBlock x:Name="txtNewProjectStatus"  VerticalAlignment="Center" Text=""/>
                     </StatusBarItem>
                 </StatusBar>
             </Grid>
+            
         </StackPanel>
         <StackPanel Orientation="Vertical" Margin="0,3,10,3" Grid.Column="1">
             <StackPanel Orientation="Horizontal">
@@ -91,7 +135,7 @@
             </StackPanel>
 
 
-            <ListBox x:Name="listOnlineTemplates" Margin="6,5,0,0" Height="411" 
+            <ListBox x:Name="listOnlineTemplates" Margin="6,5,0,0" Height="540" 
          Background="{DynamicResource ThemeMainBackgroundColor}" 
          Foreground="{DynamicResource ThemeButtonForeground}" 
          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
