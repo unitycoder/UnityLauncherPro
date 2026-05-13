@@ -448,6 +448,23 @@ namespace UnityLauncherPro
             Settings.Default.Save();
         }
 
+        private void chkEnableVersionControl_Checked(object sender, RoutedEventArgs e)
+        {
+            if (isInitializing) return;
+
+            bool state = chkEnableVersionControl.IsChecked == true;
+
+            // lock controls
+            rbPrivate.IsEnabled = state;
+            rbPublic.IsEnabled = state;
+            txtRepoName.IsEnabled = state;
+            txtRepoDescription.IsEnabled = state;
+            chkEnableLfs.IsEnabled = state;
+            chkInitialCommit.IsEnabled = state;
+            //chkAddUnityGitIgnore.IsEnabled = state; // not used yet
+            chkAddReadme.IsEnabled = state;
+        }
+
         private void btnBrowseForProjectFolder_Click(object sender, RoutedEventArgs e)
         {
             string defaultFolder = null;
@@ -921,5 +938,49 @@ namespace UnityLauncherPro
                 _ = LoadOnlineTemplatesAsync(baseVersion, _templateLoadCancellation.Token);
             }
         }
+
+        private void btnCreateToken_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO create new token from URL
+            // https://github.com/settings/tokens/new?description=UnityLauncherPro+Setup+Project+Access&default_expires_at=90&scopes=repo
+        }
+
+        private void txtTokenInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // TODO validate token format (e.g. length, prefix) and show error if invalid AND enable Validate/Authorize button
+        }
+
+        private void btnAuthorizeToken_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO validate token with github API and save to secure storage, then hide token from text field or set as "Authorized"
+        }
+
+        private void chkEnableLfs_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void chkInitialCommit_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void chkAddReadme_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void txtRepoName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // TODO validate repo name with github requirements and show error if invalid AND check if already used
+        }
+
+        private void expVersionControl_Collapsed(object sender, RoutedEventArgs e)
+        {
+            // TODO save state of expander to settings AND if version control is enabled, always show expander and disable collapsing
+        }
+
+
+
     } // class NewProject
 } // namespace UnityLauncherPro

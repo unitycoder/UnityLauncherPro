@@ -7,7 +7,7 @@
         xmlns:data="clr-namespace:UnityLauncherPro.Data"
         d:DataContext="{d:DesignInstance Type=local:NewProject}"
         mc:Ignorable="d"
-        Title="Create New Project" Height="600" Width="640" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
+        Title="Create New Project" Height="640" Width="640" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -15,7 +15,7 @@
             <ColumnDefinition Width="164"/>
         </Grid.ColumnDefinitions>
         <StackPanel Margin="10,3">
-            
+
             <Label Content="Unity Version" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,3" Padding="5,5,5,3" />
             <DataGrid x:Name="gridAvailableVersions" KeyboardNavigation.TabNavigation = "None" SelectionMode="Single" Height="190" Margin="0" HeadersVisibility="None" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Foreground="{DynamicResource ThemeButtonForeground}" Background="{DynamicResource ThemeMainBackgroundColor}" SelectionChanged="GridAvailableVersions_SelectionChanged" IsTabStop="True" TabIndex="0"  Loaded="GridAvailableVersions_Loaded" EnableRowVirtualization="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" PreviewMouseDoubleClick="gridAvailableVersions_PreviewMouseDoubleClick" CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserResizeRows="False" CanUserDeleteRows="False">
                 <DataGrid.Columns>
@@ -52,7 +52,7 @@
             </Grid>
 
             <Label x:Name="lblNewProjectFolderLabel" Grid.Column="0" Content="Project Root Folder:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,3,0,0" Padding="0,5,5,0" />
-            
+
             <Grid HorizontalAlignment="Stretch" Margin="0,3,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="18*"/>
@@ -78,55 +78,74 @@
                 </Button>
             </Grid>
 
-            <Grid UseLayoutRounding="False">
-                <StackPanel Margin="0,6,0,0" Orientation="Vertical">
-                    <!--<Label Grid.Column="0" Content="Version Control" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,0,0,5" />-->
-                    <CheckBox x:Name="chkEnableVersionControl" Content="Enable Version Control (Github)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,6" VerticalAlignment="Center"/>
+            <Expander x:Name="expVersionControl" Margin="0,10,0,0" Header="Version Control (Github)" Foreground="{DynamicResource ThemeButtonForeground}" IsExpanded="True" Collapsed="expVersionControl_Collapsed">
+                <Grid UseLayoutRounding="False">
+                    <StackPanel Margin="0,6,0,0" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                            <Label Name="lblNotConnected" Content="❌" Margin="0,0,0,0" VerticalAlignment="Center" Foreground="Red"/>
+                            <Label Name="lblConnected" Content="✔️" Margin="0,0,0,0" VerticalAlignment="Center" Foreground="Lime" Visibility="Collapsed"/>
+                            <Label Content="Connected as:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,0" VerticalAlignment="Center"/>
+                            <Label x:Name="lblGithubUsername" Content="(not connected)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="5,0,0,0" VerticalAlignment="Center" FontStyle="Italic" MaxWidth="92"/>
+                            <Button x:Name="btnCreateToken" Style="{StaticResource CustomButton}" Content="Get Token 🔗" ToolTip="Open Github to create a token" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="0,4,6,0" TabIndex="10" Grid.Column="1" FontSize="10" Width="66" Click="btnCreateToken_Click" />
+                            <TextBox x:Name="txtTokenInput" ToolTip="Enter your Github token here" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2" HorizontalAlignment="Left" Width="100" TextChanged="txtTokenInput_TextChanged"/>
+                            <Button x:Name="btnAuthorizeToken" Style="{StaticResource CustomButton}" Content="Authorize" ToolTip="Open Github to create a token" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="6,4,0,0" TabIndex="10"  IsEnabled="False" Width="60" Click="btnAuthorizeToken_Click" />
+                            <Button x:Name="btnDisconnectToken" Style="{StaticResource CustomButton}" Content="Disconnect" ToolTip="Disconnect from Github" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="6,4,0,0" TabIndex="10"  IsEnabled="False" Width="60" Visibility="Collapsed" />
 
-                    <Grid Margin="0,0,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" Content="Visibility:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <RadioButton x:Name="rbPrivate" Content="Private 🔒︎" IsChecked="True" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                            <RadioButton x:Name="rbPublic" Content="Public 🌐" Foreground="{DynamicResource ThemeButtonForeground}" VerticalAlignment="Center"/>
                         </StackPanel>
-                    </Grid>
-                    
-                    <Grid Margin="0,3,0,0" HorizontalAlignment="Left">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" Content="Repository Name:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
-                        <TextBox Grid.Column="1" x:Name="txtRepoName" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2" HorizontalAlignment="Left" Width="200"/>
-                    </Grid>
+                        <CheckBox x:Name="chkEnableVersionControl" Content="Enable Version Control" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,6,0,6" VerticalAlignment="Center" Checked="chkEnableVersionControl_Checked" Unchecked="chkEnableVersionControl_Checked"/>
+                        <Grid Margin="0,0,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Visibility:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal"  HorizontalAlignment="Left">
+                                <RadioButton x:Name="rbPrivate" Content="Private" IsChecked="True" Foreground="{DynamicResource ThemeButtonForeground}" VerticalAlignment="Center"/>
+                                <Label Content="🔒︎" Foreground="#FFFFD200"/>
+                                <RadioButton x:Name="rbPublic" Content="Public" Foreground="{DynamicResource ThemeButtonForeground}" VerticalAlignment="Center" Margin="42,0,0,0"/>
+                                <Label Content="🌐" Foreground="#FF009CFF"/>
+                            </StackPanel>
+                        </Grid>
 
-                    <Grid Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" Content="Description:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
-                        <TextBox Grid.Column="1" x:Name="txtRepoDescription" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2"/>
-                    </Grid>
+                        <Grid Margin="0,0,0,0" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Repository Name:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
+                            <TextBox Grid.Column="1" x:Name="txtRepoName" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2" HorizontalAlignment="Left" Width="200" TextChanged="txtRepoName_TextChanged"/>
+                        </Grid>
 
-                    <CheckBox x:Name="chkEnableLfs" Content="Enable Git LFS" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center"/>
-                    <CheckBox x:Name="chkInitialCommit" Content="Create initial commit" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,5,0,0" VerticalAlignment="Center"/>
-                    <CheckBox x:Name="chkAddUnityGitIgnore" Content="Add Unity .gitignore" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,5,0,0" VerticalAlignment="Center" IsEnabled="False" IsChecked="True"/>
-                </StackPanel>
-            </Grid>
+                        <Grid Margin="0,5,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Description:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
+                            <TextBox Grid.Column="1" x:Name="txtRepoDescription" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2"/>
+                        </Grid>
 
-            <Grid UseLayoutRounding="False" Margin="0,15,0,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                            <CheckBox x:Name="chkEnableLfs" Content="Enable Git LFS " ToolTip="Enable Git Large File Storage" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" Checked="chkEnableLfs_Checked" Unchecked="chkEnableLfs_Checked"/>
+                            <CheckBox x:Name="chkInitialCommit" Content="Create initial commit" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" Checked="chkInitialCommit_Checked" Unchecked="chkInitialCommit_Checked"/>
+                            <CheckBox x:Name="chkAddUnityGitIgnore" Content="Add Unity .gitignore" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" IsEnabled="False" IsChecked="True"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                            <CheckBox x:Name="chkAddReadme" Content="Add README" ToolTip="Add a README file" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" IsChecked="True" Checked="chkAddReadme_Checked" Unchecked="chkAddReadme_Checked"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                </Grid>
+            </Expander>
+
+            <Grid UseLayoutRounding="False" Margin="0,4,0,0">
                 <StatusBar VerticalAlignment="Center" Background="{x:Null}" Foreground="{DynamicResource ThemeStatusText}">
                     <StatusBarItem>
                         <TextBlock x:Name="txtNewProjectStatus"  VerticalAlignment="Center" Text=""/>
                     </StatusBarItem>
                 </StatusBar>
             </Grid>
-            
+
         </StackPanel>
         <StackPanel Orientation="Vertical" Margin="0,3,10,3" Grid.Column="1">
             <StackPanel Orientation="Horizontal">
