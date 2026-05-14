@@ -656,23 +656,23 @@ namespace UnityLauncherPro
                     if (nodeStart == -1) break;
 
                     // Find the end of this node object (simplified - find matching brace)
-                    int nodeEnd = FindMatchingBrace(json, nodeStart);
+                    int nodeEnd = JsonParser.FindMatchingBrace(json, nodeStart);
                     if (nodeEnd == -1) break;
 
                     string nodeJson = json.Substring(nodeStart, nodeEnd - nodeStart + 1);
 
                     // Parse individual fields
-                    var tarballUrl = ExtractNestedJsonString(nodeJson, "\"tarball\"", "\"url\"");
-                    var rawDescription = ExtractJsonString(nodeJson, "\"description\"");
-                    var splitDescription = SplitTextToRows(rawDescription, 3);
+                    var tarballUrl = JsonParser.ExtractNestedJsonString(nodeJson, "\"tarball\"", "\"url\"");
+                    var rawDescription = JsonParser.GetStringValue(nodeJson, "\"description\"");
+                    var splitDescription = Tools.SplitTextToRows(rawDescription, 3);
 
                     var template = new OnlineTemplateItem
                     {
-                        Name = ExtractJsonString(nodeJson, "\"name\""),
+                        Name = JsonParser.GetStringValue(nodeJson, "\"name\""),
                         Description = splitDescription,
-                        Type = ExtractJsonString(nodeJson, "\"type\""),
-                        RenderPipeline = ExtractJsonString(nodeJson, "\"renderPipeline\""),
-                        PreviewImageURL = ExtractNestedJsonString(nodeJson, "\"previewImage\"", "\"url\"") ?? "pack://application:,,,/Images/icon.png",
+                        Type = JsonParser.GetStringValue(nodeJson, "\"type\""),
+                        RenderPipeline = JsonParser.GetStringValue(nodeJson, "\"renderPipeline\""),
+                        PreviewImageURL = JsonParser.ExtractNestedJsonString(nodeJson, "\"previewImage\"", "\"url\"") ?? "pack://application:,,,/Images/icon.png",
                         TarBallURL = tarballUrl,
                         IsDownloaded = false
                     };
@@ -706,78 +706,6 @@ namespace UnityLauncherPro
 
             return templates;
         }
-
-        private string ExtractJsonString(string json, string key)
-        {
-            int keyIndex = json.IndexOf(key + ":");
-            if (keyIndex == -1) return null;
-
-            int valueStart = json.IndexOf("\"", keyIndex + key.Length + 1);
-            if (valueStart == -1) return null;
-
-            int valueEnd = json.IndexOf("\"", valueStart + 1);
-            if (valueEnd == -1) return null;
-
-            return json.Substring(valueStart + 1, valueEnd - valueStart - 1);
-        }
-
-        private string ExtractNestedJsonString(string json, string parentKey, string childKey)
-        {
-            int parentIndex = json.IndexOf(parentKey + ":");
-            if (parentIndex == -1) return null;
-
-            // Find the object after parentKey
-            int objectStart = json.IndexOf("{", parentIndex);
-            if (objectStart == -1) return null;
-
-            int objectEnd = FindMatchingBrace(json, objectStart);
-            if (objectEnd == -1) return null;
-
-            string nestedJson = json.Substring(objectStart, objectEnd - objectStart + 1);
-            return ExtractJsonString(nestedJson, childKey);
-        }
-
-        private int FindMatchingBrace(string json, int openBraceIndex)
-        {
-            int braceCount = 0;
-            bool inString = false;
-            bool escapeNext = false;
-
-            for (int i = openBraceIndex; i < json.Length; i++)
-            {
-                char c = json[i];
-
-                if (escapeNext)
-                {
-                    escapeNext = false;
-                    continue;
-                }
-
-                if (c == '\\')
-                {
-                    escapeNext = true;
-                    continue;
-                }
-
-                if (c == '"')
-                {
-                    inString = !inString;
-                    continue;
-                }
-
-                if (!inString)
-                {
-                    if (c == '{') braceCount++;
-                    else if (c == '}')
-                    {
-                        braceCount--;
-                        if (braceCount == 0) return i;
-                    }
-                }
-            }
-
-            return -1;
-        } // FindMatchingBrace
 
         private void listOnlineTemplates_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -903,24 +831,6 @@ namespace UnityLauncherPro
                 }
             }
         } // btnDownloadTemplate_Click
-
-        private string SplitTextToRows(string description, int rows)
-        {
-            if (rows < 2) return description;
-            if (string.IsNullOrEmpty(description)) return description;
-
-            int len = description.Length;
-            if (len <= rows) return description; // too short to split meaningfully
-
-            int firstCut = (len / rows);
-            int secondCut = (len * 2) / rows;
-
-            string part1 = description.Substring(0, firstCut).Trim();
-            string part2 = description.Substring(firstCut, secondCut - firstCut).Trim();
-            string part3 = description.Substring(secondCut).Trim();
-
-            return part1 + Environment.NewLine + part2 + Environment.NewLine + part3;
-        }
 
         private void btnFetchTemplates_Click(object sender, RoutedEventArgs e)
         {

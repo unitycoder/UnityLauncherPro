@@ -3324,6 +3324,25 @@ public static class UnityLauncherProTools
             return version;
         }
 
+
+        public static string SplitTextToRows(string description, int rows)
+        {
+            if (rows < 2) return description;
+            if (string.IsNullOrEmpty(description)) return description;
+
+            int len = description.Length;
+            if (len <= rows) return description; // too short to split meaningfully
+
+            int firstCut = (len / rows);
+            int secondCut = (len * 2) / rows;
+
+            string part1 = description.Substring(0, firstCut).Trim();
+            string part2 = description.Substring(firstCut, secondCut - firstCut).Trim();
+            string part3 = description.Substring(secondCut).Trim();
+
+            return part1 + Environment.NewLine + part2 + Environment.NewLine + part3;
+        }
+
     } // class
 
 } // namespace
