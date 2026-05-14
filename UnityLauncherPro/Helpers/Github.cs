@@ -18,6 +18,54 @@ namespace UnityLauncherPro.Helpers
         public HttpStatusCode StatusCode { get; set; }
     }
 
+    public static class GithubActions
+    {
+        // checks if repo is valid and if it already exists in the user's account. Returns null if valid, otherwise an error message.
+        public static async Task<string> ValidateRepoName(string repoName, string userName)
+        {
+            // validate string locally
+            if (string.IsNullOrEmpty(repoName)) return "Repository name cannot be empty.";
+
+            // regex "The repository name can only contain ASCII letters, digits, and the characters ., -, and _."
+            if (!System.Text.RegularExpressions.Regex.IsMatch(repoName, @"^[a-zA-Z0-9._-]+$")) return "Repository name can only contain letters, digits, ., -, and _.";
+
+            // check if repo already exists in user's account
+            var token = GitHubTokenStore.LoadToken();
+            if (string.IsNullOrWhiteSpace(token)) return "No GitHub token found. Please set a token first.";
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("UnityLauncherPro");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Trim());
+                client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+                client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+
+                HttpResponseMessage response;
+                try
+                {
+                    response = await client.GetAsync($"https://api.github.com/repos/{userName}/{repoName}");
+                }
+                catch (Exception ex)
+                {
+                    return "Request failed: " + ex.Message;
+                }
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                    return $"Repository '{repoName}' already exists in your account.";
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    return null; // repo does not exist, name is available
+
+                string responseText = await response.Content.ReadAsStringAsync();
+                return $"Unexpected GitHub response: {(int)response.StatusCode} {response.ReasonPhrase}\n{responseText}";
+            }
+        }
+
+
+    } // GithubActions class
+
     public static class GitHubAuth
     {
         public static async Task<GitHubTokenValidationResult> ValidateTokenAsync(string token)

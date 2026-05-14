@@ -7,7 +7,7 @@
         xmlns:data="clr-namespace:UnityLauncherPro.Data"
         d:DataContext="{d:DesignInstance Type=local:NewProject}"
         mc:Ignorable="d"
-        Title="Create New Project" Height="640" Width="640" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
+        Title="Create New Project" Height="650" Width="650" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -90,7 +90,6 @@
                             <TextBox x:Name="txtTokenInput" ToolTip="Enter your Github token here" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2" HorizontalAlignment="Left" Width="100" TextChanged="txtTokenInput_TextChanged"/>
                             <Button x:Name="btnAuthorizeToken" Style="{StaticResource CustomButton}" Content="Authorize" ToolTip="Open Github to create a token" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="6,4,0,0"   IsEnabled="False" Width="60" Click="btnAuthorizeToken_Click" />
                             <Button x:Name="btnDisconnectToken" Style="{StaticResource CustomButton}" Content="Disconnect" ToolTip="Disconnect from Github AND delete saved token" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="6,4,0,0"   IsEnabled="False" Width="64" Visibility="Collapsed" Click="btnDisconnectToken_Click" />
-
                         </StackPanel>
                         <CheckBox x:Name="chkEnableVersionControl" Content="Enable Version Control" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,6,0,6" VerticalAlignment="Center" Checked="chkEnableVersionControl_Checked" Unchecked="chkEnableVersionControl_Checked"/>
                         <Grid Margin="0,0,0,0">
@@ -111,9 +110,12 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="120"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="Repository Name:" Foreground="{DynamicResource ThemeButtonForeground}" Padding="0,3,5,3"/>
                             <TextBox Grid.Column="1" x:Name="txtRepoName" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2" HorizontalAlignment="Left" Width="200" TextChanged="txtRepoName_TextChanged"/>
+                            <Label Grid.Column="2" Name="lblRepoNameInvalid" Content="❌" Margin="0,0,0,0" VerticalAlignment="Center" Foreground="Red" HorizontalAlignment="Left"/>
+                            <Label Grid.Column="2" Name="lblRepoNameValid" Content="✔️" Margin="0,0,0,0" VerticalAlignment="Center" Foreground="Lime" Visibility="Collapsed"/>
                         </Grid>
 
                         <Grid Margin="0,5,0,0">
@@ -126,8 +128,8 @@
                         </Grid>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-                            <CheckBox x:Name="chkEnableLfs" Content="Enable Git LFS " ToolTip="Enable Git Large File Storage" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" Checked="chkEnableLfs_Checked" Unchecked="chkEnableLfs_Checked"/>
-                            <CheckBox x:Name="chkInitialCommit" Content="Create initial commit" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" Checked="chkInitialCommit_Checked" Unchecked="chkInitialCommit_Checked"/>
+                            <CheckBox x:Name="chkEnableLfs" Content="Enable Git LFS " ToolTip="Enable Git Large File Storage" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" Checked="chkEnableLfs_Checked" Unchecked="chkEnableLfs_Checked" IsChecked="True"/>
+                            <CheckBox x:Name="chkInitialCommit" Content="Create initial commit" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" Checked="chkInitialCommit_Checked" Unchecked="chkInitialCommit_Checked" IsEnabled="False"/>
                             <CheckBox x:Name="chkAddUnityGitIgnore" Content="Add Unity .gitignore" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" IsEnabled="False" IsChecked="True"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,0">

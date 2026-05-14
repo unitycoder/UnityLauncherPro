@@ -56,6 +56,10 @@ namespace UnityLauncherPro
             txtNewProjectName.IsEnabled = !nameIsLocked;
 
             txtNewProjectName.Text = newName;
+
+            // git
+            txtRepoName.Text = newName;
+
             txtNewProjectFolder.Text = targetFolder;
 
             if (MainWindow.unityInstallationsSource.Count == 0)
@@ -997,8 +1001,33 @@ namespace UnityLauncherPro
             Settings.Default.Save();
         }
 
-        private void txtRepoName_TextChanged(object sender, TextChangedEventArgs e)
+        private CancellationTokenSource _repoNameCts;
+
+        private async void txtRepoName_TextChanged(object sender, TextChangedEventArgs e)
         {
+            _repoNameCts?.Cancel();
+            _repoNameCts = new CancellationTokenSource();
+            var token = _repoNameCts.Token;
+
+            await Task.Delay(500);
+
+            if (token.IsCancellationRequested) return;
+
+            var res = await GithubActions.ValidateRepoName(txtRepoName.Text, Settings.Default.gitUsername);
+
+            if (token.IsCancellationRequested) return;
+
+            if (res != null)
+            {
+                txtNewProjectStatus.Text = res;
+                lblRepoNameValid.Visibility = Visibility.Collapsed;
+                lblRepoNameInvalid.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                lblRepoNameValid.Visibility = Visibility.Visible;
+                lblRepoNameInvalid.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void expVersionControl_Collapsed(object sender, RoutedEventArgs e)
