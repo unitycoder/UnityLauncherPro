@@ -269,8 +269,46 @@ namespace UnityLauncherPro
                 Settings.Default.Save();
             }
 
+            btnCreateNewProject.IsEnabled = false;
+
             if (chkEnableVersionControl.IsChecked == true)
             {
+                // setup local git
+                try
+                {
+                    string projectPath = await GithubActions.InitRepositoryAsync(baseDir: txtNewProjectFolder.Text, projectName: txtNewProjectName.Text, initGitLfs: (chkEnableLfs.IsChecked == true), defaultBranch: "main");
+
+                    txtNewProjectStatus.Text = "Git repository initialized at: " + projectPath;
+                }
+                catch (Exception ex)
+                {
+                    txtNewProjectStatus.Text = "Git init failed: " + ex.Message;
+                }
+
+                // create online repo
+                try
+                {
+                    string token = GitHubTokenStore.LoadToken();
+
+                    GitHubCreateRepoResult result = await GithubActions.CreateRepositoryAsync(token: token, repoName: txtRepoName.Text, description: txtRepoDescription.Text, isPrivate: rbPrivate.IsChecked == true, autoInit: false);
+
+                    if (result.Success)
+                    {
+                        Console.WriteLine("Created repo successfully.");
+
+                        string remoteUrl = $"https://github.com/{Settings.Default.gitUsername}/{txtRepoName.Text}.git";
+                        await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), $"remote add origin {remoteUrl}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to create repo..");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    txtNewProjectStatus.Text += " | GitHub repo creation failed: " + ex.Message;
+                }
+
                 // create readme if enabled
                 if (chkAddReadme.IsChecked == true)
                 {
@@ -311,33 +349,33 @@ namespace UnityLauncherPro
                     }
                 }
 
-                // setup git
-                try
-                {
-                    string projectPath = await GithubActions.InitRepositoryAsync(baseDir: txtNewProjectFolder.Text, projectName: txtNewProjectName.Text, initGitLfs: (chkEnableLfs.IsChecked == true), defaultBranch: "main");
-
-                    txtNewProjectStatus.Text = "Git repository initialized at: " + projectPath;
-                }
-                catch (Exception ex)
-                {
-                    txtNewProjectStatus.Text = "Git init failed: " + ex.Message;
-                }
 
                 if (chkInitialCommit.IsChecked == true)
                 {
+                    Console.WriteLine(1);
                     try
                     {
                         await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "add .");
                         await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "commit -m \"Initial commit from " + MainWindow.appName + "\"");
+                        await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "push -u origin main");
+
+                        Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text)+" add .");
+                        Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text)+ " commit -m \"Initial commit from " + MainWindow.appName + "\"");
+
                         txtNewProjectStatus.Text += " | Initial commit created";
                     }
                     catch (Exception ex)
                     {
                         txtNewProjectStatus.Text += " | Initial commit failed: " + ex.Message;
+                        Console.WriteLine("failed commit");
                     }
                 }
 
+                Tools.OpenURL("https://github.com/" + Settings.Default.gitUsername + "/" + txtRepoName.Text);
+
             } // if version control enabled
+
+            btnCreateNewProject.IsEnabled = true;
 
             DialogResult = true;
         } // BtnCreateNewProject_Click

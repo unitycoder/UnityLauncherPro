@@ -19,16 +19,121 @@ namespace UnityLauncherPro.Helpers
         public HttpStatusCode StatusCode { get; set; }
     }
 
+    public class GitHubCreateRepoResult
+    {
+        public bool Success { get; set; }
+        public string Name { get; set; }
+        //public string FullName { get; set; }
+        //public string HtmlUrl { get; set; }
+        //public string CloneUrl { get; set; }
+        //public string SshUrl { get; set; }
+        public string Error { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
+    }
+
     public static class GithubActions
     {
+
+        public static async Task<GitHubCreateRepoResult> CreateRepositoryAsync(string token, string repoName, string description = "", bool isPrivate = true, bool autoInit = false)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return new GitHubCreateRepoResult
+                {
+                    Success = false,
+                    Error = "Token is empty."
+                };
+            }
+
+            if (string.IsNullOrWhiteSpace(repoName))
+            {
+                return new GitHubCreateRepoResult
+                {
+                    Success = false,
+                    Error = "Repository name is empty."
+                };
+            }
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(MainWindow.appName);
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token.Trim());
+
+                client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+                client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+
+                var json = ('{' +
+                     $"\"name\": \"{repoName}\"," +
+                     $"\"description\": \"{description ?? ""}\"," +
+                     $"\"private\": {isPrivate.ToString().ToLower()}," +
+                     $"\"auto_init\": {autoInit.ToString().ToLower()}" +
+                     '}');
+
+                using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
+                {
+                    HttpResponseMessage response;
+
+                    try
+                    {
+                        response = await client.PostAsync(
+                            "https://api.github.com/user/repos",
+                            content);
+                    }
+                    catch (Exception ex)
+                    {
+                        return new GitHubCreateRepoResult
+                        {
+                            Success = false,
+                            Error = "Request failed: " + ex.Message
+                        };
+                    }
+
+                    string responseText = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return new GitHubCreateRepoResult
+                        {
+                            Success = true,
+                            StatusCode = response.StatusCode
+                            //Name = (string)result["name"],
+                            //FullName = (string)result["full_name"],
+                            //HtmlUrl = (string)result["html_url"],
+                            //CloneUrl = (string)result["clone_url"],
+                            //SshUrl = (string)result["ssh_url"]
+                        };
+                    }
+
+                    return new GitHubCreateRepoResult
+                    {
+                        Success = false,
+                        StatusCode = response.StatusCode,
+                        Error = "GitHub API error: " +
+                                (int)response.StatusCode + " " +
+                                response.ReasonPhrase + "\n" +
+                                responseText
+                    };
+                }
+            }
+        }
+
+
+
+
+
+
+
+
         public static async Task<string> InitRepositoryAsync(string baseDir, string projectName, bool initGitLfs = false, string defaultBranch = "main")
         {
             string projectPath = string.IsNullOrWhiteSpace(projectName)
                 ? Path.GetFullPath(baseDir)
                 : Path.GetFullPath(Path.Combine(baseDir, projectName));
 
-            if (!Directory.Exists(projectPath))
-                Directory.CreateDirectory(projectPath);
+            if (!Directory.Exists(projectPath)) Directory.CreateDirectory(projectPath);
 
             // Git 2.28+ supports --initial-branch
             await RunGitAsync(projectPath, "init --initial-branch=\"" + defaultBranch + "\"");
@@ -67,6 +172,8 @@ namespace UnityLauncherPro.Helpers
                     CreateNoWindow = true
                 };
 
+                Console.WriteLine("run " + startInfo.FileName + " " + startInfo.Arguments);
+
                 using (var process = new Process())
                 {
                     process.StartInfo = startInfo;
@@ -80,6 +187,7 @@ namespace UnityLauncherPro.Helpers
 
                     if (process.ExitCode != 0)
                     {
+                        Console.WriteLine("failed to run git command: " + error);
                         throw new Exception(
                             "Git command failed:\n" +
                             "git " + arguments + "\n\n" +
@@ -110,7 +218,7 @@ namespace UnityLauncherPro.Helpers
 
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("UnityLauncherPro");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(MainWindow.appName);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Trim());
                 client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
                 client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
@@ -156,7 +264,7 @@ namespace UnityLauncherPro.Helpers
 
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("MyWpfApp");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(MainWindow.appName);
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", token.Trim());
 
