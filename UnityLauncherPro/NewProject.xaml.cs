@@ -899,19 +899,25 @@ namespace UnityLauncherPro
 
         private void ShowGitAuthorizedUI(bool show)
         {
+            txtTokenInput.Text = null;
+
             if (show)
             {
+                lblGithubUsername.Content = Settings.Default.gitUsername;
 
-                txtTokenInput.Text = null; // clear input after successful save
                 txtTokenInput.Visibility = Visibility.Collapsed;
                 btnAuthorizeToken.Visibility = Visibility.Collapsed;
                 btnDisconnectToken.Visibility = Visibility.Visible;
                 lblConnected.Visibility = Visibility.Visible;
                 lblNotConnected.Visibility = Visibility.Collapsed;
+                btnCreateToken.Visibility = Visibility.Collapsed;
+
+                btnCreateToken.IsEnabled = false;
+                btnDisconnectToken.IsEnabled = true;
+                btnAuthorizeToken.IsEnabled = false;
             }
             else
             {
-                txtTokenInput.Text = null;
                 lblGithubUsername.Content = string.Empty;
 
                 txtTokenInput.Visibility = Visibility.Visible;
@@ -919,9 +925,11 @@ namespace UnityLauncherPro
                 btnDisconnectToken.Visibility = Visibility.Collapsed;
                 lblConnected.Visibility = Visibility.Collapsed;
                 lblNotConnected.Visibility = Visibility.Visible;
+                btnCreateToken.Visibility = Visibility.Visible;
 
                 btnDisconnectToken.IsEnabled = false;
                 btnAuthorizeToken.IsEnabled = true;
+                btnCreateToken.IsEnabled = true;
             }
         }
 
@@ -937,6 +945,8 @@ namespace UnityLauncherPro
             lblConnected.Visibility = Visibility.Collapsed;
             lblNotConnected.Visibility = Visibility.Visible;
 
+            Settings.Default.gitUsername = null;
+
             try
             {
                 GitHubTokenValidationResult result = await GitHubAuth.ValidateTokenAsync(token);
@@ -945,6 +955,7 @@ namespace UnityLauncherPro
                 {
                     GitHubTokenStore.SaveToken(token);
                     txtNewProjectStatus.Text = "Token valid. Logged in as " + result.Login + ".";
+                    Settings.Default.gitUsername = result.Login;
                     lblGithubUsername.Content = result.Login;
                     ShowGitAuthorizedUI(true);
                 }
@@ -958,6 +969,8 @@ namespace UnityLauncherPro
             {
                 btnAuthorizeToken.IsEnabled = true;
             }
+
+            Settings.Default.Save();
         }
 
         private void chkEnableLfs_Checked(object sender, RoutedEventArgs e)

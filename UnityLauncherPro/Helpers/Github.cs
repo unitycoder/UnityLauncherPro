@@ -106,29 +106,17 @@ namespace UnityLauncherPro.Helpers
 
     public static class GitHubTokenStore
     {
-        private static readonly string FolderPath =
-            Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "YourAppName");
-
-        private static readonly string FilePath =
-            Path.Combine(FolderPath, "github_token.dat");
+        private static readonly string FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), MainWindow.appName);
+        private static readonly string FilePath = Path.Combine(FolderPath, MainWindow.appName + ".dat");
 
         public static void SaveToken(string token)
         {
-            if (string.IsNullOrWhiteSpace(token))
-                throw new ArgumentException("Token is empty.", "token");
+            if (string.IsNullOrWhiteSpace(token)) throw new ArgumentException("Token is empty.", "token");
 
-            if (!Directory.Exists(FolderPath))
-                Directory.CreateDirectory(FolderPath);
+            if (!Directory.Exists(FolderPath)) Directory.CreateDirectory(FolderPath);
 
             byte[] plainBytes = Encoding.UTF8.GetBytes(token);
-
-            byte[] encryptedBytes = ProtectedData.Protect(
-                plainBytes,
-                null,
-                DataProtectionScope.CurrentUser);
-
+            byte[] encryptedBytes = ProtectedData.Protect(plainBytes, null, DataProtectionScope.CurrentUser);
             File.WriteAllBytes(FilePath, encryptedBytes);
         }
 

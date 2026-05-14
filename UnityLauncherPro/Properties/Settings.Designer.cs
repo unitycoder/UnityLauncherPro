@@ -733,5 +733,17 @@ namespace UnityLauncherPro.Properties {
                 this["showRecoveredScenePopup"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string gitUsername {
+            get {
+                return ((string)(this["gitUsername"]));
+            }
+            set {
+                this["gitUsername"] = value;
+            }
+        }
     }
 }
