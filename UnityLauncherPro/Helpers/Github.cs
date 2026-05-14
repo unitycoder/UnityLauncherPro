@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Diagnostics;
 
 namespace UnityLauncherPro.Helpers
 {
@@ -20,6 +21,78 @@ namespace UnityLauncherPro.Helpers
 
     public static class GithubActions
     {
+        public static async Task<string> InitRepositoryAsync(string baseDir, string projectName, bool initGitLfs = false, string defaultBranch = "main")
+        {
+            string projectPath = string.IsNullOrWhiteSpace(projectName)
+                ? Path.GetFullPath(baseDir)
+                : Path.GetFullPath(Path.Combine(baseDir, projectName));
+
+            if (!Directory.Exists(projectPath))
+                Directory.CreateDirectory(projectPath);
+
+            // Git 2.28+ supports --initial-branch
+            await RunGitAsync(projectPath, "init --initial-branch=\"" + defaultBranch + "\"");
+
+            string gitignorePath = Path.Combine(projectPath, ".gitignore");
+
+            if (initGitLfs)
+            {
+                try
+                {
+                    // Local repo setup. Requires Git LFS to be installed on the user's machine.
+                    await RunGitAsync(projectPath, "lfs install --local");
+                }
+                catch
+                {
+                    // Git repo is still valid even if LFS init fails.
+                    // Log this in your app if you have a logger.
+                }
+            }
+
+            return projectPath;
+        }
+
+        public static async Task RunGitAsync(string workingDirectory, string arguments)
+        {
+            await Task.Run(delegate
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = arguments,
+                    WorkingDirectory = workingDirectory,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                using (var process = new Process())
+                {
+                    process.StartInfo = startInfo;
+
+                    process.Start();
+
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception(
+                            "Git command failed:\n" +
+                            "git " + arguments + "\n\n" +
+                            "Output:\n" + output + "\n\n" +
+                            "Error:\n" + error);
+                    }
+                }
+            });
+        }
+
+
+
+
         // checks if repo is valid and if it already exists in the user's account. Returns null if valid, otherwise an error message.
         public static async Task<string> ValidateRepoName(string repoName, string userName)
         {

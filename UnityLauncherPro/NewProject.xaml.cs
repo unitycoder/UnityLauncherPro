@@ -155,11 +155,13 @@ namespace UnityLauncherPro
 
             if (result.IsValid)
             {
+                chkEnableVersionControl.IsChecked = true;
                 ShowGitAuthorizedUI(true);
                 // You can also store result.Login somewhere
             }
             else
             {
+                chkEnableVersionControl.IsChecked = false;
                 GitHubTokenStore.DeleteToken();
                 ShowGitAuthorizedUI(false);
             }
@@ -210,7 +212,7 @@ namespace UnityLauncherPro
             }
         }
 
-        private void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
+        private async void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
             // check if projectname already exists (only if should be automatically created name)
             var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
@@ -267,8 +269,78 @@ namespace UnityLauncherPro
                 Settings.Default.Save();
             }
 
+            if (chkEnableVersionControl.IsChecked == true)
+            {
+                // create readme if enabled
+                if (chkAddReadme.IsChecked == true)
+                {
+                    var readmePath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, "README.md");
+                    try
+                    {
+                        if (Directory.Exists(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text)) == false)
+                        {
+                            Directory.CreateDirectory(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text));
+                        }
+                        File.WriteAllText(readmePath, "# " + txtRepoName.Text + "\n\n" + txtRepoDescription.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.SetStatus("Failed to create README file for this project: " + ex.Message);
+                    }
+                }
+
+                // create .gitattributes if LFS enabled?
+                if (chkEnableLfs.IsChecked == true)
+                {
+                    var attributesUrl = "https://raw.githubusercontent.com/gitattributes/gitattributes/refs/heads/master/Unity.gitattributes";
+                    var res = await Tools.DownloadFileAsync(attributesUrl, Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitattributes"));
+                    if (res == false)
+                    {
+                        Tools.SetStatus("Failed to download .gitattributes file for this project.");
+                    }
+                }
+
+                // download .gitignore if enabled
+                if (chkAddUnityGitIgnore.IsChecked == true)
+                {
+                    var ignoreUrl = "https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Unity.gitignore";
+                    var res = await Tools.DownloadFileAsync(ignoreUrl, Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitignore"));
+                    if (res == false)
+                    {
+                        Tools.SetStatus("Failed to download .gitignore file for this project.");
+                    }
+                }
+
+                // setup git
+                try
+                {
+                    string projectPath = await GithubActions.InitRepositoryAsync(baseDir: txtNewProjectFolder.Text, projectName: txtNewProjectName.Text, initGitLfs: (chkEnableLfs.IsChecked == true), defaultBranch: "main");
+
+                    txtNewProjectStatus.Text = "Git repository initialized at: " + projectPath;
+                }
+                catch (Exception ex)
+                {
+                    txtNewProjectStatus.Text = "Git init failed: " + ex.Message;
+                }
+
+                if (chkInitialCommit.IsChecked == true)
+                {
+                    try
+                    {
+                        await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "add .");
+                        await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "commit -m \"Initial commit from " + MainWindow.appName + "\"");
+                        txtNewProjectStatus.Text += " | Initial commit created";
+                    }
+                    catch (Exception ex)
+                    {
+                        txtNewProjectStatus.Text += " | Initial commit failed: " + ex.Message;
+                    }
+                }
+
+            } // if version control enabled
+
             DialogResult = true;
-        }
+        } // BtnCreateNewProject_Click
 
 
         private void BtnCancelNewProject_Click(object sender, RoutedEventArgs e)
@@ -378,6 +450,7 @@ namespace UnityLauncherPro
             //System.Console.WriteLine("newProjectName: " + txtNewProjectName.Text);
 
             newProjectName = txtNewProjectName.Text;
+            if (chkEnableVersionControl.IsChecked == true) txtRepoName.Text = newProjectName;
         }
 
         private void TxtNewProjectName_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -1008,8 +1081,10 @@ namespace UnityLauncherPro
             _repoNameCts?.Cancel();
             _repoNameCts = new CancellationTokenSource();
             var token = _repoNameCts.Token;
+            lblRepoNameValid.Visibility = Visibility.Collapsed;
+            lblRepoNameInvalid.Visibility = Visibility.Visible;
 
-            await Task.Delay(500);
+            await Task.Delay(750);
 
             if (token.IsCancellationRequested) return;
 

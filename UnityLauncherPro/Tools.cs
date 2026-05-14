@@ -2759,13 +2759,21 @@ public static class UnityLauncherProTools
             }
         }
 
-        private static async Task<bool> DownloadFileAsync(string fileUrl, string destinationPath)
+        public static async Task<bool> DownloadFileAsync(string fileUrl, string destinationPath)
         {
             var cancellationTokenSource = new CancellationTokenSource();
             var fileName = Path.GetFileName(fileUrl);
             var progressWindow = new DownloadProgressWindow(fileName, () => cancellationTokenSource.Cancel());
             progressWindow.Show();
             var result = false;
+
+            // create destination folder, if not exists
+            var outputFolderPath = Path.GetDirectoryName(destinationPath);
+            if (Directory.Exists(outputFolderPath) == false)
+            {
+                Directory.CreateDirectory(outputFolderPath);
+            }
+
             try
             {
                 using (var client = new HttpClient())
@@ -2778,8 +2786,7 @@ public static class UnityLauncherProTools
                     var totalRead = 0;
 
                     using (var contentStream = await response.Content.ReadAsStreamAsync())
-                    using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write,
-                               FileShare.None, buffer.Length, true))
+                    using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None, buffer.Length, true))
                     {
                         int bytesRead;
                         while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationTokenSource.Token)) > 0)
