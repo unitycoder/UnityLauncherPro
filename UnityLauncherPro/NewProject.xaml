@@ -78,7 +78,7 @@
                 </Button>
             </Grid>
 
-            <Expander x:Name="expVersionControl" Margin="0,10,0,0" Header="Version Control (Github)" Foreground="{DynamicResource ThemeButtonForeground}" IsExpanded="True" Collapsed="expVersionControl_Collapsed">
+            <Expander x:Name="expVersionControl" Margin="0,10,0,0" Header="Version Control (Github)" Foreground="{DynamicResource ThemeButtonForeground}" IsExpanded="True" Collapsed="expVersionControl_Collapsed" Expanded="expVersionControl_Collapsed">
                 <Grid UseLayoutRounding="False">
                     <StackPanel Margin="0,6,0,0" Orientation="Vertical">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,0">

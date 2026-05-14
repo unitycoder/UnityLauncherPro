@@ -85,7 +85,7 @@ namespace UnityLauncherPro
                             gridAvailableVersions.SelectedIndex = i;
                             gridAvailableVersions.ScrollIntoView(gridAvailableVersions.SelectedItem);
 
-                            string baseVersion = GetBaseVersion(newVersion);
+                            string baseVersion = Tools.GetBaseVersion(newVersion);
                             if (fetchOnlineTemplates) _ = LoadOnlineTemplatesAsync(baseVersion);
                             break;
                         }
@@ -127,6 +127,12 @@ namespace UnityLauncherPro
         private void LoadSettings()
         {
             chkForceDX11.IsChecked = Settings.Default.forceDX11;
+            chkEnableLfs.IsChecked = Settings.Default.gitIEnableLFS;
+            chkInitialCommit.IsChecked = Settings.Default.gitInitialCommit;
+            chkAddReadme.IsChecked = Settings.Default.gitAddReadme;
+            //chkAddUnityGitIgnore.IsChecked = Settings.Default.gitAddUnityGitIgnore; // not used yet
+            chkEnableVersionControl.IsChecked = Settings.Default.gitEnableVersionControl;
+            expVersionControl.IsExpanded = Settings.Default.gitPanelExpanded || Settings.Default.gitEnableVersionControl;
         }
 
         void UpdateTemplatesDropDown(string unityPath)
@@ -388,23 +394,12 @@ namespace UnityLauncherPro
             listOnlineTemplates.ItemsSource = null; // clear previous items
             if (loadOnlineTemplates)
             {
-                string baseVersion = GetBaseVersion(k.Version);
+                string baseVersion = Tools.GetBaseVersion(k.Version);
                 // Cancel previous request
                 _templateLoadCancellation?.Cancel();
                 _templateLoadCancellation = new CancellationTokenSource();
                 _ = LoadOnlineTemplatesAsync(baseVersion, _templateLoadCancellation.Token);
             }
-        }
-
-        string GetBaseVersion(string version)
-        {
-            // e.g. 2020.3.15f1 -> 2020.3
-            var parts = version.Split('.');
-            if (parts.Length >= 2)
-            {
-                return parts[0] + "." + parts[1];
-            }
-            return version;
         }
 
         private void GridAvailableVersions_Loaded(object sender, RoutedEventArgs e)
@@ -463,6 +458,9 @@ namespace UnityLauncherPro
             chkInitialCommit.IsEnabled = state;
             //chkAddUnityGitIgnore.IsEnabled = state; // not used yet
             chkAddReadme.IsEnabled = state;
+
+            Settings.Default.gitEnableVersionControl = state;
+            Settings.Default.Save();
         }
 
         private void btnBrowseForProjectFolder_Click(object sender, RoutedEventArgs e)
@@ -531,7 +529,6 @@ namespace UnityLauncherPro
             }
         }
 
-        // Add this static field to the class (near other static fields)
         private static readonly HttpClient _httpClient = new HttpClient();
 
         private async Task LoadOnlineTemplatesAsync(string baseVersion, CancellationToken cancellationToken = default)
@@ -782,8 +779,6 @@ namespace UnityLauncherPro
             return -1;
         } // FindMatchingBrace
 
-
-
         private void listOnlineTemplates_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             // Get the item that was clicked
@@ -810,7 +805,6 @@ namespace UnityLauncherPro
                 clickedElement = VisualTreeHelper.GetParent(clickedElement);
             }
         }
-
 
         private void listOnlineTemplates_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -932,7 +926,7 @@ namespace UnityLauncherPro
         {
             if (gridAvailableVersions.SelectedItem is UnityInstallation selectedInstallation)
             {
-                string baseVersion = GetBaseVersion(selectedInstallation.Version);
+                string baseVersion = Tools.GetBaseVersion(selectedInstallation.Version);
                 _templateLoadCancellation?.Cancel();
                 _templateLoadCancellation = new CancellationTokenSource();
                 _ = LoadOnlineTemplatesAsync(baseVersion, _templateLoadCancellation.Token);
@@ -957,27 +951,38 @@ namespace UnityLauncherPro
 
         private void chkEnableLfs_Checked(object sender, RoutedEventArgs e)
         {
+            if (isInitializing) return;
 
+            Settings.Default.gitIEnableLFS = chkEnableLfs.IsChecked == true;
+            Settings.Default.Save();
         }
 
         private void chkInitialCommit_Checked(object sender, RoutedEventArgs e)
         {
+            if (isInitializing) return;
 
+            Settings.Default.gitInitialCommit = chkInitialCommit.IsChecked == true;
+            Settings.Default.Save();
         }
 
         private void chkAddReadme_Checked(object sender, RoutedEventArgs e)
         {
+            if (isInitializing) return;
 
+            Settings.Default.gitAddReadme = chkAddReadme.IsChecked == true;
+            Settings.Default.Save();
         }
 
         private void txtRepoName_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // TODO validate repo name with github requirements and show error if invalid AND check if already used
         }
 
         private void expVersionControl_Collapsed(object sender, RoutedEventArgs e)
         {
-            // TODO save state of expander to settings AND if version control is enabled, always show expander and disable collapsing
+            if (isInitializing) return;
+
+            Settings.Default.gitPanelExpanded = expVersionControl.IsExpanded;
+            Settings.Default.Save();
         }
 
 

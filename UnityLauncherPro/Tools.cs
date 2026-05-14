@@ -3312,6 +3312,18 @@ public static class UnityLauncherProTools
                 return false;
             }
         }
+
+        public static string GetBaseVersion(string version)
+        {
+            // e.g. 2020.3.15f1 -> 2020.3
+            var parts = version.Split('.');
+            if (parts.Length >= 2)
+            {
+                return parts[0] + "." + parts[1];
+            }
+            return version;
+        }
+
     } // class
 
 } // namespace

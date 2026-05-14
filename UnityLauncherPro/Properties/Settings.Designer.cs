@@ -12,7 +12,7 @@ namespace UnityLauncherPro.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -199,18 +199,6 @@ namespace UnityLauncherPro.Properties {
             }
             set {
                 this["enableProjectRename"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool showRecoveredScenePopup {
-            get {
-                return ((bool)(this["showRecoveredScenePopup"]));
-            }
-            set {
-                this["showRecoveredScenePopup"] = value;
             }
         }
         
@@ -671,6 +659,78 @@ namespace UnityLauncherPro.Properties {
             }
             set {
                 this["fetchOnlineTemplates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool gitIEnableLFS {
+            get {
+                return ((bool)(this["gitIEnableLFS"]));
+            }
+            set {
+                this["gitIEnableLFS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool gitInitialCommit {
+            get {
+                return ((bool)(this["gitInitialCommit"]));
+            }
+            set {
+                this["gitInitialCommit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool gitAddReadme {
+            get {
+                return ((bool)(this["gitAddReadme"]));
+            }
+            set {
+                this["gitAddReadme"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool gitPanelExpanded {
+            get {
+                return ((bool)(this["gitPanelExpanded"]));
+            }
+            set {
+                this["gitPanelExpanded"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool gitEnableVersionControl {
+            get {
+                return ((bool)(this["gitEnableVersionControl"]));
+            }
+            set {
+                this["gitEnableVersionControl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool showRecoveredScenePopup {
+            get {
+                return ((bool)(this["showRecoveredScenePopup"]));
+            }
+            set {
+                this["showRecoveredScenePopup"] = value;
             }
         }
     }
