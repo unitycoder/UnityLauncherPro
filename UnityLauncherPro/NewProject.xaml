@@ -82,14 +82,14 @@
                 <Grid UseLayoutRounding="False">
                     <StackPanel Margin="0,6,0,0" Orientation="Vertical">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-                            <Label Name="lblNotConnected" Content="❌" Margin="0,0,0,0" VerticalAlignment="Center" Foreground="Red"/>
+                            <Label Name="lblNotConnected" Content="❌" Margin="0,0,0,0" VerticalAlignment="Center" Foreground="Red" HorizontalAlignment="Left"/>
                             <Label Name="lblConnected" Content="✔️" Margin="0,0,0,0" VerticalAlignment="Center" Foreground="Lime" Visibility="Collapsed"/>
-                            <Label Content="Connected as:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,0" VerticalAlignment="Center"/>
+                            <Label Content="Connected as:" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                             <Label x:Name="lblGithubUsername" Content="(not connected)" Foreground="{DynamicResource ThemeButtonForeground}" Margin="5,0,0,0" VerticalAlignment="Center" FontStyle="Italic" MaxWidth="92"/>
                             <Button x:Name="btnCreateToken" Style="{StaticResource CustomButton}" Content="Get Token 🔗" ToolTip="Open Github to create a token" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="0,4,6,0" TabIndex="10" Grid.Column="1" FontSize="10" Width="66" Click="btnCreateToken_Click" />
                             <TextBox x:Name="txtTokenInput" ToolTip="Enter your Github token here" VerticalAlignment="Center" IsUndoEnabled="True" Margin="0,2,0,2" HorizontalAlignment="Left" Width="100" TextChanged="txtTokenInput_TextChanged"/>
                             <Button x:Name="btnAuthorizeToken" Style="{StaticResource CustomButton}" Content="Authorize" ToolTip="Open Github to create a token" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="6,4,0,0" TabIndex="10"  IsEnabled="False" Width="60" Click="btnAuthorizeToken_Click" />
-                            <Button x:Name="btnDisconnectToken" Style="{StaticResource CustomButton}" Content="Disconnect" ToolTip="Disconnect from Github" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="6,4,0,0" TabIndex="10"  IsEnabled="False" Width="60" Visibility="Collapsed" />
+                            <Button x:Name="btnDisconnectToken" Style="{StaticResource CustomButton}" Content="Disconnect" ToolTip="Disconnect from Github" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="6,4,0,0" TabIndex="10"  IsEnabled="False" Width="60" Visibility="Collapsed" Click="btnDisconnectToken_Click" />
 
                         </StackPanel>
                         <CheckBox x:Name="chkEnableVersionControl" Content="Enable Version Control" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,6,0,6" VerticalAlignment="Center" Checked="chkEnableVersionControl_Checked" Unchecked="chkEnableVersionControl_Checked"/>

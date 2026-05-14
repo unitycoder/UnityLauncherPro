@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using UnityLauncherPro.Data;
+using UnityLauncherPro.Helpers;
 using UnityLauncherPro.Properties;
 
 namespace UnityLauncherPro
@@ -32,6 +33,9 @@ namespace UnityLauncherPro
 
         public static string targetFolder { get; private set; } = null;
         private CancellationTokenSource _templateLoadCancellation;
+
+        const string githubTokenCreationURL = "https://github.com/settings/tokens/new?description=UnityLauncherPro+Setup+Project+Access&default_expires_at=90&scopes=repo#Remember_to_Copy_Token!";
+
 
         public NewProject(string unityVersion, string suggestedName, string targetFolder, bool nameIsLocked = false, bool fetchOnlineTemplates = false)
         {
@@ -124,7 +128,7 @@ namespace UnityLauncherPro
 
         }  // NewProject
 
-        private void LoadSettings()
+        private async void LoadSettings()
         {
             chkForceDX11.IsChecked = Settings.Default.forceDX11;
             chkEnableLfs.IsChecked = Settings.Default.gitIEnableLFS;
@@ -133,6 +137,28 @@ namespace UnityLauncherPro
             //chkAddUnityGitIgnore.IsChecked = Settings.Default.gitAddUnityGitIgnore; // not used yet
             chkEnableVersionControl.IsChecked = Settings.Default.gitEnableVersionControl;
             expVersionControl.IsExpanded = Settings.Default.gitPanelExpanded || Settings.Default.gitEnableVersionControl;
+
+            string token = GitHubTokenStore.LoadToken();
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                ShowGitAuthorizedUI(false);
+                return;
+            }
+
+            // TODO no need to validate on every load..
+            GitHubTokenValidationResult result = await GitHubAuth.ValidateTokenAsync(token);
+
+            if (result.IsValid)
+            {
+                ShowGitAuthorizedUI(true);
+                // You can also store result.Login somewhere
+            }
+            else
+            {
+                GitHubTokenStore.DeleteToken();
+                ShowGitAuthorizedUI(false);
+            }
         }
 
         void UpdateTemplatesDropDown(string unityPath)
@@ -830,7 +856,7 @@ namespace UnityLauncherPro
                     button.Content = "⬇";
                 }
             }
-        } // btnDownloadTemplate_Click
+        }
 
         private void btnFetchTemplates_Click(object sender, RoutedEventArgs e)
         {
@@ -845,18 +871,93 @@ namespace UnityLauncherPro
 
         private void btnCreateToken_Click(object sender, RoutedEventArgs e)
         {
-            // TODO create new token from URL
-            // https://github.com/settings/tokens/new?description=UnityLauncherPro+Setup+Project+Access&default_expires_at=90&scopes=repo
+            Tools.OpenURL(githubTokenCreationURL);
         }
+
+
 
         private void txtTokenInput_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // TODO validate token format (e.g. length, prefix) and show error if invalid AND enable Validate/Authorize button
+            bool tokenSeemsOK = false;
+
+            if (string.IsNullOrWhiteSpace(txtTokenInput.Text)) return;
+
+            if (txtTokenInput.Text.StartsWith("ghp_") && txtTokenInput.Text.Length == 40)
+            {
+                btnAuthorizeToken.IsEnabled = true;
+                txtTokenInput.BorderBrush = Brushes.Green;
+                tokenSeemsOK = true;
+            }
+            else
+            {
+                btnAuthorizeToken.IsEnabled = false;
+                txtTokenInput.BorderBrush = Brushes.Red;
+            }
+
+            btnAuthorizeToken.IsEnabled = tokenSeemsOK;
         }
 
-        private void btnAuthorizeToken_Click(object sender, RoutedEventArgs e)
+        private void ShowGitAuthorizedUI(bool show)
         {
-            // TODO validate token with github API and save to secure storage, then hide token from text field or set as "Authorized"
+            if (show)
+            {
+
+                txtTokenInput.Text = null; // clear input after successful save
+                txtTokenInput.Visibility = Visibility.Collapsed;
+                btnAuthorizeToken.Visibility = Visibility.Collapsed;
+                btnDisconnectToken.Visibility = Visibility.Visible;
+                lblConnected.Visibility = Visibility.Visible;
+                lblNotConnected.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                txtTokenInput.Text = null;
+                lblGithubUsername.Content = string.Empty;
+
+                txtTokenInput.Visibility = Visibility.Visible;
+                btnAuthorizeToken.Visibility = Visibility.Visible;
+                btnDisconnectToken.Visibility = Visibility.Collapsed;
+                lblConnected.Visibility = Visibility.Collapsed;
+                lblNotConnected.Visibility = Visibility.Visible;
+
+                btnDisconnectToken.IsEnabled = false;
+                btnAuthorizeToken.IsEnabled = true;
+            }
+        }
+
+        private async void btnAuthorizeToken_Click(object sender, RoutedEventArgs e)
+        {
+            string token = txtTokenInput.Text.Trim();
+
+            btnAuthorizeToken.IsEnabled = false;
+            btnDisconnectToken.IsEnabled = true;
+
+            txtNewProjectStatus.Text = "Validating token...";
+
+            lblConnected.Visibility = Visibility.Collapsed;
+            lblNotConnected.Visibility = Visibility.Visible;
+
+            try
+            {
+                GitHubTokenValidationResult result = await GitHubAuth.ValidateTokenAsync(token);
+
+                if (result.IsValid)
+                {
+                    GitHubTokenStore.SaveToken(token);
+                    txtNewProjectStatus.Text = "Token valid. Logged in as " + result.Login + ".";
+                    lblGithubUsername.Content = result.Login;
+                    ShowGitAuthorizedUI(true);
+                }
+                else
+                {
+                    txtNewProjectStatus.Text = result.Error;
+                    ShowGitAuthorizedUI(false);
+                }
+            }
+            finally
+            {
+                btnAuthorizeToken.IsEnabled = true;
+            }
         }
 
         private void chkEnableLfs_Checked(object sender, RoutedEventArgs e)
@@ -895,7 +996,11 @@ namespace UnityLauncherPro
             Settings.Default.Save();
         }
 
-
+        private void btnDisconnectToken_Click(object sender, RoutedEventArgs e)
+        {
+            GitHubTokenStore.DeleteToken();
+            ShowGitAuthorizedUI(false);
+        }
 
     } // class NewProject
 } // namespace UnityLauncherPro
