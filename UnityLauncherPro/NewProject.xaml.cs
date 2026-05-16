@@ -128,19 +128,21 @@ namespace UnityLauncherPro
             }
 
             isInitializing = false;
-
-
         }  // NewProject
 
         private async void LoadSettings()
         {
+            chkEnableVersionControl.IsChecked = Settings.Default.gitEnableVersionControl;
+
             chkForceDX11.IsChecked = Settings.Default.forceDX11;
             chkEnableLfs.IsChecked = Settings.Default.gitIEnableLFS;
+            chkEnableLfs.IsEnabled = chkEnableVersionControl.IsChecked == true;
             chkInitialCommit.IsChecked = Settings.Default.gitInitialCommit;
+            chkInitialCommit.IsEnabled = chkEnableVersionControl.IsChecked == true;
             chkAddReadme.IsChecked = Settings.Default.gitAddReadme;
-            //chkAddUnityGitIgnore.IsChecked = Settings.Default.gitAddUnityGitIgnore; // not used yet
-            chkEnableVersionControl.IsChecked = Settings.Default.gitEnableVersionControl;
-            expVersionControl.IsExpanded = Settings.Default.gitPanelExpanded || Settings.Default.gitEnableVersionControl;
+            chkAddUnityGitIgnore.IsChecked = Settings.Default.gitAddIgnore;
+
+            expVersionControl.IsExpanded = Settings.Default.gitPanelExpanded || chkEnableVersionControl.IsChecked == true;
 
             string token = GitHubTokenStore.LoadToken();
 
@@ -150,21 +152,20 @@ namespace UnityLauncherPro
                 return;
             }
 
+
             // TODO no need to validate on every load..
             GitHubTokenValidationResult result = await GitHubAuth.ValidateTokenAsync(token);
 
             if (result.IsValid)
             {
-                chkEnableVersionControl.IsChecked = true;
                 ShowGitAuthorizedUI(true);
-                // You can also store result.Login somewhere
             }
             else
             {
-                chkEnableVersionControl.IsChecked = false;
                 GitHubTokenStore.DeleteToken();
                 ShowGitAuthorizedUI(false);
             }
+
         } // LoadSettings
 
         void UpdateTemplatesDropDown(string unityPath)
@@ -315,59 +316,77 @@ namespace UnityLauncherPro
                     txtNewProjectStatus.Text += " | GitHub repo creation failed: " + ex.Message;
                 }
 
-                // create readme if enabled
-                if (chkAddReadme.IsChecked == true)
-                {
-                    var readmePath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, "README.md");
-                    try
-                    {
-                        if (Directory.Exists(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text)) == false)
-                        {
-                            Directory.CreateDirectory(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text));
-                        }
-                        File.WriteAllText(readmePath, "# " + txtRepoName.Text + "\n\n" + txtRepoDescription.Text);
-                    }
-                    catch (Exception ex)
-                    {
-                        Tools.SetStatus("Failed to create README file for this project: " + ex.Message);
-                    }
-                }
-
                 // create .gitattributes if LFS enabled?
                 if (chkEnableLfs.IsChecked == true)
                 {
-                    //var attributesUrl = "https://raw.githubusercontent.com/gitattributes/gitattributes/refs/heads/master/Unity.gitattributes";
-                    //var res = await Tools.DownloadFileAsync(attributesUrl, Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitattributes"));
-                    //if (res == false)
-                    //{
-                    //    Tools.SetStatus("Failed to download .gitattributes file for this project.");
-                    //}
+                    //var gitAttributesUrl = "https://raw.githubusercontent.com/gitattributes/gitattributes/refs/heads/master/Unity.gitattributes";
 
                     // load from resources
                     try
                     {
-                        var attributesPath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitattributes");
-                        //File.WriteAllText(attributesPath, attributesContent);
+                        var assembly = typeof(NewProject).Assembly;
+                        var resourceName = $"{typeof(NewProject).Namespace}.Resources..gitattributes";
+
+                        using var stream = assembly.GetManifestResourceStream(resourceName);
+                        if (stream == null) return;
+
+                        var gitattributesPath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitattributes");
+                        using var fileStream = File.Create(gitattributesPath);
+                        stream.CopyTo(fileStream);
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        Tools.SetStatus("Failed to create .gitattributes file for this project: " + ex.Message);
+                        Tools.SetStatus("Failed to create .gitattributes file for this project.");
                     }
-
                 }
+            } // if version control enabled
 
-                // download .gitignore if enabled
-                if (chkAddUnityGitIgnore.IsChecked == true)
+            // create readme if enabled
+            if (chkAddReadme.IsChecked == true)
+            {
+                var readmePath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, "README.md");
+                try
                 {
-                    var ignoreUrl = "https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Unity.gitignore";
-                    var res = await Tools.DownloadFileAsync(ignoreUrl, Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitignore"));
-                    if (res == false)
+                    if (Directory.Exists(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text)) == false)
                     {
-                        Tools.SetStatus("Failed to download .gitignore file for this project.");
+                        Directory.CreateDirectory(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text));
                     }
+                    File.WriteAllText(readmePath, "# " + txtRepoName.Text + "\n\n" + txtRepoDescription.Text);
                 }
+                catch (Exception ex)
+                {
+                    Tools.SetStatus("Failed to create README file for this project: " + ex.Message);
+                }
+            }
 
 
+
+            // download .gitignore if enabled
+            if (chkAddUnityGitIgnore.IsChecked == true)
+            {
+                //var gitIgnoreUrl = "https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Unity.gitignore";
+
+                // load from resources
+                try
+                {
+                    var assembly = typeof(NewProject).Assembly;
+                    var resourceName = $"{typeof(NewProject).Namespace}.Resources..gitignore";
+
+                    using var stream = assembly.GetManifestResourceStream(resourceName);
+                    if (stream == null) return;
+
+                    var gitignorePath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitignore");
+                    using var fileStream = File.Create(gitignorePath);
+                    stream.CopyTo(fileStream);
+                }
+                catch
+                {
+                    Tools.SetStatus("Failed to create .gitignore file for this project.");
+                }
+            }
+
+            if (chkEnableVersionControl.IsChecked == true)
+            {
                 if (chkInitialCommit.IsChecked == true)
                 {
                     Console.WriteLine(1);
@@ -377,8 +396,8 @@ namespace UnityLauncherPro
                         await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "commit -m \"Initial commit from " + MainWindow.appName + "\"");
                         await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "push -u origin main");
 
-                        Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text)+" add .");
-                        Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text)+ " commit -m \"Initial commit from " + MainWindow.appName + "\"");
+                        Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text) + " add .");
+                        Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text) + " commit -m \"Initial commit from " + MainWindow.appName + "\"");
 
                         txtNewProjectStatus.Text += " | Initial commit created";
                     }
@@ -624,8 +643,8 @@ namespace UnityLauncherPro
             txtRepoDescription.IsEnabled = state;
             chkEnableLfs.IsEnabled = state;
             chkInitialCommit.IsEnabled = state;
-            //chkAddUnityGitIgnore.IsEnabled = state; // not used yet
-            chkAddReadme.IsEnabled = state;
+            //chkAddUnityGitIgnore.IsEnabled = state;
+            //chkAddReadme.IsEnabled = state;
 
             Settings.Default.gitEnableVersionControl = state;
             Settings.Default.Save();
@@ -1026,6 +1045,9 @@ namespace UnityLauncherPro
             {
                 lblGithubUsername.Content = Settings.Default.gitUsername;
 
+                chkEnableVersionControl.IsChecked = true;
+                chkEnableVersionControl.IsEnabled = true;
+
                 txtTokenInput.Visibility = Visibility.Collapsed;
                 btnAuthorizeToken.Visibility = Visibility.Collapsed;
                 btnDisconnectToken.Visibility = Visibility.Visible;
@@ -1040,6 +1062,9 @@ namespace UnityLauncherPro
             else
             {
                 lblGithubUsername.Content = string.Empty;
+
+                chkEnableVersionControl.IsChecked = false;
+                chkEnableVersionControl.IsEnabled = false;
 
                 txtTokenInput.Visibility = Visibility.Visible;
                 btnAuthorizeToken.Visibility = Visibility.Visible;
@@ -1118,6 +1143,14 @@ namespace UnityLauncherPro
             Settings.Default.Save();
         }
 
+        private void chkAddUnityGitIgnore_Checked(object sender, RoutedEventArgs e)
+        {
+            if (isInitializing) return;
+
+            Settings.Default.gitAddIgnore = chkAddUnityGitIgnore.IsChecked == true;
+            Settings.Default.Save();
+        }
+
         private CancellationTokenSource _repoNameCts;
 
         private async void txtRepoName_TextChanged(object sender, TextChangedEventArgs e)
@@ -1185,5 +1218,7 @@ namespace UnityLauncherPro
 
             btnAuthorizeToken.IsEnabled = tokenSeemsOK;
         }
+
+
     } // class NewProject
 } // namespace UnityLauncherPro

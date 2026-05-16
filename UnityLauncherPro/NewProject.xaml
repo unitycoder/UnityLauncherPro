@@ -128,9 +128,9 @@
                         </Grid>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-                            <CheckBox x:Name="chkEnableLfs" Content="Enable Git LFS " ToolTip="Enable Git Large File Storage" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" Checked="chkEnableLfs_Checked" Unchecked="chkEnableLfs_Checked" IsChecked="True"/>
+                            <CheckBox x:Name="chkEnableLfs" Content="Enable Git LFS " ToolTip="Enable Large File Storage and add .gitattributes" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" Checked="chkEnableLfs_Checked" Unchecked="chkEnableLfs_Checked" IsChecked="True"/>
                             <CheckBox x:Name="chkInitialCommit" Content="Create initial commit" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" Checked="chkInitialCommit_Checked" Unchecked="chkInitialCommit_Checked" IsChecked="True"/>
-                            <CheckBox x:Name="chkAddUnityGitIgnore" Content="Add Unity .gitignore" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" IsEnabled="False" IsChecked="True"/>
+                            <CheckBox x:Name="chkAddUnityGitIgnore" Content="Add Unity .gitignore" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" IsChecked="True" Checked="chkAddUnityGitIgnore_Checked"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                             <CheckBox x:Name="chkAddReadme" Content="Add README" ToolTip="Add a README file" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" IsChecked="True" Checked="chkAddReadme_Checked" Unchecked="chkAddReadme_Checked"/>

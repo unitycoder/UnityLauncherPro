@@ -745,5 +745,17 @@ namespace UnityLauncherPro.Properties {
                 this["gitUsername"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool gitAddIgnore {
+            get {
+                return ((bool)(this["gitAddIgnore"]));
+            }
+            set {
+                this["gitAddIgnore"] = value;
+            }
+        }
     }
 }
