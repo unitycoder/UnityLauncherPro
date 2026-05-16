@@ -804,15 +804,15 @@ namespace UnityLauncherPro
 
                     // Parse individual fields
                     var tarballUrl = JsonParser.ExtractNestedJsonString(nodeJson, "\"tarball\"", "\"url\"");
-                    var rawDescription = JsonParser.GetStringValue(nodeJson, "\"description\"");
+                    var rawDescription = JsonParser.ExtractJsonString(nodeJson, "\"description\"");
                     var splitDescription = Tools.SplitTextToRows(rawDescription, 3);
 
                     var template = new OnlineTemplateItem
                     {
-                        Name = JsonParser.GetStringValue(nodeJson, "\"name\""),
+                        Name = JsonParser.ExtractJsonString(nodeJson, "\"name\""),
                         Description = splitDescription,
-                        Type = JsonParser.GetStringValue(nodeJson, "\"type\""),
-                        RenderPipeline = JsonParser.GetStringValue(nodeJson, "\"renderPipeline\""),
+                        Type = JsonParser.ExtractJsonString(nodeJson, "\"type\""),
+                        RenderPipeline = JsonParser.ExtractJsonString(nodeJson, "\"renderPipeline\""),
                         PreviewImageURL = JsonParser.ExtractNestedJsonString(nodeJson, "\"previewImage\"", "\"url\"") ?? "pack://application:,,,/Images/icon.png",
                         TarBallURL = tarballUrl,
                         IsDownloaded = false
