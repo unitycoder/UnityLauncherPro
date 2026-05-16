@@ -165,7 +165,7 @@ namespace UnityLauncherPro
                 GitHubTokenStore.DeleteToken();
                 ShowGitAuthorizedUI(false);
             }
-        }
+        } // LoadSettings
 
         void UpdateTemplatesDropDown(string unityPath)
         {
@@ -290,6 +290,12 @@ namespace UnityLauncherPro
                 {
                     string token = GitHubTokenStore.LoadToken();
 
+                    // if invalid repo, add DDMMYYY_HHMMSS
+                    if (lblRepoNameInvalid.Visibility == Visibility.Visible)
+                    {
+                        txtRepoName.Text += "_" + DateTime.Now.ToString("ddMMyyyy_HHmmss");
+                    }
+
                     GitHubCreateRepoResult result = await GithubActions.CreateRepositoryAsync(token: token, repoName: txtRepoName.Text, description: txtRepoDescription.Text, isPrivate: rbPrivate.IsChecked == true, autoInit: false);
 
                     if (result.Success)
@@ -330,12 +336,24 @@ namespace UnityLauncherPro
                 // create .gitattributes if LFS enabled?
                 if (chkEnableLfs.IsChecked == true)
                 {
-                    var attributesUrl = "https://raw.githubusercontent.com/gitattributes/gitattributes/refs/heads/master/Unity.gitattributes";
-                    var res = await Tools.DownloadFileAsync(attributesUrl, Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitattributes"));
-                    if (res == false)
+                    //var attributesUrl = "https://raw.githubusercontent.com/gitattributes/gitattributes/refs/heads/master/Unity.gitattributes";
+                    //var res = await Tools.DownloadFileAsync(attributesUrl, Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitattributes"));
+                    //if (res == false)
+                    //{
+                    //    Tools.SetStatus("Failed to download .gitattributes file for this project.");
+                    //}
+
+                    // load from resources
+                    try
                     {
-                        Tools.SetStatus("Failed to download .gitattributes file for this project.");
+                        var attributesPath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitattributes");
+                        //File.WriteAllText(attributesPath, attributesContent);
                     }
+                    catch (Exception ex)
+                    {
+                        Tools.SetStatus("Failed to create .gitattributes file for this project: " + ex.Message);
+                    }
+
                 }
 
                 // download .gitignore if enabled
@@ -586,9 +604,18 @@ namespace UnityLauncherPro
 
         private void chkEnableVersionControl_Checked(object sender, RoutedEventArgs e)
         {
-            if (isInitializing) return;
-
             bool state = chkEnableVersionControl.IsChecked == true;
+
+            if (state == true)
+            {
+                btnCreateNewProject.Content = "Create Project + GitHub Repo";
+            }
+            else
+            {
+                btnCreateNewProject.Content = "Create Project";
+            }
+
+            if (isInitializing) return;
 
             // lock controls
             rbPrivate.IsEnabled = state;
@@ -991,30 +1018,9 @@ namespace UnityLauncherPro
 
 
 
-        private void txtTokenInput_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            bool tokenSeemsOK = false;
-
-            if (string.IsNullOrWhiteSpace(txtTokenInput.Text)) return;
-
-            if (txtTokenInput.Text.StartsWith("ghp_") && txtTokenInput.Text.Length == 40)
-            {
-                btnAuthorizeToken.IsEnabled = true;
-                txtTokenInput.BorderBrush = Brushes.Green;
-                tokenSeemsOK = true;
-            }
-            else
-            {
-                btnAuthorizeToken.IsEnabled = false;
-                txtTokenInput.BorderBrush = Brushes.Red;
-            }
-
-            btnAuthorizeToken.IsEnabled = tokenSeemsOK;
-        }
-
         private void ShowGitAuthorizedUI(bool show)
         {
-            txtTokenInput.Text = null;
+            txtTokenInput.Password = null;
 
             if (show)
             {
@@ -1050,7 +1056,7 @@ namespace UnityLauncherPro
 
         private async void btnAuthorizeToken_Click(object sender, RoutedEventArgs e)
         {
-            string token = txtTokenInput.Text.Trim();
+            string token = txtTokenInput.Password.Trim();
 
             btnAuthorizeToken.IsEnabled = false;
             btnDisconnectToken.IsEnabled = true;
@@ -1135,11 +1141,13 @@ namespace UnityLauncherPro
                 txtNewProjectStatus.Text = res;
                 lblRepoNameValid.Visibility = Visibility.Collapsed;
                 lblRepoNameInvalid.Visibility = Visibility.Visible;
+                lblRepoNameInvalid.ToolTip = res;
             }
             else
             {
                 lblRepoNameValid.Visibility = Visibility.Visible;
                 lblRepoNameInvalid.Visibility = Visibility.Collapsed;
+                lblRepoNameInvalid.ToolTip = "";
             }
         }
 
@@ -1157,5 +1165,25 @@ namespace UnityLauncherPro
             ShowGitAuthorizedUI(false);
         }
 
+        private void txtTokenInput_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            bool tokenSeemsOK = false;
+
+            if (string.IsNullOrWhiteSpace(txtTokenInput.Password)) return;
+
+            if (txtTokenInput.Password.StartsWith("ghp_") && txtTokenInput.Password.Length == 40)
+            {
+                btnAuthorizeToken.IsEnabled = true;
+                txtTokenInput.BorderBrush = Brushes.Green;
+                tokenSeemsOK = true;
+            }
+            else
+            {
+                btnAuthorizeToken.IsEnabled = false;
+                txtTokenInput.BorderBrush = Brushes.Red;
+            }
+
+            btnAuthorizeToken.IsEnabled = tokenSeemsOK;
+        }
     } // class NewProject
 } // namespace UnityLauncherPro

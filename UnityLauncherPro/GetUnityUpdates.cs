@@ -385,17 +385,54 @@ namespace UnityLauncherPro
 
         private static List<UnityVersion> LoadCachedVersions()
         {
-            string configFilePath = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+            string configFilePath = ConfigurationManager
+                .OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal)
+                .FilePath;
+
             string configDirectory = Path.GetDirectoryName(configFilePath);
-            if (configDirectory == null) return new List<UnityVersion>();
+            if (string.IsNullOrEmpty(configDirectory))
+                return new List<UnityVersion>();
+
+            Directory.CreateDirectory(configDirectory);
 
             string cacheFilePath = Path.Combine(configDirectory, CacheFileName);
-            if (!File.Exists(cacheFilePath)) return new List<UnityVersion>();
 
-            Console.WriteLine("cache file: " + cacheFilePath);
+            // copy from embedded resource on first run
+            if (!File.Exists(cacheFilePath))
+            {
+                try
+                {
+                    string resourceName = $"{typeof(GetUnityUpdates).Namespace}.Resources.{CacheFileName}";
+                    using (var stream = typeof(GetUnityUpdates).Assembly.GetManifestResourceStream(resourceName))
+                    {
+                        if (stream != null)
+                        {
+                            using (var fileStream = File.Create(cacheFilePath))
+                            {
+                                stream.CopyTo(fileStream);
+                            }
+                        }
+                        else
+                        {
+                            return new List<UnityVersion>();
+                        }
+                    }
+                }
+                catch
+                {
+                    return new List<UnityVersion>();
+                }
+            }
 
-            string json = File.ReadAllText(cacheFilePath);
-            return ParseCachedUnityVersions(json);
+            try
+            {
+                string json = File.ReadAllText(cacheFilePath);
+                return ParseCachedUnityVersions(json);
+            }
+            catch
+            {
+                return new List<UnityVersion>();
+            }
         }
 
         private static void SaveCachedVersions(List<UnityVersion> versions)

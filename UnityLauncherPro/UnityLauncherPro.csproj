@@ -190,6 +190,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Include="Resources\.gitattributes" />
+    <EmbeddedResource Include="Resources\.gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App.config" />
