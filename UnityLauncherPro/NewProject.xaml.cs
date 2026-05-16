@@ -213,13 +213,18 @@ namespace UnityLauncherPro
             }
         }
 
+        bool isCreatingProject = false;
         private async void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
+            if (isCreatingProject) return;
+            isCreatingProject = true;
+
             // check if projectname already exists (only if should be automatically created name)
             var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
             if (txtNewProjectName.IsEnabled == true && Directory.Exists(targetPath) == true)
             {
                 Tools.SetStatus("Project already exists: " + txtNewProjectName.Text);
+                isCreatingProject = false;
                 return;
             }
 
@@ -245,12 +250,14 @@ namespace UnityLauncherPro
                     if (!File.Exists(templateZipPath))
                     {
                         Tools.SetStatus("Selected online template is not downloaded. Please download it first.");
+                        isCreatingProject = false;
                         return;
                     }
                 }
                 else
                 {
                     Tools.SetStatus("Invalid online template URL");
+                    isCreatingProject = false;
                     return;
                 }
             }
@@ -359,8 +366,6 @@ namespace UnityLauncherPro
                 }
             }
 
-
-
             // download .gitignore if enabled
             if (chkAddUnityGitIgnore.IsChecked == true)
             {
@@ -413,6 +418,7 @@ namespace UnityLauncherPro
             } // if version control enabled
 
             btnCreateNewProject.IsEnabled = true;
+            isCreatingProject = false;
 
             DialogResult = true;
         } // BtnCreateNewProject_Click

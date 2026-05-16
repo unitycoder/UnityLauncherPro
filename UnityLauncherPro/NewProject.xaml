@@ -70,12 +70,8 @@
                     <ColumnDefinition Width="0.7*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject"  Margin="0,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" TabIndex="4" >
-                    <Label  Content="Cancel" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
-                </Button>
-                <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Margin="3,0,0,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click" TabIndex="3">
-                    <Label Content="_Create Project" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
-                </Button>
+                <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject" Margin="0,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" TabIndex="4" Content="Cancel"/>
+                <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Margin="3,0,0,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click" TabIndex="3" Content="_Create Project"/>
             </Grid>
 
             <Expander x:Name="expVersionControl" Margin="0,10,0,0" Header="Version Control (Github)" Foreground="{DynamicResource ThemeButtonForeground}" IsExpanded="True" Collapsed="expVersionControl_Collapsed" Expanded="expVersionControl_Collapsed">
