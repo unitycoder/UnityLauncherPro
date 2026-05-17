@@ -14,7 +14,7 @@ jobs:
   build:
     permissions:
       contents: write
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -142,11 +142,25 @@ jobs:
         id: vswhere
         shell: pwsh
         run: |
-          $installPath = vswhere -latest -products * -version "[18.0,19.0)" `
-                         -requires Microsoft.Component.MSBuild -property installationPath
-          if (-not $installPath) {
-            throw 'VS 2026 (major 18) not found'
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (-not (Test-Path $vswhere)) {
+            throw "Could not find vswhere.exe at $vswhere"
           }
+
+          $installPath = & $vswhere -latest -products * -version "[18.0,19.0)" `
+                          -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+
+          if (-not $installPath) {
+            Write-Host 'VS 2026 (major 18) not found on runner. Falling back to VS 2022 (major 17).'
+            $installPath = & $vswhere -latest -products * -version "[17.0,18.0)" `
+                            -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          }
+
+          if (-not $installPath) {
+            throw "Could not find a Visual Studio installation"
+          }
+
+          "VS=$installPath" >> $env:GITHUB_ENV
           "installPath=$installPath" >> $env:GITHUB_OUTPUT
 
       # download vs installer builder (v2.0.1)
