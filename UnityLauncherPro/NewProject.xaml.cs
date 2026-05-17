@@ -145,6 +145,7 @@ namespace UnityLauncherPro
             expVersionControl.IsExpanded = Settings.Default.gitPanelExpanded || chkEnableVersionControl.IsChecked == true;
 
             string token = GitHubTokenStore.LoadToken();
+            string username = GitHubTokenStore.LoadUsername();
 
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -163,6 +164,7 @@ namespace UnityLauncherPro
             else
             {
                 GitHubTokenStore.DeleteToken();
+                Settings.Default.Save();
                 ShowGitAuthorizedUI(false);
             }
 
@@ -310,7 +312,8 @@ namespace UnityLauncherPro
                     {
                         Console.WriteLine("Created repo successfully.");
 
-                        string remoteUrl = $"https://github.com/{Settings.Default.gitUsername}/{txtRepoName.Text}.git";
+                        string username = GitHubTokenStore.LoadUsername();
+                        string remoteUrl = $"https://github.com/{username}/{txtRepoName.Text}.git";
                         await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), $"remote add origin {remoteUrl}");
                     }
                     else
@@ -413,7 +416,8 @@ namespace UnityLauncherPro
                     }
                 }
 
-                Tools.OpenURL("https://github.com/" + Settings.Default.gitUsername + "/" + txtRepoName.Text);
+                string username = GitHubTokenStore.LoadUsername();
+                Tools.OpenURL("https://github.com/" + username + "/" + txtRepoName.Text);
 
             } // if version control enabled
 
@@ -1049,7 +1053,9 @@ namespace UnityLauncherPro
 
             if (show)
             {
-                lblGithubUsername.Content = Settings.Default.gitUsername;
+                var username = GitHubTokenStore.LoadUsername();
+
+                lblGithubUsername.Content = username;
 
                 chkEnableVersionControl.IsChecked = true;
                 chkEnableVersionControl.IsEnabled = true;
@@ -1097,17 +1103,14 @@ namespace UnityLauncherPro
             lblConnected.Visibility = Visibility.Collapsed;
             lblNotConnected.Visibility = Visibility.Visible;
 
-            Settings.Default.gitUsername = null;
-
             try
             {
                 GitHubTokenValidationResult result = await GitHubAuth.ValidateTokenAsync(token);
 
                 if (result.IsValid)
                 {
-                    GitHubTokenStore.SaveToken(token);
+                    GitHubTokenStore.SaveToken(token, result.Login);
                     txtNewProjectStatus.Text = "Token valid. Logged in as " + result.Login + ".";
-                    Settings.Default.gitUsername = result.Login;
                     lblGithubUsername.Content = result.Login;
                     ShowGitAuthorizedUI(true);
                 }
@@ -1171,7 +1174,8 @@ namespace UnityLauncherPro
 
             if (token.IsCancellationRequested) return;
 
-            var res = await GithubActions.ValidateRepoName(txtRepoName.Text, Settings.Default.gitUsername);
+            var username = GitHubTokenStore.LoadUsername();
+            var res = await GithubActions.ValidateRepoName(txtRepoName.Text, username);
 
             if (token.IsCancellationRequested) return;
 
@@ -1201,6 +1205,7 @@ namespace UnityLauncherPro
         private void btnDisconnectToken_Click(object sender, RoutedEventArgs e)
         {
             GitHubTokenStore.DeleteToken();
+            Settings.Default.Save();
             ShowGitAuthorizedUI(false);
         }
 

@@ -338,18 +338,37 @@ namespace UnityLauncherPro.Helpers
         private static readonly string FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), MainWindow.appName);
         private static readonly string FilePath = Path.Combine(FolderPath, MainWindow.appName + ".dat");
 
-        public static void SaveToken(string token)
+        public static void SaveToken(string token, string username)
         {
             if (string.IsNullOrWhiteSpace(token)) throw new ArgumentException("Token is empty.", "token");
 
             if (!Directory.Exists(FolderPath)) Directory.CreateDirectory(FolderPath);
 
-            byte[] plainBytes = Encoding.UTF8.GetBytes(token);
+            string payload = BuildPayload(token, username);
+            byte[] plainBytes = Encoding.UTF8.GetBytes(payload);
             byte[] encryptedBytes = ProtectedData.Protect(plainBytes, null, DataProtectionScope.CurrentUser);
             File.WriteAllBytes(FilePath, encryptedBytes);
         }
 
         public static string LoadToken()
+        {
+            return LoadValue("token");
+        }
+
+        public static string LoadUsername()
+        {
+            return LoadValue("username");
+        }
+
+        private static string LoadValue(string key)
+        {
+            string payload = LoadPayload();
+            if (string.IsNullOrWhiteSpace(payload)) return null;
+
+            return ReadValue(payload, key);
+        }
+
+        private static string LoadPayload()
         {
             if (!File.Exists(FilePath))
                 return null;
@@ -358,17 +377,64 @@ namespace UnityLauncherPro.Helpers
             {
                 byte[] encryptedBytes = File.ReadAllBytes(FilePath);
 
-                byte[] plainBytes = ProtectedData.Unprotect(
-                    encryptedBytes,
-                    null,
-                    DataProtectionScope.CurrentUser);
-
+                byte[] plainBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.CurrentUser);
                 return Encoding.UTF8.GetString(plainBytes);
             }
             catch
             {
                 return null;
             }
+        }
+
+        private static string BuildPayload(string token, string username)
+        {
+            return "token=" + EscapeValue(token) + "\nusername=" + EscapeValue(username);
+        }
+
+        private static string ReadValue(string payload, string key)
+        {
+            string prefix = key + "=";
+            string[] lines = payload.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+                if (!line.StartsWith(prefix, StringComparison.Ordinal)) continue;
+                return UnescapeValue(line.Substring(prefix.Length));
+            }
+
+            return null;
+        }
+
+        private static string EscapeValue(string value)
+        {
+            if (value == null) return string.Empty;
+            return value.Replace("\\", "\\\\").Replace("\r", "\\r").Replace("\n", "\\n");
+        }
+
+        private static string UnescapeValue(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return value;
+
+            var builder = new StringBuilder(value.Length);
+            for (int i = 0; i < value.Length; i++)
+            {
+                char c = value[i];
+                if (c == '\\' && i + 1 < value.Length)
+                {
+                    i++;
+                    char next = value[i];
+                    if (next == 'r') builder.Append('\r');
+                    else if (next == 'n') builder.Append('\n');
+                    else builder.Append(next);
+                }
+                else
+                {
+                    builder.Append(c);
+                }
+            }
+
+            return builder.ToString();
         }
 
         public static void DeleteToken()
