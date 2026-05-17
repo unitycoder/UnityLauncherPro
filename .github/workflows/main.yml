@@ -14,7 +14,7 @@ jobs:
   build:
     permissions:
       contents: write
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -137,22 +137,30 @@ jobs:
           Get-Content $proj
           Write-Host "=== END .vdproj CONTENT ==="
 
-      # locate VS 2022
-      - name: Locate Visual Studio 2022
+      # locate VS 2026
+      - name: Locate Visual Studio 2026
         id: vswhere
         shell: pwsh
         run: |
-          $installPath = vswhere -latest -products * -requires Microsoft.Component.MSBuild `
-                         -property installationPath
-          if (-not $installPath) { throw 'VS 2022 not found' }
+          $installPath = vswhere -latest -products * -version "[18.0,19.0)" `
+                         -requires Microsoft.Component.MSBuild -property installationPath
+          if (-not $installPath) {
+            throw 'VS 2026 (major 18) not found'
+          }
           "installPath=$installPath" >> $env:GITHUB_OUTPUT
 
       # download vs installer builder (v2.0.1)
       - name: Download Installer-Projects VSIX
         shell: pwsh
         run: |
-          $vsixUrl = "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/VisualStudioClient/vsextensions/MicrosoftVisualStudio2022InstallerProjects/2.0.1/vspackage"
-          Invoke-WebRequest $vsixUrl -OutFile installerprojects.vsix
+          $vsixUrl = "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/VisualStudioClient/vsextensions/MicrosoftVisualStudio2026InstallerProjects/2.0.1/vspackage"
+          $fallbackUrl = "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/VisualStudioClient/vsextensions/MicrosoftVisualStudio2022InstallerProjects/2.0.1/vspackage"
+          try {
+            Invoke-WebRequest $vsixUrl -OutFile installerprojects.vsix -ErrorAction Stop
+          } catch {
+            Write-Host "VS2026 Installer Projects package not found, falling back to VS2022 feed."
+            Invoke-WebRequest $fallbackUrl -OutFile installerprojects.vsix -ErrorAction Stop
+          }
 
       # install vs installer builder
       - name: Install Installer-Projects extension
@@ -162,7 +170,7 @@ jobs:
           Write-Host "Running: $vsixInstaller installerprojects.vsix /quiet"
           & $vsixInstaller installerprojects.vsix /quiet
 
-      # Build MSI installer project using Visual Studio 2022 workaround
+      # Build MSI installer project using Visual Studio 2026 workaround
       - name: Build Installer MSI
         if: env.build_trigger == 'true'
         shell: cmd
