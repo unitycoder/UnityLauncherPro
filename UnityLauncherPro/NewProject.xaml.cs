@@ -62,16 +62,15 @@ namespace UnityLauncherPro
 
             txtNewProjectFolder.Text = targetFolder;
 
+            UpdateCreateButtonsEnabledState();
+
             if (MainWindow.unityInstallationsSource.Count == 0)
             {
                 Tools.SetStatus("No Unity installations found! Please add Unity installations first.");
                 isInitializing = false;
                 btnCreateNewProject.IsEnabled = false;
+                btnCreateNewProjectAndRepo.IsEnabled = false;
                 return;
-            }
-            else
-            {
-                btnCreateNewProject.IsEnabled = true;
             }
 
             // fill available versions, only replace if it's a different collection instance
@@ -218,8 +217,24 @@ namespace UnityLauncherPro
         bool isCreatingProject = false;
         private async void BtnCreateNewProject_Click(object sender, RoutedEventArgs e)
         {
+            await CreateNewProject(withRepo: false);
+        }
+
+        private async void btnCreateNewProjectAndRepo_Click(object sender, RoutedEventArgs e)
+        {
+            await CreateNewProject(withRepo: true);
+        }
+
+        private async Task CreateNewProject(bool withRepo)
+        {
             if (isCreatingProject) return;
             isCreatingProject = true;
+
+            btnCreateNewProject.IsEnabled = false;
+            btnCreateNewProjectAndRepo.IsEnabled = false;
+
+            try
+            {
 
             // check if projectname already exists (only if should be automatically created name)
             var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
@@ -279,9 +294,7 @@ namespace UnityLauncherPro
                 Settings.Default.Save();
             }
 
-            btnCreateNewProject.IsEnabled = false;
-
-            if (chkEnableVersionControl.IsChecked == true)
+            if (withRepo && chkEnableVersionControl.IsChecked == true)
             {
                 // setup local git
                 try
@@ -352,7 +365,7 @@ namespace UnityLauncherPro
             } // if version control enabled
 
             // create readme if enabled
-            if (chkAddReadme.IsChecked == true)
+            if (withRepo && chkAddReadme.IsChecked == true)
             {
                 var readmePath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, "README.md");
                 try
@@ -370,7 +383,7 @@ namespace UnityLauncherPro
             }
 
             // download .gitignore if enabled
-            if (chkAddUnityGitIgnore.IsChecked == true)
+            if (withRepo && chkAddUnityGitIgnore.IsChecked == true)
             {
                 //var gitIgnoreUrl = "https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Unity.gitignore";
 
@@ -391,13 +404,12 @@ namespace UnityLauncherPro
                 {
                     Tools.SetStatus("Failed to create .gitignore file for this project.");
                 }
-            }
+            } // if add gitignore
 
-            if (chkEnableVersionControl.IsChecked == true)
+            if (withRepo && chkEnableVersionControl.IsChecked == true)
             {
                 if (chkInitialCommit.IsChecked == true)
                 {
-                    Console.WriteLine(1);
                     try
                     {
                         await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "add .");
@@ -421,11 +433,26 @@ namespace UnityLauncherPro
 
             } // if version control enabled
 
-            btnCreateNewProject.IsEnabled = true;
-            isCreatingProject = false;
+            }
+            finally
+            {
+                isCreatingProject = false;
+                UpdateCreateButtonsEnabledState();
+            }
 
             DialogResult = true;
-        } // BtnCreateNewProject_Click
+        }
+
+        private void UpdateCreateButtonsEnabledState()
+        {
+            bool folderExists = Directory.Exists(txtNewProjectFolder.Text);
+            bool projectNameAvailable = !string.IsNullOrWhiteSpace(txtNewProjectName.Text) && !Directory.Exists(Path.Combine(targetFolder, txtNewProjectName.Text));
+            bool onlineTemplateReady = !(listOnlineTemplates.SelectedItem is OnlineTemplateItem selectedOnlineTemplate) || selectedOnlineTemplate.IsDownloaded;
+            bool versionControlEnabled = chkEnableVersionControl.IsChecked == true;
+
+            btnCreateNewProject.IsEnabled = folderExists && projectNameAvailable && onlineTemplateReady && !isCreatingProject;
+            btnCreateNewProjectAndRepo.IsEnabled = btnCreateNewProject.IsEnabled && versionControlEnabled;
+        }
 
 
         private void BtnCancelNewProject_Click(object sender, RoutedEventArgs e)
@@ -434,7 +461,7 @@ namespace UnityLauncherPro
         }
 
 
-        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
@@ -460,7 +487,7 @@ namespace UnityLauncherPro
                     e.Handled = true; // override writing to textbox
                     break;
                 case Key.Enter: // enter, create proj
-                    BtnCreateNewProject_Click(null, null);
+                    await CreateNewProject(withRepo: false);
                     e.Handled = true;
                     break;
                 case Key.Escape: // esc cancel
@@ -523,14 +550,14 @@ namespace UnityLauncherPro
                 System.Console.WriteLine("Project already exists");
                 txtNewProjectName.BorderBrush = Brushes.Red; // not visible if focused
                 txtNewProjectName.ToolTip = "Project folder already exists";
-                btnCreateNewProject.IsEnabled = false;
             }
             else
             {
                 txtNewProjectName.BorderBrush = null;
-                btnCreateNewProject.IsEnabled = true;
                 txtNewProjectName.ToolTip = "";
             }
+
+            UpdateCreateButtonsEnabledState();
 
             //System.Console.WriteLine("newProjectName: " + txtNewProjectName.Text);
 
@@ -612,14 +639,14 @@ namespace UnityLauncherPro
             previousSelectedModuleIndex = cmbNewProjectPlatform.SelectedIndex;
         }
 
-        private void gridAvailableVersions_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private async void gridAvailableVersions_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             // check that we clicked actually on a row
             var src = VisualTreeHelper.GetParent((DependencyObject)e.OriginalSource);
             var srcType = src.GetType();
             if (srcType == typeof(ContentPresenter))
             {
-                BtnCreateNewProject_Click(null, null);
+                await CreateNewProject(withRepo: false);
             }
         }
 
@@ -635,14 +662,7 @@ namespace UnityLauncherPro
         {
             bool state = chkEnableVersionControl.IsChecked == true;
 
-            if (state == true)
-            {
-                btnCreateNewProject.Content = "Create Project + GitHub Repo";
-            }
-            else
-            {
-                btnCreateNewProject.Content = "Create Project";
-            }
+            btnCreateNewProjectAndRepo.IsEnabled = state;
 
             if (isInitializing) return;
 
@@ -699,16 +719,16 @@ namespace UnityLauncherPro
             if (Directory.Exists(txtNewProjectFolder.Text) == false)
             {
                 txtNewProjectFolder.BorderBrush = Brushes.Red; // not visible if focused
-                btnCreateNewProject.IsEnabled = false;
                 btnCreateMissingFolder.IsEnabled = true;
             }
             else
             {
                 txtNewProjectFolder.BorderBrush = null;
-                btnCreateNewProject.IsEnabled = true;
                 targetFolder = txtNewProjectFolder.Text;
                 btnCreateMissingFolder.IsEnabled = false;
             }
+
+            UpdateCreateButtonsEnabledState();
         }
 
         private void btnCreateMissingFolder_Click(object sender, RoutedEventArgs e)
@@ -942,8 +962,6 @@ namespace UnityLauncherPro
                 cmbNewProjectTemplate.IsEnabled = false;
                 cmbNewProjectTemplate.SelectedIndex = 0; // Reset to default
 
-                // disable create button if template not downloaded yet
-                btnCreateNewProject.IsEnabled = selectedTemplate.IsDownloaded;
                 btnCreateNewProject.Content = selectedTemplate.IsDownloaded ? "Create Project" : "Download Template First >";
             }
             else
@@ -955,9 +973,10 @@ namespace UnityLauncherPro
                 cmbNewProjectTemplate.IsEnabled = true;
 
                 // enable create button
-                btnCreateNewProject.IsEnabled = true;
                 btnCreateNewProject.Content = "Create Project";
             }
+
+            UpdateCreateButtonsEnabledState();
         }
 
         private async void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
@@ -1229,7 +1248,6 @@ namespace UnityLauncherPro
 
             btnAuthorizeToken.IsEnabled = tokenSeemsOK;
         }
-
 
     } // class NewProject
 } // namespace UnityLauncherPro

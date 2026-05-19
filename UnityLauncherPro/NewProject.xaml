@@ -7,7 +7,7 @@
         xmlns:data="clr-namespace:UnityLauncherPro.Data"
         d:DataContext="{d:DesignInstance Type=local:NewProject}"
         mc:Ignorable="d"
-        Title="Create New Project" Height="660" Width="650" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
+        Title="Create New Project" Height="660" Width="670" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -67,11 +67,13 @@
             <!--<Label x:Name="lblNewProjectFolder" Content="(folder)" Foreground="{DynamicResource ThemeButtonForegroundDisabled}" Margin="0" FontSize="10" Padding="5,0,5,3" />-->
             <Grid HorizontalAlignment="Stretch" Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.7*"/>
+                    <ColumnDefinition Width="0.3*"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject" Margin="0,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" TabIndex="4" Content="Cancel"/>
-                <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Margin="3,0,0,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click" TabIndex="3" Content="_Create Project"/>
+                <Button Grid.Column="0" Style="{StaticResource CustomButton}" x:Name="btnCancelNewProject" Margin="0,0,3,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCancelNewProject_Click" TabIndex="4" Content="_Cancel"/>
+                <Button Grid.Column="1" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProjectAndRepo" Margin="3,0,0,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="btnCreateNewProjectAndRepo_Click" TabIndex="3" Content="New Project+_Repo"/>
+                <Button Grid.Column="2" Style="{StaticResource CustomButton}" x:Name="btnCreateNewProject" Margin="3,0,0,3" BorderBrush="{x:Null}" VerticalAlignment="Top" Height="35" Click="BtnCreateNewProject_Click" TabIndex="3" Content="_New Project"/>
             </Grid>
 
             <Expander x:Name="expVersionControl" Margin="0,10,0,0" Header="Version Control (Github)" Foreground="{DynamicResource ThemeButtonForeground}" IsExpanded="True" Collapsed="expVersionControl_Collapsed" Expanded="expVersionControl_Collapsed">
