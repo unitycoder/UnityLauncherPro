@@ -4332,6 +4332,8 @@ namespace UnityLauncherPro
             //MessageBox.Show("files: " + files.Length, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
 
             bool addedAny = false;
+            string addedPath = null;
+
             // check if any of the files is a unity project (has Assets and ProjectSettings folder)
             foreach (var file in files)
             {
@@ -4343,6 +4345,7 @@ namespace UnityLauncherPro
                     if (Directory.Exists(assetsFolder) == true && Directory.Exists(projectSettingsFolder) == true)
                     {
                         Tools.AddProjectToHistory(file);
+                        addedPath = file;
                         addedAny = true;
                     }
                     else
@@ -4361,9 +4364,23 @@ namespace UnityLauncherPro
                 // clear search, so can see added project
                 searchBoxProjects.SearchText = "";
                 RefreshRecentProjects();
-                // NOTE 0 works for sort-by-date only
-                Tools.SetFocusToGrid(gridRecent, 0);
                 SetStatus("Added project(s) with drag and drop..");
+
+                // find one of the added items
+                if (addedPath != null)
+                {
+                    for (int i = 0, len = gridRecent.Items.Count; i < len; i++)
+                    {
+                        var item = gridRecent.Items[i] as Project;
+                        if (item != null && (item.Path ?? "").Replace('\\', '/') == addedPath.Replace('\\', '/'))
+                        {
+                            gridRecent.SelectedIndex = i;
+                            gridRecent.ScrollIntoView(item);
+                            gridRecent.Focus();
+                            break;
+                        }
+                    }
+                }
             }
         }
 
