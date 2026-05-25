@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace UnityLauncherPro.Helpers
 {
@@ -34,7 +36,7 @@ namespace UnityLauncherPro.Helpers
     public static class GithubActions
     {
 
-        public static async Task<GitHubCreateRepoResult> CreateRepositoryAsync(string token, string repoName, string description = "", bool isPrivate = true, bool autoInit = false)
+        public static async Task<GitHubCreateRepoResult> CreateRepositoryAsync(string token, string repoName, string description = "", bool isPrivate = true, bool autoInit = false, string organization = null)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -75,12 +77,13 @@ namespace UnityLauncherPro.Helpers
                 using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
                 {
                     HttpResponseMessage response;
+                    var endpoint = string.IsNullOrWhiteSpace(organization)
+                        ? "https://api.github.com/user/repos"
+                        : "https://api.github.com/orgs/" + Uri.EscapeDataString(organization.Trim()) + "/repos";
 
                     try
                     {
-                        response = await client.PostAsync(
-                            "https://api.github.com/user/repos",
-                            content);
+                        response = await client.PostAsync(endpoint, content);
                     }
                     catch (Exception ex)
                     {
@@ -120,12 +123,47 @@ namespace UnityLauncherPro.Helpers
             }
         }
 
+        public static async Task<List<string>> GetUserOrganizationsAsync(string token)
+        {
+            var organizations = new List<string>();
 
+            if (string.IsNullOrWhiteSpace(token)) return organizations;
 
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(MainWindow.appName);
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token.Trim());
 
+                client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+                client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
 
+                HttpResponseMessage response;
 
+                try
+                {
+                    response = await client.GetAsync("https://api.github.com/user/orgs");
+                }
+                catch
+                {
+                    return organizations;
+                }
+
+                if (!response.IsSuccessStatusCode) return organizations;
+
+                string responseText = await response.Content.ReadAsStringAsync();
+                var matches = Regex.Matches(responseText, "\"login\"\\s*:\\s*\"([^\"]+)\"");
+
+                for (int i = 0; i < matches.Count; i++)
+                {
+                    organizations.Add(matches[i].Groups[1].Value);
+                }
+            }
+
+            return organizations;
+        }
 
         public static async Task<string> InitRepositoryAsync(string baseDir, string projectName, bool initGitLfs = false, string defaultBranch = "main")
         {
@@ -323,10 +361,7 @@ namespace UnityLauncherPro.Helpers
                 {
                     IsValid = false,
                     StatusCode = response.StatusCode,
-                    Error = "Unexpected GitHub response: " +
-                            (int)response.StatusCode + " " +
-                            response.ReasonPhrase + "\n" +
-                            responseText
+                    Error = "Unexpected GitHub response: " + (int)response.StatusCode + " " + response.ReasonPhrase + "\n" + responseText
                 };
             }
         }

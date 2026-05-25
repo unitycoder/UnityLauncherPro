@@ -36,6 +36,12 @@ namespace UnityLauncherPro
 
         const string githubTokenCreationURL = "https://github.com/settings/tokens/new?description=UnityLauncherPro+Setup+Project+Access&default_expires_at=90&scopes=repo#Remember_to_Copy_Token!";
 
+        void UpdateOrgUiState()
+        {
+            bool orgsEnabled = chkEnableOrgs.IsChecked == true;
+            btnCreateNewProjectAndRepo.Content = orgsEnabled ? "New Project+Repo at Org" : "New Project+Repo";
+        }
+
 
         public NewProject(string unityVersion, string suggestedName, string targetFolder, bool nameIsLocked = false, bool fetchOnlineTemplates = false)
         {
@@ -140,6 +146,8 @@ namespace UnityLauncherPro
             chkInitialCommit.IsEnabled = chkEnableVersionControl.IsChecked == true;
             chkAddReadme.IsChecked = Settings.Default.gitAddReadme;
             chkAddUnityGitIgnore.IsChecked = Settings.Default.gitAddIgnore;
+            chkEnableOrgs.IsChecked = Settings.Default.gitEnableOrgs;
+            UpdateOrgUiState();
 
             expVersionControl.IsExpanded = Settings.Default.gitPanelExpanded || chkEnableVersionControl.IsChecked == true;
 
@@ -159,6 +167,7 @@ namespace UnityLauncherPro
             if (result.IsValid)
             {
                 ShowGitAuthorizedUI(true);
+                await LoadGithubOrgsAsync(token);
             }
             else
             {
@@ -294,8 +303,11 @@ namespace UnityLauncherPro
                 Settings.Default.Save();
             }
 
+            var repoOwner = GitHubTokenStore.LoadUsername();
+
             if (withRepo && chkEnableVersionControl.IsChecked == true)
             {
+
                 // setup local git
                 try
                 {
@@ -319,19 +331,28 @@ namespace UnityLauncherPro
                         txtRepoName.Text += "_" + DateTime.Now.ToString("ddMMyyyy_HHmmss");
                     }
 
-                    GitHubCreateRepoResult result = await GithubActions.CreateRepositoryAsync(token: token, repoName: txtRepoName.Text, description: txtRepoDescription.Text, isPrivate: rbPrivate.IsChecked == true, autoInit: false);
+                    string selectedOrg = null;
+                    if (chkEnableOrgs.IsChecked == true)
+                    {
+                        selectedOrg = cmbGithubOrgs.SelectedItem as string;
+                        if (string.IsNullOrWhiteSpace(selectedOrg)) selectedOrg = null;
+                    }
+
+                    repoOwner = selectedOrg ?? repoOwner;
+
+                    GitHubCreateRepoResult result = await GithubActions.CreateRepositoryAsync(token: token, repoName: txtRepoName.Text, description: txtRepoDescription.Text, isPrivate: rbPrivate.IsChecked == true, autoInit: false, organization: selectedOrg);
 
                     if (result.Success)
                     {
                         Console.WriteLine("Created repo successfully.");
 
-                        string username = GitHubTokenStore.LoadUsername();
-                        string remoteUrl = $"https://github.com/{username}/{txtRepoName.Text}.git";
+                        string remoteUrl = $"https://github.com/{repoOwner}/{txtRepoName.Text}.git";
                         await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), $"remote add origin {remoteUrl}");
                     }
                     else
                     {
                         Console.WriteLine("Failed to create repo..");
+                        txtNewProjectStatus.Text = "GitHub repo creation failed: " + (string.IsNullOrWhiteSpace(result.Error) ? "Unknown GitHub error." : result.Error);
                     }
                 }
                 catch (Exception ex)
@@ -428,8 +449,7 @@ namespace UnityLauncherPro
                     }
                 }
 
-                string username = GitHubTokenStore.LoadUsername();
-                Tools.OpenURL("https://github.com/" + username + "/" + txtRepoName.Text);
+                Tools.OpenURL("https://github.com/" + repoOwner + "/" + txtRepoName.Text);
 
             } // if version control enabled
 
@@ -748,6 +768,40 @@ namespace UnityLauncherPro
 
         private static readonly HttpClient _httpClient = new HttpClient();
 
+        private async Task LoadGithubOrgsAsync(string token)
+        {
+            cmbGithubOrgs.IsEnabled = chkEnableOrgs.IsChecked == true;
+            if (chkEnableOrgs.IsChecked != true) return;
+
+            var orgs = await GithubActions.GetUserOrganizationsAsync(token);
+            cmbGithubOrgs.ItemsSource = orgs;
+
+            var lastOrg = Settings.Default.gitLastOrg;
+            if (!string.IsNullOrWhiteSpace(lastOrg) && orgs.Contains(lastOrg))
+            {
+                cmbGithubOrgs.SelectedItem = lastOrg;
+            }
+            else if (orgs.Count > 0)
+            {
+                cmbGithubOrgs.SelectedIndex = 0;
+            }
+            else
+            {
+                cmbGithubOrgs.SelectedIndex = -1;
+            }
+        }
+
+        private void cmbGithubOrgs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (isInitializing) return;
+
+            var selectedOrg = cmbGithubOrgs.SelectedItem as string;
+            if (string.IsNullOrWhiteSpace(selectedOrg)) return;
+
+            Settings.Default.gitLastOrg = selectedOrg;
+            Settings.Default.Save();
+        }
+
         private async Task LoadOnlineTemplatesAsync(string baseVersion, CancellationToken cancellationToken = default)
         {
             try
@@ -1061,7 +1115,12 @@ namespace UnityLauncherPro
 
         private void btnCreateToken_Click(object sender, RoutedEventArgs e)
         {
-            Tools.OpenURL(githubTokenCreationURL);
+            string tokenUrl = githubTokenCreationURL;
+            if (chkEnableOrgs.IsChecked == true)
+            {
+                tokenUrl = tokenUrl.Replace("scopes=repo", "scopes=repo,read:org");
+            }
+            Tools.OpenURL(tokenUrl);
         }
 
 
@@ -1132,6 +1191,7 @@ namespace UnityLauncherPro
                     txtNewProjectStatus.Text = "Token valid. Logged in as " + result.Login + ".";
                     lblGithubUsername.Content = result.Login;
                     ShowGitAuthorizedUI(true);
+                    await LoadGithubOrgsAsync(token);
                 }
                 else
                 {
@@ -1179,6 +1239,37 @@ namespace UnityLauncherPro
             Settings.Default.Save();
         }
 
+        private async void chkEnableOrgs_Checked(object sender, RoutedEventArgs e)
+        {
+            if (isInitializing) return;
+
+            Settings.Default.gitEnableOrgs = chkEnableOrgs.IsChecked == true;
+            Settings.Default.Save();
+            UpdateOrgUiState();
+
+            var enabled = chkEnableOrgs.IsChecked == true;
+            cmbGithubOrgs.IsEnabled = enabled;
+
+            if (!enabled)
+            {
+                var selectedOrg = cmbGithubOrgs.SelectedItem as string;
+                if (!string.IsNullOrWhiteSpace(selectedOrg))
+                {
+                    Settings.Default.gitLastOrg = selectedOrg;
+                    Settings.Default.Save();
+                }
+
+                cmbGithubOrgs.ItemsSource = null;
+                cmbGithubOrgs.SelectedIndex = -1;
+                return;
+            }
+
+            var token = GitHubTokenStore.LoadToken();
+            if (string.IsNullOrWhiteSpace(token)) return;
+
+            await LoadGithubOrgsAsync(token);
+        }
+
         private CancellationTokenSource _repoNameCts;
 
         private async void txtRepoName_TextChanged(object sender, TextChangedEventArgs e)
@@ -1224,6 +1315,8 @@ namespace UnityLauncherPro
         private void btnDisconnectToken_Click(object sender, RoutedEventArgs e)
         {
             GitHubTokenStore.DeleteToken();
+            cmbGithubOrgs.ItemsSource = null;
+            cmbGithubOrgs.SelectedIndex = -1;
             Settings.Default.Save();
             ShowGitAuthorizedUI(false);
         }
@@ -1248,6 +1341,7 @@ namespace UnityLauncherPro
 
             btnAuthorizeToken.IsEnabled = tokenSeemsOK;
         }
+
 
     } // class NewProject
 } // namespace UnityLauncherPro

@@ -745,5 +745,29 @@ namespace UnityLauncherPro.Properties {
                 this["gitAddIgnore"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool gitEnableOrgs {
+            get {
+                return ((bool)(this["gitEnableOrgs"]));
+            }
+            set {
+                this["gitEnableOrgs"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string gitLastOrg {
+            get {
+                return ((string)(this["gitLastOrg"]));
+            }
+            set {
+                this["gitLastOrg"] = value;
+            }
+        }
     }
 }

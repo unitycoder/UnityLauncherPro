@@ -7,7 +7,7 @@
         xmlns:data="clr-namespace:UnityLauncherPro.Data"
         d:DataContext="{d:DesignInstance Type=local:NewProject}"
         mc:Ignorable="d"
-        Title="Create New Project" Height="660" Width="670" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
+        Title="Create New Project" Height="680" Width="670" Background="{DynamicResource ThemeDarkestBackground}" PreviewKeyDown="Window_PreviewKeyDown" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="True">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -89,7 +89,9 @@
                             <Button x:Name="btnAuthorizeToken" Style="{StaticResource CustomButton}" Content="Authorize" ToolTip="Open Github to create a token" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="6,4,0,0"   IsEnabled="False" Width="60" Click="btnAuthorizeToken_Click" />
                             <Button x:Name="btnDisconnectToken" Style="{StaticResource CustomButton}" Content="Disconnect" ToolTip="Disconnect from Github AND delete saved token" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top"  Margin="6,4,0,0"   IsEnabled="False" Width="64" Visibility="Collapsed" Click="btnDisconnectToken_Click" />
                         </StackPanel>
+                        
                         <CheckBox x:Name="chkEnableVersionControl" Content="Enable Version Control" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,6,0,6" VerticalAlignment="Center" Checked="chkEnableVersionControl_Checked" Unchecked="chkEnableVersionControl_Checked"/>
+                        
                         <Grid Margin="0,0,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="120"/>
@@ -103,8 +105,14 @@
                                 <Label Content="🌐" Foreground="#FF009CFF"/>
                             </StackPanel>
                         </Grid>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <CheckBox x:Name="chkEnableOrgs" Content="Organization:" ToolTip="Enable Large File Storage and add .gitattributes" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" IsChecked="True" Checked="chkEnableOrgs_Checked" Unchecked="chkEnableOrgs_Checked"/>
+                            <ComboBox x:Name="cmbGithubOrgs" Margin="6,0,0,0" TabIndex="2" VerticalAlignment="Top" HorizontalAlignment="Left" SelectionChanged="cmbGithubOrgs_SelectionChanged" />
+                        </StackPanel>
 
-                        <Grid Margin="0,0,0,0" HorizontalAlignment="Left">
+
+                        <Grid Margin="0,8,0,0" HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="120"/>
                                 <ColumnDefinition Width="*"/>
@@ -129,13 +137,16 @@
                             <CheckBox x:Name="chkEnableLfs" Content="Enable Git LFS " ToolTip="Enable Large File Storage and add .gitattributes" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" Checked="chkEnableLfs_Checked" Unchecked="chkEnableLfs_Checked" IsChecked="True"/>
                             <CheckBox x:Name="chkInitialCommit" Content="Create initial commit" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" Checked="chkInitialCommit_Checked" Unchecked="chkInitialCommit_Checked" IsChecked="True"/>
                             <CheckBox x:Name="chkAddUnityGitIgnore" Content="Add Unity .gitignore" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,5,0,0" VerticalAlignment="Center" IsChecked="True" Checked="chkAddUnityGitIgnore_Checked"/>
+                            <CheckBox x:Name="chkAddReadme" Content="Add README" ToolTip="Add a README file" Foreground="{DynamicResource ThemeButtonForeground}" Margin="16,8,0,0" VerticalAlignment="Center" IsChecked="True" Checked="chkAddReadme_Checked" Unchecked="chkAddReadme_Checked"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-                            <CheckBox x:Name="chkAddReadme" Content="Add README" ToolTip="Add a README file" Foreground="{DynamicResource ThemeButtonForeground}" Margin="0,8,0,0" VerticalAlignment="Center" IsChecked="True" Checked="chkAddReadme_Checked" Unchecked="chkAddReadme_Checked"/>
                         </StackPanel>
+                       
                     </StackPanel>
 
                 </Grid>
+
+
             </Expander>
 
             <Grid UseLayoutRounding="False" Margin="0,2,0,0">
