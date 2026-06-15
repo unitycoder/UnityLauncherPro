@@ -336,6 +336,12 @@ namespace UnityLauncherPro
         {
             bool result = false;
 
+            if (RemoveProjectFromUnityHubJson(projectPathToRemove))
+            {
+                //Console.WriteLine("Deleted Unity Hub project item: " + projectPathToRemove);
+                result = true;
+            }
+
             var hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
 
             // check each version path
@@ -397,9 +403,114 @@ namespace UnityLauncherPro
                 result = true;
             }
 
-
             return result;
         } // RemoveRecentProject()
+
+        private static bool RemoveProjectFromUnityHubJson(string projectPathToRemove)
+        {
+            string hubProjectsFile = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "UnityHub", "projects-v1.json");
+
+            if (!File.Exists(hubProjectsFile))
+                return false;
+
+            string json;
+
+            try
+            {
+                json = File.ReadAllText(hubProjectsFile);
+            }
+            catch
+            {
+                return false;
+            }
+
+            string wantedPath = NormalizeProjectPath(projectPathToRemove);
+
+            int dataIndex = json.IndexOf("\"data\":");
+            if (dataIndex == -1)
+                return false;
+
+            int dataStart = json.IndexOf('{', dataIndex + 7);
+            if (dataStart == -1)
+                return false;
+
+            int searchFrom = dataStart + 1;
+
+            while (true)
+            {
+                int entryStart = json.IndexOf('{', searchFrom);
+                if (entryStart == -1)
+                    break;
+
+                int entryEnd = JsonParser.FindMatchingBrace(json, entryStart);
+                if (entryEnd == -1)
+                    break;
+
+                string entry = json.Substring(entryStart, entryEnd - entryStart + 1);
+                string projectPath = JsonParser.GetStringValue(entry, "path");
+
+                if (!string.IsNullOrEmpty(projectPath))
+                {
+                    projectPath = NormalizeProjectPath(projectPath);
+
+                    if (string.Equals(projectPath, wantedPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        int removeStart = entryStart;
+                        int removeEnd = entryEnd + 1;
+
+                        // Prefer removing comma after this object.
+                        int i = removeEnd;
+                        while (i < json.Length && char.IsWhiteSpace(json[i]))
+                            i++;
+
+                        if (i < json.Length && json[i] == ',')
+                        {
+                            removeEnd = i + 1;
+                        }
+                        else
+                        {
+                            // Otherwise remove comma before this object.
+                            i = removeStart - 1;
+                            while (i >= 0 && char.IsWhiteSpace(json[i]))
+                                i--;
+
+                            if (i >= 0 && json[i] == ',')
+                                removeStart = i;
+                        }
+
+                        json = json.Remove(removeStart, removeEnd - removeStart);
+
+                        try
+                        {
+                            File.WriteAllText(hubProjectsFile, json);
+                            return true;
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                searchFrom = entryEnd + 1;
+            }
+
+            return false;
+        }
+
+        private static string NormalizeProjectPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return "";
+
+            return path
+                .Replace(@"\\", "/")
+                .Replace("\\", "/")
+                .Trim()
+                .TrimEnd('/');
+        }
 
     } // class
 } // namespace
