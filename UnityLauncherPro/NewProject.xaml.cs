@@ -76,6 +76,7 @@ namespace UnityLauncherPro
                 isInitializing = false;
                 btnCreateNewProject.IsEnabled = false;
                 btnCreateNewProjectAndRepo.IsEnabled = false;
+                txtNewProjectStatus.Text = "No Unity installations found! Please add Unity installations first.";
                 return;
             }
 
@@ -245,213 +246,213 @@ namespace UnityLauncherPro
             try
             {
 
-            // check if projectname already exists (only if should be automatically created name)
-            var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
-            if (txtNewProjectName.IsEnabled == true && Directory.Exists(targetPath) == true)
-            {
-                Tools.SetStatus("Project already exists: " + txtNewProjectName.Text);
-                isCreatingProject = false;
-                return;
-            }
-
-            // Check if online template is selected
-            if (listOnlineTemplates.SelectedItem is OnlineTemplateItem selectedOnlineTemplate)
-            {
-                // Use online template path
-                string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                string templatesPath = Path.Combine(appDataPath, "UnityHub", "Templates");
-
-                if (!string.IsNullOrEmpty(selectedOnlineTemplate.TarBallURL))
+                // check if projectname already exists (only if should be automatically created name)
+                var targetPath = Path.Combine(targetFolder, txtNewProjectName.Text);
+                if (txtNewProjectName.IsEnabled == true && Directory.Exists(targetPath) == true)
                 {
-                    string fileName = Path.GetFileName(new Uri(selectedOnlineTemplate.TarBallURL).LocalPath);
-                    if (string.IsNullOrEmpty(fileName))
+                    Tools.SetStatus("Project already exists: " + txtNewProjectName.Text);
+                    isCreatingProject = false;
+                    return;
+                }
+
+                // Check if online template is selected
+                if (listOnlineTemplates.SelectedItem is OnlineTemplateItem selectedOnlineTemplate)
+                {
+                    // Use online template path
+                    string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                    string templatesPath = Path.Combine(appDataPath, "UnityHub", "Templates");
+
+                    if (!string.IsNullOrEmpty(selectedOnlineTemplate.TarBallURL))
                     {
-                        string safeFileName = string.Join("_", selectedOnlineTemplate.Name.Split(Path.GetInvalidFileNameChars()));
-                        fileName = $"{safeFileName}.tgz";
+                        string fileName = Path.GetFileName(new Uri(selectedOnlineTemplate.TarBallURL).LocalPath);
+                        if (string.IsNullOrEmpty(fileName))
+                        {
+                            string safeFileName = string.Join("_", selectedOnlineTemplate.Name.Split(Path.GetInvalidFileNameChars()));
+                            fileName = $"{safeFileName}.tgz";
+                        }
+
+                        templateZipPath = Path.Combine(templatesPath, fileName);
+
+                        // Verify the file exists
+                        if (!File.Exists(templateZipPath))
+                        {
+                            Tools.SetStatus("Selected online template is not downloaded. Please download it first.");
+                            isCreatingProject = false;
+                            return;
+                        }
                     }
-
-                    templateZipPath = Path.Combine(templatesPath, fileName);
-
-                    // Verify the file exists
-                    if (!File.Exists(templateZipPath))
+                    else
                     {
-                        Tools.SetStatus("Selected online template is not downloaded. Please download it first.");
+                        Tools.SetStatus("Invalid online template URL");
                         isCreatingProject = false;
                         return;
                     }
                 }
                 else
                 {
-                    Tools.SetStatus("Invalid online template URL");
-                    isCreatingProject = false;
-                    return;
-                }
-            }
-            else
-            {
-                // Use built-in template from dropdown
-                if (cmbNewProjectTemplate.SelectedValue != null) templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
-            }
-
-            if (cmbNewProjectTemplate.SelectedValue != null)
-            {
-                selectedPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
-                UpdateSelectedVersion();
-
-                // save last used value for platform
-                Settings.Default.newProjectPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
-                Settings.Default.Save();
-            }
-
-            var repoOwner = GitHubTokenStore.LoadUsername();
-
-            if (withRepo && chkEnableVersionControl.IsChecked == true)
-            {
-
-                // setup local git
-                try
-                {
-                    string projectPath = await GithubActions.InitRepositoryAsync(baseDir: txtNewProjectFolder.Text, projectName: txtNewProjectName.Text, initGitLfs: (chkEnableLfs.IsChecked == true), defaultBranch: "main");
-
-                    txtNewProjectStatus.Text = "Git repository initialized at: " + projectPath;
-                }
-                catch (Exception ex)
-                {
-                    txtNewProjectStatus.Text = "Git init failed: " + ex.Message;
+                    // Use built-in template from dropdown
+                    if (cmbNewProjectTemplate.SelectedValue != null) templateZipPath = ((KeyValuePair<string, string>)cmbNewProjectTemplate.SelectedValue).Value;
                 }
 
-                // create online repo
-                try
+                if (cmbNewProjectTemplate.SelectedValue != null)
                 {
-                    string token = GitHubTokenStore.LoadToken();
+                    selectedPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
+                    UpdateSelectedVersion();
 
-                    // if invalid repo, add DDMMYYY_HHMMSS
-                    if (lblRepoNameInvalid.Visibility == Visibility.Visible)
+                    // save last used value for platform
+                    Settings.Default.newProjectPlatform = cmbNewProjectPlatform.SelectedValue.ToString();
+                    Settings.Default.Save();
+                }
+
+                var repoOwner = GitHubTokenStore.LoadUsername();
+
+                if (withRepo && chkEnableVersionControl.IsChecked == true)
+                {
+
+                    // setup local git
+                    try
                     {
-                        txtRepoName.Text += "_" + DateTime.Now.ToString("ddMMyyyy_HHmmss");
+                        string projectPath = await GithubActions.InitRepositoryAsync(baseDir: txtNewProjectFolder.Text, projectName: txtNewProjectName.Text, initGitLfs: (chkEnableLfs.IsChecked == true), defaultBranch: "main");
+
+                        txtNewProjectStatus.Text = "Git repository initialized at: " + projectPath;
+                    }
+                    catch (Exception ex)
+                    {
+                        txtNewProjectStatus.Text = "Git init failed: " + ex.Message;
                     }
 
-                    string selectedOrg = null;
-                    if (chkEnableOrgs.IsChecked == true)
+                    // create online repo
+                    try
                     {
-                        selectedOrg = cmbGithubOrgs.SelectedItem as string;
-                        if (string.IsNullOrWhiteSpace(selectedOrg)) selectedOrg = null;
+                        string token = GitHubTokenStore.LoadToken();
+
+                        // if invalid repo, add DDMMYYY_HHMMSS
+                        if (lblRepoNameInvalid.Visibility == Visibility.Visible)
+                        {
+                            txtRepoName.Text += "_" + DateTime.Now.ToString("ddMMyyyy_HHmmss");
+                        }
+
+                        string selectedOrg = null;
+                        if (chkEnableOrgs.IsChecked == true)
+                        {
+                            selectedOrg = cmbGithubOrgs.SelectedItem as string;
+                            if (string.IsNullOrWhiteSpace(selectedOrg)) selectedOrg = null;
+                        }
+
+                        repoOwner = selectedOrg ?? repoOwner;
+
+                        GitHubCreateRepoResult result = await GithubActions.CreateRepositoryAsync(token: token, repoName: txtRepoName.Text, description: txtRepoDescription.Text, isPrivate: rbPrivate.IsChecked == true, autoInit: false, organization: selectedOrg);
+
+                        if (result.Success)
+                        {
+                            Console.WriteLine("Created repo successfully.");
+
+                            string remoteUrl = $"https://github.com/{repoOwner}/{txtRepoName.Text}.git";
+                            await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), $"remote add origin {remoteUrl}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Failed to create repo..");
+                            txtNewProjectStatus.Text = "GitHub repo creation failed: " + (string.IsNullOrWhiteSpace(result.Error) ? "Unknown GitHub error." : result.Error);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        txtNewProjectStatus.Text += " | GitHub repo creation failed: " + ex.Message;
                     }
 
-                    repoOwner = selectedOrg ?? repoOwner;
-
-                    GitHubCreateRepoResult result = await GithubActions.CreateRepositoryAsync(token: token, repoName: txtRepoName.Text, description: txtRepoDescription.Text, isPrivate: rbPrivate.IsChecked == true, autoInit: false, organization: selectedOrg);
-
-                    if (result.Success)
+                    // create .gitattributes if LFS enabled?
+                    if (chkEnableLfs.IsChecked == true)
                     {
-                        Console.WriteLine("Created repo successfully.");
+                        //var gitAttributesUrl = "https://raw.githubusercontent.com/gitattributes/gitattributes/refs/heads/master/Unity.gitattributes";
 
-                        string remoteUrl = $"https://github.com/{repoOwner}/{txtRepoName.Text}.git";
-                        await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), $"remote add origin {remoteUrl}");
+                        // load from resources
+                        try
+                        {
+                            var assembly = typeof(NewProject).Assembly;
+                            var resourceName = $"{typeof(NewProject).Namespace}.Resources..gitattributes";
+
+                            using var stream = assembly.GetManifestResourceStream(resourceName);
+                            if (stream == null) return;
+
+                            var gitattributesPath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitattributes");
+                            using var fileStream = File.Create(gitattributesPath);
+                            stream.CopyTo(fileStream);
+                        }
+                        catch
+                        {
+                            Tools.SetStatus("Failed to create .gitattributes file for this project.");
+                        }
                     }
-                    else
+                } // if version control enabled
+
+                // create readme if enabled
+                if (withRepo && chkAddReadme.IsChecked == true)
+                {
+                    var readmePath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, "README.md");
+                    try
                     {
-                        Console.WriteLine("Failed to create repo..");
-                        txtNewProjectStatus.Text = "GitHub repo creation failed: " + (string.IsNullOrWhiteSpace(result.Error) ? "Unknown GitHub error." : result.Error);
+                        if (Directory.Exists(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text)) == false)
+                        {
+                            Directory.CreateDirectory(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text));
+                        }
+                        File.WriteAllText(readmePath, "# " + txtRepoName.Text + "\n\n" + txtRepoDescription.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.SetStatus("Failed to create README file for this project: " + ex.Message);
                     }
                 }
-                catch (Exception ex)
-                {
-                    txtNewProjectStatus.Text += " | GitHub repo creation failed: " + ex.Message;
-                }
 
-                // create .gitattributes if LFS enabled?
-                if (chkEnableLfs.IsChecked == true)
+                // download .gitignore if enabled
+                if (withRepo && chkAddUnityGitIgnore.IsChecked == true)
                 {
-                    //var gitAttributesUrl = "https://raw.githubusercontent.com/gitattributes/gitattributes/refs/heads/master/Unity.gitattributes";
+                    //var gitIgnoreUrl = "https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Unity.gitignore";
 
                     // load from resources
                     try
                     {
                         var assembly = typeof(NewProject).Assembly;
-                        var resourceName = $"{typeof(NewProject).Namespace}.Resources..gitattributes";
+                        var resourceName = $"{typeof(NewProject).Namespace}.Resources..gitignore";
 
                         using var stream = assembly.GetManifestResourceStream(resourceName);
                         if (stream == null) return;
 
-                        var gitattributesPath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitattributes");
-                        using var fileStream = File.Create(gitattributesPath);
+                        var gitignorePath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitignore");
+                        using var fileStream = File.Create(gitignorePath);
                         stream.CopyTo(fileStream);
                     }
                     catch
                     {
-                        Tools.SetStatus("Failed to create .gitattributes file for this project.");
+                        Tools.SetStatus("Failed to create .gitignore file for this project.");
                     }
-                }
-            } // if version control enabled
+                } // if add gitignore
 
-            // create readme if enabled
-            if (withRepo && chkAddReadme.IsChecked == true)
-            {
-                var readmePath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, "README.md");
-                try
+                if (withRepo && chkEnableVersionControl.IsChecked == true)
                 {
-                    if (Directory.Exists(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text)) == false)
+                    if (chkInitialCommit.IsChecked == true)
                     {
-                        Directory.CreateDirectory(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text));
+                        try
+                        {
+                            await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "add .");
+                            await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "commit -m \"Initial commit from " + MainWindow.appName + "\"");
+                            await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "push -u origin main");
+
+                            Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text) + " add .");
+                            Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text) + " commit -m \"Initial commit from " + MainWindow.appName + "\"");
+
+                            txtNewProjectStatus.Text += " | Initial commit created";
+                        }
+                        catch (Exception ex)
+                        {
+                            txtNewProjectStatus.Text += " | Initial commit failed: " + ex.Message;
+                            Console.WriteLine("failed commit");
+                        }
                     }
-                    File.WriteAllText(readmePath, "# " + txtRepoName.Text + "\n\n" + txtRepoDescription.Text);
-                }
-                catch (Exception ex)
-                {
-                    Tools.SetStatus("Failed to create README file for this project: " + ex.Message);
-                }
-            }
 
-            // download .gitignore if enabled
-            if (withRepo && chkAddUnityGitIgnore.IsChecked == true)
-            {
-                //var gitIgnoreUrl = "https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Unity.gitignore";
+                    Tools.OpenURL("https://github.com/" + repoOwner + "/" + txtRepoName.Text);
 
-                // load from resources
-                try
-                {
-                    var assembly = typeof(NewProject).Assembly;
-                    var resourceName = $"{typeof(NewProject).Namespace}.Resources..gitignore";
-
-                    using var stream = assembly.GetManifestResourceStream(resourceName);
-                    if (stream == null) return;
-
-                    var gitignorePath = Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".gitignore");
-                    using var fileStream = File.Create(gitignorePath);
-                    stream.CopyTo(fileStream);
-                }
-                catch
-                {
-                    Tools.SetStatus("Failed to create .gitignore file for this project.");
-                }
-            } // if add gitignore
-
-            if (withRepo && chkEnableVersionControl.IsChecked == true)
-            {
-                if (chkInitialCommit.IsChecked == true)
-                {
-                    try
-                    {
-                        await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "add .");
-                        await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "commit -m \"Initial commit from " + MainWindow.appName + "\"");
-                        await GithubActions.RunGitAsync(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text), "push -u origin main");
-
-                        Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text) + " add .");
-                        Console.WriteLine(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text) + " commit -m \"Initial commit from " + MainWindow.appName + "\"");
-
-                        txtNewProjectStatus.Text += " | Initial commit created";
-                    }
-                    catch (Exception ex)
-                    {
-                        txtNewProjectStatus.Text += " | Initial commit failed: " + ex.Message;
-                        Console.WriteLine("failed commit");
-                    }
-                }
-
-                Tools.OpenURL("https://github.com/" + repoOwner + "/" + txtRepoName.Text);
-
-            } // if version control enabled
+                } // if version control enabled
 
             }
             finally
@@ -466,12 +467,18 @@ namespace UnityLauncherPro
         private void UpdateCreateButtonsEnabledState()
         {
             bool folderExists = Directory.Exists(txtNewProjectFolder.Text);
-            bool projectNameAvailable = !string.IsNullOrWhiteSpace(txtNewProjectName.Text) && !Directory.Exists(Path.Combine(targetFolder, txtNewProjectName.Text));
+            bool projectNameAvailable = txtNewProjectName.IsEnabled==false || (!string.IsNullOrWhiteSpace(txtNewProjectName.Text) && !Directory.Exists(Path.Combine(targetFolder, txtNewProjectName.Text)));
             bool onlineTemplateReady = !(listOnlineTemplates.SelectedItem is OnlineTemplateItem selectedOnlineTemplate) || selectedOnlineTemplate.IsDownloaded;
             bool versionControlEnabled = chkEnableVersionControl.IsChecked == true;
+            bool gitFolderExists = Directory.Exists(Path.Combine(txtNewProjectFolder.Text, txtNewProjectName.Text, ".git"));
 
             btnCreateNewProject.IsEnabled = folderExists && projectNameAvailable && onlineTemplateReady && !isCreatingProject;
-            btnCreateNewProjectAndRepo.IsEnabled = btnCreateNewProject.IsEnabled && versionControlEnabled;
+            btnCreateNewProjectAndRepo.IsEnabled = btnCreateNewProject.IsEnabled && versionControlEnabled && !gitFolderExists;
+
+            if (folderExists == false) txtNewProjectStatus.Text = "Folder does not exist.";
+            if (projectNameAvailable == false && txtNewProjectName.IsEnabled == true) txtNewProjectStatus.Text = "Project name is empty or already exists.";
+            if (onlineTemplateReady == false) txtNewProjectStatus.Text = "Selected online template is not downloaded.";
+            if (gitFolderExists == true) txtNewProjectStatus.Text = "Git repository already exists in the project folder.";
         }
 
 
@@ -682,7 +689,7 @@ namespace UnityLauncherPro
         {
             bool state = chkEnableVersionControl.IsChecked == true;
 
-            btnCreateNewProjectAndRepo.IsEnabled = state;
+            UpdateCreateButtonsEnabledState();
 
             if (isInitializing) return;
 
