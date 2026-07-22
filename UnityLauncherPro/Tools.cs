@@ -1858,6 +1858,7 @@ namespace UnityLauncherPro
 
             // launch empty project
             var proj = new Project();
+
             proj.Title = projectName;
             proj.Path = Path.Combine(baseFolder, newPath).Replace("\\", "/");
             proj.Version = version;
@@ -1866,11 +1867,18 @@ namespace UnityLauncherPro
             proj.Modified = DateTime.Now;
             proj.folderExists = true; // have to set this value, so item is green on list
             proj.Arguments = version.Contains("6000") ? (forceDX11 ? "-force-d3d11" : null) : null; // this gets erased later, since its not saved? would be nice to not add it at all though
+
+            var origArgs = proj.Arguments;
             if (cloneFromTemplate == true)
             {
                 proj.Arguments += " -cloneFromTemplate \"" + templateZipPath + "\"";
             }
             var proc = LaunchProject(proj, null, useInitScript, false, cloneFromTemplate);
+            if (cloneFromTemplate == true)
+            {
+                // remove the -cloneFromTemplate argument, since its not needed in the recent list
+                proj.Arguments = origArgs;
+            }
             ProcessHandler.Add(proj, proc);
 
             return proj;
