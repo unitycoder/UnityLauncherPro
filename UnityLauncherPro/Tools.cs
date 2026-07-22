@@ -1843,19 +1843,6 @@ namespace UnityLauncherPro
 
             }
 
-            // copy init file into project
-            if (useInitScript == true)
-            {
-                if (File.Exists(initScriptPath) == true)
-                {
-                    var editorTargetFolder = Path.Combine(baseFolder, projectName, "Assets", "Editor");
-                    if (Directory.Exists(editorTargetFolder) == false) Directory.CreateDirectory(editorTargetFolder);
-                    var targetScriptFile = Path.Combine(editorTargetFolder, Path.GetFileName(initScriptPath));
-                    // TODO overwrite old file, there shouldnt be anything here
-                    if (File.Exists(targetScriptFile) == false) File.Copy(initScriptPath, targetScriptFile);
-                }
-            }
-
             // launch empty project
             var proj = new Project();
 
@@ -1874,12 +1861,44 @@ namespace UnityLauncherPro
                 proj.Arguments += " -cloneFromTemplate \"" + templateZipPath + "\"";
             }
             var proc = LaunchProject(proj, null, useInitScript, false, cloneFromTemplate);
+
             if (cloneFromTemplate == true)
             {
                 // remove the -cloneFromTemplate argument, since its not needed in the recent list
                 proj.Arguments = origArgs;
             }
+
             ProcessHandler.Add(proj, proc);
+
+            // copy init file into project
+            if (useInitScript == true)
+            {
+                Action copyInitScript = () =>
+                {
+                    if (File.Exists(initScriptPath) == true)
+                    {
+                        var editorTargetFolder = Path.Combine(baseFolder, projectName, "Assets", "Editor");
+                        if (Directory.Exists(editorTargetFolder) == false) Directory.CreateDirectory(editorTargetFolder);
+                        var targetScriptFile = Path.Combine(editorTargetFolder, Path.GetFileName(initScriptPath));
+                        // TODO overwrite old file, there shouldnt be anything here
+                        if (File.Exists(targetScriptFile) == false) File.Copy(initScriptPath, targetScriptFile);
+                    }
+                };
+
+                if (cloneFromTemplate == true)
+                {
+                    // need to copy later, because cloning overwrites the folder?
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(7500);
+                        copyInitScript();
+                    });
+                }
+                else
+                {
+                    copyInitScript();
+                }
+            }
 
             return proj;
         } // FastCreateProject
