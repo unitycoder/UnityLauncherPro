@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Drawing; // for notifyicon
 using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -2145,6 +2146,12 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(initScriptFileFullPath) == true)
             {
                 initScriptFileFullPath = Tools.GetSafeFilePath("Scripts", "InitializeProject.cs");
+            }
+
+            // if newversion is not installed, pick next available version
+            if (MainWindow.unityInstalledVersions.ContainsKey(newVersion) == false)
+            {
+                newVersion = Tools.FindNearestVersion(newVersion, MainWindow.unityInstalledVersions.Keys.ToList());
             }
 
             // for new projects created from explorer, always ask for name
