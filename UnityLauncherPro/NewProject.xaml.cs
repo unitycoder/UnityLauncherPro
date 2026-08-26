@@ -987,6 +987,14 @@ namespace UnityLauncherPro
 
         private void listOnlineTemplates_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            // only left mouse button
+            if (e.ChangedButton != MouseButton.Left)
+            {
+                // eat the event
+                e.Handled = true;
+                return;
+            }
+
             // Get the item that was clicked
             var listBox = sender as ListBox;
             if (listBox == null) return;
