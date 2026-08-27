@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -970,7 +971,7 @@ namespace UnityLauncherPro
             if (string.IsNullOrEmpty(version)) return null;
 
             var split = version.Split('.');
-            float parsedVersion = float.Parse($"{split[0]}.{split[1]}");
+            float parsedVersion = float.Parse($"{split[0]}.{split[1]}", CultureInfo.InvariantCulture);
 
             // For 2023.3 and newer pre-release (alpha or beta) versions, do not clean.
             if ((IsAlpha(version) || version.Contains("b")) && parsedVersion >= 2023.3)
