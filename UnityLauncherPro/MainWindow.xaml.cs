@@ -55,9 +55,12 @@ namespace UnityLauncherPro
         UnityVersion[] updatesSource;
         public static List<string> updatesAsStrings = new List<string>();
 
-        string _filterString = null;
-        bool multiWordSearch = false;
-        string[] searchWords;
+        string _projectFilterString = null;
+        bool _projectMultiWordSearch = false;
+        string[] _projectSearchWords;
+        string _updatesFilterString = null;
+        string _unitysFilterString = null;
+        string _buildReportFilterString = null;
         bool isDirtyCell = false;
 
         int lastSelectedProjectIndex = 0;
@@ -422,16 +425,16 @@ namespace UnityLauncherPro
         void FilterRecentProjects()
         {
             // https://www.wpftutorial.net/DataViews.html
-            _filterString = searchBoxProjects.SearchText;
+            _projectFilterString = searchBoxProjects.SearchText ?? string.Empty;
 
-            if (_filterString.IndexOf(' ') > -1)
+            if (_projectFilterString.IndexOf(' ') > -1)
             {
-                multiWordSearch = true;
-                searchWords = _filterString.Split(' ');
+                _projectMultiWordSearch = true;
+                _projectSearchWords = _projectFilterString.Split(' ');
             }
             else
             {
-                multiWordSearch = false;
+                _projectMultiWordSearch = false;
             }
 
 
@@ -446,7 +449,7 @@ namespace UnityLauncherPro
 
         void FilterUpdates()
         {
-            _filterString = searchBoxUpdates.SearchText.Trim();
+            _updatesFilterString = (searchBoxUpdates.SearchText ?? string.Empty).Trim();
             ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUpdates.ItemsSource);
             if (collection == null) return;
 
@@ -459,7 +462,7 @@ namespace UnityLauncherPro
 
         void FilterUnitys()
         {
-            _filterString = searchBoxUnitys.SearchText.Trim();
+            _unitysFilterString = (searchBoxUnitys.SearchText ?? string.Empty).Trim();
             ICollectionView collection = CollectionViewSource.GetDefaultView(dataGridUnitys.ItemsSource);
             collection.Filter = UnitysFilter;
             if (dataGridUnitys.Items.Count > 0)
@@ -470,7 +473,7 @@ namespace UnityLauncherPro
 
         void FilterBuildReport()
         {
-            _filterString = searchBoxBuildReport.SearchText;
+            _buildReportFilterString = searchBoxBuildReport.SearchText ?? string.Empty;
             ICollectionView collection = CollectionViewSource.GetDefaultView(gridBuildReport.ItemsSource);
             collection.Filter = BuildReportFilter;
             //if (gridBuildReport.Items.Count > 0)
@@ -484,10 +487,10 @@ namespace UnityLauncherPro
             Project proj = item as Project;
 
             // split search string by space, if it contains space
-            if (multiWordSearch == true)
+            if (_projectMultiWordSearch == true)
             {
                 bool found = true;
-                foreach (var word in searchWords)
+                foreach (var word in _projectSearchWords)
                 {
                     bool titleMatched = proj.Title.IndexOf(word, 0, StringComparison.OrdinalIgnoreCase) != -1;
                     bool pathMatched = searchProjectPathAlso && proj.Path.IndexOf(word, 0, StringComparison.OrdinalIgnoreCase) != -1;
@@ -497,8 +500,8 @@ namespace UnityLauncherPro
             }
             else // single word search
             {
-                bool titleMatched = proj.Title.IndexOf(_filterString, 0, StringComparison.OrdinalIgnoreCase) != -1;
-                bool pathMatched = searchProjectPathAlso && proj.Path.IndexOf(_filterString, 0, StringComparison.OrdinalIgnoreCase) != -1;
+                bool titleMatched = proj.Title.IndexOf(_projectFilterString, 0, StringComparison.OrdinalIgnoreCase) != -1;
+                bool pathMatched = searchProjectPathAlso && proj.Path.IndexOf(_projectFilterString, 0, StringComparison.OrdinalIgnoreCase) != -1;
 
                 return titleMatched || pathMatched;
             }
@@ -511,8 +514,8 @@ namespace UnityLauncherPro
                 return false;
             }
 
-            bool haveSearchString = string.IsNullOrEmpty(_filterString) == false;
-            bool matchString = haveSearchString && unityVersion.Version.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) > -1;
+            bool haveSearchString = string.IsNullOrEmpty(_updatesFilterString) == false;
+            bool matchString = haveSearchString && unityVersion.Version.IndexOf(_updatesFilterString, 0, StringComparison.CurrentCultureIgnoreCase) > -1;
 
             bool checkedAlls = (bool)rdoAll.IsChecked;
             bool checkedLTSs = (bool)rdoLTS.IsChecked;
@@ -546,13 +549,13 @@ namespace UnityLauncherPro
         private bool UnitysFilter(object item)
         {
             UnityInstallation unity = item as UnityInstallation;
-            return (unity.Version?.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1) || (unity.ReleaseType?.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1) || (unity.PlatformsCombined?.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+            return (unity.Version?.IndexOf(_unitysFilterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1) || (unity.ReleaseType?.IndexOf(_unitysFilterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1) || (unity.PlatformsCombined?.IndexOf(_unitysFilterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
         }
 
         private bool BuildReportFilter(object item)
         {
             BuildReportItem reportItem = item as BuildReportItem;
-            return (reportItem.Path.IndexOf(_filterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
+            return (reportItem.Path.IndexOf(_buildReportFilterString, 0, StringComparison.CurrentCultureIgnoreCase) != -1);
         }
 
         void LoadSettings()
