@@ -2360,8 +2360,6 @@ namespace UnityLauncherPro
 
         private void GridRecent_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            if (tabControl.SelectedIndex == 0)
-            {
                 var proj = GetSelectedProject();
                 if (proj != null)
                 {
@@ -2372,8 +2370,24 @@ namespace UnityLauncherPro
                 {
                     menuItemKillProcess.IsEnabled = false;
                 }
-            }
         }
+
+        private void GridUnitys_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            var isNewerThan6000_7 = Tools.IsVersionAtLeast(unity?.Version, "6000.7");
+
+            if (unity != null && isNewerThan6000_7)
+            {
+                menuItemDownloadCoreCRLModule.IsEnabled = true;
+            }
+            else
+            {
+                menuItemDownloadCoreCRLModule.IsEnabled = false;
+            }
+
+        }
+
 
         // add alt+Q shortcut for killing process
         // https://stackoverflow.com/a/29817712/5452781
@@ -2780,6 +2794,10 @@ namespace UnityLauncherPro
 
                 var companyName = rows[i].Split(new[] { "companyName: " }, StringSplitOptions.None)[1];
                 var productName = rows[i + 1].Split(new[] { "productName: " }, StringSplitOptions.None)[1];
+
+                // replace special characters with _, but not space
+                companyName = Regex.Replace(companyName, @"[^\w\s]", "_");
+                productName = Regex.Replace(productName, @"[^\w\s]", "_");
 
                 // open folder from %userprofile%\AppData\LocalLow\<companyname>\<productname>
                 var dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/../LocalLow");
@@ -3831,6 +3849,13 @@ namespace UnityLauncherPro
             var unity = GetSelectedUnity();
             if (unity == null) return;
             Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Windows-IL2CPP");
+        }
+
+        private void menuItemDownloadCoreCRLModule_Click(object sender, RoutedEventArgs e)
+        {
+            var unity = GetSelectedUnity();
+            if (unity == null) return;
+            Tools.DownloadAdditionalModules(unity.Path, unity.Version, "Windows-CoreCLR");
         }
 
         private void menuItemDownloadWinDedicatedServerModule_Click(object sender, RoutedEventArgs e)

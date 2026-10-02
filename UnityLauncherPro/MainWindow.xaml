@@ -291,7 +291,7 @@
 
                     <Button Style="{StaticResource CustomButton}" ToolTip="Refresh installations (F5)" x:Name="btnRefreshUnityList" Content="⟳" Height="22" Width="26" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16"  Margin="0,4,3,0" Padding="1,-2,1,1"  Click="BtnRefreshUnityList_Click"/>
 
-                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" CanUserAddRows="False" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick">
+                    <DataGrid x:Name="dataGridUnitys"  SelectionMode="Single" Margin="4,30,2,42" Background="{x:Null}" BorderBrush="{x:Null}" ColumnHeaderStyle="{StaticResource HeaderStyle}" Padding="0" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Foreground="{DynamicResource ThemeGridForeground}" HorizontalGridLinesBrush="{DynamicResource ThemeDatagridLines}" VerticalGridLinesBrush="{DynamicResource ThemeGridVerticalGridLines}" CanUserAddRows="False" AutoGenerateColumns="False" PreviewKeyDown="DataGridUnitys_PreviewKeyDown" PreviewMouseDoubleClick="DataGridUnitys_PreviewMouseDoubleClick" ContextMenuOpening="GridUnitys_ContextMenuOpening">
                         <DataGrid.CommandBindings>
                             <CommandBinding Command="ApplicationCommands.Copy" Executed="CopyRowFolderToClipBoard" CanExecute="CanExecute_Copy"/>
                         </DataGrid.CommandBindings>
@@ -346,6 +346,7 @@
                                     <MenuItem x:Name="menuItemDownloadWebGLModule" Header="Download WebGL module" Click="MenuItemDownloadWebGLModule_Click" />
                                     <MenuItem x:Name="menuItemDownloadLinuxModule" Header="Download Linux modules" Click="MenuItemDownloadLinuxModule_Click"/>
                                     <MenuItem x:Name="menuItemDownloadIL2CPPModule" Header="Download IL2CPP module" Click="menuItemDownloadIL2CPPModule_Click"/>
+                                    <MenuItem x:Name="menuItemDownloadCoreCRLModule" Header="Download CoreCLR module" Click="menuItemDownloadCoreCRLModule_Click"/>
                                     <MenuItem x:Name="menuItemDownloadWinDedicatedServerModule" Header="Download Windows Dedicated module" Click="menuItemDownloadWinDedicatedServerModule_Click"/>
                                     <MenuItem x:Name="menuItemDownloadLinuxDedicatedServerModule" Header="Download Linux Dedicated module" Click="menuItemDownloadLinuxDedicatedServerModule_Click"/>
                                 </MenuItem>
