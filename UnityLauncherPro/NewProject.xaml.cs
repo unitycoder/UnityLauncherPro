@@ -1048,6 +1048,53 @@ namespace UnityLauncherPro
             UpdateCreateButtonsEnabledState();
         }
 
+        private void DeleteTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is MenuItem menuItem) || !(menuItem.DataContext is OnlineTemplateItem template)) return;
+            if (string.IsNullOrEmpty(template.TarBallURL)) return;
+
+            string templatesPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "UnityHub", "Templates");
+            string fileName;
+
+            try
+            {
+                fileName = Path.GetFileName(new Uri(template.TarBallURL).LocalPath);
+            }
+            catch
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(fileName)) return;
+
+            string filePath = Path.Combine(templatesPath, fileName);
+            try
+            {
+                if (File.Exists(filePath)) File.Delete(filePath);
+                template.IsDownloaded = false;
+
+                if (listOnlineTemplates.SelectedItem == template)
+                {
+                    btnCreateNewProject.Content = "Download Template First >";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, "Could not delete the template:\n" + ex.Message,
+                    "Delete template", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void OpenTemplateInExplorer_Click(object sender, RoutedEventArgs e)
+        {
+            string templatesPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "UnityHub", "Templates");
+            Tools.LaunchExplorer(templatesPath);
+        }
+
         private async void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
@@ -1360,7 +1407,6 @@ namespace UnityLauncherPro
 
             btnAuthorizeToken.IsEnabled = tokenSeemsOK;
         }
-
 
     } // class NewProject
 } // namespace UnityLauncherPro

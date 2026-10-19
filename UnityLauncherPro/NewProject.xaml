@@ -187,11 +187,21 @@
                     <DataTemplate>
                         <StackPanel Orientation="Vertical" Margin="3">
                             <Grid>
-                                <Image Source="{Binding PreviewImage}" 
-                           Margin="0,0,0,5" 
-                           ToolTip="{Binding Description}" 
-                           Stretch="Uniform"
-                           HorizontalAlignment="Stretch"/>
+                                 <Image Source="{Binding PreviewImage}" 
+                            Margin="0,0,0,5" 
+                            ToolTip="{Binding Description}" 
+                            Stretch="Uniform"
+                            HorizontalAlignment="Stretch">
+                                     <Image.ContextMenu>
+                                         <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                             <MenuItem Header="Delete template"
+                                                       IsEnabled="{Binding IsDownloaded}"
+                                                       Click="DeleteTemplate_Click" />
+                                             <MenuItem Header="Open in Explorer"
+                                                       Click="OpenTemplateInExplorer_Click" />
+                                         </ContextMenu>
+                                     </Image.ContextMenu>
+                                 </Image>
                                 <Button x:Name="btnDownloadTemplate" 
                                     ToolTip="Download Template" 
                                     Content="📥" 
