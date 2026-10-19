@@ -1087,12 +1087,15 @@ namespace UnityLauncherPro
 
                     // Download the template (overwrite if exists)
                     using (var client = new HttpClient())
+                    using (var response = await client.GetAsync(template.TarBallURL, HttpCompletionOption.ResponseHeadersRead))
                     {
-                        var response = await client.GetAsync(template.TarBallURL);
                         response.EnsureSuccessStatusCode();
 
-                        var fileBytes = await response.Content.ReadAsByteArrayAsync();
-                        File.WriteAllBytes(targetFilePath, fileBytes);
+                        using (var contentStream = await response.Content.ReadAsStreamAsync())
+                        using (var fileStream = new FileStream(targetFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true))
+                        {
+                            await contentStream.CopyToAsync(fileStream);
+                        }
 
                         // Mark as downloaded
                         template.IsDownloaded = true;
@@ -1119,6 +1122,7 @@ namespace UnityLauncherPro
 
         private void btnFetchTemplates_Click(object sender, RoutedEventArgs e)
         {
+            listOnlineTemplates.ItemsSource = null; // clear previous items
             if (gridAvailableVersions.SelectedItem is UnityInstallation selectedInstallation)
             {
                 string baseVersion = Tools.GetBaseVersion(selectedInstallation.Version);
